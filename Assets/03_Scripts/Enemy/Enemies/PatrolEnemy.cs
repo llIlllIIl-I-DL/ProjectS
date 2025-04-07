@@ -76,4 +76,14 @@ public class PatrolEnemy : BaseEnemy
     {
         // 단순 패트롤 적은 충돌 데미지만 주므로 여기선 구현 불필요
     }
+
+    protected override void OnPlayerDetected()
+    {
+        // 아무것도 하지 않음
+    }
+
+    protected override void OnPlayerLost()
+    {
+        // 아무것도 하지 않음
+    }
 }

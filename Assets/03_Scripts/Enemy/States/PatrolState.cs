@@ -29,13 +29,6 @@ namespace Enemy.States
 
         public override void Update()
         {
-            // 플레이어 감지되었으면 추격 상태로 전환
-            if (enemy.IsPlayerDetected())
-            {
-                // ChaseState로 전환
-                return;
-            }
-
             // 대기 중이면 타이머 체크
             if (isWaiting)
             {
