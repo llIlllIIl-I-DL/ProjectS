@@ -47,12 +47,21 @@ public class PlayerIdleState : PlayerStateBase
 
     public override void FixedUpdate()
     {
-        // 마찰력 적용
-        if (player.IsGrounded() && Mathf.Abs(player.Rb.velocity.x) > 0.1f)
+        // 마찰력 적용 (더 강하게)
+        if (player.IsGrounded())
         {
-            float friction = Mathf.Min(Mathf.Abs(player.Rb.velocity.x), 0.2f);
-            friction *= Mathf.Sign(player.Rb.velocity.x);
-            player.Rb.AddForce(Vector2.right * -friction, ForceMode2D.Impulse);
+            // 속도가 매우 작으면 완전히 멈춤
+            if (Mathf.Abs(player.Rb.velocity.x) < 0.2f)
+            {
+                player.Rb.velocity = new Vector2(0f, player.Rb.velocity.y);
+            }
+            // 그 외에는 강한 마찰력 적용
+            else if (Mathf.Abs(player.MoveInput.x) < 0.1f)
+            {
+                float friction = Mathf.Min(Mathf.Abs(player.Rb.velocity.x), 0.5f);
+                friction *= Mathf.Sign(player.Rb.velocity.x);
+                player.Rb.AddForce(Vector2.right * -friction, ForceMode2D.Impulse);
+            }
         }
     }
 }

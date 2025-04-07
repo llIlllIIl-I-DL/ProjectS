@@ -247,6 +247,23 @@ public class PlayerController : MonoBehaviour, PlayerControls.IPlayerActions
             transform.localScale = new Vector3(FacingDirection, 1, 1);
         }
 
+        // 이동 입력이 없으면 빠르게 감속
+        if (Mathf.Abs(MoveInput.x) < 0.01f && IsGrounded())
+        {
+            // 속도가 매우 작으면 완전히 멈춤
+            if (Mathf.Abs(Rb.velocity.x) < 0.2f)
+            {
+                Rb.velocity = new Vector2(0f, Rb.velocity.y);
+                return;
+            }
+
+            // 강한 마찰력 적용
+            float friction = Mathf.Min(Mathf.Abs(Rb.velocity.x), frictionAmount * 2);
+            friction *= Mathf.Sign(Rb.velocity.x);
+            Rb.AddForce(Vector2.right * -friction, ForceMode2D.Impulse);
+            return;
+        }
+
         // 목표 속도
         float targetSpeed = MoveInput.x * moveSpeed;
 
@@ -261,14 +278,6 @@ public class PlayerController : MonoBehaviour, PlayerControls.IPlayerActions
 
         // 이동 힘 적용
         Rb.AddForce(movement * Vector2.right);
-
-        // 마찰력 적용 (지면에 있고 입력이 없을 때)
-        if (IsGrounded() && Mathf.Abs(MoveInput.x) < 0.01f)
-        {
-            float friction = Mathf.Min(Mathf.Abs(Rb.velocity.x), frictionAmount);
-            friction *= Mathf.Sign(Rb.velocity.x);
-            Rb.AddForce(Vector2.right * -friction, ForceMode2D.Impulse);
-        }
     }
 
     // 점프 처리
@@ -316,6 +325,9 @@ public class PlayerController : MonoBehaviour, PlayerControls.IPlayerActions
 
         // 대시 방향 결정 (입력이 없으면 현재 바라보는 방향)
         float dashDirection = (MoveInput.x != 0) ? Mathf.Sign(MoveInput.x) : FacingDirection;
+        
+        // 원래 입력값 저장
+        Vector2 originalInput = MoveInput;
 
         // 대시 속도 설정
         Rb.velocity = new Vector2(dashDirection * dashSpeed, 0);
@@ -328,6 +340,13 @@ public class PlayerController : MonoBehaviour, PlayerControls.IPlayerActions
         // 대시 종료 후 상태 변경
         IsDashing = false;
         Rb.gravityScale = originalGravity;
+        
+        // 이동 입력 복원 (이미 새 입력이 있는 경우 무시)
+        if (MoveInput == Vector2.zero)
+        {
+            MoveInput = originalInput;
+            Debug.Log($"대시 후 입력 복원: {MoveInput}");
+        }
 
         // 대시 종료 후 적절한 상태로 전환
         if (IsGrounded())
@@ -349,36 +368,45 @@ public class PlayerController : MonoBehaviour, PlayerControls.IPlayerActions
 
     private IEnumerator DisableMovement(float duration)
     {
-        // 입력 무시
+        // 입력 무시 상태 저장
         Vector2 cachedInput = MoveInput;
+        bool wasControlsDisabled = true;
+        
+        // 입력 비활성화
         MoveInput = Vector2.zero;
 
+        // 지정된 시간만큼 대기
         yield return new WaitForSeconds(duration);
 
-        // 입력 복원
-        MoveInput = cachedInput;
+        // 입력 복원 (이미 다른 입력이 있는 경우 덮어쓰지 않음)
+        if (wasControlsDisabled && MoveInput == Vector2.zero)
+        {
+            MoveInput = cachedInput;
+            Debug.Log($"입력 복원됨: {MoveInput}");
+        }
     }
 
     #region Input System Callbacks
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        if (context.performed || context.canceled)
-        {
-            Vector2 rawInput = Vector2.zero;
+        // 키보드 화살표 키 상태 확인
+        Vector2 moveInput = Vector2.zero;
 
+        if (Keyboard.current != null)
+        {
             if (Keyboard.current.leftArrowKey.isPressed)
-                rawInput.x = -1;
+                moveInput.x = -1;
             else if (Keyboard.current.rightArrowKey.isPressed)
-                rawInput.x = 1;
+                moveInput.x = 1;
 
             if (Keyboard.current.upArrowKey.isPressed)
-                rawInput.y = 1;
+                moveInput.y = 1;
             else if (Keyboard.current.downArrowKey.isPressed)
-                rawInput.y = -1;
-
-            MoveInput = rawInput;
+                moveInput.y = -1;
         }
+
+        MoveInput = moveInput;
     }
 
     public void OnJump(InputAction.CallbackContext context)
