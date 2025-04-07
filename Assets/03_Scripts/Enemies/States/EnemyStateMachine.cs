@@ -4,6 +4,7 @@ using UnityEngine;
 /// <summary>
 /// 적의 상태를 관리하는 상태 머신 클래스
 /// </summary>
+
 public class EnemyStateMachine
 {
     // 현재 상태
@@ -25,7 +26,7 @@ public class EnemyStateMachine
         if (currentState != null)
         {
             string stateName = currentState.GetType().Name;
-            Debug.Log($"State changed to: {stateName}");
+            Debug.Log($"스테이트 전환 : {stateName}");
             
             // 상태 이력 저장 (최대 10개)
             stateHistory.Add(stateName);

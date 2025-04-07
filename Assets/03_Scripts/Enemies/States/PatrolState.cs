@@ -3,25 +3,26 @@ using UnityEngine;
 public class PatrolState : BaseEnemyState
 {
     // 순찰 경로
-    protected Vector2[] waypoints;
-    protected int currentWaypoint = 0;
-    protected float waypointReachDistance = 0.1f;
+    protected Vector2[] waypoints; // 순찰 경로
+    protected int currentWaypoint = 0; // 현재 목적지 인덱스
+    protected float waypointReachDistance = 0.1f; // 목적지 도달 거리
     
     // 대기 시간
-    protected float waitAtWaypoint = 0.5f;
+    protected float waitAtWaypoint; 
     protected float waitTimer = 0f;
     protected bool isWaiting = false;
     
-    public PatrolState(BaseEnemy enemy, EnemyStateMachine stateMachine, Vector2[] waypoints) 
+    public PatrolState(BaseEnemy enemy, EnemyStateMachine stateMachine, Vector2[] waypoints, float waitTime)
         : base(enemy, stateMachine)
     {
         this.waypoints = waypoints;
+        this.waitAtWaypoint = waitTime;
     }
     
     public override void Enter()
     {
         // 순찰 애니메이션 재생
-        enemy.GetComponent<Animator>()?.SetBool("IsWalking", true);
+        // enemy.GetComponent<Animator>()?.SetBool("IsPatrol", true);
     }
     
     public override void Update()
@@ -37,6 +38,9 @@ public class PatrolState : BaseEnemyState
         if (isWaiting)
         {
             waitTimer += Time.deltaTime;
+            //대기중이라면 대기 애니메이션 재생
+            // enemy.GetComponent<Animator>()?.SetBool("IsPatrol", false);
+            // enemy.GetComponent<Animator>()?.SetBool("IsWating", true);
             if (waitTimer >= waitAtWaypoint)
             {
                 isWaiting = false;

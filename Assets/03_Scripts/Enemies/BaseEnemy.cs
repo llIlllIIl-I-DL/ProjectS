@@ -109,7 +109,7 @@ public abstract class BaseEnemy : MonoBehaviour, Idamageable
             Die();
         }
     }
-    
+
     /// <summary>
     /// 사망 처리
     /// </summary>
@@ -238,7 +238,10 @@ public abstract class BaseEnemy : MonoBehaviour, Idamageable
     #endregion
 
     // 새로운 메서드들
-    public bool IsPlayerDetected() => playerDetected;
+    public bool IsPlayerDetected()
+    {
+        return playerDetected;
+    }
 
     public Vector2 GetLastKnownPlayerPosition() => lastKnownPlayerPosition;
 
@@ -259,6 +262,7 @@ public abstract class BaseEnemy : MonoBehaviour, Idamageable
 
     public void StopMoving()
     {
+        if (rb != null)
         rb.velocity = Vector2.zero;
     }
 }
