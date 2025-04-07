@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Enemy.States;
 
 /// <summary>
 /// 간단한 순찰 적 (Met/굼바 스타일)
