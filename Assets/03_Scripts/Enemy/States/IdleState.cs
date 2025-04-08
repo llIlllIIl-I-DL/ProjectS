@@ -18,7 +18,7 @@ namespace Enemy.States
         {
             idleTimer = 0f;
             // 대기 애니메이션 재생
-            enemy.GetComponent<Animator>()?.SetBool("IsIdle", true);
+            // enemy.GetComponent<Animator>()?.SetBool("IsIdle", true);
         }
 
         public override void Update()
@@ -44,7 +44,7 @@ namespace Enemy.States
         public override void Exit()
         {
             // 대기 애니메이션 종료
-            enemy.GetComponent<Animator>()?.SetBool("IsIdle", false);
+            // enemy.GetComponent<Animator>()?.SetBool("IsIdle", false);
         }
     }
 }

@@ -8,7 +8,8 @@ using UnityEngine;
 public class EnemyStateMachine
 {
     // 현재 상태
-    private IEnemyState currentState;
+    public IEnemyState currentState;
+    public IEnemyState CurrentState => currentState;
     
     // 상태 전환 이력 (디버깅용)
     private List<string> stateHistory = new List<string>();

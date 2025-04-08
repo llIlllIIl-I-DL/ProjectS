@@ -33,6 +33,7 @@ public abstract class BaseEnemy : MonoBehaviour, Idamageable
 
     protected EnemyStateMachine stateMachine; // 상태 머신
     
+    
     // 컴포넌트 캐싱 및 초기화
     protected virtual void Awake()
     {

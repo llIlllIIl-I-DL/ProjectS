@@ -59,7 +59,7 @@ namespace Enemy.States
         protected virtual void PerformAttack()
         {
             // 공격 애니메이션 실행
-            enemy.GetComponent<Animator>()?.SetTrigger("Attack");
+            // enemy.GetComponent<Animator>()?.SetTrigger("Attack");
 
             // 공격 로직 실행
             enemy.PerformAttack();
