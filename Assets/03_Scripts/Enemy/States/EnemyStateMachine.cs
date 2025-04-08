@@ -4,17 +4,33 @@ using UnityEngine;
 /// <summary>
 /// 적의 상태를 관리하는 상태 머신 클래스
 /// </summary>
-
 public class EnemyStateMachine
 {
-    // 현재 상태
-    public IEnemyState currentState;
+    #region Properties and Fields
+    
+    /// <summary>
+    /// 현재 활성화된 상태
+    /// </summary>
+    private IEnemyState currentState;
+
+    /// <summary>
+    /// 현재 상태 접근자 (읽기 전용)
+    /// </summary>
     public IEnemyState CurrentState => currentState;
     
-    // 상태 전환 이력 (디버깅용)
+    /// <summary>
+    /// 상태 전환 이력 (디버깅용)
+    /// </summary>
     private List<string> stateHistory = new List<string>();
     
-    // 상태 전환
+    #endregion
+    
+    #region State Management
+    
+    /// <summary>
+    /// 상태를 새로운 상태로 전환합니다.
+    /// </summary>
+    /// <param name="newState">전환할 새 상태</param>
     public void ChangeState(IEnemyState newState)
     {
         // 이전 상태가 있다면 Exit 호출
@@ -39,33 +55,56 @@ public class EnemyStateMachine
         currentState?.Enter();
     }
     
-    // 업데이트 로직
+    #endregion
+    
+    #region Update Methods
+    
+    /// <summary>
+    /// 프레임 기반 업데이트 - 현재 상태의 Update 메서드를 호출합니다.
+    /// </summary>
     public void Update()
     {
         currentState?.Update();
     }
     
-    // 물리 업데이트 로직
+    /// <summary>
+    /// 물리 기반 업데이트 - 현재 상태의 FixedUpdate 메서드를 호출합니다.
+    /// </summary>
     public void FixedUpdate()
     {
         currentState?.FixedUpdate();
     }
     
-    // 트리거 이벤트 전달
+    /// <summary>
+    /// 트리거 이벤트 처리 - 현재 상태의 OnTriggerEnter2D 메서드를 호출합니다.
+    /// </summary>
+    /// <param name="other">충돌한 콜라이더</param>
     public void OnTriggerEnter2D(Collider2D other)
     {
         currentState?.OnTriggerEnter2D(other);
     }
     
-    // 현재 상태 이름 반환
+    #endregion
+    
+    #region Utility and Debug
+    
+    /// <summary>
+    /// 현재 상태의 이름을 반환합니다.
+    /// </summary>
+    /// <returns>현재 상태 이름 또는 "No State"</returns>
     public string GetCurrentStateName()
     {
         return currentState != null ? currentState.GetType().Name : "No State";
     }
     
-    // 상태 이력 반환 (디버그용)
+    /// <summary>
+    /// 상태 전환 이력을 배열로 반환합니다. (디버그용)
+    /// </summary>
+    /// <returns>상태 이름 배열</returns>
     public string[] GetStateHistory()
     {
         return stateHistory.ToArray();
     }
+    
+    #endregion
 }
