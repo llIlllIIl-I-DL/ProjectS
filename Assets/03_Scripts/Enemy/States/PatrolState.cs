@@ -74,7 +74,7 @@ namespace Enemy.States
         public override void Exit()
         {
             // 순찰 애니메이션 종료
-            enemy.GetComponent<Animator>()?.SetBool("IsWalking", false);
+            // enemy.GetComponent<Animator>()?.SetBool("IsWalking", false);
 
             // 이동 정지
             enemy.StopMoving();

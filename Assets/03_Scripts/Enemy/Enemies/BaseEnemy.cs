@@ -95,7 +95,7 @@ public abstract class BaseEnemy : MonoBehaviour, Idamageable
     /// <summary>
     /// 피해를 입음
     /// </summary>
-    public virtual void TakeDamage(int damage)
+    public virtual void TakeDamage(float damage)
     {
         if (isDead) return;
         
@@ -238,8 +238,8 @@ public abstract class BaseEnemy : MonoBehaviour, Idamageable
     
     #endregion
 
-    // 새로운 메서드들
-    public bool IsPlayerDetected()
+    #region Getters and Setters
+    public bool IsPlayerDetected() 
     {
         return playerDetected;
     }
@@ -251,19 +251,50 @@ public abstract class BaseEnemy : MonoBehaviour, Idamageable
     public bool IsInAttackRange() 
     {
         if (playerTransform == null) return false;
-        return Vector2.Distance(transform.position, playerTransform.position) <= attackRange;
+        
+        float distance = Vector2.Distance(transform.position, playerTransform.position);
+        bool inRange = distance <= attackRange;        
+        return inRange;
     }
 
     public void MoveInDirection(Vector2 direction, float speedMultiplier = 1f)
     {
-        if (isDead || isStunned) return;
+        if (isDead || isStunned) return; // 사망 또는 기절 상태일 때 이동하지 않음
         
-        rb.velocity = direction * moveSpeed * speedMultiplier;
+        rb.velocity = direction * moveSpeed * speedMultiplier; // 이동 속도 적용
     }
 
     public void StopMoving()
     {
-        if (rb != null)
-        rb.velocity = Vector2.zero;
+        if (rb != null) // Rigidbody2D가 null이 아닐 때만 정지
+        rb.velocity = Vector2.zero; // 속도 강제로 0으로 설정
     }
+
+    public virtual void SwitchToIdleState()
+    {
+        // 기본 구현은 비어있음 - 자식 클래스에서 구현
+    }
+
+    public virtual void SwitchToPatrolState()
+    {
+        // 기본 구현은 비어있음 - 자식 클래스에서 구현
+    }
+    public virtual void SwitchToChaseState()
+    {
+        // 기본 구현은 비어있음 - 자식 클래스에서 구현
+    }
+
+    public virtual void SwitchToAttackState()
+    {
+        // 기본 구현은 비어있음 - 자식 클래스에서 구현
+    }
+    public virtual void SwitchToChargeAttackState()
+    {
+        // 기본 구현은 비어있음 - 자식 클래스에서 구현
+    }
+    public virtual void SwitchToSlamAttackState()
+    {
+        // 기본 구현은 비어있음 - 자식 클래스에서 구현
+    }
+    #endregion
 }

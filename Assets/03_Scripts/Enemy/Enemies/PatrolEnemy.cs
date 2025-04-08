@@ -49,7 +49,7 @@ public class PatrolEnemy : BaseEnemy
         patrolState = new PatrolState(this, stateMachine, new Vector2[] { leftPoint, rightPoint }, patrolWaitTime);
         idleState = new IdleState(this, stateMachine, patrolWaitTime);
 
-        // 초기 상태 설정 ★중요: 이 부분이 빠졌음★
+        // 상태 머신 초기화
         stateMachine.ChangeState(patrolState);
     }
 

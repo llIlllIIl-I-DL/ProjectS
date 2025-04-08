@@ -23,7 +23,7 @@ public class TurretEnemy : BaseEnemy
     private Vector2 startPosition;
     private Quaternion initialRotation;
 
-    // 위치를 강제로 고정하는 가장 확실한 방법
+    // 위치를 강제로 고정하기 위한 변수
     private Vector3 fixedPosition;
 
     protected override void Awake()
@@ -46,13 +46,11 @@ public class TurretEnemy : BaseEnemy
     protected override void Update()
     {
         base.Update(); // BaseEnemy의 Update 호출
-        Debug.Log($"현재 상태 : {currentState}"); // 디버그 로그
     }
 
     protected override void FixedUpdate()
     {
         base.FixedUpdate(); // BaseEnemy의 FixedUpdate 호출
-        Debug.Log($"Current Position: {transform.position}"); // 디버그 로그
         
         // 위치 강제 고정
         transform.position = fixedPosition;

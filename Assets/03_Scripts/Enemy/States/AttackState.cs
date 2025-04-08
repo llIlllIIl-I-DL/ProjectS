@@ -9,7 +9,7 @@ namespace Enemy.States
         protected float attackTimer = 0;
         protected bool canAttack = true;
 
-        public AttackState(BaseEnemy enemy, EnemyStateMachine stateMachine, float attackCooldown = 1.5f)
+        public AttackState(BaseEnemy enemy, EnemyStateMachine stateMachine, float attackCooldown = 1f)
             : base(enemy, stateMachine)
         {
             this.attackCooldown = attackCooldown;
@@ -26,7 +26,7 @@ namespace Enemy.States
             // 플레이어가 공격 범위를 벗어났는지 확인
             if (!enemy.IsInAttackRange())
             {
-                // 추격 상태로 전환
+                enemy.SwitchToChaseState();
                 return;
             }
 
@@ -49,6 +49,7 @@ namespace Enemy.States
 
                 // 공격 실행
                 PerformAttack();
+                Debug.Log("Attack performed!");
 
                 // 쿨다운 설정
                 canAttack = false;
