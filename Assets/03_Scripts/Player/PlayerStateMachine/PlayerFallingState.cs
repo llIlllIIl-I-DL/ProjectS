@@ -50,7 +50,6 @@ public class PlayerFallingState : IPlayerState
         if (rb.HasValue && rb.Value.y < 0)
         {
             // 이 부분은 PlayerMovement에 별도의 메서드로 구현하는 것이 좋음
-            // 여기서는 예시로만 표시
         }
     }
 

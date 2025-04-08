@@ -15,6 +15,8 @@ public class PlayerMovement : MonoBehaviour
     public Vector2 Velocity => rb.velocity;
 
     public event System.Action<int> OnDirectionChanged;
+    public event System.Action OnDashEnd;
+    public event System.Action OnDashCooldownComplete;
 
     private void Awake()
     {
@@ -129,6 +131,11 @@ public class PlayerMovement : MonoBehaviour
 
         // 대시 종료 시 중력 복원
         rb.gravityScale = 1;
+        OnDashEnd?.Invoke();
+
+        yield return new WaitForSeconds(settings.dashCooldown);
+
+        OnDashCooldownComplete?.Invoke();
     }
 
     public void WallSlide(float slideSpeed, bool fastSlide = false)

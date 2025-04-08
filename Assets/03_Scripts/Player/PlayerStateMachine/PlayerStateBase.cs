@@ -3,11 +3,11 @@ using UnityEngine;
 // 기본 상태 추상 클래스
 public abstract class PlayerStateBase : IPlayerState
 {
-    protected Player player;
+    protected PlayerStateManager player;
 
-    public PlayerStateBase(Player playerController)
+    public PlayerStateBase(PlayerStateManager stateManager)
     {
-        player = playerController;
+        player = stateManager;
     }
 
     public virtual void Enter() { }
