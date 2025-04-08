@@ -7,5 +7,11 @@ public enum PlayerStateType
     Falling,
     WallSliding,
     Dashing,
-    Attacking
+    Attacking,
+    Hit,
+    Crouching,
+    CrouchWalking,
+    Climbing
+
+    
 }
