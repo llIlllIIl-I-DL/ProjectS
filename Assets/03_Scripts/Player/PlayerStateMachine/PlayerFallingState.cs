@@ -1,82 +1,61 @@
 using UnityEngine;
 
-public class PlayerFallingState : PlayerStateBase
+public class PlayerFallingState : IPlayerState
 {
-    private float originalGravity;
+    private PlayerStateManager stateManager;
+    private float fallStartTime;
 
-    public PlayerFallingState(PlayerController playerController) : base(playerController) { }
-
-    public override void Enter()
+    public PlayerFallingState(PlayerStateManager stateManager)
     {
-        // 애니메이션 설정
-        player.UpdateAnimations(null);
-
-        // 원래 중력값 저장 후 중력 배율 증가
-        originalGravity = player.Rb.gravityScale;
-        player.Rb.gravityScale = player.FallGravityMultiplier;
+        this.stateManager = stateManager;
     }
 
-    public override void Exit()
+    public void Enter()
     {
-        // 중력 배율 원래대로
-        player.Rb.gravityScale = originalGravity;
+        fallStartTime = Time.time;
+        Debug.Log("낙하 상태 시작");
     }
 
-    public override void HandleInput()
+    public void HandleInput()
     {
-        // 대시 처리
-        if (player.DashPressed && player.CanDash)
-        {
-            player.DashPressed = false;
-            player.ChangeState(PlayerStateType.Dashing);
-            return;
-        }
+        // 낙하 중 입력 처리
+        // 대부분의 입력 처리는 PlayerStateManager의 이벤트 핸들러에서 처리됨
+    }
 
-        // 점프 버퍼 처리 (지면에 닿기 직전 점프 입력)
-        if (player.JumpPressed)
+    public void Update()
+    {
+        var collisionDetector = stateManager.GetCollisionDetector();
+
+        // 땅에 닿으면 상태 전환 (HandleGroundedChanged에서 처리)
+
+        // 벽에 닿으면 벽 슬라이딩 상태로 전환
+        if (collisionDetector.IsTouchingWall && !collisionDetector.IsGrounded)
         {
-            player.LastJumpTime = player.JumpBufferTime;
-            player.JumpPressed = false;
+            stateManager.ChangeState(PlayerStateType.WallSliding);
         }
     }
 
-    public override void Update()
+    public void FixedUpdate()
     {
-        // 지면에 닿으면 상태 전환
-        if (player.IsGrounded())
+        // 낙하 중 이동 처리
+        var inputHandler = stateManager.GetInputHandler();
+        var movement = stateManager.GetMovement();
+        var settings = stateManager.GetSettings();
+
+        // 낙하 중 이동 (공중 조작)
+        movement.Move(inputHandler.MoveDirection);
+
+        // 낙하 중 중력 가속도 증가 (선택적)
+        var rb = movement.GetType().GetProperty("Velocity")?.GetValue(movement) as Vector2?;
+        if (rb.HasValue && rb.Value.y < 0)
         {
-            // 버퍼된 점프 입력이 있으면 점프
-            if (player.LastJumpTime > 0)
-            {
-                player.ChangeState(PlayerStateType.Jumping);
-                return;
-            }
-
-            // 이동 중이면 달리기, 아니면 대기 상태로
-            if (player.IsMoving())
-            {
-                if (player.IsSprinting)
-                    player.ChangeState(PlayerStateType.Sprinting);
-                else
-                    player.ChangeState(PlayerStateType.Running);
-            }
-            else
-                player.ChangeState(PlayerStateType.Idle);
-
-            return;
-        }
-
-        // 벽에 붙었을 때 벽 슬라이딩 상태로 전환
-        if (player.IsTouchingWall() && player.IsMovingInFacingDirection())
-        {
-            player.ChangeState(PlayerStateType.WallSliding);
-            return;
+            // 이 부분은 PlayerMovement에 별도의 메서드로 구현하는 것이 좋음
+            // 여기서는 예시로만 표시
         }
     }
 
-    public override void FixedUpdate()
+    public void Exit()
     {
-        // 이동 처리
-        player.Move();
+        Debug.Log("낙하 상태 종료");
     }
 }

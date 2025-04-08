@@ -1,19 +1,11 @@
 using System.Collections;
 using UnityEngine;
-public interface IPlayerState
-{
-    void Enter();
-    void Exit();
-    void Update();
-    void FixedUpdate();
-    void HandleInput();
-}
 // 기본 상태 추상 클래스
 public abstract class PlayerStateBase : IPlayerState
 {
-    protected PlayerController player;
+    protected Player player;
 
-    public PlayerStateBase(PlayerController playerController)
+    public PlayerStateBase(Player playerController)
     {
         player = playerController;
     }

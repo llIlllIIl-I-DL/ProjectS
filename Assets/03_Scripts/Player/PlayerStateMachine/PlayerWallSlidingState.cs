@@ -1,69 +1,74 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-// 벽 슬라이딩 상태
-public class PlayerWallSlidingState : PlayerStateBase
+public class PlayerWallSlidingState : IPlayerState
 {
-    private float originalGravity;
+    private PlayerStateManager stateManager;
 
-    public PlayerWallSlidingState(PlayerController playerController) : base(playerController) { }
-
-    public override void Enter()
+    public PlayerWallSlidingState(PlayerStateManager stateManager)
     {
-        player.IsWallSliding = true;
-        player.UpdateAnimations();
-        // 원래 중력값 저장
-        originalGravity = player.Rb.gravityScale;
+        this.stateManager = stateManager;
     }
 
-    public override void Exit()
+    public void Enter()
     {
-        player.IsWallSliding = false;
-        // 원래 중력값 복원
-        player.Rb.gravityScale = originalGravity;
+        // 벽 슬라이딩 상태 설정
+        stateManager.SetWallSliding(true);
+        Debug.Log("벽 슬라이딩 상태 시작");
     }
 
-    public override void HandleInput()
+    public void HandleInput()
     {
-        // 점프 입력 처리 (벽 점프)
-        if (player.JumpPressed)
-        {
-            player.JumpPressed = false;
-            player.WallJump();
-            player.ChangeState(PlayerStateType.Jumping);
-            return;
-        }
+        var inputHandler = stateManager.GetInputHandler();
 
-        // 대시 처리
-        if (player.DashPressed && player.CanDash)
+        // 점프 입력은 PlayerStateManager에서 HandleJumpInput으로 처리
+
+        // 벽에서 반대 방향으로 입력하면 벽에서 떨어짐 (선택적)
+        var facingDirection = stateManager.GetMovement().FacingDirection;
+        if ((facingDirection > 0 && inputHandler.IsLeftPressed) ||
+            (facingDirection < 0 && inputHandler.IsRightPressed))
         {
-            player.DashPressed = false;
-            player.ChangeState(PlayerStateType.Dashing);
-            return;
+            // 벽에서 떨어지도록 처리할 수 있음
+            // 여기서는 그냥 자연스럽게 떨어지도록 둠
         }
     }
 
-    public override void Update()
+    public void Update()
     {
-        // 벽에서 떨어졌는지 확인
-        if (!player.IsTouchingWall() || player.IsGrounded())
+        var collisionDetector = stateManager.GetCollisionDetector();
+
+        // 땅에 닿으면 Idle 또는 Running 상태로 전환
+        if (collisionDetector.IsGrounded)
         {
-            player.ChangeState(PlayerStateType.Falling);
+            var inputHandler = stateManager.GetInputHandler();
+            stateManager.ChangeState(inputHandler.IsMoving() ?
+                                    PlayerStateType.Running :
+                                    PlayerStateType.Idle);
             return;
         }
 
-        // 현재 방향과 반대 방향키가 눌렸는지 확인
-        if (!player.IsMovingInFacingDirection())
+        // 벽에서 떨어지면 Falling 상태로 전환
+        if (!collisionDetector.IsTouchingWall)
         {
-            player.ChangeState(PlayerStateType.Falling);
+            stateManager.ChangeState(PlayerStateType.Falling);
             return;
         }
     }
 
-    public override void FixedUpdate()
+    public void FixedUpdate()
     {
         // 벽 슬라이딩 처리
-        player.WallSlide();
+        var inputHandler = stateManager.GetInputHandler();
+        var movement = stateManager.GetMovement();
+
+        // 아래 방향키를 누르고 있으면 빠르게 슬라이딩
+        bool fastSlide = inputHandler.IsDownPressed;
+        movement.WallSlide(stateManager.GetSettings().wallSlideSpeed, fastSlide);
+    }
+
+    public void Exit()
+    {
+        // 벽 슬라이딩 상태 종료
+        stateManager.SetWallSliding(false);
+        Debug.Log("벽 슬라이딩 상태 종료");
     }
 }

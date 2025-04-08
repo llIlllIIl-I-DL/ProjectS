@@ -1,79 +1,44 @@
 using UnityEngine;
 
-public class PlayerIdleState : PlayerStateBase
+public class PlayerIdleState : IPlayerState
 {
-    public PlayerIdleState(PlayerController playerController) : base(playerController) { }
+    private PlayerStateManager stateManager;
 
-    public override void Enter()
+    public PlayerIdleState(PlayerStateManager stateManager)
     {
-        // 애니메이션 설정 (상태 문자열 전달하지 않음)
-        player.UpdateAnimations(null);
+        this.stateManager = stateManager;
     }
 
-    public override void HandleInput()
+    public void Enter()
     {
-        // 점프 처리
-        if (player.JumpPressed && player.LastGroundedTime > 0)
-        {
-            player.ChangeState(PlayerStateType.Jumping);
-            return;
-        }
-
-        // 대시 처리
-        if (player.DashPressed && player.CanDash)
-        {
-            player.DashPressed = false;
-            player.ChangeState(PlayerStateType.Dashing);
-            return;
-        }
+        // Idle 상태 진입 시 초기화
+        stateManager.SetJumping(false);
+        stateManager.SetWallSliding(false);
+        stateManager.SetSprinting(false);
     }
 
-    public override void Update()
+    public void HandleInput()
     {
-        // 이동 감지하여 달리기 상태로 전환
-        if (player.IsMoving())
-        {
-            player.ChangeState(PlayerStateType.Running);
-            return;
-        }
+        // 입력 처리
+        var inputHandler = stateManager.GetInputHandler();
 
-        // 지면에서 벗어나면 낙하 상태로 전환
-        if (!player.IsGrounded())
-        {
-            player.ChangeState(PlayerStateType.Falling);
-            return;
-        }
+        // 입력에 따른 상태 전환 로직은 주로 PlayerStateManager에서 처리
     }
 
-    public override void FixedUpdate()
+    public void Update()
     {
-        // 이동 입력이 있으면 Move 호출 (상태 전환 전에도 움직임 처리)
-        if (player.IsMoving())
-        {
-            player.Move();
-            return;
-        }
-        
-        // Idle 상태에서는 강제로 수평 속도를 0으로 설정
-        if (Mathf.Abs(player.Rb.velocity.x) < 0.1f)
-        {
-            player.Rb.velocity = new Vector2(0f, player.Rb.velocity.y);
-        }
-        // 작은 속도가 있다면 마찰력 적용
-        else if (player.IsGrounded())
-        {
-            // 속도가 매우 작으면 완전히 멈춤
-            if (Mathf.Abs(player.Rb.velocity.x) < 0.2f)
-            {
-                player.Rb.velocity = new Vector2(0f, player.Rb.velocity.y);
-            }
-            // 그 외에는 강한 마찰력 적용
-            else
-            {
-                float friction = Mathf.Min(Mathf.Abs(player.Rb.velocity.x), 0.5f);
-                friction *= Mathf.Sign(player.Rb.velocity.x);
-                player.Rb.AddForce(Vector2.right * -friction, ForceMode2D.Impulse);
-            }
-        }
+        // 상태 로직 업데이트
+    }
+
+    public void FixedUpdate()
+    {
+        // 입력이 없으면 마찰 적용
+        var movement = stateManager.GetMovement();
+        movement.Move(Vector2.zero); // 제로 벡터를 전달하여 마찰 적용
+    }
+
+    public void Exit()
+    {
+        // 상태 종료 시 정리 작업
     }
 }

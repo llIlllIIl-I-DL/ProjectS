@@ -1,60 +1,41 @@
 using UnityEngine;
 
-public class PlayerRunningState : PlayerStateBase
+public class PlayerRunningState : IPlayerState
 {
-    public PlayerRunningState(PlayerController playerController) : base(playerController) { }
+    private PlayerStateManager stateManager;
 
-    public override void Enter()
+    public PlayerRunningState(PlayerStateManager stateManager)
     {
-        // 애니메이션 설정 (상태 문자열 전달하지 않음)
-        player.UpdateAnimations(null);
+        this.stateManager = stateManager;
     }
 
-    public override void HandleInput()
+    public void Enter()
     {
-        // 점프 처리
-        if (player.JumpPressed && player.LastGroundedTime > 0)
-        {
-            player.ChangeState(PlayerStateType.Jumping);
-            return;
-        }
-
-        // 대시 처리
-        if (player.DashPressed && player.CanDash)
-        {
-            player.DashPressed = false;
-            player.ChangeState(PlayerStateType.Dashing);
-            return;
-        }
+        // Running 상태 진입 시 초기화
+        stateManager.SetJumping(false);
+        stateManager.SetWallSliding(false);
     }
 
-    public override void Update()
+    public void HandleInput()
     {
-        // 이동 입력이 없으면 대기 상태로 전환
-        if (!player.IsMoving())
-        {
-            player.ChangeState(PlayerStateType.Idle);
-            return;
-        }
-
-        // 스프린트 상태로 전환 확인
-        if (player.IsSprinting)
-        {
-            player.ChangeState(PlayerStateType.Sprinting);
-            return;
-        }
-
-        // 지면에서 벗어나면 낙하 상태로 전환
-        if (player.LastGroundedTime <= 0)
-        {
-            player.ChangeState(PlayerStateType.Falling);
-            return;
-        }
+        // 입력 처리
     }
 
-    public override void FixedUpdate()
+    public void Update()
+    {
+        // 이동 방향 갱신
+    }
+
+    public void FixedUpdate()
     {
         // 이동 처리
-        player.Move();
+        var inputHandler = stateManager.GetInputHandler();
+        var movement = stateManager.GetMovement();
+        movement.Move(inputHandler.MoveDirection);
+    }
+
+    public void Exit()
+    {
+        // 상태 종료 시 정리 작업
     }
 }
