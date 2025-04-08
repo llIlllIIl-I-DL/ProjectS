@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// 모든 적 캐릭터의 기본 클래스
 /// </summary>
-public abstract class BaseEnemy : MonoBehaviour, Idamageable
+public abstract class BaseEnemy : MonoBehaviour, IDamageable
 {
     [Header("기본 스탯")]
     [SerializeField] protected float maxHealth; // 최대 체력

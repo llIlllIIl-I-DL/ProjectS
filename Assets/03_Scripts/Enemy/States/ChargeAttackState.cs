@@ -86,7 +86,7 @@ namespace Enemy.States
             if (collision.gameObject.CompareTag("Player"))
             {
                 // 플레이어에게 데미지
-                Idamageable damageable = collision.gameObject.GetComponent<Idamageable>();
+                IDamageable damageable = collision.gameObject.GetComponent<IDamageable>();
                 if (damageable != null)
                 {
                     damageable.TakeDamage(damageAmount);

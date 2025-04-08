@@ -171,7 +171,7 @@ namespace Enemy.States
                 
             foreach (Collider2D player in hitPlayers)
             {
-                Idamageable damageable = player.GetComponent<Idamageable>();
+                IDamageable damageable = player.GetComponent<IDamageable>();
                 if (damageable != null)
                 {
                     damageable.TakeDamage(damageAmount);
