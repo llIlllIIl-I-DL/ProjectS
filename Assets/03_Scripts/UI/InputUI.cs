@@ -11,10 +11,6 @@ public class InputUI : MonoBehaviour
 {
     static GameObject currentPage = null;
 
-    //[Header("UI 창")]
-    //[SerializeField] public GameObject[] UIMenu;
-
-
     [Header("UI 창")]
     [SerializeField] public GameObject pauseMenu;
     [SerializeField] public GameObject mapMenu;

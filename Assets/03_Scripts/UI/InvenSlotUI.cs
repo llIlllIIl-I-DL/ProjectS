@@ -23,8 +23,6 @@ public class InvenSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
 
 
-
-
     public void OnPointerEnter(PointerEventData eventData)
     {
         invenPopWindow.SetActive(true);

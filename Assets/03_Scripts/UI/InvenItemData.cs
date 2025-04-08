@@ -25,5 +25,5 @@ public class InvenItemData : ScriptableObject
     private string itemdescription;
     public string ItemDescription { get { return itemdescription; } }
 
-
+    public int id;
 }
