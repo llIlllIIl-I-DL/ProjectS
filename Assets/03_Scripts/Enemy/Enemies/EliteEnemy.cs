@@ -8,6 +8,8 @@ using Enemy.States;
 /// </summary>
 public class EliteEnemy : BaseEnemy
 {
+    #region Variables
+    
     [Header("순찰 설정")]
     [SerializeField] private float patrolDistance; // 순찰 거리
     [SerializeField] private float patrolWaitTime; // 방향 전환 시 대기 시간
@@ -38,11 +40,20 @@ public class EliteEnemy : BaseEnemy
     private ChaseState chaseState;
     private ChargeAttackState chargeAttackState;
     private SlamAttackState slamAttackState;
+    
+    // 쿨다운 관리
     private float chargeCooldownTimer = 0f;
     private bool chargeReady = true;
     private float slamCooldownTimer = 0f;
     private bool slamReady = true;
 
+    // 참조 및 속성
+    private Vector2 startPosition; // 순찰 시작점
+    
+    #endregion
+
+    #region Properties
+    
     public IEnemyState currentState => stateMachine.CurrentState;
 
     // 상태 접근자 메서드들
@@ -50,25 +61,59 @@ public class EliteEnemy : BaseEnemy
     public AttackState GetAttackState() => attackState;
     public PatrolState GetPatrolState() => patrolState;
     public ChaseState GetChaseState() => chaseState;
+    
+    #endregion
 
-    // 순찰 시작점
-    private Vector2 startPosition;
-
+    #region Unity Lifecycle Methods
+    
+    /// <summary>
+    /// 컴포넌트 초기화 및 시작 위치 저장
+    /// </summary>
     protected override void Awake()
     {
         base.Awake();
         startPosition = transform.position;
     }
+
+    /// <summary>
+    /// 프레임 기반 업데이트
+    /// </summary>
     protected override void Update()
     {
         base.Update(); // BaseEnemy의 Update 호출
     }
 
+    /// <summary>
+    /// 물리 기반 업데이트
+    /// </summary>
     protected override void FixedUpdate()
     {
         base.FixedUpdate(); // BaseEnemy의 FixedUpdate 호출
     }
+    
+    /// <summary>
+    /// 충돌 감지 처리
+    /// </summary>
+    protected override void OnCollisionEnter2D(Collision2D collision)
+    {
+        // 상태별 충돌 처리 위임
+        if (currentState == chargeAttackState)
+        {
+            chargeAttackState.OnCollision(collision);
+        }
+        else if (currentState == slamAttackState)
+        {
+            // 내려찍기 충돌 처리 (필요시 구현)
+        }
 
+        // 기본 충돌 처리 (데미지 등)
+        base.OnCollisionEnter2D(collision);
+    }
+    
+    #endregion
+
+    #region Core Methods
+    
     /// <summary>
     /// 적 초기화 및 상태 설정
     /// </summary>
@@ -79,18 +124,21 @@ public class EliteEnemy : BaseEnemy
         Vector2 rightPoint = startPosition + new Vector2(patrolDistance, 0);
 
         // 상태 생성 및 초기화
-        patrolState = new PatrolState(this, stateMachine, new Vector2[] { leftPoint, rightPoint }, patrolWaitTime); // 웨이 포인트도 같이 설정
+        patrolState = new PatrolState(this, stateMachine, new Vector2[] { leftPoint, rightPoint }, patrolWaitTime);
         idleState = new IdleState(this, stateMachine, patrolWaitTime);
         attackState = new AttackState(this, stateMachine, attackSpeed);
         chaseState = new ChaseState(this, stateMachine, chaseSpeed, moveInYAxis: false);
+        
+        // 특수 공격 상태 초기화
         chargeAttackState = new ChargeAttackState(
             this,
             stateMachine,
             chargeSpeed,
             chargeDistance,
-            chargePower, // 데미지
+            chargePower,
             "Charge" // 애니메이션 트리거
         );
+        
         slamAttackState = new SlamAttackState(
             this,
             stateMachine,
@@ -107,7 +155,7 @@ public class EliteEnemy : BaseEnemy
     }
 
     /// <summary>
-    /// 상태 머신 업데이트
+    /// AI 업데이트 - 상태 머신 및 공격 패턴 관리
     /// </summary>
     protected override void UpdateAI()
     {
@@ -118,11 +166,12 @@ public class EliteEnemy : BaseEnemy
         CheckAndPerformChargeAttack();
         CheckAndPerformSlamAttack();
         
+        // 상태 머신 업데이트
         stateMachine.Update();
     }
 
     /// <summary>
-    /// 이동 로직은 상태에서 처리
+    /// 이동 로직 처리 (상태에서 관리)
     /// </summary>
     protected override void HandleMovement()
     {
@@ -130,7 +179,7 @@ public class EliteEnemy : BaseEnemy
     }
 
     /// <summary>
-    /// 공격 실행, 공격 범위 내에 있을 때 호출
+    /// 공격 실행 (공격 범위 내에서 호출됨)
     /// </summary>
     public override void PerformAttack()
     {
@@ -143,46 +192,80 @@ public class EliteEnemy : BaseEnemy
         // 애니메이션 트리거
         // GetComponent<Animator>()?.SetTrigger("Attack");
         
-        // 공격 로직 (데미지 처리 등)
+        // 공격 로직 - 범위 내 플레이어에게 데미지
         if (IsInAttackRange())
         {
-            // 플레이어에게 데미지
-            // ...
+            // 플레이어에게 데미지 (구현 필요)
         }
     }
+    
+    #endregion
 
+    #region Player Detection
+    
+    /// <summary>
+    /// 플레이어 감지 시 호출됨
+    /// </summary>
     protected override void OnPlayerDetected()
     {
-        // 플레이어 감지 시 상태 전환
-        if (currentState != chaseState)
+        // 플레이어 감지 시 추격 상태로 전환
+        if (currentState != chaseState && currentState != attackState)
         {
             stateMachine.ChangeState(chaseState);
         }
     }
 
+    /// <summary>
+    /// 플레이어를 놓쳤을 때 호출됨
+    /// </summary>
     protected override void OnPlayerLost()
     {
-
+        // 플레이어 놓침 처리 (필요시 구현)
     }
+    
+    #endregion
 
+    #region State Switch Methods
+    
+    /// <summary>
+    /// 순찰 상태로 전환
+    /// </summary>
     public override void SwitchToPatrolState()
     {
         stateMachine.ChangeState(patrolState);
     }
+    
+    /// <summary>
+    /// 공격 상태로 전환
+    /// </summary>
     public override void SwitchToAttackState()
     {
         stateMachine.ChangeState(attackState);
     }
+    
+    /// <summary>
+    /// 추격 상태로 전환
+    /// </summary>
     public override void SwitchToChaseState()
     {
         stateMachine.ChangeState(chaseState);
     }
+    
+    /// <summary>
+    /// 내려찍기 상태로 전환
+    /// </summary>
     public override void SwitchToSlamAttackState()
     {
-        stateMachine.ChangeState(idleState);
+        stateMachine.ChangeState(slamAttackState);
     }
+    
+    #endregion
 
-    // 쿨다운 관리 메서드 추가
+    #region Attack Pattern Methods
+    
+    /// <summary>
+    /// 쿨다운 관리
+    /// </summary>
     private void UpdateCooldowns()
     {
         // 돌진 공격 쿨다운 관리
@@ -208,20 +291,6 @@ public class EliteEnemy : BaseEnemy
         }
     }
 
-    // 충돌 감지 추가
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        // 돌진 상태일 때 충돌 처리를 ChargeAttackState에 위임
-        if (currentState == chargeAttackState)
-        {
-            chargeAttackState.OnCollision(collision);
-        }
-        else if (currentState == slamAttackState)
-        {
-            // 필요 시 별도 처리
-        }
-    }
-
     /// <summary>
     /// 돌진 공격 조건 확인 및 실행
     /// </summary>
@@ -231,12 +300,12 @@ public class EliteEnemy : BaseEnemy
         if (currentState == chargeAttackState || !chargeReady)
             return;
         
-        // 추격 중일 때만 돌진 판단 (이동 중에 공격 패턴으로 판단)
+        // 추격 중일 때만 돌진 판단
         if (currentState == chaseState && playerDetected)
         {
             float distanceToPlayer = Vector2.Distance(transform.position, GetPlayerPosition());
             
-            // 플레이어가 공격 범위 밖이면서 추격 범위 안에 있고, 일정 거리(예: 추격 범위의 절반) 이상 떨어져 있을 때
+            // 플레이어가 공격 범위 밖이면서 추격 범위 안에 있을 때
             if (!IsInAttackRange() && distanceToPlayer > attackRange && distanceToPlayer <= detectionRange)
             {
                 Debug.Log($"추격 범위 내에서 돌진 공격! 거리: {distanceToPlayer}");
@@ -269,4 +338,6 @@ public class EliteEnemy : BaseEnemy
             }
         }
     }
+    
+    #endregion
 }

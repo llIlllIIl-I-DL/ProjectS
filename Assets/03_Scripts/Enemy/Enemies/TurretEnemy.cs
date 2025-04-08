@@ -8,24 +8,43 @@ using Enemy.States;
 /// </summary>
 public class TurretEnemy : BaseEnemy
 {
+    #region Variables
+    
     [Header("터렛 설정")]
     [SerializeField] private Transform firePoint;         // 발사 지점
     [SerializeField] private GameObject bulletPrefab;     // 총알 프리팹
-    [SerializeField] private float fireRate;       // 발사 속도 (초당)
-    [SerializeField] private float bulletSpeed;      // 총알 속도
-    [SerializeField] private float maxRotationAngle; // 최대 회전 각도 (제한된 각도만 회전하고 싶을 경우)
+    [SerializeField] private float fireRate;              // 발사 속도 (초당)
+    [SerializeField] private float bulletSpeed;           // 총알 속도
+    [SerializeField] private float maxRotationAngle;      // 최대 회전 각도 (제한된 각도만 회전하고 싶을 경우)
     [SerializeField] private bool rotateToPlayer = true;  // 플레이어 방향으로 회전 여부
     
     // 상태
     private IdleState idleState;
     private AttackState attackState;
     
+    // 참조 및 속성
     private Vector2 startPosition;
     private Quaternion initialRotation;
+    private Vector3 fixedPosition; // 위치를 강제로 고정하기 위한 변수
+    
+    #endregion
 
-    // 위치를 강제로 고정하기 위한 변수
-    private Vector3 fixedPosition;
+    #region Properties
+    
+    // 현재 상태 가져오기 (상태 전환 로직용)
+    public IEnemyState currentState => stateMachine.CurrentState;
+    
+    // 상태 접근자 메서드들
+    public IdleState GetIdleState() => idleState;
+    public AttackState GetAttackState() => attackState;
+    
+    #endregion
 
+    #region Unity Lifecycle Methods
+    
+    /// <summary>
+    /// 컴포넌트 초기화 및 시작 위치 저장
+    /// </summary>
     protected override void Awake()
     {
         base.Awake();
@@ -37,17 +56,26 @@ public class TurretEnemy : BaseEnemy
             firePoint = transform;
     }
     
+    /// <summary>
+    /// 시작 시 위치 고정값 설정
+    /// </summary>
     protected override void Start()
     {
         base.Start();
         fixedPosition = transform.position;
     }
     
+    /// <summary>
+    /// 프레임 기반 업데이트
+    /// </summary>
     protected override void Update()
     {
         base.Update(); // BaseEnemy의 Update 호출
     }
 
+    /// <summary>
+    /// 물리 기반 업데이트 - 위치 고정
+    /// </summary>
     protected override void FixedUpdate()
     {
         base.FixedUpdate(); // BaseEnemy의 FixedUpdate 호출
@@ -55,7 +83,11 @@ public class TurretEnemy : BaseEnemy
         // 위치 강제 고정
         transform.position = fixedPosition;
     }
+    
+    #endregion
 
+    #region Core Methods
+    
     /// <summary>
     /// 적 초기화 및 상태 설정
     /// </summary>
@@ -70,7 +102,7 @@ public class TurretEnemy : BaseEnemy
     }
     
     /// <summary>
-    /// 상태 머신 업데이트
+    /// 상태 머신 업데이트 및 플레이어 감지에 따른 상태 전환
     /// </summary>
     protected override void UpdateAI()
     {
@@ -94,7 +126,7 @@ public class TurretEnemy : BaseEnemy
     }
     
     /// <summary>
-    /// 이동 로직은 터렛에서 필요 없음
+    /// 이동 로직은 터렛에서 필요 없음 (고정 위치)
     /// </summary>
     protected override void HandleMovement()
     {
@@ -105,12 +137,37 @@ public class TurretEnemy : BaseEnemy
         }
     }
     
+    #endregion
+
+    #region Combat Methods
+    
     /// <summary>
-    /// 플레이어를 향해 회전
+    /// 플레이어를 향해 회전 (최대 회전 각도 제한 적용)
     /// </summary>
     private void RotateTowardsPlayer()
     {
-
+        if (playerTransform == null) return;
+        
+        // 플레이어 방향 구하기
+        Vector2 direction = (playerTransform.position - transform.position).normalized;
+        float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        
+        // 초기 각도에서 최대 회전 각도 제한 적용
+        float initialAngle = initialRotation.eulerAngles.z;
+        float clampedAngle = targetAngle;
+        
+        if (maxRotationAngle > 0)
+        {
+            // 최소/최대 허용 각도 계산
+            float minAllowedAngle = initialAngle - maxRotationAngle;
+            float maxAllowedAngle = initialAngle + maxRotationAngle;
+            
+            // 각도 제한 적용
+            clampedAngle = Mathf.Clamp(targetAngle, minAllowedAngle, maxAllowedAngle);
+        }
+        
+        // 회전 적용
+        transform.rotation = Quaternion.Euler(0, 0, clampedAngle);
     }
     
     /// <summary>
@@ -165,10 +222,25 @@ public class TurretEnemy : BaseEnemy
         Debug.Log($"총알 발사 방향: {fireDirection}, 각도: {angle}도");
     }
     
-    // 현재 상태 가져오기 (상태 전환 로직용)
-    public IEnemyState currentState => stateMachine.CurrentState;
+    #endregion
+
+    #region State Switch Methods
     
-    // 상태 접근자 메서드들
-    public IdleState GetIdleState() => idleState;
-    public AttackState GetAttackState() => attackState;
+    /// <summary>
+    /// 대기 상태로 전환
+    /// </summary>
+    public override void SwitchToIdleState()
+    {
+        stateMachine.ChangeState(idleState);
+    }
+    
+    /// <summary>
+    /// 공격 상태로 전환
+    /// </summary>
+    public override void SwitchToAttackState()
+    {
+        stateMachine.ChangeState(attackState);
+    }
+    
+    #endregion
 }

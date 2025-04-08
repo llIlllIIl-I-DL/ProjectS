@@ -2,19 +2,24 @@ using UnityEngine;
 
 namespace Enemy.States
 {
+    /// <summary>
+    /// 적의 내려찍기 공격 상태 - 점프 후 내려찍어 범위 데미지를 주는 공격 패턴
+    /// </summary>
     public class SlamAttackState : BaseEnemyState
     {
+        #region Variables
+        
         // 매개변수화된 속성들
         protected float slamSpeed;        // 내려찍기 속도
-        protected float slamDistance;     // 내려찍기 영향 범위
-        protected float damageAmount;       // 데미지 양
+        protected float slamDistance;     // 내려찍기 영향 범위 (충격파 반경)
+        protected float damageAmount;     // 데미지 양
         protected string animationTrigger; // 애니메이션 트리거 이름
-        protected bool moveToPlayerX; // X축으로 플레이어 위치로 이동할지 여부
+        protected bool moveToPlayerX;     // X축으로 플레이어 위치로 이동할지 여부
         
         // 내려찍기 상태 변수
         protected Vector2 startPosition;  // 시작 위치
         protected Vector2 targetPosition;  // 플레이어 위치
-        protected float jumpHeight;  // 최대 점프 높이
+        protected float jumpHeight;       // 최대 점프 높이
         protected float jumpDuration = 0.5f; // 점프 단계 시간
         protected float hangTime = 0.3f;  // 공중에 머무는 시간
         protected float slamTime = 0.3f;  // 내려찍는데 걸리는 시간
@@ -24,10 +29,25 @@ namespace Enemy.States
         protected SlamPhase currentPhase;
         protected float phaseTimer = 0f;
         
+        #endregion
+        
+        #region Constructor
+        
+        /// <summary>
+        /// 내려찍기 공격 상태 생성자
+        /// </summary>
+        /// <param name="enemy">적 객체 참조</param>
+        /// <param name="stateMachine">상태 머신 참조</param>
+        /// <param name="slamSpeed">내려찍기 속도</param>
+        /// <param name="slamDistance">충격파 범위</param>
+        /// <param name="damageAmount">데미지 양</param>
+        /// <param name="animationTrigger">애니메이션 트리거</param>
+        /// <param name="jumpHeight">점프 높이</param>
+        /// <param name="moveToPlayerX">플레이어 X위치로 이동 여부</param>
         public SlamAttackState(BaseEnemy enemy, EnemyStateMachine stateMachine, 
                             float slamSpeed, float slamDistance, 
                             float damageAmount, string animationTrigger = "Slam",
-                            float jumpHeight = 0f,
+                            float jumpHeight = 3f,
                             bool moveToPlayerX = true)
             : base(enemy, stateMachine)
         {
@@ -36,9 +56,16 @@ namespace Enemy.States
             this.damageAmount = damageAmount;
             this.animationTrigger = animationTrigger;
             this.jumpHeight = jumpHeight;
-            this.moveToPlayerX = moveToPlayerX; // 이동 여부 설정
+            this.moveToPlayerX = moveToPlayerX;
         }
         
+        #endregion
+        
+        #region State Methods
+        
+        /// <summary>
+        /// 내려찍기 상태 진입 시 호출 - 초기 위치 저장 및 초기화
+        /// </summary>
         public override void Enter()
         {
             Debug.Log("내려찍기 공격 시작");
@@ -57,6 +84,9 @@ namespace Enemy.States
             // enemy.GetComponent<Animator>()?.SetTrigger("Jump");
         }
         
+        /// <summary>
+        /// 내려찍기 상태 업데이트 - 단계별 진행 관리
+        /// </summary>
         public override void Update()
         {
             phaseTimer += Time.deltaTime;
@@ -64,18 +94,20 @@ namespace Enemy.States
             switch (currentPhase)
             {
                 case SlamPhase.Jump:
+                    // 점프 단계 - 상승 후 정점에 도달
                     if (phaseTimer >= jumpDuration)
                     {
                         // 점프 단계 완료, 공중에 머무는 단계로
                         currentPhase = SlamPhase.Hang;
                         phaseTimer = 0f;
                         
-                        // 애니메이션 전환 (선택 사항)
+                        // 애니메이션 전환
                         // enemy.GetComponent<Animator>()?.SetTrigger("Hang");
                     }
                     break;
                     
                 case SlamPhase.Hang:
+                    // 공중 정지 단계 - 목표물 위에서 잠시 대기
                     if (phaseTimer >= hangTime)
                     {
                         // 머무는 단계 완료, 내려찍기 단계로
@@ -97,6 +129,7 @@ namespace Enemy.States
                     break;
                     
                 case SlamPhase.Slam:
+                    // 내려찍기 단계 - 빠르게 하강하여 지면에 충격파 생성
                     if (phaseTimer >= slamTime || IsGrounded())
                     {
                         // 내려찍기 완료
@@ -112,13 +145,16 @@ namespace Enemy.States
             }
         }
         
+        /// <summary>
+        /// 물리 업데이트 - 각 단계별 이동 처리
+        /// </summary>
         public override void FixedUpdate()
         {
             // 각 단계별 이동 처리
             switch (currentPhase)
             {
                 case SlamPhase.Jump:
-                    // 점프 단계 - 위로 상승
+                    // 점프 단계 - 위로 상승 (사인 곡선으로 부드러운 움직임)
                     float jumpProgress = phaseTimer / jumpDuration;
                     float height = Mathf.Sin(jumpProgress * Mathf.PI / 2) * jumpHeight;
                     
@@ -128,13 +164,19 @@ namespace Enemy.States
                     break;
                     
                 case SlamPhase.Hang:
+                    // 공중에 정지 상태 - 위치 유지
                     break;
                     
                 case SlamPhase.Slam:
+                    // 빠르게 아래로 내려찍기
+                    // enemy.rb.velocity = new Vector2(0, -slamSpeed);
                     break;
             }
         }
         
+        /// <summary>
+        /// 내려찍기 상태 종료 시 호출 - 애니메이션 리셋 및 이동 정지
+        /// </summary>
         public override void Exit()
         {
             // 내려찍기 종료 - 이동 정지
@@ -144,7 +186,14 @@ namespace Enemy.States
             // enemy.GetComponent<Animator>()?.ResetTrigger(animationTrigger);
         }
         
-        // 지면 충돌 확인
+        #endregion
+        
+        #region Utility Methods
+        
+        /// <summary>
+        /// 지면과 충돌했는지 확인
+        /// </summary>
+        /// <returns>지면에 닿았는지 여부</returns>
         private bool IsGrounded()
         {
             // 간단한 레이캐스트로 지면 확인
@@ -155,12 +204,14 @@ namespace Enemy.States
                 LayerMask.GetMask("Ground"));
         }
         
-        // 충격파 생성 및 데미지 처리
+        /// <summary>
+        /// 충격파 생성 및 플레이어에게 데미지 처리
+        /// </summary>
         private void CreateShockwave()
         {
             Debug.Log("충격파 생성!");
             
-            // 시각 효과 (선택 사항)
+            // 시각 효과 (추후 구현)
             // GameObject effect = Object.Instantiate(shockwaveEffect, enemy.transform.position, Quaternion.identity);
             
             // 영역 내 플레이어 감지 및 데미지 처리
@@ -174,9 +225,10 @@ namespace Enemy.States
                 IDamageable damageable = player.GetComponent<IDamageable>();
                 if (damageable != null)
                 {
+                    // 데미지 적용
                     damageable.TakeDamage(damageAmount);
                     
-                    // 넉백 효과 테스트해보고 이상하거나 필요없으면 삭제
+                    // 넉백 효과 적용
                     Rigidbody2D playerRb = player.GetComponent<Rigidbody2D>();
                     if (playerRb != null)
                     {
@@ -186,8 +238,10 @@ namespace Enemy.States
                 }
             }
             
-            // 화면 흔들림 효과 추후에? 필요할지도 모르니까??
+            // 화면 흔들림 효과 (추후 구현)
             // CameraShake.Instance?.ShakeCamera(0.3f, 0.3f);
         }
+        
+        #endregion
     }
 }
