@@ -1,123 +1,170 @@
-using System.Collections;
-using System.Collections.Generic;
+// 보스의 상태를 정의하는 열거형
 using UnityEngine;
 
-public enum BossState { Idle, Attack, Groggy, Dead }
+public enum BossState
+{
+    Idle,       // 대기 상태
+    Attack,     // 공격 상태
+    HitDelay,   // 피격 후 딜레이 상태
+    Groggy,     // 그로기 상태 (피격 가능)
+    Dead        // 사망 상태
+}
 
 public class Boss : MonoBehaviour
 {
-    public BossState currentState = BossState.Idle;
-    public float hp = 100;
-    public bool isInvincible = true;
+    public BossState currentState = BossState.Idle; // 현재 상태
 
-    private float groggyGauge = 0;
-    private float groggyThreshold = 100;
-    private float groggyTimer;
+    [Header("보스 기본 스탯")]
+    public float maxHp = 100f;
+    public float currentHp;
+    public bool isInvincible = true; // 무적 여부
 
-    void Update() //상태 업데이트
+    [Header("Hit Delay")]
+    public float hitDelayDuration = 1.0f; // 피격 후 무적 시간
+    private float hitDelayTimer; // 피격 딜레이 타이머
+
+    [Header("Groggy")]
+    public int groggyThreshold = 3; // 그로기 전까지 맞아야 할 횟수
+    public float groggyDuration = 3f; // 그로기 지속 시간
+    private float groggyTimer; // 그로기 타이머
+    private int hitCount; // 누적 피격 횟수
+
+    [Header("컴포넌트")]
+    private Animator animator; // 애니메이터 컴포넌트
+    public GameObject hpUI; // 보스 HP UI
+
+    void Start()
+    {
+        currentHp = maxHp;
+        animator = GetComponent<Animator>();
+        hpUI.SetActive(false); // 처음엔 HP UI 숨김
+    }
+
+    void Update()
     {
         switch (currentState)
         {
             case BossState.Idle:
-                IdleState();
+                HandleIdle();
                 break;
             case BossState.Attack:
-                AttackState();
+                HandleAttack();
+                break;
+            case BossState.HitDelay:
+                HandleHitDelay();
                 break;
             case BossState.Groggy:
-                GroggyState();
+                HandleGroggy();
                 break;
             case BossState.Dead:
-                DeadState();
+                HandleDead();
                 break;
         }
     }
 
-    void IdleState()
+    void HandleIdle()
     {
-        // 대기 상태 (피격 불가)
-        isInvincible = true;
+        isInvincible = true; // 무적 상태
+        animator.Play("Idle");
 
-        // 조건에 따라 공격 상태 전환
+        // 플레이어가 범위에 들어오면 공격 상태로 전환
         if (PlayerInRange())
         {
             currentState = BossState.Attack;
         }
     }
 
-    void AttackState()
+    void HandleAttack()
     {
-        // 공격 수행
-        isInvincible = true;
+        isInvincible = true; // 공격 중 무적
+        animator.Play("Attack");
 
-        // 일정 시간 후 혹은 누적 피해량 등으로 그로기 전환
-        if (ShouldGroggy())
+        // 공격 도중 피격 시 피격 상태로 전이
+        if (WasHit())
         {
-            currentState = BossState.Groggy;
+            EnterHitDelay();
         }
     }
 
-    void GroggyState()
+    void HandleHitDelay()
     {
-        // 피격 가능 상태
-        isInvincible = false;
+        animator.Play("Hit");
+        hitDelayTimer -= Time.deltaTime;
 
-        // 일정 시간 후 다시 Idle로
-        if (GroggyTimeOver())
+        if (hitDelayTimer <= 0)
         {
-            currentState = BossState.Idle;
+            // 누적 피격 수가 기준 이상이면 그로기 진입
+            if (hitCount >= groggyThreshold)
+            {
+                EnterGroggy();
+            }
+            else
+            {
+                currentState = BossState.Idle; // 다시 대기 상태로
+            }
         }
     }
 
-    void DeadState()
+    void HandleGroggy()
     {
-        // 사망 처리
-        isInvincible = true;
-        // 애니메이션, 드롭 등
+        isInvincible = false; // 그로기 중엔 무적 해제
+        animator.Play("Groggy");
+
+        groggyTimer -= Time.deltaTime;
+        if (groggyTimer <= 0)
+        {
+            hitCount = 0; // 피격 카운트 초기화
+            currentState = BossState.Idle; // 회복 후 Idle
+        }
     }
 
+    void HandleDead()
+    {
+        isInvincible = true;
+        animator.Play("Dead");
+        // 드롭, 제거 로직 추가 가능
+    }
+
+    // 외부에서 데미지를 입히는 함수
     public void TakeDamage(float amount)
     {
         if (isInvincible) return;
 
-        hp -= amount;
-        if (hp <= 0)
+        currentHp -= amount;
+        hitCount++;
+
+        if (currentHp <= 0)
+        {
+            currentHp = 0;
             currentState = BossState.Dead;
+            return;
+        }
+
+        EnterHitDelay();
     }
 
-    public void ApplyStagger(float amount)
+    void EnterHitDelay()
     {
-        groggyGauge += amount;
-        if (groggyGauge >= groggyThreshold) EnterGroggyState();
+        currentState = BossState.HitDelay;
+        hitDelayTimer = hitDelayDuration;
+        isInvincible = true;
     }
 
-    void EnterGroggyState()
+    void EnterGroggy()
     {
         currentState = BossState.Groggy;
-        isInvincible = false;
         groggyTimer = groggyDuration;
     }
 
-    void OnTriggerEnter(Collider other)
+    // 플레이어가 범위 안에 있는지 확인하는 임시 함수
+    bool PlayerInRange()
     {
-        if (other.CompareTag("Player"))
-        {
-            bossUI.SetActive(true);
-        }
+        return true;
     }
 
-    void OnTriggerExit(Collider other)
+    // 피격 여부 체크하는 임시 함수
+    bool WasHit()
     {
-        if (other.CompareTag("Player"))
-        {
-            bossUI.SetActive(false);
-        }
+        return false;
     }
-
-
-
-    bool PlayerInRange() => true; // 임시 조건
-    bool ShouldGroggy() => false;
-    bool GroggyTimeOver() => false;
 }
-
