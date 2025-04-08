@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerAttackState : PlayerStateBase
+public class PlayerAttackingState : PlayerStateBase
 {
     private float attackStartTime;
     private float attackDuration = 0.25f; // 공격 모션 지속 시간
@@ -9,7 +9,7 @@ public class PlayerAttackState : PlayerStateBase
 
     private Vector2 lastAimDirection;
 
-    public PlayerAttackState(PlayerStateManager stateManager) : base(stateManager)
+    public PlayerAttackingState(PlayerStateManager stateManager) : base(stateManager)
     {
     }
 
@@ -71,7 +71,7 @@ public class PlayerAttackState : PlayerStateBase
         else
         {
             // 임시 총알 생성 로직 (WeaponManager가 없을 경우)
-            CreateBullet(lastAimDirection);
+            WeaponManager.Instance.FireWeapon(lastAimDirection);
         }
 
         // 공격 쿨다운 시작
@@ -83,35 +83,6 @@ public class PlayerAttackState : PlayerStateBase
         canAttackAgain = false;
         yield return new WaitForSeconds(attackCooldown);
         canAttackAgain = true;
-    }
-
-    // 임시 총알 생성 메서드
-    private void CreateBullet(Vector2 direction)
-    {
-        // 총알 프리팹 (추후 WeaponManager로 이동할 코드)
-        GameObject bulletPrefab = Resources.Load<GameObject>("Prefabs/Bullet");
-        if (bulletPrefab == null)
-        {
-            Debug.LogError("총알 프리팹을 찾을 수 없습니다. Resources/Prefabs/Bullet 경로 확인 필요");
-            return;
-        }
-
-        // 총구 위치 (플레이어 앞쪽)
-        Vector3 spawnPosition = player.transform.position + new Vector3(direction.x * 0.5f, 0.1f, 0);
-
-        // 총알 생성
-        GameObject bullet = GameObject.Instantiate(bulletPrefab, spawnPosition, Quaternion.identity);
-
-        // 총알 속도 및 방향 설정
-        Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
-        if (bulletRb != null)
-        {
-            float bulletSpeed = 15f;
-            bulletRb.velocity = direction * bulletSpeed;
-        }
-
-        // 3초 후 총알 자동 제거
-        GameObject.Destroy(bullet, 3f);
     }
 
     public override void Exit()

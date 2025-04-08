@@ -19,6 +19,75 @@ public class Player : MonoBehaviour
         EnsureComponents();
     }
 
+    private void OnEnable()
+    {
+        // 이벤트 구독
+        if (inputHandler != null)
+        {
+            inputHandler.OnSprintActivated += HandleSprint;
+        }
+    }
+
+    private void OnDisable()
+    {
+        // 이벤트 구독 해제
+        if (inputHandler != null)
+        {
+            inputHandler.OnSprintActivated -= HandleSprint;
+        }
+    }
+
+    private void HandleSprint()
+    {
+        Debug.Log("스프린트 활성화!");
+        if (movement != null)
+        {
+            movement.SetSprinting(true);
+            
+            // 애니메이션 업데이트
+            if (playerAnimator != null)
+            {
+                playerAnimator.SetSprinting(true);
+            }
+            
+            // 상태 매니저 업데이트
+            if (stateManager != null)
+            {
+                stateManager.ChangeState(PlayerStateType.Sprinting);
+            }
+            
+            // 일정 시간 후 스프린트 비활성화
+            Invoke("DisableSprint", 1.5f);
+        }
+    }
+
+    private void DisableSprint()
+    {
+        if (movement != null)
+        {
+            movement.SetSprinting(false);
+            
+            // 애니메이션 업데이트
+            if (playerAnimator != null)
+            {
+                playerAnimator.SetSprinting(false);
+            }
+            
+            // 상태 매니저 업데이트 (이동 중이면 Running, 아니면 Idle)
+            if (stateManager != null && inputHandler != null)
+            {
+                if (inputHandler.IsMoving())
+                {
+                    stateManager.ChangeState(PlayerStateType.Running);
+                }
+                else
+                {
+                    stateManager.ChangeState(PlayerStateType.Idle);
+                }
+            }
+        }
+    }
+
     private void EnsureComponents()
     {
         // 컴포넌트 가져오기 또는 추가
