@@ -12,24 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a3f0597a151f6d4582aca54eb54cc26, type: 3}
   m_Name: PlayerSettings
   m_EditorClassIdentifier: 
-  moveSpeed: 7
+  moveSpeed: 3
   sprintMultiplier: 1.5
   doubleTapTime: 0.3
-  acceleration: 60
-  deceleration: 60
+  acceleration: 10
+  deceleration: 10
   velocityPower: 0.9
   frictionAmount: 0.2
-  jumpForce: 12
+  jumpForce: 6
   jumpCutMultiplier: 0.5
   fallGravityMultiplier: 1.7
   coyoteTime: 0.15
   jumpBufferTime: 0.1
-  dashSpeed: 15
+  dashSpeed: 7
   dashDuration: 0.2
   dashCooldown: 0.4
   wallSlideSpeed: 3
   wallSlideAcceleration: 5
   wallFastSlideSpeed: 6
-  wallJumpForce: 12
+  wallJumpForce: 6
   wallJumpDirection: {x: 1, y: 1.5}
   wallStickTime: 0.2
