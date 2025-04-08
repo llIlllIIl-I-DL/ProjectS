@@ -1,12 +1,13 @@
 using UnityEngine;
+
 public class PlayerRunningState : PlayerStateBase
 {
     public PlayerRunningState(PlayerController playerController) : base(playerController) { }
 
     public override void Enter()
     {
-        // 애니메이션 설정
-        player.UpdateAnimations("Run");
+        // 애니메이션 설정 (상태 문자열 전달하지 않음)
+        player.UpdateAnimations(null);
     }
 
     public override void HandleInput()
@@ -30,9 +31,16 @@ public class PlayerRunningState : PlayerStateBase
     public override void Update()
     {
         // 이동 입력이 없으면 대기 상태로 전환
-        if (Mathf.Abs(player.MoveInput.x) < 0.1f)
+        if (!player.IsMoving())
         {
             player.ChangeState(PlayerStateType.Idle);
+            return;
+        }
+
+        // 스프린트 상태로 전환 확인
+        if (player.IsSprinting)
+        {
+            player.ChangeState(PlayerStateType.Sprinting);
             return;
         }
 

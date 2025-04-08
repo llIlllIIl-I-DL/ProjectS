@@ -635,27 +635,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 4
+  sprintMultiplier: 1.5
+  doubleTapTime: 0.3
   acceleration: 10
   deceleration: 10
   velocityPower: 0.9
   frictionAmount: 0.2
-  jumpForce: 5
-  jumpCutMultiplier: 0.5
-  fallGravityMultiplier: 1.7
+  jumpForce: 7
+  jumpCutMultiplier: 0.7
+  fallGravityMultiplier: 2.4
   coyoteTime: 0.15
   jumpBufferTime: 0.1
   dashSpeed: 7
   dashDuration: 0.2
   dashCooldown: 0.4
   wallSlideSpeed: 3
+  wallSlideAcceleration: 5
+  wallFastSlideSpeed: 6
   wallJumpForce: 12
   wallJumpDirection: {x: 1, y: 1.5}
+  wallStickTime: 0.2
   groundLayer:
     serializedVersion: 2
     m_Bits: 1
   wallLayer:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 128
   showDebugRays: 1
 --- !u!50 &1092708148
 Rigidbody2D:

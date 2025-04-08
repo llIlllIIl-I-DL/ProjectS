@@ -5,19 +5,23 @@ using UnityEngine;
 // 벽 슬라이딩 상태
 public class PlayerWallSlidingState : PlayerStateBase
 {
-    private float wallSlideSpeed = 3f;
+    private float originalGravity;
 
     public PlayerWallSlidingState(PlayerController playerController) : base(playerController) { }
 
     public override void Enter()
     {
         player.IsWallSliding = true;
-        player.UpdateAnimations("WallSlide");
+        player.UpdateAnimations();
+        // 원래 중력값 저장
+        originalGravity = player.Rb.gravityScale;
     }
 
     public override void Exit()
     {
         player.IsWallSliding = false;
+        // 원래 중력값 복원
+        player.Rb.gravityScale = originalGravity;
     }
 
     public override void HandleInput()
@@ -42,27 +46,24 @@ public class PlayerWallSlidingState : PlayerStateBase
 
     public override void Update()
     {
-        // 벽에서 떨어지거나, 지면에 닿으면 상태 전환
-        if (!player.IsTouchingWall() || player.IsGrounded() || player.MoveInput.x == 0)
+        // 벽에서 떨어졌는지 확인
+        if (!player.IsTouchingWall() || player.IsGrounded())
         {
-            if (player.IsGrounded())
-            {
-                if (Mathf.Abs(player.MoveInput.x) > 0.1f)
-                    player.ChangeState(PlayerStateType.Running);
-                else
-                    player.ChangeState(PlayerStateType.Idle);
-            }
-            else
-            {
-                player.ChangeState(PlayerStateType.Falling);
-            }
+            player.ChangeState(PlayerStateType.Falling);
+            return;
+        }
+
+        // 현재 방향과 반대 방향키가 눌렸는지 확인
+        if (!player.IsMovingInFacingDirection())
+        {
+            player.ChangeState(PlayerStateType.Falling);
             return;
         }
     }
 
     public override void FixedUpdate()
     {
-        // 벽 슬라이딩 속도 제한
-        player.Rb.velocity = new Vector2(player.Rb.velocity.x, Mathf.Max(player.Rb.velocity.y, -wallSlideSpeed));
+        // 벽 슬라이딩 처리
+        player.WallSlide();
     }
 }
