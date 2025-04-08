@@ -116,6 +116,7 @@ public class PlayerStateManager : MonoBehaviour
         states.Add(PlayerStateType.WallSliding, new PlayerWallSlidingState(this));
         states.Add(PlayerStateType.Dashing, new PlayerDashingState(this));
         states.Add(PlayerStateType.Attacking, new PlayerAttackingState(this));
+        states.Add(PlayerStateType.Hit, new PlayerHitState(this));
         // 초기 상태 설정
         ChangeState(PlayerStateType.Idle);
     }
@@ -403,4 +404,23 @@ public class PlayerStateManager : MonoBehaviour
     public void SetJumping(bool value) => isJumping = value;
     public void SetWallSliding(bool value) => isWallSliding = value;
     public void SetSprinting(bool value) => isSprinting = value;
+
+    // 피격 처리 메서드
+    public void TakeDamage(float damage)
+    {
+        // 현재 대시 중이거나 무적 상태이면 데미지를 무시할 수 있음
+        if (isDashing) return;
+
+        // PlayerHP 컴포넌트가 있다면 데미지 적용
+        var playerHP = GetComponent<PlayerHP>();
+        if (playerHP != null)
+        {
+            playerHP.TakeDamage(damage);
+        }
+
+        // Hit 상태로 전환
+        ChangeState(PlayerStateType.Hit);
+        
+        Debug.Log($"플레이어가 {damage} 데미지를 받았습니다.");
+    }
 }
