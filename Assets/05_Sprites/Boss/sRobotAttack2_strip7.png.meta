@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -134,7 +134,154 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: sRobotAttack2_strip7_0
+      rect:
+        serializedVersion: 2
+        x: 85
+        y: 31
+        width: 287
+        height: 351
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d0e52a7c61fa9c4f959f97a39a92e94
+      internalID: 1396058855
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sRobotAttack2_strip7_1
+      rect:
+        serializedVersion: 2
+        x: 551
+        y: 31
+        width: 285
+        height: 354
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d3ecc27cc20b8a04a907182c36123eb5
+      internalID: 995872716
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sRobotAttack2_strip7_2
+      rect:
+        serializedVersion: 2
+        x: 961
+        y: 31
+        width: 345
+        height: 354
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ad5094eca67665441b33daa80f334679
+      internalID: 1875803365
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sRobotAttack2_strip7_3
+      rect:
+        serializedVersion: 2
+        x: 1380
+        y: 31
+        width: 391
+        height: 359
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1292e7b867fb85a4a986ad5ec5f53d04
+      internalID: 1241850141
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sRobotAttack2_strip7_4
+      rect:
+        serializedVersion: 2
+        x: 1840
+        y: 29
+        width: 395
+        height: 367
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 26fd945328d6eeb409c783c55bee2dcc
+      internalID: -1300706979
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sRobotAttack2_strip7_5
+      rect:
+        serializedVersion: 2
+        x: 2324
+        y: 31
+        width: 375
+        height: 354
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b2f34035ef092ca4ab4d6d29f38f9fb8
+      internalID: 419857988
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: sRobotAttack2_strip7_6
+      rect:
+        serializedVersion: 2
+        x: 2821
+        y: 23
+        width: 287
+        height: 323
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 56ee521ab6301db44bbef8f1d335fce3
+      internalID: -1509038781
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -145,7 +292,14 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      sRobotAttack2_strip7_0: 1396058855
+      sRobotAttack2_strip7_1: 995872716
+      sRobotAttack2_strip7_2: 1875803365
+      sRobotAttack2_strip7_3: 1241850141
+      sRobotAttack2_strip7_4: -1300706979
+      sRobotAttack2_strip7_5: 419857988
+      sRobotAttack2_strip7_6: -1509038781
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
