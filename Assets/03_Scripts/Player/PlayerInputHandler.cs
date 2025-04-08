@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
 {
-    [SerializeField] private float doubleTapTime = 0.3f;
+    [SerializeField] private float doubleTapTime = 0.5f;
 
     private PlayerInput playerInputs;
 
@@ -31,6 +31,7 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
     public event Action OnJumpRelease;
     public event Action OnDashInput;
     public event Action OnSprintActivated;
+    public event Action OnAttackInput;
 
     private Vector2 moveDirection;
     public Vector2 MoveDirection => moveDirection;
@@ -47,6 +48,12 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
     {
         playerInputs.Player.Enable();
         Debug.Log("PlayerInput이 활성화되었습니다.");
+        
+        // 이벤트 구독 상태 확인
+        if (OnSprintActivated == null)
+        {
+            Debug.LogWarning("OnSprintActivated 이벤트에 구독된 리스너가 없습니다!");
+        }
     }
 
     private void OnDisable()
@@ -81,10 +88,6 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
 
     private void CheckDoubleTaps()
     {
-        // 더블 탭 상태 초기화
-        LeftDoubleTapped = false;
-        RightDoubleTapped = false;
-
         // 현재 시간 기준으로 더블 탭 만료 체크
         float currentTime = Time.time;
 
@@ -125,6 +128,7 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
                 if (timeSinceLastTap <= doubleTapTime)
                 {
                     LeftDoubleTapped = true;
+                    Debug.Log("왼쪽 방향키 더블 탭 감지!");
                     OnSprintActivated?.Invoke();
                 }
                 lastLeftTapTime = Time.time;
@@ -136,6 +140,7 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
                 if (timeSinceLastTap <= doubleTapTime)
                 {
                     RightDoubleTapped = true;
+                    Debug.Log("오른쪽 방향키 더블 탭 감지!");
                     OnSprintActivated?.Invoke();
                 }
                 lastRightTapTime = Time.time;
@@ -177,7 +182,7 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
         if (context.started)
         {
             Debug.Log("공격 입력 감지");
-            // 공격 이벤트 전달 (추가 구현 필요)
+            OnAttackInput?.Invoke();
         }
     }
 
