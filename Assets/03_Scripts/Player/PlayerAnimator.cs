@@ -26,9 +26,14 @@ public class PlayerAnimator : MonoBehaviour
             }
 
             // 상태별 파라미터
+            bool hasSprinting = HasParameter("IsSprinting");
+            Debug.Log($"IsSprinting 파라미터 존재 여부: {hasSprinting}, 현재 상태: {state == PlayerStateType.Sprinting}");
 
-            if (HasParameter("IsSprinting"))
+            if (hasSprinting)
+            {
                 animator.SetBool("IsSprinting", state == PlayerStateType.Sprinting);
+                Debug.Log($"IsSprinting 파라미터 설정: {state == PlayerStateType.Sprinting}");
+            }
 
             if (HasParameter("IsJumping"))
                 animator.SetBool("IsJumping", state == PlayerStateType.Jumping);
@@ -60,5 +65,23 @@ public class PlayerAnimator : MonoBehaviour
 
         Debug.LogWarning($"애니메이터에 '{paramName}' 파라미터가 존재하지 않습니다.");
         return false;
+    }
+
+    public void SetSprinting(bool isSprinting)
+    {
+        if (animator == null) return;
+        
+        try
+        {
+            if (HasParameter("IsSprinting"))
+            {
+                animator.SetBool("IsSprinting", isSprinting);
+                Debug.Log($"스프린트 애니메이션 상태 변경: {isSprinting}");
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"스프린트 애니메이션 설정 중 오류: {e.Message}");
+        }
     }
 }

@@ -46,7 +46,7 @@ public class PlayerMovement : MonoBehaviour
 
         // 목표 속도 (스프린트 상태 반영)
         float currentMoveSpeed = settings.moveSpeed;
-        if (sprint)
+        if (sprint || isSprinting)
         {
             currentMoveSpeed *= settings.sprintMultiplier;
         }

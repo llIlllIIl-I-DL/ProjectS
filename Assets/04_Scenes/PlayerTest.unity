@@ -195,6 +195,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 5332983872366635018, guid: 5c0d43b7a2a3c41a8b250db0b322b8b1, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1068,14 +1072,30 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3952546512422567701, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: doubleTapTime
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 6148639762890856299, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 519420031}
     - target: {fileID: 8033034078652405491, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: maxAmmo
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8033034078652405491, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: currentAmmo
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8033034078652405491, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
       propertyPath: bulletPrefab
       value: 
       objectReference: {fileID: 6760042265540064826, guid: e4992159c28c2e24ba7b726d9457aee1, type: 3}
+    - target: {fileID: 8033034078652405491, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: bulletLifetime
+      value: 1.8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
