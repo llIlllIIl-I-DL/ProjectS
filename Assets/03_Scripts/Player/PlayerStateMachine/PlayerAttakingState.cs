@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerAttackState : PlayerStateBase
+public class PlayerAttackingState : PlayerStateBase
 {
     private float attackStartTime;
     private float attackDuration = 0.25f; // 공격 모션 지속 시간
@@ -9,7 +9,7 @@ public class PlayerAttackState : PlayerStateBase
 
     private Vector2 lastAimDirection;
 
-    public PlayerAttackState(PlayerStateManager stateManager) : base(stateManager)
+    public PlayerAttackingState(PlayerStateManager stateManager) : base(stateManager)
     {
     }
 

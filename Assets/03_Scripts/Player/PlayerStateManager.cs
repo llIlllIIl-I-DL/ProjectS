@@ -65,6 +65,7 @@ public class PlayerStateManager : MonoBehaviour
             inputHandler.OnJumpRelease += HandleJumpRelease;
             inputHandler.OnDashInput += HandleDashInput;
             inputHandler.OnSprintActivated += HandleSprintActivated;
+            inputHandler.OnAttackInput += HandleAttackInput;
         }
 
         if (collisionDetector != null)
@@ -88,6 +89,7 @@ public class PlayerStateManager : MonoBehaviour
             inputHandler.OnJumpRelease -= HandleJumpRelease;
             inputHandler.OnDashInput -= HandleDashInput;
             inputHandler.OnSprintActivated -= HandleSprintActivated;
+            inputHandler.OnAttackInput -= HandleAttackInput;
         }
 
         if (collisionDetector != null)
@@ -113,7 +115,7 @@ public class PlayerStateManager : MonoBehaviour
         states.Add(PlayerStateType.Falling, new PlayerFallingState(this));
         states.Add(PlayerStateType.WallSliding, new PlayerWallSlidingState(this));
         states.Add(PlayerStateType.Dashing, new PlayerDashingState(this));
-
+        states.Add(PlayerStateType.Attacking, new PlayerAttackingState(this));
         // 초기 상태 설정
         ChangeState(PlayerStateType.Idle);
     }
@@ -306,6 +308,31 @@ public class PlayerStateManager : MonoBehaviour
             ChangeState(PlayerStateType.Sprinting);
         }
     }
+
+    // 공격 입력 처리 메서드 추가:
+    private void HandleAttackInput()
+    {
+        // 대시 중에는 공격 불가
+        if (isDashing) return;
+        
+        // 현재 공격 중이라면, 연속 공격 가능한지 체크
+        if (currentStateType == PlayerStateType.Attacking)
+        {
+            PlayerAttackingState attackState = states[PlayerStateType.Attacking] as PlayerAttackingState;
+            if (attackState != null && attackState.CanAttack())
+            {
+                // 현재 상태 재진입으로 연속 공격
+                currentState.Exit();
+                currentState.Enter();
+            }
+        }
+        else
+        {
+            // 공격 상태로 전환
+            ChangeState(PlayerStateType.Attacking);
+        }
+    }
+    
 
     private void HandleGroundedChanged(bool isGrounded)
     {

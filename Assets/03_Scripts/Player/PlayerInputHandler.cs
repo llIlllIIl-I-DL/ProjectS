@@ -31,6 +31,7 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
     public event Action OnJumpRelease;
     public event Action OnDashInput;
     public event Action OnSprintActivated;
+    public event Action OnAttackInput;
 
     private Vector2 moveDirection;
     public Vector2 MoveDirection => moveDirection;
@@ -177,7 +178,7 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
         if (context.started)
         {
             Debug.Log("공격 입력 감지");
-            // 공격 이벤트 전달 (추가 구현 필요)
+            OnAttackInput?.Invoke();
         }
     }
 
