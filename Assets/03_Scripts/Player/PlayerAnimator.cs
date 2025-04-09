@@ -17,23 +17,65 @@ public class PlayerAnimator : MonoBehaviour
 
     private void Awake()
     {
+        // 애니메이터 참조 가져오기 (자식 오브젝트에 있을 수 있음)
         animator = GetComponentInChildren<Animator>();
+        
+        if (animator == null)
+        {
+            Debug.LogError("애니메이터를 찾을 수 없습니다! 플레이어 또는 자식 오브젝트에 Animator 컴포넌트가 있는지 확인하세요.");
+            // 혹시 본인에게 있을 수도 있으니 확인
+            animator = GetComponent<Animator>();
+        }
+        
+        // 디버그용: 애니메이터 파라미터 목록 출력
+        if (animator != null)
+        {
+            Debug.Log("애니메이터 파라미터 목록:");
+            foreach (AnimatorControllerParameter param in animator.parameters)
+            {
+                Debug.Log($"- {param.name} ({param.type})");
+                
+                // 사다리 관련 파라미터인 경우 강조 표시
+                if (param.name.Contains("Climb") || param.name == "IsActuallyClimbing" || param.name == "isActuallyClimbing")
+                {
+                    Debug.Log($"*** 중요: 사다리 관련 파라미터 발견: {param.name} ({param.type}) ***");
+                }
+            }
+            
+            // IsActuallyClimbing 파라미터가 있는지 특별히 확인
+            bool hasActuallyClimbParam = HasParameter("IsActuallyClimbing");
+            Debug.Log($"IsActuallyClimbing 파라미터 확인 결과: {hasActuallyClimbParam}");
+        }
+    }
+    
+    private void Start()
+    {
+        // Animator 레퍼런스 유효성 다시 확인
+        if (animator == null)
+        {
+            animator = GetComponentInChildren<Animator>();
+            Debug.Log($"Start에서 애니메이터 참조 확인: {(animator != null ? "성공" : "실패")}");
+        }
     }
     
     private void LateUpdate()
     {
+        // 애니메이터가 없으면 실행하지 않음
+        if (animator == null) return;
+        
         // 사다리 애니메이션 속도 처리
-        if (animator != null && HasParameter("IsActuallyClimbing"))
+        if (HasParameter("IsActuallyClimbing"))
         {
             // 애니메이션 일시정지 제어
-            if (isActuallyClimbing && !isPaused)
+            if (isActuallyClimbing && isPaused)
             {
                 // 움직이는 중이면 애니메이션 계속 진행
                 ResumeAnimation();
             }
-            else if (!isActuallyClimbing && !isPaused)
+            else if (!isActuallyClimbing && !isPaused && 
+                    (HasParameter("IsClimbing") && animator.GetBool("IsClimbing")))
             {
-                // 움직임이 멈추면 현재 프레임에서 애니메이션 정지
+                // 움직임이 멈추었고 사다리 상태일 때만 애니메이션 정지
                 PauseAnimation();
             }
         }
@@ -44,24 +86,42 @@ public class PlayerAnimator : MonoBehaviour
     {
         if (animator == null || isPaused) return;
         
-        // 현재 재생 중인 애니메이션 정보 가져오기
-        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-        
-        // 사다리 오르기 상태인지 확인
-        if (stateInfo.IsName("Climbing") || stateInfo.IsName("Base Layer.Climbing") || 
-            (climbingStateFullPath != "" && stateInfo.IsName(climbingStateFullPath)))
+        try
         {
-            // 현재 정규화된 시간 (0~1 사이)
-            float normalizedTime = stateInfo.normalizedTime % 1;
+            // 현재 재생 중인 애니메이션 정보 가져오기
+            AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
             
-            // 현재 프레임 인덱스 계산 (애니메이션에 프레임 수에 따라 조정)
-            lastFrameIndex = Mathf.FloorToInt(normalizedTime * 30); // 30은 예상 프레임 수
+            // 사다리 오르기 상태인지 확인
+            // 여러 가능한 이름을 확인 (Animator 설정에 따라 다를 수 있음)
+            bool isClimbState = stateInfo.IsName("Climbing") || 
+                               stateInfo.IsName("Base Layer.Climbing") || 
+                               stateInfo.IsName("Climb") ||
+                               stateInfo.IsName("Base Layer.Climb") ||
+                               stateInfo.IsName("ClimbingState") || 
+                               (climbingStateFullPath != "" && stateInfo.IsName(climbingStateFullPath));
             
-            // 애니메이션 속도를 0으로 설정해 멈춤
-            animator.speed = 0;
-            isPaused = true;
-            
-            Debug.Log($"애니메이션 일시정지: 프레임 {lastFrameIndex}, 시간 {normalizedTime}");
+            if (isClimbState || HasParameter("IsClimbing") && animator.GetBool("IsClimbing"))
+            {
+                // 현재 정규화된 시간 (0~1 사이)
+                float normalizedTime = stateInfo.normalizedTime % 1;
+                
+                // 현재 프레임 인덱스 계산 (애니메이션에 프레임 수에 따라 조정)
+                lastFrameIndex = Mathf.FloorToInt(normalizedTime * 30); // 30은 예상 프레임 수
+                
+                // 애니메이션 속도를 0으로 설정해 멈춤
+                animator.speed = 0;
+                isPaused = true;
+                
+                Debug.Log($"애니메이션 일시정지: 프레임 {lastFrameIndex}, 시간 {normalizedTime}, 상태: {stateInfo.fullPathHash}");
+            }
+            else
+            {
+                Debug.LogWarning($"사다리 오르기 상태가 아닙니다. 현재 상태: {stateInfo.fullPathHash}, 이름: {stateInfo.nameHash}");
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"애니메이션 일시정지 중 오류: {e.Message}");
         }
     }
     
@@ -70,16 +130,27 @@ public class PlayerAnimator : MonoBehaviour
     {
         if (animator == null || !isPaused) return;
         
-        // 애니메이션 속도 복원
-        animator.speed = 1;
-        isPaused = false;
-        
-        Debug.Log("애니메이션 재개");
+        try
+        {
+            // 애니메이션 속도 복원
+            animator.speed = 1;
+            isPaused = false;
+            
+            Debug.Log("애니메이션 재개");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"애니메이션 재개 중 오류: {e.Message}");
+        }
     }
 
     public void UpdateAnimation(PlayerStateType state, bool isMoving, Vector2 velocity)
     {
-        if (animator == null) return;
+        if (animator == null)
+        {
+            Debug.LogError("UpdateAnimation 호출되었으나 animator가 null입니다!");
+            return;
+        }
 
         try
         {
@@ -94,13 +165,9 @@ public class PlayerAnimator : MonoBehaviour
             }
 
             // 상태별 파라미터
-            bool hasSprinting = HasParameter("IsSprinting");
-            Debug.Log($"IsSprinting 파라미터 존재 여부: {hasSprinting}, 현재 상태: {state == PlayerStateType.Sprinting}");
-
-            if (hasSprinting)
+            if (HasParameter("IsSprinting"))
             {
                 animator.SetBool("IsSprinting", state == PlayerStateType.Sprinting);
-                Debug.Log($"IsSprinting 파라미터 설정: {state == PlayerStateType.Sprinting}");
             }
 
             if (HasParameter("IsJumping"))
@@ -131,7 +198,7 @@ public class PlayerAnimator : MonoBehaviour
                 bool isClimbingState = state == PlayerStateType.Climbing;
                 animator.SetBool("IsClimbing", isClimbingState);
                 
-                // 사다리 오르기 상태가 아니면 일시정지 해제
+                // 이전에 일시정지 상태였고 현재 사다리 상태가 아니면 재생 복구
                 if (!isClimbingState && isPaused)
                 {
                     ResumeAnimation();
@@ -151,6 +218,8 @@ public class PlayerAnimator : MonoBehaviour
                     animator.SetBool("IsActuallyClimbing", actuallyClimbing);
                     isActuallyClimbing = actuallyClimbing;
                     
+                    Debug.Log($"IsActuallyClimbing 설정: {actuallyClimbing}, 속도Y: {velocity.y}");
+                    
                     // 움직임 유무에 따라 애니메이션 일시정지/재개
                     if (actuallyClimbing && isPaused)
                     {
@@ -161,6 +230,10 @@ public class PlayerAnimator : MonoBehaviour
                         PauseAnimation();
                     }
                 }
+            }
+            else
+            {
+                Debug.LogWarning("IsClimbing 파라미터가 없습니다. Animator에 추가해주세요.");
             }
                 
             // 사다리 이동 속도 파라미터 - 상하 움직임 애니메이션 속도 조절용
@@ -188,78 +261,88 @@ public class PlayerAnimator : MonoBehaviour
     }
     
     // 사다리 애니메이션 상태의 전체 경로 가져오기
-    private System.Collections.IEnumerator GetClimbingStatePath()
+    private IEnumerator GetClimbingStatePath()
     {
         // 다음 프레임을 기다려 애니메이션이 변경된 후 상태 정보 확인
         yield return null;
         
         if (animator != null)
         {
-            AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-            
-            // 현재 클립 이름 가져오기 시도
-            if (animator.GetCurrentAnimatorClipInfo(0).Length > 0)
+            try
             {
-                string clipName = animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
-                if (clipName.Contains("Climb") || clipName.Contains("climb") || clipName.Contains("Ladder"))
+                AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+                
+                // 현재 클립 이름 가져오기 시도
+                if (animator.GetCurrentAnimatorClipInfo(0).Length > 0)
                 {
-                    // 사다리 애니메이션 상태 경로 저장
-                    climbingStateFullPath = stateInfo.fullPathHash.ToString();
-                    Debug.Log($"사다리 애니메이션 상태 경로 저장: {clipName}, 해시: {climbingStateFullPath}");
+                    string clipName = animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
+                    Debug.Log($"현재 재생 중인 클립: {clipName}");
+                    
+                    if (clipName.Contains("Climb") || clipName.Contains("climb") || clipName.Contains("Ladder"))
+                    {
+                        // 사다리 애니메이션 상태 경로 저장
+                        climbingStateFullPath = stateInfo.fullPathHash.ToString();
+                        Debug.Log($"사다리 애니메이션 상태 경로 저장: {clipName}, 해시: {climbingStateFullPath}");
+                    }
                 }
+                else
+                {
+                    Debug.LogWarning("현재 재생 중인 애니메이션 클립 정보를 가져올 수 없습니다.");
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"클립 정보 가져오기 중 오류: {e.Message}");
             }
         }
     }
 
     public void SetSprinting(bool isSprinting)
     {
-        if (animator == null) return;
-        
-        try
+        if (animator == null)
         {
-            if (HasParameter("IsSprinting"))
-            {
-                animator.SetBool("IsSprinting", isSprinting);
-                Debug.Log($"스프린트 애니메이션 상태 변경: {isSprinting}");
-            }
+            Debug.LogError("SetSprinting 호출되었으나 animator가 null입니다!");
+            return;
         }
-        catch (System.Exception e)
+        
+        if (HasParameter("IsSprinting"))
         {
-            Debug.LogError($"스프린트 애니메이션 설정 중 오류: {e.Message}");
+            animator.SetBool("IsSprinting", isSprinting);
+            Debug.Log($"스프린트 애니메이션 상태 변경: {isSprinting}");
         }
     }
     
     // 앉기 상태 설정 메서드 추가
     public void SetCrouching(bool isCrouching)
     {
-        if (animator == null) return;
-        
-        try
+        if (animator == null)
         {
-            if (HasParameter("IsCrouching"))
-            {
-                animator.SetBool("IsCrouching", isCrouching);
-                Debug.Log($"앉기 애니메이션 상태 변경: {isCrouching}");
-            }
+            Debug.LogError("SetCrouching 호출되었으나 animator가 null입니다!");
+            return;
         }
-        catch (System.Exception e)
+        
+        if (HasParameter("IsCrouching"))
         {
-            Debug.LogError($"앉기 애니메이션 설정 중 오류: {e.Message}");
+            animator.SetBool("IsCrouching", isCrouching);
+            Debug.Log($"앉기 애니메이션 상태 변경: {isCrouching}");
         }
     }
     
     // 사다리 오르기 상태 설정 메서드 추가
     public void SetClimbing(bool isClimbing)
     {
-        if (animator == null) return;
-        
-        try
+        if (animator == null)
         {
-            if (HasParameter("IsClimbing"))
-            {
-                animator.SetBool("IsClimbing", isClimbing);
-                Debug.Log($"사다리 오르기 애니메이션 상태 변경: {isClimbing}");
-            }
+            Debug.LogError("SetClimbing 호출되었으나 animator가 null입니다!");
+            return;
+        }
+        
+        Debug.Log($"SetClimbing 호출: isClimbing={isClimbing}");
+        
+        if (HasParameter("IsClimbing"))
+        {
+            animator.SetBool("IsClimbing", isClimbing);
+            Debug.Log($"사다리 오르기 애니메이션 상태 변경: {isClimbing}");
             
             // 사다리에 들어가면 처음에는 실제 오르기 애니메이션 비활성화
             if (HasParameter("IsActuallyClimbing"))
@@ -276,10 +359,9 @@ public class PlayerAnimator : MonoBehaviour
             if (isClimbing)
             {
                 // 사다리 모드 진입 시 현재 프레임에서 일시정지
-                if (!isPaused)
-                {
-                    PauseAnimation();
-                }
+                // 일단 일시정지하지 않고 일반 사다리 애니메이션 재생
+                animator.speed = 1;
+                isPaused = false;
             }
             else
             {
@@ -293,53 +375,56 @@ public class PlayerAnimator : MonoBehaviour
                 animator.speed = 1;
             }
         }
-        catch (System.Exception e)
+        else
         {
-            Debug.LogError($"사다리 오르기 애니메이션 설정 중 오류: {e.Message}");
+            Debug.LogWarning("IsClimbing 파라미터가 없습니다. Animator에 추가해주세요.");
         }
     }
 
     // 실제 사다리 오르기 애니메이션 상태 직접 제어
     public void SetActuallyClimbing(bool isActuallyClimbing)
     {
-        if (animator == null) return;
-
-        try
+        if (animator == null)
         {
-            if (HasParameter("IsActuallyClimbing"))
-            {
-                bool wasClimbing = this.isActuallyClimbing;
-                this.isActuallyClimbing = isActuallyClimbing;
-                animator.SetBool("IsActuallyClimbing", isActuallyClimbing);
+            Debug.LogError("SetActuallyClimbing 호출되었으나 animator가 null입니다!");
+            return;
+        }
 
-                // 움직임 상태가 변경된 경우에만 처리
-                if (wasClimbing != isActuallyClimbing)
-                {
-                    if (isActuallyClimbing && isPaused)
-                    {
-                        // 움직임 시작 시 애니메이션 재개
-                        ResumeAnimation();
-                    }
-                    else if (!isActuallyClimbing && !isPaused)
-                    {
-                        // 움직임 정지 시 현재 프레임에서 멈춤
-                        PauseAnimation();
-                    }
-                    
-                    Debug.Log($"실제 사다리 오르기 애니메이션 변경: {isActuallyClimbing}, 일시정지: {isPaused}");
-                }
+        Debug.Log($"SetActuallyClimbing 호출: {isActuallyClimbing}");
+        
+        if (HasParameter("IsActuallyClimbing"))
+        {
+            bool wasClimbing = this.isActuallyClimbing;
+            this.isActuallyClimbing = isActuallyClimbing;
+            animator.SetBool("IsActuallyClimbing", isActuallyClimbing);
+            
+            Debug.Log($"IsActuallyClimbing 파라미터 설정: {isActuallyClimbing}, 이전 상태: {wasClimbing}, HasParameter 결과: {HasParameter("IsActuallyClimbing")}");
+            
+            // 움직임 유무에 따라 애니메이션 일시정지/재개
+            if (isActuallyClimbing && isPaused)
+            {
+                ResumeAnimation();
+            }
+            else if (!isActuallyClimbing && !isPaused)
+            {
+                // 움직임이 없을 때는 현재 프레임을 유지
+                PauseAnimation();
             }
         }
-        catch (System.Exception e)
+        else
         {
-            Debug.LogError($"실제 사다리 오르기 애니메이션 설정 중 오류: {e.Message}");
+            Debug.LogError("IsActuallyClimbing 파라미터가 Animator에 없습니다. 추가해주세요!");
         }
     }
 
     // 트리거 설정 메서드
     public void SetTrigger(string triggerName)
     {
-        if (animator == null) return;
+        if (animator == null)
+        {
+            Debug.LogError("SetTrigger 호출되었으나 animator가 null입니다!");
+            return;
+        }
         
         if (HasParameter(triggerName))
         {
@@ -368,13 +453,34 @@ public class PlayerAnimator : MonoBehaviour
     {
         if (animator == null) return false;
 
-        foreach (AnimatorControllerParameter param in animator.parameters)
+        try
         {
-            if (param.name == paramName)
+            foreach (AnimatorControllerParameter param in animator.parameters)
             {
-                return true;
+                if (param.name == paramName)
+                {
+                    Debug.Log($"파라미터 확인: '{paramName}' 존재함");
+                    return true;
+                }
             }
+            
+            // 대소문자 구분 없이 일치하는 파라미터 찾기 (오류 감지용)
+            foreach (AnimatorControllerParameter param in animator.parameters)
+            {
+                if (param.name.ToLower() == paramName.ToLower())
+                {
+                    Debug.LogWarning($"대소문자 불일치 파라미터: 요청된 이름 '{paramName}'이지만 실제 이름은 '{param.name}'입니다.");
+                    return false;
+                }
+            }
+            
+            Debug.LogWarning($"애니메이션 파라미터 '{paramName}'이(가) 없습니다.");
+            return false;
         }
-        return false;
+        catch (System.Exception e)
+        {
+            Debug.LogError($"파라미터 확인 중 오류: {e.Message}");
+            return false;
+        }
     }
 }
