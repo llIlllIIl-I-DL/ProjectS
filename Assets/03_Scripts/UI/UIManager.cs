@@ -7,6 +7,13 @@ public class UIManager : Singleton<UIManager>
 {
     public List<GameObject> allUIPages = new List<GameObject>();
 
+    InputUI inputUI;
+
+    private void Start()
+    {
+        inputUI = FindObjectOfType<InputUI>();
+    }
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -17,6 +24,7 @@ public class UIManager : Singleton<UIManager>
 
     public void CloseAllPage()
     {
+        
         foreach (GameObject uiPage in allUIPages)
         {
             if (uiPage != null)
@@ -25,5 +33,9 @@ public class UIManager : Singleton<UIManager>
                 Time.timeScale = 1f;
             }
         }
+
+        inputUI.isOpen = false;
+        inputUI.isPauseMenuOpen = false;
+        inputUI.isSettingOpen = false;
     }
 }

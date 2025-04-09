@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using Unity.VisualScripting.Antlr3.Runtime;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -26,9 +27,10 @@ public class InputUI : MonoBehaviour
     [Header("PauseManu UI 창")]
     [SerializeField] public GameObject settingMenu;
 
-    static bool isOpen = false;
-    //static bool wannaOpenPageOnPauseMenu = false;
-    static bool isPauseMenuOpen = false;
+    public bool isOpen = false;
+    public bool isPauseMenuOpen = false;
+
+    public bool isSettingOpen = false;
 
 
     private void Start()
@@ -90,7 +92,6 @@ public class InputUI : MonoBehaviour
     public void PauseMenu(GameObject Menu)
     {
         isPauseMenuOpen = true;
-        //wannaOpenPageOnPauseMenu = true;
 
         if (isPauseMenuOpen == true)
         {
@@ -109,8 +110,6 @@ public class InputUI : MonoBehaviour
                 Time.timeScale = 1f;
             }
         }
-
-        //닫을 때 isPauseMenuOpen false로 바꾸기
     }
 
 
@@ -121,7 +120,17 @@ public class InputUI : MonoBehaviour
 
     public void SettingMenu()
     {
+        if (isSettingOpen == false)
+        {
+            settingMenu.SetActive(true);
+            isSettingOpen = true;
+        }
 
+        else
+        {
+            settingMenu.SetActive(false);
+            isSettingOpen = false;
+        }
     }
 
     public void ToMainMenu()
