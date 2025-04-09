@@ -1,6 +1,6 @@
-// 보스의 상태를 정의하는 열거형
 using UnityEngine;
 
+// 보스의 상태를 정의하는 열거형
 public enum BossState
 {
     Idle,       // 대기 상태
@@ -15,29 +15,29 @@ public class Boss : MonoBehaviour
     public BossState currentState = BossState.Idle; // 현재 상태
 
     [Header("보스 기본 스탯")]
-    public float maxHp = 100f;
-    public float currentHp;
+    public float maxHp; //최대 체력
+    public float currentHp; //현재 체력
     public bool isInvincible = true; // 무적 여부
 
     [Header("Hit Delay")]
-    public float hitDelayDuration = 1.0f; // 피격 후 무적 시간
+    public float hitDelayDuration; // 피격 후 무적 시간
     private float hitDelayTimer; // 피격 딜레이 타이머
 
-    [Header("Groggy")]
-    public int groggyThreshold = 3; // 그로기 전까지 맞아야 할 횟수
-    public float groggyDuration = 3f; // 그로기 지속 시간
+    [Header("그로기 상태")]
+    public int groggyThreshold; // 그로기 전까지 맞아야 할 횟수
+    public float groggyDuration; // 그로기 지속 시간
     private float groggyTimer; // 그로기 타이머
     private int hitCount; // 누적 피격 횟수
 
     [Header("컴포넌트")]
     private Animator animator; // 애니메이터 컴포넌트
-    public GameObject hpUI; // 보스 HP UI
+    //public GameObject hpUI; // 보스 HP UI
 
     void Start()
     {
         currentHp = maxHp;
         animator = GetComponent<Animator>();
-        hpUI.SetActive(false); // 처음엔 HP UI 숨김
+        //hpUI.SetActive(false); // 처음엔 HP UI 숨김
     }
 
     void Update()
@@ -65,7 +65,7 @@ public class Boss : MonoBehaviour
     void HandleIdle()
     {
         isInvincible = true; // 무적 상태
-        animator.Play("Idle");
+        animator.Play("Boss_Idle");
 
         // 플레이어가 범위에 들어오면 공격 상태로 전환
         if (PlayerInRange())
@@ -77,7 +77,7 @@ public class Boss : MonoBehaviour
     void HandleAttack()
     {
         isInvincible = true; // 공격 중 무적
-        animator.Play("Attack");
+        animator.Play("Boss_Attack");
 
         // 공격 도중 피격 시 피격 상태로 전이
         if (WasHit())
@@ -121,7 +121,7 @@ public class Boss : MonoBehaviour
     void HandleDead()
     {
         isInvincible = true;
-        animator.Play("Dead");
+        animator.Play("Boss_Dead");
         // 드롭, 제거 로직 추가 가능
     }
 
