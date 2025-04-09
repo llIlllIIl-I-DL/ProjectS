@@ -19,7 +19,7 @@ MonoBehaviour:
   deceleration: 10
   velocityPower: 0.9
   frictionAmount: 0.2
-  crouchSpeed: 1.5
+  crouchSpeed: 0.5
   crouchHeightRatio: 0.6
   crouchOffsetY: -0.186
   jumpForce: 6
