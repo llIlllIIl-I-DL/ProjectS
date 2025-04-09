@@ -52,6 +52,10 @@ public class PlayerAnimator : MonoBehaviour
 
             if (HasParameter("IsAttacking"))
                 animator.SetBool("IsAttacking", state == PlayerStateType.Attacking);
+                
+            // 앉기 상태 파라미터 추가
+            if (HasParameter("IsCrouching"))
+                animator.SetBool("IsCrouching", state == PlayerStateType.Crouching);
         }
         catch (System.Exception e)
         {
@@ -74,6 +78,25 @@ public class PlayerAnimator : MonoBehaviour
         catch (System.Exception e)
         {
             Debug.LogError($"스프린트 애니메이션 설정 중 오류: {e.Message}");
+        }
+    }
+    
+    // 앉기 상태 설정 메서드 추가
+    public void SetCrouching(bool isCrouching)
+    {
+        if (animator == null) return;
+        
+        try
+        {
+            if (HasParameter("IsCrouching"))
+            {
+                animator.SetBool("IsCrouching", isCrouching);
+                Debug.Log($"앉기 애니메이션 상태 변경: {isCrouching}");
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"앉기 애니메이션 설정 중 오류: {e.Message}");
         }
     }
 

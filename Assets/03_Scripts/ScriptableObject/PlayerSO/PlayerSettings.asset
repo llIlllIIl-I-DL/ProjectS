@@ -19,11 +19,16 @@ MonoBehaviour:
   deceleration: 10
   velocityPower: 0.9
   frictionAmount: 0.2
+  crouchSpeed: 1.5
+  crouchHeightRatio: 0.6
+  crouchOffsetY: -0.186
   jumpForce: 6
   jumpCutMultiplier: 0.5
   fallGravityMultiplier: 1.7
   coyoteTime: 0.15
   jumpBufferTime: 0.1
+  doubleJumpForceMultiplier: 0.8
+  canDoubleJump: 0
   dashSpeed: 7
   dashDuration: 0.2
   dashCooldown: 0.4

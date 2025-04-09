@@ -32,6 +32,7 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
     public event Action OnDashInput;
     public event Action OnSprintActivated;
     public event Action OnAttackInput;
+    public event Action OnCrouchInput;
 
     private Vector2 moveDirection;
     public Vector2 MoveDirection => moveDirection;
@@ -183,6 +184,15 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
         {
             Debug.Log("공격 입력 감지");
             OnAttackInput?.Invoke();
+        }
+    }
+
+    public void OnCrouch(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            Debug.Log("앉기 입력 감지");
+            OnCrouchInput?.Invoke();
         }
     }
 

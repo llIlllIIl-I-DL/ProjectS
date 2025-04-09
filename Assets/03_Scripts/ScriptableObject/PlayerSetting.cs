@@ -11,6 +11,10 @@ public class PlayerSettings : ScriptableObject
     public float deceleration = 60f;
     public float velocityPower = 0.9f;
     public float frictionAmount = 0.2f;
+    [Header("앉기 설정")]
+    public float crouchSpeed = 3.5f;
+    public float crouchHeightRatio = 0.6f; // 앉기 상태 콜라이더 높이 비율
+    public float crouchOffsetY = -0.5f;
 
     [Header("점프 설정")]
     public float jumpForce = 12f;

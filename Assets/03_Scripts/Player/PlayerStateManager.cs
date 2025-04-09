@@ -29,6 +29,7 @@ public class PlayerStateManager : MonoBehaviour
     private bool isDashing;
     private bool isSprinting;
     private bool canDash = true;
+    private bool isCrouching;
 
     // 프로퍼티
     public PlayerStateType CurrentState => currentStateType;
@@ -40,9 +41,11 @@ public class PlayerStateManager : MonoBehaviour
     public bool IsWallSliding => isWallSliding;
     public bool IsDashing => isDashing;
     public bool CanDash => canDash;
+    public bool IsCrouching => isCrouching;
 
     // 이벤트
     public event Action<PlayerStateType> OnStateChanged;
+    public event Action<bool> OnCrouchStateChanged;
 
     private void Awake()
     {
@@ -117,6 +120,7 @@ public class PlayerStateManager : MonoBehaviour
         states.Add(PlayerStateType.Dashing, new PlayerDashingState(this));
         states.Add(PlayerStateType.Attacking, new PlayerAttackingState(this));
         states.Add(PlayerStateType.Hit, new PlayerHitState(this));
+        states.Add(PlayerStateType.Crouching, new PlayerCrouchingState(this));
         // 초기 상태 설정
         ChangeState(PlayerStateType.Idle);
     }
@@ -125,6 +129,9 @@ public class PlayerStateManager : MonoBehaviour
     {
         // 타이머 업데이트
         UpdateTimers();
+
+        // 앉기 입력 체크
+        CheckCrouchInput();
 
         // 상태 관련 자동 전환 확인
         CheckStateTransitions();
@@ -171,18 +178,21 @@ public class PlayerStateManager : MonoBehaviour
 
     private void CheckStateTransitions()
     {
+        // Crouching 상태에서 앉기 입력이 해제되고 지상에 있으면 Idle로 전환
+        if (currentStateType == PlayerStateType.Crouching && !inputHandler.IsDownPressed && collisionDetector.IsGrounded)
+        {
+            ChangeState(inputHandler.IsMoving() ? PlayerStateType.Running : PlayerStateType.Idle);
+        }
         // Idle 상태에서 이동 입력이 있으면 Running으로 전환
-        if (currentStateType == PlayerStateType.Idle && inputHandler.IsMoving() && collisionDetector.IsGrounded)
+        else if (currentStateType == PlayerStateType.Idle && inputHandler.IsMoving() && collisionDetector.IsGrounded)
         {
             ChangeState(PlayerStateType.Running);
         }
-
         // Running 상태에서 이동 입력이 없으면 Idle로 전환
         else if (currentStateType == PlayerStateType.Running && !inputHandler.IsMoving() && collisionDetector.IsGrounded)
         {
             ChangeState(PlayerStateType.Idle);
         }
-
         // 지상에 있지 않고 낙하 중이면 Falling으로 전환
         else if (currentStateType != PlayerStateType.Jumping &&
                  currentStateType != PlayerStateType.WallSliding &&
@@ -193,7 +203,6 @@ public class PlayerStateManager : MonoBehaviour
         {
             ChangeState(PlayerStateType.Falling);
         }
-
         // 벽에 붙어있으면 WallSliding으로 전환
         else if (currentStateType != PlayerStateType.WallSliding &&
                  currentStateType != PlayerStateType.Dashing &&
@@ -404,6 +413,7 @@ public class PlayerStateManager : MonoBehaviour
     public void SetJumping(bool value) => isJumping = value;
     public void SetWallSliding(bool value) => isWallSliding = value;
     public void SetSprinting(bool value) => isSprinting = value;
+    public void SetCrouching(bool value) => isCrouching = value;
 
     // 피격 처리 메서드
     public void TakeDamage(float damage)
@@ -422,5 +432,61 @@ public class PlayerStateManager : MonoBehaviour
         ChangeState(PlayerStateType.Hit);
         
         Debug.Log($"플레이어가 {damage} 데미지를 받았습니다.");
+    }
+
+    // 앉기 입력 체크 메서드
+    private void CheckCrouchInput()
+    {
+        // 지상에 있고 아래 방향키가 눌렸을 때 앉기 상태로 전환
+        if (collisionDetector.IsGrounded && inputHandler.IsDownPressed &&
+            currentStateType != PlayerStateType.Crouching &&
+            currentStateType != PlayerStateType.Dashing &&
+            currentStateType != PlayerStateType.Attacking)
+        {
+            EnterCrouchState();
+        }
+    }
+
+    // 앉기 상태 진입 메서드
+    private void EnterCrouchState()
+    {
+        if (!isCrouching)
+        {
+            isCrouching = true;
+            ChangeState(PlayerStateType.Crouching);
+            OnCrouchStateChanged?.Invoke(true);
+            
+            // 앉기 애니메이션 상태 설정
+            playerAnimator?.SetCrouching(true);
+            
+            // 앉기 상태에서의 콜라이더 크기 조절 등은 PlayerCrouchingState에서 처리
+        }
+    }
+
+    // 앉기 상태 종료 메서드
+    public void ExitCrouchState()
+    {
+        if (isCrouching)
+        {
+            isCrouching = false;
+            OnCrouchStateChanged?.Invoke(false);
+            
+            // 앉기 애니메이션 상태 해제
+            playerAnimator?.SetCrouching(false);
+            
+            // 플레이어가 천장과 충돌하지 않는지 확인 후 상태 전환
+            if (CanStandUp())
+            {
+                ChangeState(inputHandler.IsMoving() ? PlayerStateType.Running : PlayerStateType.Idle);
+            }
+        }
+    }
+
+    // 일어설 수 있는지 확인하는 메서드
+    private bool CanStandUp()
+    {
+        // 필요 시 천장 충돌 체크 로직 구현
+        // 여기서는 간단하게 true 반환
+        return true;
     }
 }
