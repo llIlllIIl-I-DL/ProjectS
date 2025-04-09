@@ -233,10 +233,5 @@ public class PlayerCrouchingState : PlayerStateBase
             // 앉기 상태에서의 이동 속도 적용
             movement.Move(moveInput * crouchingMoveSpeed);
         }
-        else
-        {
-            // 정지
-            //movement.Stop();
-        }
     }
 } 

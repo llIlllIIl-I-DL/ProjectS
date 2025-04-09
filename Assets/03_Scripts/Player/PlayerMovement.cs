@@ -171,4 +171,29 @@ public class PlayerMovement : MonoBehaviour
     {
         isSprinting = sprinting;
     }
+
+    // 사다리 오르기 이동 메서드 추가
+    public void ClimbMove(Vector2 moveVelocity)
+    {
+        if (rb == null) return;
+        
+        // 사다리 오르기는 X, Y 모두 직접 속도 설정
+        rb.velocity = moveVelocity;
+        
+        // X 방향 이동이 있으면 방향 체크
+        if (!Mathf.Approximately(moveVelocity.x, 0f))
+        {
+            CheckDirectionChange(moveVelocity.x);
+        }
+    }
+
+    private void CheckDirectionChange(float moveX)
+    {
+        if ((moveX > 0 && facingDirection < 0) || (moveX < 0 && facingDirection > 0))
+        {
+            facingDirection = (int)Mathf.Sign(moveX);
+            transform.localScale = new Vector3(facingDirection, 1, 1);
+            OnDirectionChanged?.Invoke(facingDirection);
+        }
+    }
 }

@@ -37,5 +37,10 @@ public class PlayerSettings : ScriptableObject
     public float wallJumpForce = 12f;
     public Vector2 wallJumpDirection = new Vector2(1f, 1.5f);
     public float wallStickTime = 0.2f;
+    
+    [Header("사다리 설정")]
+    public float climbSpeed = 4f; // 사다리 오르기 속도
+    public float climbHorizontalSpeed = 2f; // 사다리에서 좌우 이동 속도
+    public bool allowClimbJump = true; // 사다리에서 점프 가능 여부
 }
 
