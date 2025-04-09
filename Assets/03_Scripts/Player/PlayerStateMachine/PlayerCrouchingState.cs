@@ -34,22 +34,7 @@ public class PlayerCrouchingState : PlayerStateBase
         // CapsuleCollider2D 또는 BoxCollider2D 찾기
         playerCollider = player.GetComponent<CapsuleCollider2D>();
         
-        if (playerCollider != null)
-        {
-            Debug.Log($"CapsuleCollider2D 찾음: {playerCollider.name}, 현재 크기: {playerCollider.size}");
-            originalColliderHeight = playerCollider.size.y;
-            crouchingColliderHeight = originalColliderHeight * 0.6f; // 기본값, 설정에서 가져올 수 있으면 변경
-            
-            // PlayerSettings의 crouchHeightRatio 값 사용 시도
-            var settings = player.GetSettings();
-            if (settings != null && settings.GetType().GetField("crouchHeightRatio") != null)
-            {
-                crouchingColliderHeight = originalColliderHeight * settings.crouchHeightRatio;
-            }
-            
-            Debug.Log($"콜라이더 초기화 완료: 원래 높이={originalColliderHeight}, 앉을 때 높이={crouchingColliderHeight}, 오프셋={crouchingOffsetY}");
-        }
-        else
+        
         {
             // BoxCollider2D 시도
             boxCollider = player.GetComponent<BoxCollider2D>();
