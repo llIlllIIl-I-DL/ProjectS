@@ -6,7 +6,7 @@ using Enemy.States;
 /// <summary>
 /// 엘리트 적 - 플레이어 감지, 추격 및 공격, 롤의 알리스타처럼 돌진과 내려찍기 패턴이 있음
 /// </summary>
-public class EliteEnemy : BaseEnemy
+public class EnemyBigDust : BaseEnemy
 {
     #region Variables
     
