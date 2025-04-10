@@ -75,5 +75,4 @@ public class NextInventoryPageBtn : MonoBehaviour
             this.currentPage = InventoryPage1;
         }
     }
-
 }

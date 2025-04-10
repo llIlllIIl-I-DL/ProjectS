@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
 public class UIManager : Singleton<UIManager>
@@ -25,13 +26,30 @@ public class UIManager : Singleton<UIManager>
 
     public void CloseAllPage()
     {
-        
         foreach (GameObject uiPage in allUIPages)
         {
             if (uiPage != null)
             {
                 uiPage.gameObject.SetActive(false);
             }
+        }
+    }
+
+
+
+    public void YouAreOnlyOne(GameObject menu) //인게임 중 단 하나의 UI Canvas만 활성화되도록 함.
+    {
+        if (inputUI.currentPage != null)
+        {
+            foreach (GameObject uiPage in allUIPages)
+            {
+                if (uiPage != null)
+                {
+                    uiPage.gameObject.SetActive(false);
+                }
+            }
+
+            inputUI.currentPage.SetActive(true);
         }
     }
 }

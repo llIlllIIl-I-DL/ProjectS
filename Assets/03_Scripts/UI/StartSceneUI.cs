@@ -13,30 +13,48 @@ public class StartSceneUI : MonoBehaviour
     [SerializeField] public Button exitBtn;
 
     [Header("StartScene Menu")]
-    [SerializeField] public GameObject CheckPointMenu;
-    [SerializeField] public GameObject SettingMenu;
+    [SerializeField] public GameObject checkPointMenu;
+    [SerializeField] public GameObject settingMenu;
     [SerializeField] public GameObject difficultyMenu;
 
+    [Header("Difficulty Button")]
+    [SerializeField] public Button easy;
+    [SerializeField] public Button normal;
+    [SerializeField] public Button hard;
 
     void Start()
     {
-        newBtn.onClick.AddListener(() => SceneManager.LoadScene("YJ_UI_Scene1", LoadSceneMode.Single));
-        
+        newBtn.onClick.AddListener(() => NewGame());
         loadBtn.onClick.AddListener(() => LoadMenu());
         optionBtn.onClick.AddListener(() => OptionMenu());
         exitBtn.onClick.AddListener(() => CloseGame());
         
     }
 
+    public void NewGame()
+    {
+        difficultyMenu.SetActive(true);
+        SelectDifficulty();
+    }
+
+    public void SelectDifficulty()
+    {
+        easy.onClick.AddListener(() => SceneManager.LoadScene("YJ_UI_Scene1", LoadSceneMode.Single));
+        normal.onClick.AddListener(() => SceneManager.LoadScene("YJ_UI_Scene1", LoadSceneMode.Single));
+        hard.onClick.AddListener(() => SceneManager.LoadScene("YJ_UI_Scene1", LoadSceneMode.Single));
+    }
+
+
+
     public void LoadMenu()
     {
-        CheckPointMenu.SetActive(true);
+        checkPointMenu.SetActive(true);
     }
 
 
     public void OptionMenu()
     {
-        SettingMenu.SetActive(true);
+        settingMenu.SetActive(true);
     }
 
     public void CloseGame()
