@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 629705877621807215}
   - component: {fileID: 2645885010529420612}
   m_Layer: 10
-  m_Name: PatrolEnemy
+  m_Name: Enemy_Dust
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
