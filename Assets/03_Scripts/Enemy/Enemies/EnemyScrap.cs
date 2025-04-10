@@ -1,12 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Enemy.States;
 
 /// <summary>
 /// 간단한 순찰 적 (Met/굼바 스타일)
 /// </summary>
-public class EnemyDust : BaseEnemy
+public class EnemyScrap : BaseEnemy
 {
     #region Variables
     
@@ -61,16 +59,7 @@ public class EnemyDust : BaseEnemy
     /// </summary>
     protected override void InitializeEnemy()
     {
-        // 순찰 경로 설정 (시작점 기준 좌우로 순찰)
-        Vector2 leftPoint = startPosition - new Vector2(patrolDistance, 0);
-        Vector2 rightPoint = startPosition + new Vector2(patrolDistance, 0);
 
-        // 상태 생성 (두 개의 웨이포인트 설정)
-        patrolState = new PatrolState(this, stateMachine, new Vector2[] { leftPoint, rightPoint }, patrolWaitTime);
-        idleState = new IdleState(this, stateMachine, patrolWaitTime);
-
-        // 상태 머신 초기화
-        stateMachine.ChangeState(patrolState);
     }
 
     /// <summary>
@@ -122,21 +111,6 @@ public class EnemyDust : BaseEnemy
 
     #region State Switch Methods
     
-    /// <summary>
-    /// 순찰 상태로 전환
-    /// </summary>
-    public override void SwitchToPatrolState()
-    {
-        stateMachine.ChangeState(patrolState);
-    }
-    
-    /// <summary>
-    /// 대기 상태로 전환
-    /// </summary>
-    public override void SwitchToIdleState()
-    {
-        stateMachine.ChangeState(idleState);
-    }
     
     #endregion
 }
