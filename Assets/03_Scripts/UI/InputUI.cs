@@ -88,24 +88,28 @@ public class InputUI : MonoBehaviour
                 isOpen = false;
             }
         }
-    } //매니저에서 관리....
+    }
 
     public void PauseMenu(GameObject menu)
     {
         isPauseMenuOpen = true;
 
+        bool isActive = menu.activeSelf;
+        
         if (isPauseMenuOpen == true)
         {
             if (isOpen == false)
             {
-                menu.SetActive(true);
+                menu.SetActive(!isActive);
                 isOpen = true;
+                Time.timeScale = 0;
             }
 
             else
             {
-                menu.SetActive(false);
+                menu.SetActive(!isActive);
                 isOpen = false;
+                Time.timeScale = 1;
                 isPauseMenuOpen = false;
             }
         }
