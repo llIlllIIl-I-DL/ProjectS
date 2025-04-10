@@ -5,33 +5,25 @@ using UnityEngine;
 /// <summary>
 /// 모든 적 캐릭터의 기본 클래스
 /// </summary>
-public abstract class BaseEnemy : MonoBehaviour, IDamageable
+public abstract class BaseEnemy : DestructibleEntity
 {
-        #region Variables
+    #region Variables
 
     [Header("기본 스탯")]
-    [SerializeField] protected float maxHealth; // 최대 체력
-    [SerializeField] protected float currentHealth; // 현재 체력
     [SerializeField] protected float moveSpeed; // 이동 속도
     [SerializeField] protected float attackPower; // 공격력
     [SerializeField] protected float attackRange; // 공격 범위
     [SerializeField] protected float detectionRange; // 감지 범위
-
-    [Header("드롭 아이템")]
-    [SerializeField] protected GameObject[] possibleDrops; // 드롭 가능한 아이템들
-    [SerializeField] protected float dropChance = 0.3f; // 드롭 확률
     
     [Header("충돌 데미지")]
     [SerializeField] protected float contactDamage = 1f; // 충돌 데미지 값
     [SerializeField] protected bool dealsDamageOnContact = true; // 충돌 데미지 적용 여부
 
-    // 상태 관련
-    protected bool isDead = false; // 사망 여부
+    // Enemy 고유 상태 관련
     protected bool isStunned = false; // 기절 여부
     protected Transform playerTransform; 
     protected Rigidbody2D rb;
     protected Animator animator;
-    protected SpriteRenderer spriteRenderer;
     
     // 플레이어 감지
     protected bool playerDetected = false;
@@ -47,13 +39,16 @@ public abstract class BaseEnemy : MonoBehaviour, IDamageable
     /// <summary>
     /// 컴포넌트 캐싱 및 초기화
     /// </summary>
-    protected virtual void Awake()
+    protected override void Awake()
     {
-        currentHealth = maxHealth;
+        base.Awake(); // 부모 클래스 초기화 추가
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
         stateMachine = new EnemyStateMachine();
+        
+        // spriteRenderer가 부모 클래스에서 초기화되지 않았을 경우를 대비
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponent<SpriteRenderer>();
     }
     
     /// <summary>
@@ -71,7 +66,7 @@ public abstract class BaseEnemy : MonoBehaviour, IDamageable
     /// </summary>
     protected virtual void Update()
     {
-        if (isDead || isStunned) return;
+        if (isDestroyed || isStunned) return;
         
         // 플레이어 감지
         DetectPlayer();
@@ -85,7 +80,7 @@ public abstract class BaseEnemy : MonoBehaviour, IDamageable
     /// </summary>
     protected virtual void FixedUpdate()
     {
-        if (isDead || isStunned) return;
+        if (isDestroyed || isStunned) return;
         
         // 물리 기반 이동
         HandleMovement();
@@ -150,42 +145,16 @@ public abstract class BaseEnemy : MonoBehaviour, IDamageable
     public abstract void PerformAttack();
     
     /// <summary>
-    /// 피해를 입음
-    /// </summary>
-    public virtual void TakeDamage(float damage)
-    {
-        if (isDead) return;
-        
-        currentHealth -= damage;
-        
-        // 피격 효과
-        StartCoroutine(FlashEffect());
-        
-        // 사망 체크
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
-    }
-
-    /// <summary>
     /// 사망 처리
     /// </summary>
-    protected virtual void Die()
+    protected override void Destroy()
     {
-        isDead = true;
+        if (isDestroyed) return; // 이미 파괴된 경우 무시
         
-        // 애니메이션
-        animator?.SetTrigger("Die");
-        
-        // 콜라이더 비활성화
-        GetComponent<Collider2D>().enabled = false;
-        
-        // 아이템 드롭
-        DropItem();
-        
-        // 지연 파괴
-        Destroy(gameObject, 2f);
+        isDestroyed = true;
+        StopMoving(); // 이동 정지
+        PlayDestructionEffect(); // 파괴 효과 재생
+        Destroy(gameObject, 1f); // 1초 후 파괴
     }
     
     #endregion
@@ -195,7 +164,7 @@ public abstract class BaseEnemy : MonoBehaviour, IDamageable
     /// <summary>
     /// 피격 효과
     /// </summary>
-    protected virtual IEnumerator FlashEffect()
+    protected override IEnumerator FlashEffect()
     {
         if (spriteRenderer == null) yield break;
         
@@ -257,15 +226,9 @@ public abstract class BaseEnemy : MonoBehaviour, IDamageable
     /// <summary>
     /// 아이템 드롭
     /// </summary>
-    protected virtual void DropItem()
+    public override void DropItem()
     {
-        if (possibleDrops.Length == 0) return;
         
-        if (Random.value <= dropChance)
-        {
-            int dropIndex = Random.Range(0, possibleDrops.Length);
-            Instantiate(possibleDrops[dropIndex], transform.position, Quaternion.identity);
-        }
     }
     
     /// <summary>
@@ -288,7 +251,7 @@ public abstract class BaseEnemy : MonoBehaviour, IDamageable
     /// </summary>
     public void MoveInDirection(Vector2 direction, float speedMultiplier = 1f)
     {
-        if (isDead || isStunned) return; // 사망 또는 기절 상태일 때 이동하지 않음
+        if (isDestroyed || isStunned) return; // 사망 또는 기절 상태일 때 이동하지 않음
         
         rb.velocity = direction * moveSpeed * speedMultiplier; // 이동 속도 적용
     }
@@ -387,5 +350,20 @@ public abstract class BaseEnemy : MonoBehaviour, IDamageable
         return distance <= attackRange;
     }
     
+    #endregion
+
+    #region DestructibleEntity Implementation
+
+    /// <summary>
+    /// 파괴 효과 재생
+    /// </summary>
+    public override void PlayDestructionEffect()
+    {
+        // 애니메이션
+        // animator?.SetTrigger("Die");
+        
+        // 여기에 Enemy 전용 파괴 효과 추가
+    }
+
     #endregion
 }

@@ -6,7 +6,7 @@ using Enemy.States;
 /// <summary>
 /// 고정형 터렛 - 플레이어 감지 시 발사
 /// </summary>
-public class TurretEnemy : BaseEnemy
+public class EnemySupuerDust : BaseEnemy
 {
     #region Variables
     

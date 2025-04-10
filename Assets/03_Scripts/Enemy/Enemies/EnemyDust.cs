@@ -6,7 +6,7 @@ using Enemy.States;
 /// <summary>
 /// 간단한 순찰 적 (Met/굼바 스타일)
 /// </summary>
-public class PatrolEnemy : BaseEnemy
+public class EnemyDust : BaseEnemy
 {
     #region Variables
     

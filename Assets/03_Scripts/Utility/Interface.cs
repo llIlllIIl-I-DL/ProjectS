@@ -22,3 +22,9 @@ public interface IEnemyState
     void FixedUpdate();     // 물리 업데이트
     void OnTriggerEnter2D(Collider2D other);  // 트리거 충돌 감지
 }
+
+public interface IDestructible : IDamageable
+{
+    void DropItem();
+    void PlayDestructionEffect();
+}
