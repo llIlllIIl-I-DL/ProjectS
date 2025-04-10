@@ -92,6 +92,10 @@ public class InputUI : MonoBehaviour
 
     public void PauseMenu()
     {
+        pauseMenu.SetActive(!isPauseMenuOpen); //토글 작업 시 자주 사용
+        Time.timeScale = isPauseMenuOpen ? 1 : 0; //삼항연산자
+
+        /*
         if (isPauseMenuOpen == true)
         {
             pauseMenu.SetActive(false);
@@ -105,6 +109,7 @@ public class InputUI : MonoBehaviour
 
             Time.timeScale = 0;
         }
+        */
 
         isPauseMenuOpen = !isPauseMenuOpen;
     }
