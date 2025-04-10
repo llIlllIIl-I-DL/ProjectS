@@ -9,6 +9,7 @@ public class UIManager : Singleton<UIManager>
 
     InputUI inputUI;
 
+
     private void Start()
     {
         inputUI = FindObjectOfType<InputUI>();
@@ -30,12 +31,7 @@ public class UIManager : Singleton<UIManager>
             if (uiPage != null)
             {
                 uiPage.gameObject.SetActive(false);
-                Time.timeScale = 1f;
             }
         }
-
-        inputUI.isOpen = false;
-        inputUI.isPauseMenuOpen = false;
-        inputUI.isSettingOpen = false;
     }
 }
