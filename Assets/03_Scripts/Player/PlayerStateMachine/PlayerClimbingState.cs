@@ -5,7 +5,7 @@ public class PlayerClimbingState : PlayerStateBase
 {
     // 클래스 변수 추가
     private float climbSpeed = 4f;
-    private bool canHorizontallyExit = false;
+    private bool canHorizontallyExit = true;
     private Vector2 originalGravity;
     private float minClimbSpeedThreshold = 0.1f;
     private bool isMoving = false;
@@ -257,9 +257,8 @@ public class PlayerClimbingState : PlayerStateBase
             return;
         }
 
-        // 좌우 이동 + 사다리 영역을 벗어났을 때 사다리에서 내리기
-        if (canHorizontallyExit && !Mathf.Approximately(inputHandler.MoveDirection.x, 0f) &&
-            !collisionDetector.IsOnLadder)
+        // 좌우 이동 입력만으로도 사다리에서 바로 내리기
+        if (!Mathf.Approximately(inputHandler.MoveDirection.x, 0f))
         {
             player.ExitClimbingState(false);
             return;
