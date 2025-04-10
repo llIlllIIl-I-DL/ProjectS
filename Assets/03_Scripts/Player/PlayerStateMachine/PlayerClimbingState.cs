@@ -5,25 +5,33 @@ public class PlayerClimbingState : PlayerStateBase
 {
     // 클래스 변수 추가
     private float climbSpeed = 4f;
-    private bool canHorizontallyExit = true;
     private Vector2 originalGravity;
     private float minClimbSpeedThreshold = 0.1f;
     private bool isMoving = false;
     private PlayerAnimator playerAnimator;
 
-    // 사다리 관련 플랫폼 콜라이더 관리
-    private List<Collider2D> connectedPlatformColliders = new List<Collider2D>();
-    private bool platformCollidersDisabled = false;
+    // 플레이어 레이어 관리 변수 추가
+    private int originalPlayerLayer;
+    private int ladderLayer;
 
     // 사다리 중앙 고정 관련 변수
     private Collider2D currentLadderCollider;
     private float ladderCenterX;
-    private float playerHorizontalMovementRange = 0.5f; // 사다리에서 좌우로 움직일 수 있는 최대 범위
+    private bool forceCenterAlignment = true; // 사다리 중앙에 강제 정렬
 
-    // 플랫폼 위에서 사다리 내려가기 관련 변수 추가
+    // 사다리 진입/진출 감지 관련 변수
+    private bool isExitingLadder = false;
+    private float ladderExitTimer = 0f;
+    private const float LADDER_EXIT_DELAY = 0.1f; // 사다리에서 나가는 딜레이
+    
+    // 아래에서 사다리 진입 관련 변수 추가
+    private bool isEnteringFromBottom = false;
     private bool isStartingFromPlatform = false;
     private float entryDelayTimer = 0f;
-    private const float PLATFORM_ENTRY_DELAY = 0.2f; // 플랫폼에서 내려갈 때 잠시 딜레이
+    private const float PLATFORM_ENTRY_DELAY = 0.1f; // 플랫폼에서 내려가기 딜레이
+
+    // 사다리 바닥 체크 관련 변수 추가
+    private bool isAtLadderBottom = false;
 
     public PlayerClimbingState(PlayerStateManager stateManager) : base(stateManager)
     {
@@ -34,19 +42,52 @@ public class PlayerClimbingState : PlayerStateBase
         }
 
         playerAnimator = stateManager.GetComponent<PlayerAnimator>();
+        
+        // NoCollision 레이어 미리 가져오기
+        ladderLayer = LayerMask.NameToLayer("NoCollision");
+        if (ladderLayer == -1)
+        {
+            Debug.LogError("NoCollision 레이어를 찾을 수 없습니다!");
+        }
     }
 
     public override void Enter()
     {
         Debug.Log("사다리 오르기 상태 진입");
 
-        // 중력 저장 및 비활성화
+        // 진입 상태 확인 (아래로 내려가는지, 플랫폼에서 시작하는지)
+        var inputHandler = player.GetInputHandler();
+        var collisionDetector = player.GetCollisionDetector();
+        
+        // 아래키를 눌러 접근하는지 체크
+        isEnteringFromBottom = inputHandler.MoveDirection.y < 0;
+        
+        // 플랫폼에서 시작하는지 체크
+        isStartingFromPlatform = collisionDetector.IsGrounded;
+        
+        Debug.Log($"사다리 진입 상태 - 아래키 접근: {isEnteringFromBottom}, 플랫폼 시작: {isStartingFromPlatform}");
+
+        // 중력 비활성화 및 설정 저장
         var rigidbody = player.GetComponent<Rigidbody2D>();
         if (rigidbody != null)
         {
             originalGravity = new Vector2(rigidbody.gravityScale, Physics2D.gravity.y);
-            rigidbody.gravityScale = 0f;
-            rigidbody.velocity = Vector2.zero;
+            
+            // 아래키를 눌러 사다리 진입 시 (플랫폼에서)
+            if (isStartingFromPlatform && isEnteringFromBottom)
+            {
+                // 약간의 초기 속도 부여 (아래로)
+                rigidbody.gravityScale = 0.1f;
+                rigidbody.velocity = new Vector2(0, -0.8f);
+                entryDelayTimer = PLATFORM_ENTRY_DELAY;
+                Debug.Log("플랫폼에서 아래로 사다리 진입 - 초기 속도 부여");
+            }
+            else
+            {
+                // 일반 사다리 진입 시 중력 완전 제거
+                rigidbody.gravityScale = 0f;
+                rigidbody.velocity = Vector2.zero;
+            }
         }
 
         // 애니메이터 참조 확인
@@ -58,7 +99,7 @@ public class PlayerClimbingState : PlayerStateBase
         // 사다리 오르기 상태 플래그 설정
         player.SetClimbing(true);
 
-        // 초기에는 움직이지 않는 상태로 시작 - 한 프레임에서 멈춰있음
+        // 초기 애니메이션 상태 설정 (멈춰있는 상태로 시작)
         isMoving = false;
         if (playerAnimator != null)
         {
@@ -66,16 +107,11 @@ public class PlayerClimbingState : PlayerStateBase
             playerAnimator.SetActuallyClimbing(false);
         }
 
-        // 플랫폼 위에서 시작했는지 확인
-        isStartingFromPlatform = player.GetCollisionDetector().IsGrounded;
-        if (isStartingFromPlatform)
-        {
-            entryDelayTimer = PLATFORM_ENTRY_DELAY;
-            Debug.Log("플랫폼에서 사다리 내려가기 시작");
-        }
-
-        // 사다리에 연결된 플랫폼 콜라이더 찾아서 비활성화
-        FindAndDisablePlatformColliders();
+        // 플레이어 레이어를 NoCollision으로 즉시 변경 (모든 경우에 항상 변경)
+        ChangePlayerToLadderLayer();
+        
+        // 사다리 찾기 및 플레이어 중앙 정렬
+        FindLadderAndCenterPlayer();
     }
 
     public override void Exit()
@@ -100,34 +136,82 @@ public class PlayerClimbingState : PlayerStateBase
             playerAnimator.SetActuallyClimbing(false);
         }
 
-        // 플랫폼 시작 플래그 초기화
-        isStartingFromPlatform = false;
-        entryDelayTimer = 0f;
-
-        // 비활성화된 플랫폼 콜라이더 다시 활성화
-        RestorePlatformColliders();
+        // 플레이어 레이어 원래대로 복원
+        RestorePlayerLayer();
     }
 
-    // 사다리에 연결된 플랫폼 콜라이더 찾기 및 비활성화
-    private void FindAndDisablePlatformColliders()
+    // 플레이어 레이어 변경
+    private void ChangePlayerToLadderLayer()
     {
-        // 1. 현재 플레이어가 닿아있는 사다리 찾기
-        var collisionDetector = player.GetCollisionDetector();
-        if (!collisionDetector.IsOnLadder)
+        // 이미 레이어가 변경되었는지 확인
+        if (player.gameObject.layer == ladderLayer)
         {
-            Debug.LogWarning("플레이어가 사다리에 있지 않습니다!");
+            Debug.Log("플레이어 레이어가 이미 NoCollision으로 설정되어 있습니다.");
             return;
         }
+        
+        // 현재 플레이어 레이어 저장
+        originalPlayerLayer = player.gameObject.layer;
 
-        // 2. 현재 닿아있는 사다리 트리거 찾기 (Ladder 레이어)
-        int ladderLayer = LayerMask.NameToLayer("Ladder");
+        // 레이어가 올바르게 설정되었는지 확인
         if (ladderLayer == -1)
         {
-            Debug.LogError("Ladder 레이어를 찾을 수 없습니다!");
-            return;
+            Debug.LogError("NoCollision 레이어가 정의되지 않았습니다. 레이어 설정을 확인하세요.");
+            // 대체 레이어를 찾아보기
+            ladderLayer = LayerMask.NameToLayer("NoCollision");
+            if (ladderLayer == -1)
+            {
+                Debug.LogError("NoCollision 레이어를 찾을 수 없습니다. 기본 레이어를 유지합니다.");
+                return;
+            }
         }
 
-        // 3. 플레이어와 겹치는 모든 콜라이더 찾기
+        Debug.Log($"플레이어 레이어 변경 전: {player.gameObject.name}, 현재 레이어: {LayerMask.LayerToName(player.gameObject.layer)}");
+
+        // 플레이어 레이어를 NoCollision으로 변경
+        player.gameObject.layer = ladderLayer;
+
+        // 즉시 레이어가 변경되었는지 확인 (디버깅 목적)
+        Debug.Log($"플레이어 레이어 변경 후: {player.gameObject.name}, 변경된 레이어: {LayerMask.LayerToName(player.gameObject.layer)}");
+
+        // 플레이어의 모든 자식 콜라이더도 레이어 변경 (필요한 경우)
+        Collider2D[] childColliders = player.GetComponentsInChildren<Collider2D>();
+        foreach (var collider in childColliders)
+        {
+            if (collider.gameObject != player.gameObject)
+            {
+                collider.gameObject.layer = ladderLayer;
+                Debug.Log($"자식 콜라이더 레이어 변경: {collider.gameObject.name}, 레이어: {LayerMask.LayerToName(collider.gameObject.layer)}");
+            }
+        }
+
+        Debug.Log($"플레이어 레이어를 NoCollision으로 변경 완료: {LayerMask.LayerToName(originalPlayerLayer)} -> {LayerMask.LayerToName(ladderLayer)}");
+    }
+
+    // 플레이어 레이어 복원
+    private void RestorePlayerLayer()
+    {
+        player.gameObject.layer = originalPlayerLayer;
+
+        // 플레이어의 모든 자식 콜라이더도 레이어 복원
+        Collider2D[] childColliders = player.GetComponentsInChildren<Collider2D>();
+        foreach (var collider in childColliders)
+        {
+            if (collider.gameObject != player.gameObject)
+            {
+                collider.gameObject.layer = originalPlayerLayer;
+            }
+        }
+
+        Debug.Log($"플레이어 레이어 복원: {LayerMask.LayerToName(ladderLayer)} -> {LayerMask.LayerToName(originalPlayerLayer)}");
+    }
+
+    // 현재 플레이어가 닿아있는 사다리 찾기 및 플레이어 중앙 정렬
+    private void FindLadderAndCenterPlayer()
+    {
+        if (ladderLayer == -1) return;
+
+        // 플레이어와 겹치는 모든 콜라이더 찾기
         Collider2D playerCollider = player.GetComponent<Collider2D>();
         if (playerCollider == null)
         {
@@ -135,13 +219,14 @@ public class PlayerClimbingState : PlayerStateBase
             return;
         }
 
-        // 사다리 콜라이더 찾기
+        // 사다리 콜라이더 찾기 (Ladder 태그를 가진 오브젝트)
+        int ladderMask = LayerMask.GetMask("Ladder"); // Ladder 레이어로 마스크 생성
         ContactFilter2D filter = new ContactFilter2D();
-        filter.SetLayerMask(1 << ladderLayer);
+        filter.SetLayerMask(ladderMask);
         filter.useTriggers = true;
 
         List<Collider2D> overlappingColliders = new List<Collider2D>();
-        Physics2D.OverlapCollider(playerCollider, filter, overlappingColliders);
+        int numColliders = Physics2D.OverlapCollider(playerCollider, filter, overlappingColliders);
 
         if (overlappingColliders.Count == 0)
         {
@@ -153,89 +238,7 @@ public class PlayerClimbingState : PlayerStateBase
         Collider2D ladderCollider = overlappingColliders[0]; // 첫 번째 사다리 콜라이더 사용
         CenterPlayerOnLadder(ladderCollider);
 
-        // 4. 각 사다리에 대해 연결된 플랫폼 콜라이더 찾기
-        foreach (var ladderCol in overlappingColliders)
-        {
-            Transform ladderTransform = ladderCol.transform;
-
-            // 4.1. 같은 게임 오브젝트에 있는 다른 콜라이더 확인 (플랫폼일 수 있음)
-            Collider2D[] attachedColliders = ladderTransform.GetComponents<Collider2D>();
-            foreach (var coll in attachedColliders)
-            {
-                // 트리거가 아닌 콜라이더는 플랫폼으로 간주
-                if (!coll.isTrigger && coll.enabled)
-                {
-                    connectedPlatformColliders.Add(coll);
-                }
-            }
-
-            // 4.2. 부모/자식 관계의 플랫폼 콜라이더 찾기
-            // 부모에서 찾기
-            if (ladderTransform.parent != null)
-            {
-                Collider2D[] parentColliders = ladderTransform.parent.GetComponentsInChildren<Collider2D>();
-                foreach (var coll in parentColliders)
-                {
-                    // 트리거가 아니고, 이미 리스트에 없으며, 사다리 레이어가 아닌 경우
-                    if (!coll.isTrigger && !connectedPlatformColliders.Contains(coll) &&
-                        coll.gameObject.layer != ladderLayer && coll.enabled)
-                    {
-                        connectedPlatformColliders.Add(coll);
-                    }
-                }
-            }
-
-            // 4.3. 사다리 위치와 겹치거나 가까운 다른 플랫폼 콜라이더 찾기 (선택적)
-            int platformLayer = LayerMask.NameToLayer("Platform");
-            if (platformLayer != -1)
-            {
-                Collider2D[] nearbyPlatforms = Physics2D.OverlapBoxAll(
-                    ladderCol.bounds.center,
-                    ladderCol.bounds.size * 1.2f, // 약간 더 넓은 영역 검색
-                    0f,
-                    1 << platformLayer
-                );
-
-                foreach (var platform in nearbyPlatforms)
-                {
-                    if (!connectedPlatformColliders.Contains(platform) && platform.enabled)
-                    {
-                        connectedPlatformColliders.Add(platform);
-                    }
-                }
-            }
-        }
-
-        // 5. 연결된 플랫폼 콜라이더 비활성화
-        Debug.Log($"비활성화할 플랫폼 콜라이더 {connectedPlatformColliders.Count}개 발견");
-        foreach (var platformCollider in connectedPlatformColliders)
-        {
-            if (platformCollider != null && platformCollider.enabled)
-            {
-                platformCollider.enabled = false;
-                Debug.Log($"플랫폼 콜라이더 비활성화: {platformCollider.gameObject.name}");
-            }
-        }
-
-        platformCollidersDisabled = true;
-    }
-
-    // 플랫폼 콜라이더 복원
-    private void RestorePlatformColliders()
-    {
-        if (!platformCollidersDisabled) return;
-
-        foreach (var platformCollider in connectedPlatformColliders)
-        {
-            if (platformCollider != null)
-            {
-                platformCollider.enabled = true;
-                Debug.Log($"플랫폼 콜라이더 복원: {platformCollider.gameObject.name}");
-            }
-        }
-
-        connectedPlatformColliders.Clear();
-        platformCollidersDisabled = false;
+        Debug.Log($"사다리 콜라이더 찾음: {ladderCollider.name}, 위치: {ladderCollider.bounds.center}");
     }
 
     public override void HandleInput()
@@ -243,30 +246,30 @@ public class PlayerClimbingState : PlayerStateBase
         var inputHandler = player.GetInputHandler();
         var collisionDetector = player.GetCollisionDetector();
 
-        // 플랫폼에서 사다리 내려가기 시작 시 딜레이 처리
-        if (isStartingFromPlatform && entryDelayTimer > 0)
-        {
-            entryDelayTimer -= Time.deltaTime;
-            return; // 딜레이 동안 다른 입력 무시
-        }
+        // 입력이 상하 방향키가 아닌 경우 사다리에서 내리기
+        Vector2 input = inputHandler.MoveDirection;
 
-        // 점프 입력 시 사다리에서 점프하여 내리기
-        if (inputHandler.JumpPressed)
+        // 상하 방향키가 눌려있지 않고 좌우 방향키가 눌려있으면 즉시 사다리에서 내림
+        if (Mathf.Abs(input.y) < 0.1f && Mathf.Abs(input.x) > 0.1f)
         {
-            player.ExitClimbingState(true);
+            Debug.Log("좌우 입력 감지 - 사다리에서 내리기");
+            isExitingLadder = true;
+            player.ExitClimbingState(false);
             return;
         }
 
-        // 좌우 이동 입력만으로도 사다리에서 바로 내리기
-        if (!Mathf.Approximately(inputHandler.MoveDirection.x, 0f))
+        // 점프 버튼이 눌리면 사다리에서 점프하며 내림
+        if (inputHandler.JumpPressed)
         {
-            player.ExitClimbingState(false);
+            Debug.Log("점프 입력 감지 - 사다리에서 점프하여 내리기");
+            isExitingLadder = true;
+            player.ExitClimbingState(true);
             return;
         }
 
         // 움직임 여부 확인 (y축 값이 임계값보다 큰지)
         bool previouslyMoving = isMoving;
-        isMoving = Mathf.Abs(inputHandler.MoveDirection.y) > minClimbSpeedThreshold;
+        isMoving = Mathf.Abs(input.y) > minClimbSpeedThreshold;
 
         // 움직임 상태에 변화가 있을 때만 애니메이션 업데이트
         if (previouslyMoving != isMoving)
@@ -279,31 +282,64 @@ public class PlayerClimbingState : PlayerStateBase
     {
         var collisionDetector = player.GetCollisionDetector();
         var inputHandler = player.GetInputHandler();
-
-        // 플랫폼에서 사다리 내려가기 시작 시 딜레이 처리
-        if (isStartingFromPlatform && entryDelayTimer > 0)
+        var rigidbody = player.GetComponent<Rigidbody2D>();
+        
+        // 레이어가 제대로 설정되었는지 확인 (아래키로 사다리 진입 시 레이어 설정 문제 해결)
+        if (player.gameObject.layer != ladderLayer)
         {
-            entryDelayTimer -= Time.deltaTime;
-            return; // 딜레이 동안 다른 상태 체크 무시
+            Debug.LogWarning("플레이어 레이어가 NoCollision이 아닙니다. 다시 설정합니다.");
+            ChangePlayerToLadderLayer();
         }
-
-        // 플랫폼 시작 상태 해제 (딜레이 이후)
-        if (isStartingFromPlatform && entryDelayTimer <= 0)
+        
+        // 플랫폼에서 아래로 내려가기 처리
+        if (isStartingFromPlatform && isEnteringFromBottom)
         {
-            isStartingFromPlatform = false;
+            if (entryDelayTimer > 0)
+            {
+                entryDelayTimer -= Time.deltaTime;
+                
+                // 지속적으로 아래로 이동하기
+                if (rigidbody != null)
+                {
+                    rigidbody.velocity = new Vector2(0, -1.0f);
+                }
+                
+                // 중앙 정렬 유지
+                if (forceCenterAlignment && currentLadderCollider != null)
+                {
+                    Vector3 pos = player.transform.position;
+                    pos.x = ladderCenterX;
+                    player.transform.position = pos;
+                }
+            }
+            else
+            {
+                // 딜레이 종료 후 정상 사다리 모드로 전환
+                isStartingFromPlatform = false;
+                isEnteringFromBottom = false;
+                if (rigidbody != null)
+                {
+                    rigidbody.gravityScale = 0f;
+                }
+                Debug.Log("플랫폼에서 사다리 진입 딜레이 종료");
+            }
         }
 
         // 사다리에서 벗어났는지 확인
-        if (!collisionDetector.IsOnLadder)
+        if (!collisionDetector.IsOnLadder && !isExitingLadder)
         {
+            Debug.Log("사다리에서 벗어남 - 상태 종료");
             player.ExitClimbingState(false);
             return;
         }
 
-        // 아래 조건 수정: 지면에 닿았을 때, 플랫폼 시작 상태가 아닌 경우에만 종료
-        // 이렇게 하면 플랫폼에서 사다리를 내려갈 때 즉시 종료되지 않음
-        if (collisionDetector.IsGrounded && inputHandler.MoveDirection.y <= 0 && !isStartingFromPlatform)
+        // 사다리의 바닥에 도달했는지 확인
+        CheckIfAtLadderBottom();
+
+        // 지면에 닿고 아래 방향으로 이동 중일 때 (사다리 바닥에 있을 때만 내리기)
+        if (collisionDetector.IsGrounded && inputHandler.MoveDirection.y < -0.1f && isAtLadderBottom)
         {
+            Debug.Log("사다리 바닥에 도달하고 아래로 이동 중 - 상태 종료");
             player.ExitClimbingState(false);
             return;
         }
@@ -311,22 +347,21 @@ public class PlayerClimbingState : PlayerStateBase
         // 사다리 위에 도달했는지 확인 (사다리 위로 올라갔을 때)
         if (collisionDetector.IsAtTopOfLadder && inputHandler.MoveDirection.y > 0)
         {
+            Debug.Log("사다리 상단에 도달 - 상태 종료");
             player.ExitClimbingState(false);
             return;
         }
 
-        // 좌우 이동으로 사다리 범위를 벗어났는지 확인
-        if (currentLadderCollider != null && IsPlayerOutOfLadderRange())
+        // 사다리 중앙 강제 정렬 (Update에서도 지속적으로 중앙 정렬)
+        if (forceCenterAlignment && currentLadderCollider != null)
         {
-            Debug.Log("플레이어가 사다리 수평 범위를 벗어났습니다");
-            player.ExitClimbingState(false);
-            return;
+            Vector3 pos = player.transform.position;
+            pos.x = ladderCenterX;
+            player.transform.position = pos;
         }
 
-        // 현재 움직임 상태 확인
+        // 움직임 상태 업데이트
         bool currentlyMoving = Mathf.Abs(inputHandler.MoveDirection.y) > minClimbSpeedThreshold;
-
-        // 움직임 상태 변경 시에만 애니메이션 상태 업데이트
         if (currentlyMoving != isMoving)
         {
             UpdateClimbingAnimation(currentlyMoving);
@@ -358,72 +393,42 @@ public class PlayerClimbingState : PlayerStateBase
     {
         var inputHandler = player.GetInputHandler();
         var movement = player.GetMovement();
-
-        // 플랫폼에서 사다리 내려가기 시작 시 딜레이 처리
-        if (isStartingFromPlatform && entryDelayTimer > 0)
+        var rigidbody = player.GetComponent<Rigidbody2D>();
+        
+        // 플랫폼에서 아래로 내려가기 처리
+        if (isStartingFromPlatform && isEnteringFromBottom && entryDelayTimer > 0)
         {
-            // 딜레이 동안 움직임 제한 (미끄러지지 않도록)
-            movement.ClimbMove(Vector2.zero);
+            // 아래로 내려가는 이동 벡터 생성
+            Vector2 downVelocity = new Vector2(0, -climbSpeed);
+            movement.ClimbMove(downVelocity);
             return;
         }
 
         // 입력 확인 및 이동 속도 계산
         Vector2 moveInput = inputHandler.MoveDirection;
 
-        // 사다리 오르내리기 - 수직 이동 처리
+        // 사다리 오르내리기 - 수직 이동만 처리 (좌우 이동은 무시)
         Vector2 climbVelocity = new Vector2(0f, moveInput.y * climbSpeed);
 
-        // 좌우 이동 - 제한적으로 허용 (사다리 중앙을 기준으로 제한된 범위 내에서만)
-        float horizontalMovement = moveInput.x * (climbSpeed * 0.1f);
-        climbVelocity.x = horizontalMovement;
-
-        // 사다리 중앙으로 서서히 당기는 힘 추가 (부드러운 중앙 정렬)
-        if (currentLadderCollider != null)
+        // 사다리 중간에 플랫폼과 충돌 시 아래로 이동 가능하도록 처리
+        var collisionDetector = player.GetCollisionDetector();
+        if (collisionDetector.IsGrounded && moveInput.y < 0 && !isAtLadderBottom)
         {
-            float currentX = player.transform.position.x;
-            float pullForce = (ladderCenterX - currentX) * 2.0f; // 가중치 계수 (높을수록 더 강하게 당김)
-
-            // 최대 당김 힘 제한 (너무 갑작스럽게 움직이지 않도록)
-            pullForce = Mathf.Clamp(pullForce, -1.0f, 1.0f);
-
-            // 입력에 의한 이동이 있으면 중앙 정렬력을 줄임
-            if (Mathf.Abs(moveInput.x) > 0.1f)
-            {
-                pullForce *= 0.3f; // 입력 시 중앙 정렬력 감소
-            }
-
-            // 최종 수평 속도에 중앙 정렬력 추가
-            climbVelocity.x += pullForce;
+            // 사다리 중간 플랫폼에서는 계속 아래로 이동할 수 있도록 속도 보장
+            climbVelocity.y = moveInput.y * climbSpeed;
+            Debug.Log("사다리 중간 플랫폼 위에서 아래로 이동 중");
         }
 
         // 사다리에서의 이동 적용
         movement.ClimbMove(climbVelocity);
-    }
 
-    // 플레이어가 사다리 범위를 벗어났는지 확인하는 메서드
-    private bool IsPlayerOutOfLadderRange()
-    {
-        if (currentLadderCollider == null) return false;
-
-        // 현재 플레이어 위치 가져오기
-        float playerX = player.transform.position.x;
-
-        // 사다리 너비의 절반 (안전 마진 포함)
-        float ladderHalfWidth = currentLadderCollider.bounds.size.x / 2f;
-
-        // 좌우 이동 최대 허용 범위 계산
-        float minX = ladderCenterX - ladderHalfWidth - playerHorizontalMovementRange;
-        float maxX = ladderCenterX + ladderHalfWidth + playerHorizontalMovementRange;
-
-        // 플레이어가 허용 범위를 벗어났는지 확인
-        bool isOutOfRange = playerX < minX || playerX > maxX;
-
-        if (isOutOfRange)
+        // 강제 위치 고정
+        if (forceCenterAlignment && currentLadderCollider != null)
         {
-            Debug.Log($"플레이어가 사다리 범위를 벗어났습니다: playerX={playerX}, 범위=[{minX}, {maxX}]");
+            Vector3 pos = player.transform.position;
+            pos.x = ladderCenterX;
+            player.transform.position = pos;
         }
-
-        return isOutOfRange;
     }
 
     // 플레이어를 사다리 중앙에 위치시키는 메서드
@@ -437,13 +442,6 @@ public class PlayerClimbingState : PlayerStateBase
         // 사다리의 중앙 X 좌표 계산
         ladderCenterX = ladderCollider.bounds.center.x;
 
-        // 플랫폼에서 시작 시에는 즉시 중앙 정렬을 하지 않음
-        if (isStartingFromPlatform)
-        {
-            Debug.Log($"플랫폼에서 시작 - 사다리 X 위치에서 중앙 정렬 지연: {ladderCenterX}");
-            return;
-        }
-
         // 플레이어의 위치를 사다리 중앙 X 좌표로 즉시 설정
         var playerTransform = player.transform;
         Vector3 newPosition = playerTransform.position;
@@ -453,5 +451,25 @@ public class PlayerClimbingState : PlayerStateBase
         playerTransform.position = newPosition;
 
         Debug.Log($"플레이어를 사다리 X 위치에 중앙 정렬: {ladderCenterX}");
+    }
+
+    // 사다리 바닥 확인 메서드
+    private void CheckIfAtLadderBottom()
+    {
+        if (currentLadderCollider == null) return;
+
+        // 사다리의 하단부 위치 계산
+        float ladderBottom = currentLadderCollider.bounds.min.y;
+        float playerBottom = player.GetComponent<Collider2D>().bounds.min.y;
+        
+        // 플레이어가 사다리 하단 근처에 있는지 확인 (약간의 여유 추가)
+        float threshold = 0.2f; // 사다리 바닥 판정 여유값
+        isAtLadderBottom = Mathf.Abs(playerBottom - ladderBottom) < threshold;
+
+        // 디버그 정보
+        if (isAtLadderBottom)
+        {
+            Debug.Log($"사다리 바닥 근처에 있음: 플레이어 바닥={playerBottom}, 사다리 바닥={ladderBottom}");
+        }
     }
 }
