@@ -54,6 +54,7 @@ public class UIManager : Singleton<UIManager>
             }
 
             inputUI.currentPage.SetActive(!isActive);
+            Time.timeScale = isActive ? 1 : 0; //삼항연산자
         }
     }
 }
