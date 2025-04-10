@@ -37,9 +37,11 @@ public class UIManager : Singleton<UIManager>
 
 
 
-    public void YouAreOnlyOne(GameObject menu) //인게임 중 단 하나의 UI Canvas만 활성화되도록 함. 우왕ㅠㅠㅠㅠㅠㅠ
+    public void YouAreOnlyOne(GameObject menu) //인게임 중 단 하나의 UI Canvas만 활성화되도록 함.
     {
         inputUI.currentPage = menu;
+
+        bool isActive = menu.activeSelf;
 
         if (inputUI.currentPage != null)
         {
@@ -51,7 +53,7 @@ public class UIManager : Singleton<UIManager>
                 }
             }
 
-            inputUI.currentPage.SetActive(true);
+            inputUI.currentPage.SetActive(!isActive);
         }
     }
 }

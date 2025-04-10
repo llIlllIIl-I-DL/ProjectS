@@ -1,10 +1,3 @@
-using JetBrains.Annotations;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Antlr3.Runtime;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -17,6 +10,10 @@ public class InputUI : MonoBehaviour
     public GameObject currentPage = null;  //여기를 인식해서 같은 키 눌렀을 때 켜고 끄기.
 
     //List로 변경하고 순회하면서 현재 Active된 캔버스 제외 전부 false
+    
+    /// <summary>
+    /// 창 켠 상태일때마다 시간 똑바로 멈춰있게 만들기만 하면 된다~~
+    /// </summary>
 
     [Header("UI 창")]
     [SerializeField] public GameObject pauseMenu;
@@ -33,7 +30,6 @@ public class InputUI : MonoBehaviour
     [SerializeField] public GameObject settingMenu;
     [SerializeField] public GameObject checkPointMenu;
 
-    public bool isOpen = false;
     public bool isPauseMenuOpen = false;
 
     private void Start()
@@ -68,23 +64,8 @@ public class InputUI : MonoBehaviour
 
     public void SetMenu(GameObject menu)
     {
-        //여기에서는 그냥 Active
 
-        //currentPage == menu.SetActive(false)
-
-        if (isOpen == false)
-        {
-            UIManager.Instance.YouAreOnlyOne(menu);
-
-            isOpen = true;
-        }
-
-        else
-        {
-            menu.SetActive(false);
-            isOpen = false;
-        }
-
+        UIManager.Instance.YouAreOnlyOne(menu);
 
         currentPage = menu;
 
@@ -94,22 +75,6 @@ public class InputUI : MonoBehaviour
     {
         pauseMenu.SetActive(!isPauseMenuOpen); //토글 작업 시 자주 사용
         Time.timeScale = isPauseMenuOpen ? 1 : 0; //삼항연산자
-
-        /*
-        if (isPauseMenuOpen == true)
-        {
-            pauseMenu.SetActive(false);
-
-            Time.timeScale = 1;
-        }
-
-        else
-        {
-            pauseMenu.SetActive(true);
-
-            Time.timeScale = 0;
-        }
-        */
 
         isPauseMenuOpen = !isPauseMenuOpen;
     }
