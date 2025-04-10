@@ -739,7 +739,7 @@ GameObject:
   - component: {fileID: 1018610063}
   - component: {fileID: 1018610062}
   - component: {fileID: 1018610061}
-  m_Layer: 7
+  m_Layer: 6
   m_Name: Square (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -885,7 +885,7 @@ GameObject:
   - component: {fileID: 1327695329}
   - component: {fileID: 1327695328}
   - component: {fileID: 1327695327}
-  m_Layer: 7
+  m_Layer: 6
   m_Name: Square (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1015,7 +1015,7 @@ GameObject:
   - component: {fileID: 1363826176}
   - component: {fileID: 1363826175}
   - component: {fileID: 1363826174}
-  m_Layer: 7
+  m_Layer: 6
   m_Name: Square (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1177,7 +1177,6 @@ GameObject:
   - component: {fileID: 1664343117}
   - component: {fileID: 1664343116}
   - component: {fileID: 1664343115}
-  - component: {fileID: 1664343118}
   m_Layer: 9
   m_Name: Ladder
   m_TagString: Untagged
@@ -1217,7 +1216,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.019368693}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -1228,7 +1227,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1, y: 1.0387362}
   m_EdgeRadius: 0
 --- !u!212 &1664343116
 SpriteRenderer:
@@ -1291,31 +1290,12 @@ Transform:
   m_GameObject: {fileID: 1664343114}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 6.194006, y: -0.24152803, z: 0.03900585}
-  m_LocalScale: {x: 0.3317317, y: 2.476486, z: 1}
+  m_LocalPosition: {x: 6.1754, y: 0.0231, z: 0.03900585}
+  m_LocalScale: {x: 0.25624081, y: 1.7944049, z: 0.8733}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1624075947}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1664343118
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1664343114}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 77d32d0572dbebe47b72fcc9d64ed4af, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  platformCollider: {fileID: 1327695327}
-  playerLayerMask:
-    serializedVersion: 2
-    m_Bits: 8
-  ladderLayerMask:
-    serializedVersion: 2
-    m_Bits: 512
 --- !u!1 &1781405039
 GameObject:
   m_ObjectHideFlags: 0
@@ -1399,7 +1379,7 @@ GameObject:
   - component: {fileID: 1933881695}
   - component: {fileID: 1933881694}
   - component: {fileID: 1933881693}
-  m_Layer: 7
+  m_Layer: 6
   m_Name: Square (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1538,6 +1518,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2921409417795693344, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: m_IncludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3137287986617449566, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1610,6 +1594,10 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 519420031}
+    - target: {fileID: 6616998530533543458, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: wallLayer.m_Bits
+      value: 64
+      objectReference: {fileID: 0}
     - target: {fileID: 6616998530533543458, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
       propertyPath: ladderLayer.m_Bits
       value: 512
