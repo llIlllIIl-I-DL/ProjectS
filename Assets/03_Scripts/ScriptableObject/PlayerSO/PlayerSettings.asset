@@ -29,8 +29,8 @@ MonoBehaviour:
   jumpBufferTime: 0.1
   doubleJumpForceMultiplier: 0.8
   canDoubleJump: 0
-  dashSpeed: 7
-  dashDuration: 0.1
+  dashSpeed: 6
+  dashDuration: 0.2
   dashCooldown: 0.8
   wallSlideSpeed: 3
   wallSlideAcceleration: 5
@@ -41,3 +41,4 @@ MonoBehaviour:
   climbSpeed: 4
   climbHorizontalSpeed: 2
   allowClimbJump: 1
+  ignorePlatformsWhileClimbing: 1
