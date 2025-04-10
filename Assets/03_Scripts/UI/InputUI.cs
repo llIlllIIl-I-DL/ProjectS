@@ -14,7 +14,7 @@ public class InputUI : MonoBehaviour
     //UIManager에서 currentPage를 만들고 현재 Active된 캔버스를 할당 한 뒤 null이 아닐 때 timescale 0으로 하기??....
 
 
-    public GameObject currentPage = null;
+    public GameObject currentPage = null;  //여기를 인식해서 같은 키 눌렀을 때 켜고 끄기.
 
     //List로 변경하고 순회하면서 현재 Active된 캔버스 제외 전부 false
 
@@ -38,9 +38,9 @@ public class InputUI : MonoBehaviour
 
     private void Start()
     {
-        characterInfoBtn.onClick.AddListener(() => InfoMenu());
-        toCheckPointBtn.onClick.AddListener(() => CheckPointMenu());
-        settingBtn.onClick.AddListener(() => SettingMenu());
+        characterInfoBtn.onClick.AddListener(() => InfoMenu(infoMenu));
+        toCheckPointBtn.onClick.AddListener(() => UIInPauseMenu(checkPointMenu));
+        settingBtn.onClick.AddListener(() => UIInPauseMenu(settingMenu));
         toMainMenuBtn.onClick.AddListener(() => ToMainMenu());
     }
 
@@ -48,8 +48,12 @@ public class InputUI : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            PauseMenu(pauseMenu);
+            PauseMenu();
+
         }
+
+        if (isPauseMenuOpen) //예외처리 미리 체크하는 편이 좋당
+            return;
 
         if (Input.GetKeyDown(KeyCode.M))
         {
@@ -64,66 +68,61 @@ public class InputUI : MonoBehaviour
 
     public void SetMenu(GameObject menu)
     {
+        //여기에서는 그냥 Active
+
+        //currentPage == menu.SetActive(false)
+
+        if (isOpen == false)
+        {
+            UIManager.Instance.YouAreOnlyOne(menu);
+
+            isOpen = true;
+        }
+
+        else
+        {
+            menu.SetActive(false);
+            isOpen = false;
+        }
+
+
         currentPage = menu;
 
-        if (isPauseMenuOpen == false)
-        {
-            if (isOpen == false)
-            {
-                UIManager.Instance.YouAreOnlyOne(menu);
-                /*
-                if (currentPage != null)
-                {
-                    currentPage.SetActive(false);
-                }
-                */
-
-                //menu.SetActive(true);
-                isOpen = true;
-            }
-
-            else
-            {
-                menu.SetActive(false);
-                isOpen = false;
-            }
-        }
     }
 
-    public void PauseMenu(GameObject menu)
+    public void PauseMenu()
     {
-        isPauseMenuOpen = true;
-
-        bool isActive = menu.activeSelf;
-        
         if (isPauseMenuOpen == true)
         {
-            if (isOpen == false)
-            {
-                menu.SetActive(!isActive);
-                isOpen = true;
-                Time.timeScale = 0;
-            }
+            pauseMenu.SetActive(false);
 
-            else
-            {
-                menu.SetActive(!isActive);
-                isOpen = false;
-                Time.timeScale = 1;
-                isPauseMenuOpen = false;
-            }
+            Time.timeScale = 1;
         }
+
+        else
+        {
+            pauseMenu.SetActive(true);
+
+            Time.timeScale = 0;
+        }
+
+        isPauseMenuOpen = !isPauseMenuOpen;
     }
 
-    public void InfoMenu()
+    public void UIInPauseMenu(GameObject menu)
     {
-        bool isActive = infoMenu.activeSelf;
-
-        infoMenu.SetActive(!isActive);
+        bool isActive = menu.activeSelf;
+        menu.SetActive(!isActive);
     }
 
 
+    public void InfoMenu(GameObject menu)
+    {
+        isPauseMenuOpen = false;
+        SetMenu(menu);
+    }
 
+    /*
     public void CheckPointMenu()
     {
         bool isActive = checkPointMenu.activeSelf;
@@ -138,6 +137,7 @@ public class InputUI : MonoBehaviour
         settingMenu.SetActive(!isActive);
     }
 
+    */
     public void ToMainMenu()
     {
         SceneManager.LoadScene("YJ_UI_Scene", LoadSceneMode.Single);
