@@ -2,14 +2,19 @@ using UnityEngine;
 
 public class DestructibleObject : DestructibleEntity
 {
-    [SerializeField] private GameObject destroyEffectPrefab;
-    [SerializeField] private AudioClip destroySound;
-    [SerializeField] private Sprite damagedSprite; // 손상된 외형(선택 사항)
+    [Header("파괴 이펙트")]
+    [SerializeField] protected GameObject destroyEffectPrefab; // 파괴 이펙트 프리팹
+    [SerializeField] protected GameObject dustEffectPrefab; // 먼지 이펙트 프리팹(선택 사항)
+
+    // 사운드 관련 변수들은 추후에 AudioManager에서 관리하게 될 수도 있어 선택사항으로 붙여 놓았음
+    [SerializeField] protected AudioClip destroySound; // 파괴 사운드(선택 사항)
+    [SerializeField] protected AudioClip hitSound; // 피격 사운드(선택 사항)
+    [SerializeField] protected Sprite damagedSprite; // 손상된 외형(선택 사항)
     
     [Header("파괴 속성")]
-    [SerializeField] private bool enableDestructionForce = false;
-    [SerializeField] private float destructionForceRadius = 2f;
-    [SerializeField] private float destructionForce = 5f;
+    [SerializeField] protected bool enableDestructionForce = false; // 파괴 힘 적용 여부
+    [SerializeField] protected float destructionForceRadius; // 파괴 힘 반경
+    [SerializeField] protected float destructionForce; // 파괴 힘 세기
     
     private float damageThreshold;
     private bool isDamaged = false;
@@ -25,11 +30,16 @@ public class DestructibleObject : DestructibleEntity
     public override void TakeDamage(float damage)
     {
         base.TakeDamage(damage);
+        // 피격 사운드 재생
+        if (hitSound != null)
+        {
+            // AudioSource.PlayClipAtPoint(hitSound, transform.position);
+        }
         
         // 외형 손상 체크
         if (!isDamaged && currentHealth <= damageThreshold && damagedSprite != null)
         {
-            spriteRenderer.sprite = damagedSprite;
+            spriteRenderer.sprite = damagedSprite; 
             isDamaged = true;
         }
     }
@@ -45,7 +55,7 @@ public class DestructibleObject : DestructibleEntity
         // 사운드 재생
         if (destroySound != null)
         {
-            AudioSource.PlayClipAtPoint(destroySound, transform.position);
+            // AudioSource.PlayClipAtPoint(destroySound, transform.position);
         }
         
         // 파괴 힘 적용
