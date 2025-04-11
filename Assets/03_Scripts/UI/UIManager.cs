@@ -30,6 +30,10 @@ public class UIManager : Singleton<UIManager>
         {
             if (uiPage != null)
             {
+                if(uiPage.name == "SuitUI" && uiPage.activeSelf)
+                {
+                    //uiPage.name("SuitUI").SetActive(false);
+                }
                 uiPage.gameObject.SetActive(false);
             }
         }

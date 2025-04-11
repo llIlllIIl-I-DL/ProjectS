@@ -19,7 +19,7 @@ public class CreatSlotSystem : Singleton<CreatSlotSystem>
 
     public void InitInventoryUI()
     {
-        int slotCount = 8;
+        int slotCount = 32;
 
         for (int i = 0; i < slotCount; i++)
         {

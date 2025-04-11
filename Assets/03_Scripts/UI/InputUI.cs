@@ -10,7 +10,7 @@ public class InputUI : MonoBehaviour
     public GameObject currentPage = null;  //여기를 인식해서 같은 키 눌렀을 때 켜고 끄기.
 
     //List로 변경하고 순회하면서 현재 Active된 캔버스 제외 전부 false
-    
+
     /// <summary>
     /// 창 켠 상태일때마다 시간 똑바로 멈춰있게 만들기만 하면 된다~~
     /// </summary>
@@ -26,9 +26,15 @@ public class InputUI : MonoBehaviour
     [SerializeField] public Button settingBtn;
     [SerializeField] public Button toMainMenuBtn;
 
+    [Header("Info → Suit UI")]
+    [SerializeField] public GameObject suitMenu;
+    [SerializeField] public Button suitBtn;
+
     [Header("PauseManu UI 창")]
     [SerializeField] public GameObject settingMenu;
     [SerializeField] public GameObject checkPointMenu;
+
+
 
     public bool isPauseMenuOpen = false;
 
@@ -37,6 +43,9 @@ public class InputUI : MonoBehaviour
         characterInfoBtn.onClick.AddListener(() => InfoMenu(infoMenu));
         toCheckPointBtn.onClick.AddListener(() => UIInPauseMenu(checkPointMenu));
         settingBtn.onClick.AddListener(() => UIInPauseMenu(settingMenu));
+
+        suitBtn.onClick.AddListener(() => SuitMenu());
+
         toMainMenuBtn.onClick.AddListener(() => ToMainMenu());
     }
 
@@ -92,22 +101,12 @@ public class InputUI : MonoBehaviour
         SetMenu(menu);
     }
 
-    /*
-    public void CheckPointMenu()
+    public void SuitMenu()
     {
-        bool isActive = checkPointMenu.activeSelf;
-
-        checkPointMenu.SetActive(!isActive);
+        suitMenu.SetActive(true);
     }
 
-    public void SettingMenu()
-    {
-        bool isActive = settingMenu.activeSelf;
 
-        settingMenu.SetActive(!isActive);
-    }
-
-    */
     public void ToMainMenu()
     {
         SceneManager.LoadScene("YJ_UI_Scene", LoadSceneMode.Single);
