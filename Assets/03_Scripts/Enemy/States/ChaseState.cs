@@ -122,7 +122,6 @@ namespace Enemy.States
 
             // 방향 설정 (스프라이트 플립 등)
             enemy.SetFacingDirection(direction);
-
             // 이동 실행
             enemy.MoveInDirection(direction, chaseSpeed);
         }

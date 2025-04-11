@@ -261,8 +261,7 @@ public abstract class BaseEnemy : DestructibleEntity
     /// </summary>
     public void StopMoving()
     {
-        if (rb != null) // Rigidbody2D가 null이 아닐 때만 정지
-            rb.velocity = Vector2.zero; // 속도 강제로 0으로 설정
+        rb.velocity = Vector2.zero; // 속도 초기화
     }
     
     #endregion

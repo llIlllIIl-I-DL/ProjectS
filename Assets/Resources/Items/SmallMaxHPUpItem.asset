@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: "\uC5D0\uB108\uC9C0 \uD0F1\uD06C"
   itemIcon: {fileID: 0}
-  itemType: 1
+  itemAttrivuteType: 1
   description: "\uCD5C\uB300 \uCCB4\uB825\uC744 10\uB9CC\uD07C \uC99D\uAC00\uC2DC\uD0B5\uB2C8\uB2E4."
   effectValue: 10
   isConsumable: 1
