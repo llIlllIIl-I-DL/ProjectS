@@ -5,6 +5,8 @@ using UnityEngine;
 public class TestDamage : MonoBehaviour
 {
     public PlayerHP playerHP;
+
+
     // Update is called once per frame
     void Update()
     {
@@ -19,14 +21,17 @@ public class TestDamage : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.H))
         {
             playerHP.Heal(25); // 회복 값은 필요에 따라 조정하세요.
+            PlayerUI.Instance.HealHP();
             // PlayerHP 클래스의 Heal 메서드를 호출하여 회복합니다.
             Debug.Log("회복 25");
         }
+        /*
         if (Input.GetKeyDown(KeyCode.I))
         {
             playerHP.IncreaseMaxHP(10); // 최대 HP 증가 값은 필요에 따라 조정하세요.
             // PlayerHP 클래스의 IncreaseMaxHP 메서드를 호출하여 최대 HP를 증가시킵니다.
             Debug.Log("최대 HP 증가 10");
         }
+        */
     }
 }

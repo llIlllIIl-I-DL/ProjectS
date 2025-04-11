@@ -32,7 +32,8 @@ public class UIManager : Singleton<UIManager>
             {
                 if(uiPage.name == "SuitUI" && uiPage.activeSelf)
                 {
-                    //uiPage.name("SuitUI").SetActive(false);
+                    allUIPages[4].SetActive(false);
+                    return;
                 }
                 uiPage.gameObject.SetActive(false);
             }
@@ -54,11 +55,12 @@ public class UIManager : Singleton<UIManager>
                 if (uiPage != null)
                 {
                     uiPage.gameObject.SetActive(false);
+                    inputUI.isPauseMenuOpen = true;
                 }
             }
 
             inputUI.currentPage.SetActive(!isActive);
-            Time.timeScale = isActive ? 1 : 0; //삼항연산자
+            Time.timeScale = isActive ? 1 : 0;
         }
     }
 }

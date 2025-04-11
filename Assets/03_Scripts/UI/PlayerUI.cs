@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerUI : MonoBehaviour
+public class PlayerUI : Singleton<PlayerUI> 
 {
     [Header("HP 바")]
     [SerializeField] private Scrollbar healthBar;
     [SerializeField] private Image healthBarImage;
     [SerializeField] private Image healLight;
 
-    [SerializeField] private int maxHP;
-    [SerializeField] private int currentHP;
-    [SerializeField] private int giveDamage;
+    //[SerializeField] private int maxHP;
+    //[SerializeField] private int currentHP;
+    //[SerializeField] private int giveDamage;
     [SerializeField] private int healHP;
 
 
     [Header("HP 바 기능 테스트를 위한 임시 버튼")]
-    [SerializeField] public Button damageButton;
+    //[SerializeField] public Button damageButton;
     [SerializeField] public Button healButton;
 
     [Header("HP 바 깨짐")]
@@ -26,37 +26,34 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] public GameObject VeryHurt;
     [SerializeField] public GameObject killme;
 
+    private PlayerHP playerHP;
 
     public float shakeTime;
-
     public float shakeRange;
-    Sprite currentHPStat;
 
     public void Start()
     {
+        playerHP = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHP>();
+
+        float maxHP = playerHP.MaxHP;
+        float currentHP = playerHP.CurrentHP;
+
         Vector3 realPosition = healthBar.transform.position;
+        Debug.Log($"{realPosition}");
 
         healthBarImage.fillAmount = 1f;
 
-        damageButton.onClick.AddListener(KillEmAll);
-        healButton.onClick.AddListener(() => Voscuro(realPosition));
+        //damageButton.onClick.AddListener(KillEmAll);
+        //healButton.onClick.AddListener(() => Voscuro(realPosition, maxHP, currentHP));
     }
 
-    public void Voscuro(Vector3 realPosition)
+    public void Voscuro(Vector3 realPosition, float maxHP, float currentHP)
     {
-
-        currentHP += healHP;
-
-
-        if (currentHP > maxHP)
-        {
-            currentHP = maxHP;
-        }
-
-        SetHealthBar();
-        HealHP(realPosition);
+        //SetHealthBar(maxHP, currentHP);
+        HealHP();
     }
 
+    /*
     public void KillEmAll()
     {
         currentHP -= giveDamage;
@@ -70,9 +67,12 @@ public class PlayerUI : MonoBehaviour
         SetHealthBar();
         StartCoroutine(ShakingHPBar());
     }
+    */
 
-    public void SetHealthBar()
+    public void SetHealthBar(float maxHP, float currentHP)
     {
+        StartCoroutine(ShakingHPBar());
+
         float currentHPAmount = (float)currentHP / maxHP;
 
         healthBarImage.fillAmount = currentHPAmount;
@@ -133,17 +133,24 @@ public class PlayerUI : MonoBehaviour
         healthBar.transform.position = originalPosition;
     }
 
-    public void HealHP(Vector3 realPosition)
+    public void HealHP()
     {
+        float maxHP = playerHP.MaxHP;
+        float currentHP = playerHP.CurrentHP;
+
+        Vector3 realPosition = healthBar.transform.position;
+
+
         healthBar.transform.position = new Vector3(realPosition.x, realPosition.y, realPosition.z);
         
 
-        if (currentHP == maxHP)
+        if (currentHP > maxHP)
         {
             return;
         }
 
         StartCoroutine(HealHPBarLighting());
+        SetHealthBar(maxHP, currentHP);
     }
 
     public IEnumerator HealHPBarLighting()

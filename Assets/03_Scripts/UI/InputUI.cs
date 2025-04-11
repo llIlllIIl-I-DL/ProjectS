@@ -1,19 +1,11 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class InputUI : MonoBehaviour
 {
-    //UIManager에서 currentPage를 만들고 현재 Active된 캔버스를 할당 한 뒤 null이 아닐 때 timescale 0으로 하기??....
-
-
-    public GameObject currentPage = null;  //여기를 인식해서 같은 키 눌렀을 때 켜고 끄기.
-
-    //List로 변경하고 순회하면서 현재 Active된 캔버스 제외 전부 false
-
-    /// <summary>
-    /// 창 켠 상태일때마다 시간 똑바로 멈춰있게 만들기만 하면 된다~~
-    /// </summary>
+    public GameObject currentPage = null;
 
     [Header("UI 창")]
     [SerializeField] public GameObject pauseMenu;
@@ -34,8 +26,6 @@ public class InputUI : MonoBehaviour
     [SerializeField] public GameObject settingMenu;
     [SerializeField] public GameObject checkPointMenu;
 
-
-
     public bool isPauseMenuOpen = false;
 
     private void Start()
@@ -53,11 +43,11 @@ public class InputUI : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            PauseMenu();
+            PauseMenu(pauseMenu);
 
         }
 
-        if (isPauseMenuOpen) //예외처리 미리 체크하는 편이 좋당
+        if (isPauseMenuOpen) //예외처리. 미리 체크하는 편이 좋당
             return;
 
         if (Input.GetKeyDown(KeyCode.M))
@@ -80,12 +70,12 @@ public class InputUI : MonoBehaviour
 
     }
 
-    public void PauseMenu()
+    public void PauseMenu(GameObject menu)
     {
-        pauseMenu.SetActive(!isPauseMenuOpen); //토글 작업 시 자주 사용
-        Time.timeScale = isPauseMenuOpen ? 1 : 0; //삼항연산자
+            pauseMenu.SetActive(!isPauseMenuOpen); //토글 작업 시 자주 사용하는 방식
+            Time.timeScale = isPauseMenuOpen ? 1 : 0; //삼항연산자
 
-        isPauseMenuOpen = !isPauseMenuOpen;
+            isPauseMenuOpen = !isPauseMenuOpen;
     }
 
     public void UIInPauseMenu(GameObject menu)
