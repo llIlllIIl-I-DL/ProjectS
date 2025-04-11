@@ -666,60 +666,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!1 &1137122546
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1137122548}
-  - component: {fileID: 1137122547}
-  m_Layer: 0
-  m_Name: AudioManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1137122547
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1137122546}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26e27899d521b4dfd9dff1a4c143334e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  audioMixer: {fileID: 24100000, guid: af1968e648f6c40f68a6c32681a94072, type: 2}
-  bgmMixerGroup: {fileID: -8448985608788330517, guid: af1968e648f6c40f68a6c32681a94072, type: 2}
-  sfxMixerGroup: {fileID: 4044676818467728419, guid: af1968e648f6c40f68a6c32681a94072, type: 2}
-  uiMixerGroup: {fileID: -5831322894747200492, guid: af1968e648f6c40f68a6c32681a94072, type: 2}
-  voiceMixerGroup: {fileID: 4760568119456514805, guid: af1968e648f6c40f68a6c32681a94072, type: 2}
-  masterVolume: 1
-  bgmVolume: 0.7
-  sfxVolume: 1
-  uiVolume: 1
-  voiceVolume: 1
---- !u!4 &1137122548
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1137122546}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.166745, y: -1.7773871, z: -0.25654876}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1348076563
 GameObject:
   m_ObjectHideFlags: 0
@@ -861,4 +807,3 @@ SceneRoots:
   - {fileID: 464537264}
   - {fileID: 1348076565}
   - {fileID: 755421408}
-  - {fileID: 1137122548}

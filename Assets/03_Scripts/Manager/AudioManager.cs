@@ -8,6 +8,9 @@ using UnityEngine.Audio;
 // ManagerBase를 상속하여 기본 관리 기능 추가
 public class AudioManager : Singleton<AudioManager>
 {
+    // 싱글톤 인스턴스
+    private static AudioManager _instance;
+
     // 초기화 상태
     public bool IsInitialized { get; private set; } = false;
 
@@ -59,13 +62,6 @@ public class AudioManager : Singleton<AudioManager>
     private const int MAX_SFX_SOURCES = 10;
     private const int MAX_UI_SOURCES = 5;
     private const int MAX_VOICE_SOURCES = 3;
-
-    protected override void Awake()
-    {
-        // 초기화
-        InitializeAudioSources();
-        IsInitialized = true;
-    }
 
     // 기존 Start는 Initialize로 이동
     private void Start()
