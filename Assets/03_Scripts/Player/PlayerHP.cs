@@ -22,6 +22,7 @@ public class PlayerHP : MonoBehaviour, IDamageable
         playerStateManager = GetComponent<PlayerStateManager>();
     }
 
+
     public void TakeDamage(float damage)
     {
         currentHP = Mathf.Clamp(currentHP - damage, MIN_HP, maxHP);
@@ -30,6 +31,7 @@ public class PlayerHP : MonoBehaviour, IDamageable
         // 플레이어가 데미지를 입으면 Hit 상태로 변경
         if (playerStateManager != null)
         {
+            PlayerUI.Instance.SetHealthBar(maxHP, currentHP);
             playerStateManager.ChangeState(PlayerStateType.Hit);
         }
 
