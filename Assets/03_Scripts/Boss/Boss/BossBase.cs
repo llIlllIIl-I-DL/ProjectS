@@ -23,8 +23,4 @@ public class BossBase : MonoBehaviour
     protected Animator animator;
     protected SpriteRenderer spriteRenderer;
 
-    // 플레이어 감지
-    protected bool playerDetected = false;
-    protected Vector2 lastKnownPlayerPosition; // 마지막으로 감지된 플레이어 위치
-
 }
