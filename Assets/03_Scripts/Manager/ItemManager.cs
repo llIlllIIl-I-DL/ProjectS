@@ -49,18 +49,18 @@ public class ItemManager : MonoBehaviour
     {
         if (itemData == null || !playerItems.Contains(itemData)) return;
 
-        switch (itemData.itemType)
+        switch (itemData.itemAttrivuteType)
         {
-            case ItemType.HealItem:
+            case ItemAttrivuteType.HealItem:
                 UseHealItem(itemData);
                 break;
                 
-            case ItemType.MaxHPUpItem:
+            case ItemAttrivuteType.MaxHPUpItem:
                 UseMaxHPUpItem(itemData);
                 break;
                 
             default:
-                Debug.LogWarning($"처리되지 않은 아이템 유형: {itemData.itemType}");
+                Debug.LogWarning($"처리되지 않은 아이템 유형: {itemData.itemAttrivuteType}");
                 break;
         }
 
@@ -73,9 +73,9 @@ public class ItemManager : MonoBehaviour
 
     
     // 특정 유형의 아이템 가져오기
-    public ItemData GetItemByType(ItemType itemType)
+    public ItemData GetItemByType(ItemAttrivuteType itemAttrivuteType)
     {
-        return playerItems.Find(item => item.itemType == itemType);
+        return playerItems.Find(item => item.itemAttrivuteType == itemAttrivuteType);
     }
     
     // 특정 이름의 아이템 가져오기

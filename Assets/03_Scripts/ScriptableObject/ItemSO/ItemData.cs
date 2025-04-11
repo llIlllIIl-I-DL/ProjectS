@@ -2,11 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ItemType
+public enum ItemAttrivuteType
 {
     HealItem,
     MaxHPUpItem
 }
+
 
 [CreateAssetMenu(fileName = "New Item", menuName = "ScriptableObjects/Item")]
 public class ItemData : ScriptableObject
@@ -14,7 +15,7 @@ public class ItemData : ScriptableObject
     [Header("기본 정보")]
     public string itemName;
     public Sprite itemIcon;
-    public ItemType itemType;
+    public ItemAttrivuteType itemAttrivuteType;
     [TextArea(3, 5)]
     public string description;
 
