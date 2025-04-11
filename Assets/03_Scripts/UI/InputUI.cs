@@ -1,0 +1,105 @@
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+public class InputUI : MonoBehaviour
+{
+    public GameObject currentPage = null;
+
+    [Header("UI 창")]
+    [SerializeField] public GameObject pauseMenu;
+    [SerializeField] public GameObject mapMenu;
+    [SerializeField] public GameObject infoMenu;
+
+    [Header("PauseManu Btn")]
+    [SerializeField] public Button characterInfoBtn;
+    [SerializeField] public Button toCheckPointBtn;
+    [SerializeField] public Button settingBtn;
+    [SerializeField] public Button toMainMenuBtn;
+
+    [Header("Info → Suit UI")]
+    [SerializeField] public GameObject suitMenu;
+    [SerializeField] public Button suitBtn;
+
+    [Header("PauseManu UI 창")]
+    [SerializeField] public GameObject settingMenu;
+    [SerializeField] public GameObject checkPointMenu;
+
+    public bool isPauseMenuOpen = false;
+
+    private void Start()
+    {
+        characterInfoBtn.onClick.AddListener(() => InfoMenu(infoMenu));
+        toCheckPointBtn.onClick.AddListener(() => UIInPauseMenu(checkPointMenu));
+        settingBtn.onClick.AddListener(() => UIInPauseMenu(settingMenu));
+
+        suitBtn.onClick.AddListener(() => SuitMenu());
+
+        toMainMenuBtn.onClick.AddListener(() => ToMainMenu());
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            PauseMenu(pauseMenu);
+
+        }
+
+        if (isPauseMenuOpen) //예외처리. 미리 체크하는 편이 좋당
+            return;
+
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            SetMenu(mapMenu);
+        }
+
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            SetMenu(infoMenu);
+        }
+    }
+
+    public void SetMenu(GameObject menu)
+    {
+
+        UIManager.Instance.YouAreOnlyOne(menu);
+
+        currentPage = menu;
+
+    }
+
+    public void PauseMenu(GameObject menu)
+    {
+            pauseMenu.SetActive(!isPauseMenuOpen); //토글 작업 시 자주 사용하는 방식
+            Time.timeScale = isPauseMenuOpen ? 1 : 0; //삼항연산자
+
+            isPauseMenuOpen = !isPauseMenuOpen;
+    }
+
+    public void UIInPauseMenu(GameObject menu)
+    {
+        bool isActive = menu.activeSelf;
+        menu.SetActive(!isActive);
+    }
+
+
+    public void InfoMenu(GameObject menu)
+    {
+        isPauseMenuOpen = false;
+        SetMenu(menu);
+    }
+
+    public void SuitMenu()
+    {
+        suitMenu.SetActive(true);
+    }
+
+
+    public void ToMainMenu()
+    {
+        SceneManager.LoadScene("YJ_UI_Scene", LoadSceneMode.Single);
+    }
+}
+

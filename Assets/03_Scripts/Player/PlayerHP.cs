@@ -22,6 +22,7 @@ public class PlayerHP : MonoBehaviour, IDamageable
         playerStateManager = GetComponent<PlayerStateManager>();
     }
 
+
     public void TakeDamage(float damage)
     {
         currentHP = Mathf.Clamp(currentHP - damage, MIN_HP, maxHP);
@@ -30,6 +31,7 @@ public class PlayerHP : MonoBehaviour, IDamageable
         // 플레이어가 데미지를 입으면 Hit 상태로 변경
         if (playerStateManager != null)
         {
+            PlayerUI.Instance.SetHealthBar(maxHP, currentHP);
             playerStateManager.ChangeState(PlayerStateType.Hit);
         }
 
@@ -49,9 +51,9 @@ public class PlayerHP : MonoBehaviour, IDamageable
     {
         if (amount <= 0) return; // 0 이하의 값은 무시
 
-        float previousMaxHP = maxHP;
+        float previousMaxHP = maxHP; // 이전 최대 HP 저장
         maxHP += amount; 
-        float actualIncrease = maxHP - previousMaxHP;
+        float actualIncrease = maxHP - previousMaxHP; // 최대 HP 증가량
 
         // 현재 HP도 최대 HP를 초과하지 않도록 조정
         float previousCurrentHP = currentHP;
