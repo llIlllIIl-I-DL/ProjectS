@@ -12,11 +12,11 @@ TagManager:
   - Player
   - Water
   - UI
-  - Ground
+  - Platform
   - Wall
   - Enemy
-  - 
-  - 
+  - Ladder
+  - NoCollision
   - 
   - 
   - 

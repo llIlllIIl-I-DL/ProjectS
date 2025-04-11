@@ -29,6 +29,8 @@ public class PlayerStateManager : MonoBehaviour
     private bool isDashing;
     private bool isSprinting;
     private bool canDash = true;
+    private bool isCrouching;
+    private bool isClimbing;
 
     // 프로퍼티
     public PlayerStateType CurrentState => currentStateType;
@@ -40,9 +42,13 @@ public class PlayerStateManager : MonoBehaviour
     public bool IsWallSliding => isWallSliding;
     public bool IsDashing => isDashing;
     public bool CanDash => canDash;
+    public bool IsCrouching => isCrouching;
+    public bool IsClimbing => isClimbing;
 
     // 이벤트
     public event Action<PlayerStateType> OnStateChanged;
+    public event Action<bool> OnCrouchStateChanged;
+    public event Action<bool> OnClimbStateChanged;
 
     private void Awake()
     {
@@ -72,6 +78,7 @@ public class PlayerStateManager : MonoBehaviour
         {
             collisionDetector.OnGroundedChanged += HandleGroundedChanged;
             collisionDetector.OnWallTouchChanged += HandleWallTouchChanged;
+            collisionDetector.OnLadderTouchChanged += HandleLadderTouchChanged;
         }
 
         if (movement != null)
@@ -96,6 +103,7 @@ public class PlayerStateManager : MonoBehaviour
         {
             collisionDetector.OnGroundedChanged -= HandleGroundedChanged;
             collisionDetector.OnWallTouchChanged -= HandleWallTouchChanged;
+            collisionDetector.OnLadderTouchChanged -= HandleLadderTouchChanged;
         }
 
         if (movement != null)
@@ -117,6 +125,8 @@ public class PlayerStateManager : MonoBehaviour
         states.Add(PlayerStateType.Dashing, new PlayerDashingState(this));
         states.Add(PlayerStateType.Attacking, new PlayerAttackingState(this));
         states.Add(PlayerStateType.Hit, new PlayerHitState(this));
+        states.Add(PlayerStateType.Crouching, new PlayerCrouchingState(this));
+        states.Add(PlayerStateType.Climbing, new PlayerClimbingState(this));
         // 초기 상태 설정
         ChangeState(PlayerStateType.Idle);
     }
@@ -125,6 +135,12 @@ public class PlayerStateManager : MonoBehaviour
     {
         // 타이머 업데이트
         UpdateTimers();
+
+        // 앉기 입력 체크
+        CheckCrouchInput();
+        
+        // 사다리 입력 체크
+        CheckClimbInput();
 
         // 상태 관련 자동 전환 확인
         CheckStateTransitions();
@@ -171,32 +187,38 @@ public class PlayerStateManager : MonoBehaviour
 
     private void CheckStateTransitions()
     {
+        // 사다리 관련 상태 전환은 HandleLadderTouchChanged에서 처리
+        
+        // Crouching 상태에서 앉기 입력이 해제되고 지상에 있으면 Idle로 전환
+        if (currentStateType == PlayerStateType.Crouching && !inputHandler.IsDownPressed && collisionDetector.IsGrounded)
+        {
+            ChangeState(inputHandler.IsMoving() ? PlayerStateType.Running : PlayerStateType.Idle);
+        }
         // Idle 상태에서 이동 입력이 있으면 Running으로 전환
-        if (currentStateType == PlayerStateType.Idle && inputHandler.IsMoving() && collisionDetector.IsGrounded)
+        else if (currentStateType == PlayerStateType.Idle && inputHandler.IsMoving() && collisionDetector.IsGrounded)
         {
             ChangeState(PlayerStateType.Running);
         }
-
         // Running 상태에서 이동 입력이 없으면 Idle로 전환
         else if (currentStateType == PlayerStateType.Running && !inputHandler.IsMoving() && collisionDetector.IsGrounded)
         {
             ChangeState(PlayerStateType.Idle);
         }
-
-        // 지상에 있지 않고 낙하 중이면 Falling으로 전환
+        // 지상에 있지 않고 낙하 중이면 Falling으로 전환 (사다리 오르기 중이 아닐 때)
         else if (currentStateType != PlayerStateType.Jumping &&
                  currentStateType != PlayerStateType.WallSliding &&
                  currentStateType != PlayerStateType.Dashing &&
                  currentStateType != PlayerStateType.Falling &&
+                 currentStateType != PlayerStateType.Climbing &&
                  !collisionDetector.IsGrounded &&
                  movement.Velocity.y < 0)
         {
             ChangeState(PlayerStateType.Falling);
         }
-
-        // 벽에 붙어있으면 WallSliding으로 전환
+        // 벽에 붙어있으면 WallSliding으로 전환 (사다리 오르기 중이 아닐 때)
         else if (currentStateType != PlayerStateType.WallSliding &&
                  currentStateType != PlayerStateType.Dashing &&
+                 currentStateType != PlayerStateType.Climbing &&
                  collisionDetector.IsTouchingWall &&
                  !collisionDetector.IsGrounded)
         {
@@ -404,6 +426,8 @@ public class PlayerStateManager : MonoBehaviour
     public void SetJumping(bool value) => isJumping = value;
     public void SetWallSliding(bool value) => isWallSliding = value;
     public void SetSprinting(bool value) => isSprinting = value;
+    public void SetCrouching(bool value) => isCrouching = value;
+    public void SetClimbing(bool value) => isClimbing = value;
 
     // 피격 처리 메서드
     public void TakeDamage(float damage)
@@ -422,5 +446,140 @@ public class PlayerStateManager : MonoBehaviour
         ChangeState(PlayerStateType.Hit);
         
         Debug.Log($"플레이어가 {damage} 데미지를 받았습니다.");
+    }
+
+    // 앉기 입력 체크 메서드
+    private void CheckCrouchInput()
+    {
+        // 지상에 있고 아래 방향키가 눌렸을 때 앉기 상태로 전환
+        if (collisionDetector.IsGrounded && inputHandler.IsDownPressed &&
+            currentStateType != PlayerStateType.Crouching &&
+            currentStateType != PlayerStateType.Dashing &&
+            currentStateType != PlayerStateType.Attacking)
+        {
+            EnterCrouchState();
+        }
+    }
+
+    // 앉기 상태 진입 메서드
+    private void EnterCrouchState()
+    {
+        if (!isCrouching)
+        {
+            isCrouching = true;
+            ChangeState(PlayerStateType.Crouching);
+            OnCrouchStateChanged?.Invoke(true);
+            
+            // 앉기 애니메이션 상태 설정
+            playerAnimator?.SetCrouching(true);
+            
+            // 앉기 상태에서의 콜라이더 크기 조절 등은 PlayerCrouchingState에서 처리
+        }
+    }
+
+    // 앉기 상태 종료 메서드
+    public void ExitCrouchState()
+    {
+        if (isCrouching)
+        {
+            isCrouching = false;
+            OnCrouchStateChanged?.Invoke(false);
+            
+            // 앉기 애니메이션 상태 해제
+            playerAnimator?.SetCrouching(false);
+            
+            // 플레이어가 천장과 충돌하지 않는지 확인 후 상태 전환
+            if (CanStandUp())
+            {
+                ChangeState(inputHandler.IsMoving() ? PlayerStateType.Running : PlayerStateType.Idle);
+            }
+        }
+    }
+
+    // 일어설 수 있는지 확인하는 메서드
+    private bool CanStandUp()
+    {
+        // 필요 시 천장 충돌 체크 로직 구현
+        // 여기서는 간단하게 true 반환
+        return true;
+    }
+
+    // 사다리 입력 체크 메서드
+    private void CheckClimbInput()
+    {
+        // 사다리와 접촉 중이며 수직 이동 입력이 있을 때 
+        if (collisionDetector.IsOnLadder && Mathf.Abs(inputHandler.MoveDirection.y) > 0.1f &&
+            currentStateType != PlayerStateType.Climbing &&
+            currentStateType != PlayerStateType.Dashing)
+        {
+            EnterClimbingState();
+        }
+    }
+
+    // 사다리 오르기 상태 진입 메서드
+    private void EnterClimbingState()
+    {
+        if (!isClimbing)
+        {
+            isClimbing = true;
+            ChangeState(PlayerStateType.Climbing);
+            OnClimbStateChanged?.Invoke(true);
+            
+            // 사다리 오르기 애니메이션 설정
+            playerAnimator?.SetClimbing(true);
+        }
+    }
+
+    // 사다리 오르기 상태 종료 메서드
+    public void ExitClimbingState(bool shouldJump)
+    {
+        if (isClimbing)
+        {
+            isClimbing = false;
+            OnClimbStateChanged?.Invoke(false);
+            
+            // 사다리 오르기 애니메이션 해제
+            playerAnimator?.SetClimbing(false);
+            
+            if (shouldJump)
+            {
+                // 점프로 사다리를 내리는 경우
+                isJumping = true;
+                movement.Jump(settings.jumpForce * 0.7f); // 사다리에서 점프는 일반 점프보다 약하게
+                ChangeState(PlayerStateType.Jumping);
+            }
+            else
+            {
+                // 그냥 사다리에서 내리는 경우
+                if (collisionDetector.IsGrounded)
+                {
+                    ChangeState(inputHandler.IsMoving() ? PlayerStateType.Running : PlayerStateType.Idle);
+                }
+                else
+                {
+                    ChangeState(PlayerStateType.Falling);
+                }
+            }
+        }
+    }
+
+    // 사다리 접촉 상태 변경 이벤트 핸들러
+    private void HandleLadderTouchChanged(bool isOnLadder)
+    {
+        // 사다리에 접촉한 경우 (선택적으로 자동 진입 가능)
+        if (isOnLadder && inputHandler.MoveDirection.y != 0)
+        {
+            // 일부 상태에서는 자동으로 사다리 오르기 상태로 전환할 수 있음
+            if (currentStateType == PlayerStateType.Falling || 
+                currentStateType == PlayerStateType.Jumping)
+            {
+                EnterClimbingState();
+            }
+        }
+        // 사다리에서 벗어난 경우
+        else if (!isOnLadder && isClimbing)
+        {
+            ExitClimbingState(false);
+        }
     }
 }

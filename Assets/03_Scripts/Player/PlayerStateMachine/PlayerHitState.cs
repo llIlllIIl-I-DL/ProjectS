@@ -6,7 +6,7 @@ public class PlayerHitState : PlayerStateBase
 {
     private float hitStartTime;
     private float hitDuration = 0.5f;         // 피격 상태 지속 시간
-    private float knockbackForce = 5f;        // 넉백 힘
+    private float knockbackForce = 1f;        // 넉백 힘
     private float invincibilityDuration = 1.5f; // 무적 시간
     private Vector2 knockbackDirection;        // 넉백 방향
 
