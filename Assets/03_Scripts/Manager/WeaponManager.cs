@@ -26,8 +26,7 @@ public class WeaponManager : Singleton<WeaponManager>
         // 총알 프리팹이 할당되었는지 검사
         if (bulletPrefab == null)
         {
-            Debug.LogError("WeaponManager: bulletPrefab이 인스펙터에서 할당되지 않았습니다. " +
-                          "Assets/02_Prefab 폴더에서 Bullet 프리팹을 WeaponManager의 bulletPrefab 필드에 할당해주세요.");
+            Debug.LogError("WeaponManager: bulletPrefab이 인스펙터에서 할당되지 않았습니다");
         }
     }
 

@@ -49,9 +49,9 @@ public class PlayerHP : MonoBehaviour, IDamageable
     {
         if (amount <= 0) return; // 0 이하의 값은 무시
 
-        float previousMaxHP = maxHP;
+        float previousMaxHP = maxHP; // 이전 최대 HP 저장
         maxHP += amount; 
-        float actualIncrease = maxHP - previousMaxHP;
+        float actualIncrease = maxHP - previousMaxHP; // 최대 HP 증가량
 
         // 현재 HP도 최대 HP를 초과하지 않도록 조정
         float previousCurrentHP = currentHP;
