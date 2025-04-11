@@ -60,6 +60,7 @@ public class ObjectCrackedWall : DestructibleObject
     {
         // 벽돌 파편 생성
         CreateBrickDebris();
+        AudioManager.Instance.PlayBGM("Test");
         
         // 큰 먼지 효과 생성
         if (dustEffectPrefab != null)
