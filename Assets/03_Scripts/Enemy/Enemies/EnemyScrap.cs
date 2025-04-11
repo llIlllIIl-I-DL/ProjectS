@@ -8,16 +8,40 @@ public class EnemyScrap : BaseEnemy
 {
     #region Variables
     
+    [Header("비행 설정")]
+    [SerializeField] private float hoverAmplitude = 0.5f; // 부유 진폭
+    [SerializeField] private float hoverFrequency = 2f; // 부유 주파수
+
+    [Header("추격 설정")]
+    [SerializeField] private float chaseSpeed; // 추격 속도 // 배수로 잡힘 ex) 1로 설정하면 기본 속도, 2로 설정하면 두 배 속도
+
+    [Header("공격 설정")]
+    [SerializeField] private float attackSpeed; // 공격 속도
+    
     [Header("순찰 설정")]
     [SerializeField] private float patrolDistance; // 순찰 거리
     [SerializeField] private float patrolWaitTime; // 방향 전환 시 대기 시간
+    
+    // 부유 효과를 위한 변수
+    private float timeCounter = 0f;
+    private float originalY;
 
     // 상태들
-    private PatrolState patrolState;
+    private FlyingPatrolState flyingPatrolState;
     private IdleState idleState;
+    private FlyingChaseState flyingChaseState;
+    private AttackState attackState;
 
     // 순찰 시작점
     private Vector2 startPosition;
+
+    // 상태 머신
+    public IEnemyState currentState => stateMachine.CurrentState;
+
+    // 상태 접근자 메서드들
+    public IdleState GetIdleState() => idleState;
+    public AttackState GetAttackState() => attackState;
+    public FlyingChaseState GetChaseState() => flyingChaseState;
     
     #endregion
 
@@ -30,6 +54,10 @@ public class EnemyScrap : BaseEnemy
     {
         base.Awake();
         startPosition = transform.position;
+        originalY = transform.position.y;
+        
+        // 날아다니는 적이므로 중력 영향 제거
+        rb.gravityScale = 0f;
     }
 
     /// <summary>
@@ -37,8 +65,16 @@ public class EnemyScrap : BaseEnemy
     /// </summary>
     protected override void Update()
     {
-        base.Update(); // BaseEnemy의 Update 호출
-        // Debug.Log("PatrolEnemy Update"); // 디버그 로그 - 개발 완료 후 제거
+        if (isDestroyed || isStunned) return;
+    
+        // 부유 효과 적용 (위아래 움직임)
+        ApplyHoverEffect();
+
+        // 플레이어 감지
+        DetectPlayer();
+    
+        // 상태 머신 업데이트 (좌우 움직임)
+        stateMachine.Update();
     }
 
     /// <summary>
@@ -46,8 +82,16 @@ public class EnemyScrap : BaseEnemy
     /// </summary>
     protected override void FixedUpdate()
     {
-        base.FixedUpdate(); // BaseEnemy의 FixedUpdate 호출
-        // Debug.Log($"Current Position: {transform.position}"); // 디버그 로그 - 개발 완료 후 제거
+        if (isDestroyed || isStunned) return;
+    
+        // 상태 머신의 물리 업데이트 호출
+        stateMachine.FixedUpdate();
+    }
+    
+    protected override void Start()
+    {
+        base.Start(); // 부모의 Start 호출
+        InitializeEnemy(); // 이 메서드 호출이 Start에서 이루어져야 함
     }
     
     #endregion
@@ -59,7 +103,15 @@ public class EnemyScrap : BaseEnemy
     /// </summary>
     protected override void InitializeEnemy()
     {
+        flyingPatrolState = new FlyingPatrolState(this, stateMachine, patrolDistance, patrolWaitTime);
+        flyingChaseState = new FlyingChaseState(this, stateMachine, chaseSpeed);
+        attackState = new AttackState(this, stateMachine, attackSpeed);
 
+        
+        // 상태 머신 초기화
+        stateMachine.ChangeState(flyingPatrolState);
+        
+        // 나머지 초기화...
     }
 
     /// <summary>
@@ -75,7 +127,7 @@ public class EnemyScrap : BaseEnemy
     /// </summary>
     protected override void HandleMovement()
     {
-        stateMachine.FixedUpdate();
+
     }
 
     /// <summary>
@@ -83,8 +135,7 @@ public class EnemyScrap : BaseEnemy
     /// </summary>
     public override void PerformAttack()
     {
-        // 단순 패트롤 적은 충돌 데미지만 주므로 여기선 구현 불필요
-        // 실제 충돌 데미지는 BaseEnemy의 OnCollisionEnter2D에서 처리됨
+
     }
     
     #endregion
@@ -92,25 +143,74 @@ public class EnemyScrap : BaseEnemy
     #region Player Detection
     
     /// <summary>
-    /// 플레이어 감지 시 호출됨 (반응 없음)
+    /// 플레이어 감지 시 호출됨
     /// </summary>
     protected override void OnPlayerDetected()
     {
-        // 단순 패트롤 적은 플레이어 감지에 반응하지 않음
+        // 플레이어 감지 시 추격 상태로 전환
+        if (currentState != flyingChaseState && currentState != attackState)
+        {
+            stateMachine.ChangeState(flyingChaseState);
+        }
     }
 
     /// <summary>
-    /// 플레이어를 놓쳤을 때 호출됨 (반응 없음)
+    /// 플레이어를 놓쳤을 때 호출됨
     /// </summary>
     protected override void OnPlayerLost()
     {
         // 단순 패트롤 적은 플레이어를 놓치는 것에 반응하지 않음
     }
     
+     #region State Switch Methods
+    
+    /// <summary>
+    /// 공격 상태로 전환
+    /// </summary>
+    public override void SwitchToAttackState()
+    {
+        stateMachine.ChangeState(attackState);
+    }
+    
+    /// <summary>
+    /// 순찰 상태로 전환
+    /// </summary>
+    public override void SwitchToPatrolState()
+    {
+        stateMachine.ChangeState(flyingPatrolState);
+    }
+
+    /// <summary>
+    /// 추격 상태로 전환
+    /// </summary>
+    public override void SwitchToChaseState()
+    {
+        stateMachine.ChangeState(flyingChaseState);
+    }
+
     #endregion
 
-    #region State Switch Methods
+    #endregion
+
+    #region Flying Mechanics
     
+    /// <summary>
+    /// 부유 효과 적용 (상하로 부드럽게 움직임)
+    /// </summary>
+    private void ApplyHoverEffect()
+    {
+        if (isDestroyed || isStunned) return;
+        
+        timeCounter += Time.deltaTime;
+        float hoverOffset = Mathf.Sin(timeCounter * hoverFrequency) * hoverAmplitude;
+        
+        // 현재 x 위치는 그대로 유지하고 y만 변경
+        // transform.position이 아닌 localPosition 사용 고려
+        Vector3 currentPos = transform.position;
+        float newY = originalY + hoverOffset;
+        
+        transform.position = new Vector3(currentPos.x, newY, currentPos.z);
+    }
     
     #endregion
 }

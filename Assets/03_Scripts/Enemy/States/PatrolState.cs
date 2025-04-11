@@ -99,7 +99,7 @@ namespace Enemy.States
             Vector2 targetPosition = waypoints[currentWaypoint];
 
             // 방향 설정
-            Vector2 direction = ((Vector3)targetPosition - enemy.transform.position).normalized;
+            Vector2 direction = (targetPosition - (Vector2)enemy.transform.position).normalized;
             enemy.SetFacingDirection(direction);
 
             // 이동
