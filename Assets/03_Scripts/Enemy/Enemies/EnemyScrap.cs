@@ -14,6 +14,9 @@ public class EnemyScrap : BaseEnemy
 
     [Header("추격 설정")]
     [SerializeField] private float chaseSpeed; // 추격 속도 // 배수로 잡힘 ex) 1로 설정하면 기본 속도, 2로 설정하면 두 배 속도
+
+    [Header("공격 설정")]
+    [SerializeField] private float attackSpeed; // 공격 속도
     
     [Header("순찰 설정")]
     [SerializeField] private float patrolDistance; // 순찰 거리
@@ -100,13 +103,10 @@ public class EnemyScrap : BaseEnemy
     /// </summary>
     protected override void InitializeEnemy()
     {
-        // 기존 상태 초기화
         flyingPatrolState = new FlyingPatrolState(this, stateMachine, patrolDistance, patrolWaitTime);
-        
-        // FlyingChaseState로 변경 (일반 ChaseState 대신)
         flyingChaseState = new FlyingChaseState(this, stateMachine, chaseSpeed);
-        
-        // attackState = new AttackState(this);
+        attackState = new AttackState(this, stateMachine, attackSpeed);
+
         
         // 상태 머신 초기화
         stateMachine.ChangeState(flyingPatrolState);
@@ -173,16 +173,21 @@ public class EnemyScrap : BaseEnemy
     }
     
     /// <summary>
+    /// 순찰 상태로 전환
+    /// </summary>
+    public override void SwitchToPatrolState()
+    {
+        stateMachine.ChangeState(flyingPatrolState);
+    }
+
+    /// <summary>
     /// 추격 상태로 전환
     /// </summary>
     public override void SwitchToChaseState()
     {
-        if (stateMachine.CurrentState != flyingChaseState)
-        {
-            stateMachine.ChangeState(flyingChaseState);
-        }
+        stateMachine.ChangeState(flyingChaseState);
     }
-    
+
     #endregion
 
     #endregion

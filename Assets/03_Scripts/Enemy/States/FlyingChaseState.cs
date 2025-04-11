@@ -39,7 +39,8 @@ namespace Enemy.States
                 if (losePlayerTimer >= losePlayerTime)
                 {
                     // 플레이어를 놓친 후 상태 전환
-                    stateMachine.ChangeState(enemy.GetComponent<FlyingPatrolState>());
+                    enemy.SwitchToPatrolState();
+                    return;
                 }
             }
             else
@@ -60,7 +61,42 @@ namespace Enemy.States
 
         public override void FixedUpdate()
         {
+             // 목표 위치 결정
+            Vector2 targetPosition;
 
+            if (isPlayerLost)
+            {
+                // 플레이어를 놓친 경우, 마지막으로 알려진 위치로 이동
+                targetPosition = enemy.GetLastKnownPlayerPosition();
+            }
+            else
+            {
+                // 플레이어를 쫓기
+                targetPosition = enemy.GetPlayerPosition();
+            }
+
+            // 원시 방향 계산
+            Vector2 rawDirection = ((Vector3)targetPosition - enemy.transform.position);
+            Vector2 direction;
+            
+            // 추격은 X축 및 Y축 모두 사용
+            if (rawDirection.x > 0)
+            {
+                direction = Vector2.right;
+            }
+            else if (rawDirection.x < 0)
+            {
+                direction = Vector2.left;
+            }
+            else
+            {
+                direction = Vector2.zero;
+            }
+
+            // 방향 설정 (스프라이트 플립 등)
+            enemy.SetFacingDirection(direction);
+            // 이동 실행
+            enemy.MoveInDirection(direction, chaseSpeed);
         }
 
         public override void OnTriggerEnter2D(Collider2D other) { }
