@@ -1722,7 +1722,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4975584541051327563, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
       propertyPath: useAnimatorForClimbing
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4975584541051327563, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
       propertyPath: climbFrames.Array.data[0]
