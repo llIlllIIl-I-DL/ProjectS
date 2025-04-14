@@ -45,9 +45,9 @@ public class Item : MonoBehaviour
     
     private void UpdateVisual()
     {
-        if (spriteRenderer != null && itemData != null && itemData.itemIcon != null)
+        if (spriteRenderer != null && itemData != null && itemData.Icon != null)
         {
-            spriteRenderer.sprite = itemData.itemIcon;
+            spriteRenderer.sprite = itemData.Icon;
         }
     }
     
@@ -56,22 +56,22 @@ public class Item : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             // 회복 아이템인 경우 즉시 사용
-            if (itemData.itemAttrivuteType == ItemAttrivuteType.HealItem)
+            if (itemData.itemAttributeType == ItemAttributeType.HealItem)
             {
                 PlayerHP playerHP = other.GetComponent<PlayerHP>();
                 if (playerHP != null)
                 {
                     playerHP.Heal(itemData.effectValue);
-                    Debug.Log($"{itemData.itemName}을(를) 획득하여 {itemData.effectValue}만큼 체력을 즉시 회복했습니다.");
+                    Debug.Log($"{itemData.ItemName}을(를) 획득하여 {itemData.effectValue}만큼 체력을 즉시 회복했습니다.");
                 }
             }
-            else if (itemData.itemAttrivuteType == ItemAttrivuteType.MaxHPUpItem)
+            else if (itemData.itemAttributeType == ItemAttributeType.MaxHPUpItem)
             {
                 PlayerHP playerHP = other.GetComponent<PlayerHP>();
                 if (playerHP != null)
                 {
                     playerHP.IncreaseMaxHP(itemData.effectValue);
-                    Debug.Log($"{itemData.itemName}을(를) 획득하여 최대 체력이 {itemData.effectValue}만큼 증가했습니다.");
+                    Debug.Log($"{itemData.ItemName}을(를) 획득하여 최대 체력이 {itemData.effectValue}만큼 증가했습니다.");
                 }
             }
             // 그 외 아이템은 인벤토리에 추가

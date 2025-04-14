@@ -42,25 +42,25 @@ public class ItemManager : MonoBehaviour
         if (itemData == null) return;
         
         playerItems.Add(itemData);
-        Debug.Log($"{itemData.itemName} 아이템을 획득했습니다!");
+        Debug.Log($"{itemData.ItemName} 아이템을 획득했습니다!");
     }
 
     public void UseItem(ItemData itemData)
     {
         if (itemData == null || !playerItems.Contains(itemData)) return;
 
-        switch (itemData.itemAttrivuteType)
+        switch (itemData.itemAttributeType)
         {
-            case ItemAttrivuteType.HealItem:
+            case ItemAttributeType.HealItem:
                 UseHealItem(itemData);
                 break;
                 
-            case ItemAttrivuteType.MaxHPUpItem:
+            case ItemAttributeType.MaxHPUpItem:
                 UseMaxHPUpItem(itemData);
                 break;
                 
             default:
-                Debug.LogWarning($"처리되지 않은 아이템 유형: {itemData.itemAttrivuteType}");
+                Debug.LogWarning($"처리되지 않은 아이템 유형: {itemData.itemAttributeType}");
                 break;
         }
 
@@ -73,15 +73,15 @@ public class ItemManager : MonoBehaviour
 
     
     // 특정 유형의 아이템 가져오기
-    public ItemData GetItemByType(ItemAttrivuteType itemAttrivuteType)
+    public ItemData GetItemByType(ItemAttributeType itemAttrivuteType)
     {
-        return playerItems.Find(item => item.itemAttrivuteType == itemAttrivuteType);
+        return playerItems.Find(item => item.itemAttributeType == itemAttrivuteType);
     }
     
     // 특정 이름의 아이템 가져오기
     public ItemData GetItemByName(string itemName)
     {
-        return playerItems.Find(item => item.itemName == itemName);
+        return playerItems.Find(item => item.ItemName == itemName);
     }
 
     private void UseHealItem(ItemData itemData)
@@ -89,7 +89,7 @@ public class ItemManager : MonoBehaviour
         if (playerHP == null) return;
         
         playerHP.Heal(itemData.effectValue);
-        Debug.Log($"{itemData.itemName}을(를) 사용해 {itemData.effectValue}만큼 체력을 회복했습니다.");
+        Debug.Log($"{itemData.ItemName}을(를) 사용해 {itemData.effectValue}만큼 체력을 회복했습니다.");
     }
 
     private void UseMaxHPUpItem(ItemData itemData)
@@ -97,7 +97,7 @@ public class ItemManager : MonoBehaviour
         if (playerHP == null) return;
         
         playerHP.IncreaseMaxHP(itemData.effectValue);
-        Debug.Log($"{itemData.itemName}을(를) 사용해 최대 체력이 {itemData.effectValue}만큼 증가했습니다.");
+        Debug.Log($"{itemData.ItemName}을(를) 사용해 최대 체력이 {itemData.effectValue}만큼 증가했습니다.");
     }
 
     // 아이템 생성 메서드 (씬에 아이템 오브젝트 실제 생성)
