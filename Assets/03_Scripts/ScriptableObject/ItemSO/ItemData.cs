@@ -3,16 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum ItemAttrivuteType
+public enum ItemAttributeType // 즉시사용 아이템 효과 종류
 {
     HealItem,
     MaxHPUpItem
 }
 
-public enum ItemType
+public enum ItemType // 아이템 주요 분류
 {
-    Equip_Type,
-    Attribute_Type
+    WeaponAttribute, // 무기속성
+    CostumeParts,   // 복장파츠
+    UsableItem      // 사용 아이템
+}
+
+public enum ItemUsageType // 사용 아이템 사용 방식
+{
+    InstantUse,     // 즉시사용 아이템
+    StoredInInventory // 인벤토리에 저장되는 아이템
 }
 
 [CreateAssetMenu(fileName = "New Item", menuName = "ScriptableObjects/Item")]
@@ -25,8 +32,13 @@ public class ItemData : ScriptableObject
     [SerializeField] private Sprite itemIcon;
     public Sprite Icon { get { return itemIcon; } set { itemIcon = value; } }
     
-    public ItemAttrivuteType itemAttrivuteType;
     public ItemType itemType;
+    
+    [Header("사용 아이템 설정")]
+    [Tooltip("아이템 타입이 UsableItem일 경우에만 사용")]
+    public ItemUsageType itemUsageType;
+    [Tooltip("즉시사용 아이템의 효과 종류")]
+    public ItemAttributeType itemAttributeType;
     
     [TextArea(3, 5)]
     [SerializeField] private string description;

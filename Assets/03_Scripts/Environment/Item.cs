@@ -56,7 +56,7 @@ public class Item : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             // 회복 아이템인 경우 즉시 사용
-            if (itemData.itemAttrivuteType == ItemAttrivuteType.HealItem)
+            if (itemData.itemAttributeType == ItemAttributeType.HealItem)
             {
                 PlayerHP playerHP = other.GetComponent<PlayerHP>();
                 if (playerHP != null)
@@ -65,7 +65,7 @@ public class Item : MonoBehaviour
                     Debug.Log($"{itemData.ItemName}을(를) 획득하여 {itemData.effectValue}만큼 체력을 즉시 회복했습니다.");
                 }
             }
-            else if (itemData.itemAttrivuteType == ItemAttrivuteType.MaxHPUpItem)
+            else if (itemData.itemAttributeType == ItemAttributeType.MaxHPUpItem)
             {
                 PlayerHP playerHP = other.GetComponent<PlayerHP>();
                 if (playerHP != null)
