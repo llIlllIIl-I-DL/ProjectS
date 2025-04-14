@@ -76,23 +76,3 @@ public class CostumeSetManager : MonoBehaviour
     }
 }
 
-// 인벤토리 매니저 참조를 위한 간단한 인터페이스 (실제 구현에 맞게 수정 필요)
-public class InventoryManager : MonoBehaviour
-{
-    // 플레이어가 가진 모든 아이템 반환
-    public List<ItemData> GetAllItems()
-    {
-        // 실제 인벤토리 시스템에 맞게 구현
-        List<ItemData> items = new List<ItemData>();
-        
-        // 여기에 아이템 로드 로직 추가
-        
-        return items;
-    }
-    
-    // 아이템 추가
-    public void AddItem(ItemData item)
-    {
-        // 아이템 추가 로직
-    }
-} 
