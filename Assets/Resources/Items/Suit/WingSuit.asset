@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a99ba7c3e938834488d121c9a34dde3, type: 3}
+  m_Name: WingSuit
+  m_EditorClassIdentifier: 
+  setName: "\uC719 \uC288\uD2B8"
+  description: "\uD65C\uACF5\uC744 \uC704\uD55C \uC288\uD2B8\uC785\uB2C8\uB2E4.\n"
+  costumeParts:
+  - {fileID: 11400000, guid: 8b97c61018a3d6144baa4fb1198a31cb, type: 2}
+  - {fileID: 11400000, guid: 8b97c61018a3d6144baa4fb1198a31cb, type: 2}
+  - {fileID: 11400000, guid: 8b97c61018a3d6144baa4fb1198a31cb, type: 2}
+  - {fileID: 11400000, guid: 8b97c61018a3d6144baa4fb1198a31cb, type: 2}
+  setReward: {fileID: 0}
