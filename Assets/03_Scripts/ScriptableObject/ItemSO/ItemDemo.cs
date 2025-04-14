@@ -61,7 +61,7 @@ public class ItemDemo : MonoBehaviour
         
         // 아이템 생성
         itemManager.SpawnItem(randomItem, spawnPoint.position);
-        Debug.Log($"{randomItem.itemName} 아이템이 생성되었습니다.");
+        Debug.Log($"{randomItem.ItemName} 아이템이 생성되었습니다.");
     }
     
     

@@ -17,7 +17,7 @@ public class InvenSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     [SerializeField] private Image iconInPopUp;
 
-    private InvenItemData invenItemData;
+    private ItemData invenItemData;
 
     private int slotIndex = 0;
 
@@ -35,14 +35,14 @@ public class InvenSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
 
 
-    public void AddItem(InvenItemData invenItemData)
+    public void AddItem(ItemData invenItemData)
     {
         CreatSlotSystem.Instance.slotList[slotIndex].SetItem(invenItemData);
         slotIndex++;
     }
 
 
-    public void SetItem(InvenItemData item)
+    public void SetItem(ItemData item)
     {
         invenItemData = item;
         RefreshUI();
