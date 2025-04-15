@@ -20,6 +20,7 @@ public class CostumeSetUI : MonoBehaviour
     // 매니저 참조
     private InventoryManager inventoryManager;
     private CostumeManager costumeManager;
+    private GameManager gameManager;
 
     private void Awake()
     {
@@ -33,6 +34,7 @@ public class CostumeSetUI : MonoBehaviour
         // 매니저 참조 가져오기
         inventoryManager = InventoryManager.Instance;
         costumeManager = CostumeManager.Instance;
+        gameManager = GameManager.Instance;
 
         UpdateUI();
     }
@@ -125,12 +127,58 @@ public class CostumeSetUI : MonoBehaviour
     // 버튼 상태 업데이트
     private void UpdateButtonState()
     {
+        if (costumeSetData == null)
+        {
+            Debug.LogWarning("UpdateButtonState: costumeSetData가 null입니다.");
+            return;
+        }
+
         bool isUnlocked = costumeSetData.isUnlocked;
         bool isActive = false;
+        bool hasAllParts = false;
+
+        // 디버그 정보
+        Debug.Log($"복장 '{costumeSetData.costumeName}' 상태 - 해금됨: {isUnlocked}");
 
         if (costumeManager != null)
         {
             isActive = costumeManager.IsActiveCostume(costumeSetData.costumeId);
+            
+            // 인벤토리에 모든 파츠가 있는지 확인
+            Dictionary<int, bool> partsStatus = costumeManager.GetPartsCollectionStatus(costumeSetData.costumeId);
+            hasAllParts = true;
+            
+            Debug.Log($"파츠 상태 확인 - 총 {costumeSetData.requiredParts.Count}개 파츠 필요");
+            
+            // 모든 파츠를 가지고 있는지 확인
+            foreach (ItemData part in costumeSetData.requiredParts)
+            {
+                if (part != null)
+                {
+                    bool hasPart = partsStatus.ContainsKey(part.id) && partsStatus[part.id];
+                    Debug.Log($"파츠 '{part.ItemName}' 보유 여부: {hasPart}");
+                    
+                    if (!hasPart)
+                    {
+                        hasAllParts = false;
+                    }
+                }
+            }
+            
+            Debug.Log($"모든 파츠 보유 여부: {hasAllParts}");
+        }
+        else
+        {
+            Debug.LogWarning("costumeManager가 null입니다.");
+        }
+
+        // 게임 상태는 무시하고 항상 활성화 가능하도록 설정
+        bool isGamePlaying = true;
+        
+        if (gameManager != null) 
+        {
+            // 로그 출력만 하고 조건에는 영향을 주지 않음
+            Debug.Log($"게임 상태: {gameManager.CurrentState}, 실제 플레이 중은 아니지만 버튼은 활성화합니다.");
         }
 
         // 버튼 텍스트 설정
@@ -138,34 +186,106 @@ public class CostumeSetUI : MonoBehaviour
         {
             if (isActive)
                 unlockButtonText.text = "활성화 중";
-            else if (isUnlocked)
+            else if (isUnlocked && hasAllParts)
                 unlockButtonText.text = "활성화";
+            else if (isUnlocked && !hasAllParts)
+                unlockButtonText.text = "파츠 부족";
             else
                 unlockButtonText.text = "해금 필요";
+            
+            Debug.Log($"버튼 텍스트: {unlockButtonText.text}");
         }
 
         // 버튼 활성화 여부
         if (unlockButton != null)
         {
-            unlockButton.interactable = isUnlocked && !isActive;
+            // 세트가 해금되어 있고, 활성화 상태가 아니며, 모든 파츠가 인벤토리에 있으면 버튼 활성화
+            // gameState 조건 제거
+            unlockButton.interactable = isUnlocked && !isActive && hasAllParts;
+            
+            Debug.Log($"버튼 활성화 상태: {unlockButton.interactable}");
+            Debug.Log($"조건 체크 - 해금됨: {isUnlocked}, 활성화 안됨: {!isActive}, 모든파츠있음: {hasAllParts}");
         }
     }
 
     // 해금/활성화 버튼 클릭 처리
     public void OnUnlockButtonClicked()
     {
-        if (costumeSetData == null || costumeManager == null) return;
-
-        if (costumeSetData.isUnlocked)
+        if (costumeSetData == null)
         {
-            // 복장 활성화
-            bool success = costumeManager.ActivateCostume(costumeSetData.costumeId);
+            Debug.LogWarning("OnUnlockButtonClicked: costumeSetData가 null입니다.");
+            return;
+        }
 
-            if (success)
+        if (costumeManager == null)
+        {
+            Debug.LogWarning("OnUnlockButtonClicked: costumeManager가 null입니다.");
+            return;
+        }
+
+        Debug.Log($"복장 '{costumeSetData.costumeName}' 버튼 클릭됨");
+        Debug.Log($"복장 해금 상태: {costumeSetData.isUnlocked}");
+        
+        // 해금된 복장만 활성화 가능
+        if (!costumeSetData.isUnlocked)
+        {
+            Debug.LogWarning($"복장 '{costumeSetData.costumeName}'가 아직 해금되지 않았습니다.");
+            return;
+        }
+
+        // 게임 상태 로그만 출력 (상태 체크 없음)
+        if (gameManager != null)
+        {
+            Debug.Log($"현재 게임 상태: {gameManager.CurrentState}, 게임 상태와 관계없이 복장 활성화를 진행합니다.");
+        }
+
+        // 모든 필요 파츠가 있는지 확인
+        bool hasAllRequiredParts = true;
+        Dictionary<int, bool> partsStatus = costumeManager.GetPartsCollectionStatus(costumeSetData.costumeId);
+        
+        Debug.Log($"파츠 상태 확인 중 - 총 {costumeSetData.requiredParts.Count}개 파츠");
+        
+        foreach (ItemData part in costumeSetData.requiredParts)
+        {
+            if (part == null) continue;
+            
+            bool hasPart = partsStatus.ContainsKey(part.id) && partsStatus[part.id];
+            Debug.Log($"파츠 '{part.ItemName}' (ID: {part.id}) 보유 여부: {hasPart}");
+            
+            if (!hasPart)
             {
-                Debug.Log($"{costumeSetData.costumeName} 복장을 활성화했습니다!");
-                UpdateUI();
+                hasAllRequiredParts = false;
+                Debug.LogWarning($"파츠 '{part.ItemName}'가 인벤토리에 없습니다.");
+                break;
             }
+        }
+        
+        if (!hasAllRequiredParts)
+        {
+            Debug.LogWarning("복장 활성화에 필요한 모든 파츠가 인벤토리에 없습니다.");
+            return;
+        }
+        
+        // 복장 활성화
+        Debug.Log($"'{costumeSetData.costumeName}' 복장 활성화 시도...");
+        bool success = costumeManager.ActivateCostume(costumeSetData.costumeId);
+
+        if (success)
+        {
+            Debug.Log($"{costumeSetData.costumeName} 복장을 활성화했습니다!");
+            
+            // 게임 매니저를 통해 데이터 저장
+            if (gameManager != null)
+            {
+                gameManager.SaveCostumeState();
+                Debug.Log("복장 상태가 저장되었습니다.");
+            }
+            
+            UpdateUI();
+        }
+        else
+        {
+            Debug.LogWarning($"{costumeSetData.costumeName} 복장 활성화에 실패했습니다.");
         }
     }
 

@@ -44,14 +44,24 @@ public class CostumeManager : MonoBehaviour
     private void Start()
     {
         inventoryManager = InventoryManager.Instance;
+        Debug.Log("CostumeManager 시작됨");
 
         if (inventoryManager != null)
         {
             // 인벤토리 변경 이벤트 구독
             inventoryManager.OnItemAdded += OnItemAdded;
+            Debug.Log("인벤토리 매니저에 이벤트 구독 완료");
+            
+            // 기존 인벤토리에서 파츠 불러오기
+            LoadPartsFromInventory();
+        }
+        else
+        {
+            Debug.LogWarning("inventoryManager가 null입니다.");
         }
 
         // 초기 복장 해금 상태 검사
+        Debug.Log($"초기 수집된 파츠 수: {collectedPartIds.Count}");
         CheckAllCostumeUnlocks();
     }
 
@@ -78,23 +88,39 @@ public class CostumeManager : MonoBehaviour
     {
         if (part == null || part.itemType != ItemType.CostumeParts)
         {
+            Debug.LogWarning($"AddPart: 유효하지 않은 파츠입니다. (null: {part == null})");
             return false;
         }
 
+        Debug.Log($"파츠 추가 시도: {part.ItemName} (ID: {part.id})");
+        
         // 이미 수집한 파츠인지 확인
         if (collectedPartIds.Contains(part.id))
         {
+            Debug.Log($"이미 수집한 파츠입니다: {part.ItemName} (ID: {part.id})");
             return false;
         }
 
         // 파츠 추가
         collectedPartIds.Add(part.id);
+        Debug.Log($"파츠를 성공적으로 추가했습니다: {part.ItemName} (ID: {part.id})");
+        Debug.Log($"현재 수집한 총 파츠 수: {collectedPartIds.Count}");
 
         // 이벤트 발생
         OnPartCollected?.Invoke(part);
 
         // 복장 해금 상태 검사
-        CheckCostumeUnlocks(part.costumeSetId);
+        if (!string.IsNullOrEmpty(part.costumeSetId))
+        {
+            Debug.Log($"복장 세트 해금 검사: {part.costumeSetId}");
+            CheckCostumeUnlocks(part.costumeSetId);
+        }
+        else
+        {
+            Debug.LogWarning($"파츠에 costumeSetId가 없습니다: {part.ItemName} (ID: {part.id})");
+            // 모든 복장 세트를 검사하여 파츠가 어떤 세트에 속하는지 확인
+            CheckAllCostumeUnlocks();
+        }
 
         return true;
     }
@@ -102,19 +128,40 @@ public class CostumeManager : MonoBehaviour
     // 특정 복장 세트의 해금 상태 검사
     private void CheckCostumeUnlocks(string costumeSetId)
     {
-        CostumeSetData costumeSet = allCostumeSets.Find(c => c.costumeId == costumeSetId);
-        if (costumeSet == null || costumeSet.isUnlocked)
+        if (string.IsNullOrEmpty(costumeSetId))
         {
+            Debug.LogWarning("CheckCostumeUnlocks: costumeSetId가 null 또는 빈 문자열입니다.");
             return;
         }
+
+        CostumeSetData costumeSet = allCostumeSets.Find(c => c.costumeId == costumeSetId);
+        if (costumeSet == null)
+        {
+            Debug.LogWarning($"CheckCostumeUnlocks: costumeId '{costumeSetId}'를 가진 복장 세트를 찾을 수 없습니다.");
+            return;
+        }
+
+        if (costumeSet.isUnlocked)
+        {
+            Debug.Log($"복장 세트 '{costumeSet.costumeName}'는 이미 해금되어 있습니다.");
+            return;
+        }
+
+        Debug.Log($"복장 세트 '{costumeSet.costumeName}' 해금 검사 시작...");
 
         // 모든 필요 파츠를 수집했는지 확인
         bool allPartsCollected = true;
         foreach (ItemData part in costumeSet.requiredParts)
         {
-            if (!collectedPartIds.Contains(part.id))
+            if (part == null) continue;
+
+            bool hasPart = collectedPartIds.Contains(part.id);
+            Debug.Log($"파츠 '{part.ItemName}' (ID: {part.id}) 보유 여부: {hasPart}");
+            
+            if (!hasPart)
             {
                 allPartsCollected = false;
+                Debug.Log($"파츠 '{part.ItemName}'가 없어서 '{costumeSet.costumeName}' 복장 해금이 불가능합니다.");
                 break;
             }
         }
@@ -123,23 +170,74 @@ public class CostumeManager : MonoBehaviour
         if (allPartsCollected)
         {
             costumeSet.isUnlocked = true;
+            Debug.Log($"모든 파츠를 수집하여 '{costumeSet.costumeName}' 복장이 해금되었습니다!");
             OnCostumeUnlocked?.Invoke(costumeSet);
         }
+        else
+        {
+            Debug.Log($"'{costumeSet.costumeName}' 복장을 해금하기 위한 모든 파츠가 아직 수집되지 않았습니다.");
+        }
+    }
+
+    // 인벤토리에서 파츠 불러오기
+    private void LoadPartsFromInventory()
+    {
+        if (inventoryManager == null) return;
+        
+        List<ItemData> inventoryParts = inventoryManager.GetCostumeParts();
+        Debug.Log($"인벤토리에서 {inventoryParts.Count}개의 파츠를 발견했습니다.");
+        
+        foreach (ItemData part in inventoryParts)
+        {
+            if (part != null && part.itemType == ItemType.CostumeParts)
+            {
+                if (!collectedPartIds.Contains(part.id))
+                {
+                    collectedPartIds.Add(part.id);
+                    Debug.Log($"인벤토리에서 파츠 로드: {part.ItemName} (ID: {part.id})");
+                }
+            }
+        }
+        
+        Debug.Log($"파츠 로드 후 컬렉션 크기: {collectedPartIds.Count}");
     }
 
     // 모든 복장 세트의 해금 상태 검사
     private void CheckAllCostumeUnlocks()
     {
+        Debug.Log($"모든 복장 세트 해금 상태 검사 시작 (총 {allCostumeSets.Count}개 세트)");
+        
         foreach (CostumeSetData costumeSet in allCostumeSets)
         {
+            if (costumeSet == null)
+            {
+                Debug.LogWarning("null인 복장 세트가 발견되었습니다.");
+                continue;
+            }
+            
+            Debug.Log($"복장 세트 '{costumeSet.costumeName}' 검사 중 (해금됨: {costumeSet.isUnlocked})");
+            
             if (!costumeSet.isUnlocked)
             {
                 bool allPartsCollected = true;
+                
+                Debug.Log($"  필요한 파츠 수: {costumeSet.requiredParts.Count}");
+                
                 foreach (ItemData part in costumeSet.requiredParts)
                 {
-                    if (!collectedPartIds.Contains(part.id))
+                    if (part == null)
+                    {
+                        Debug.LogWarning($"  null인 파츠가 '{costumeSet.costumeName}' 세트에 포함되어 있습니다.");
+                        continue;
+                    }
+                    
+                    bool hasPart = collectedPartIds.Contains(part.id);
+                    Debug.Log($"  파츠 '{part.ItemName}' (ID: {part.id}) 보유 여부: {hasPart}");
+                    
+                    if (!hasPart)
                     {
                         allPartsCollected = false;
+                        Debug.Log($"  파츠 '{part.ItemName}'가 없어서 '{costumeSet.costumeName}' 복장 해금이 불가능합니다.");
                         break;
                     }
                 }
@@ -147,7 +245,12 @@ public class CostumeManager : MonoBehaviour
                 if (allPartsCollected)
                 {
                     costumeSet.isUnlocked = true;
+                    Debug.Log($"모든 파츠를 수집하여 '{costumeSet.costumeName}' 복장이 해금되었습니다!");
                     OnCostumeUnlocked?.Invoke(costumeSet);
+                }
+                else
+                {
+                    Debug.Log($"'{costumeSet.costumeName}' 복장을 해금하기 위한 모든 파츠가 아직 수집되지 않았습니다.");
                 }
             }
         }
