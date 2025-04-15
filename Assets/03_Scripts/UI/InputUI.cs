@@ -18,10 +18,6 @@ public class InputUI : MonoBehaviour
     [SerializeField] public Button settingBtn;
     [SerializeField] public Button toMainMenuBtn;
 
-    [Header("Info → Suit UI")]
-    [SerializeField] public GameObject suitMenu;
-    [SerializeField] public Button suitBtn;
-
     [Header("PauseManu UI 창")]
     [SerializeField] public GameObject settingMenu;
     [SerializeField] public GameObject checkPointMenu;
@@ -35,8 +31,6 @@ public class InputUI : MonoBehaviour
         characterInfoBtn.onClick.AddListener(() => InfoMenu(infoMenu));
         toCheckPointBtn.onClick.AddListener(() => UIInPauseMenu(checkPointMenu));
         settingBtn.onClick.AddListener(() => UIInPauseMenu(settingMenu));
-
-        suitBtn.onClick.AddListener(() => SuitMenu());
 
         toMainMenuBtn.onClick.AddListener(() => ToMainMenu());
     }
@@ -113,15 +107,8 @@ public class InputUI : MonoBehaviour
         SetMenu(menu);
     }
 
-    public void SuitMenu()
-    {
-        suitMenu.SetActive(true);
-    }
-
-
     public void ToMainMenu()
     {
         SceneManager.LoadScene("YJ_UI_Scene", LoadSceneMode.Single);
     }
 }
-
