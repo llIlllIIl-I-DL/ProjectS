@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 501523382063693841}
   - component: {fileID: 4402080379882476782}
   - component: {fileID: 7739246131164750639}
-  m_Layer: 10
+  m_Layer: 8
   m_Name: Enemy_BigDust
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -113,7 +113,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &4402080379882476782
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -171,16 +171,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7285975119b3e4fa3beea7a41f5ac9c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 10
-  currentHealth: 10
+  maxHealth: 200
+  currentHealth: 200
+  possibleDrops: []
+  dropChance: 0.3
   moveSpeed: 3
   attackPower: 10
   attackRange: 3
-  detectionRange: 10
-  possibleDrops: []
-  dropChance: 0.3
-  patrolDistance: 3
-  patrolWaitTime: 1
+  detectionRange: 5
+  contactDamage: 1
+  dealsDamageOnContact: 1
+  patrolDistance: 5
+  patrolWaitTime: 3
   chaseSpeed: 1
   attackSpeed: 5
   chargePower: 10

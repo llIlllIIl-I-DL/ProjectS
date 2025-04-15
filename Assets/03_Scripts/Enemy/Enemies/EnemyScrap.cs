@@ -131,7 +131,7 @@ public class EnemyScrap : BaseEnemy
     }
 
     /// <summary>
-    /// 단순 충돌 공격
+    /// 총알 발사 속성 초기화
     /// </summary>
     public override void PerformAttack()
     {

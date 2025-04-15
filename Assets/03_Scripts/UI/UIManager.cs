@@ -18,24 +18,36 @@ public class UIManager : Singleton<UIManager>
 
     void Update()
     {
+        /*
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             CloseAllPage();
         }
+        */
     }
 
     public void CloseAllPage()
-    {
-        foreach (GameObject uiPage in allUIPages)
+    { 
+        foreach (GameObject uiPage in allUIPages) 
         {
             if (uiPage != null)
             {
-                if(uiPage.name == "SuitUI" && uiPage.activeSelf)
+                if (uiPage.name == "SuitUI" && uiPage.activeSelf)
                 {
-                    allUIPages[4].SetActive(false);
-                    return;
+                    allUIPages[3].SetActive(false);
                 }
-                uiPage.gameObject.SetActive(false);
+
+                else
+                {
+                    uiPage.gameObject.SetActive(false);//계속 닫기를 요청 중....
+
+                    if (allUIPages[3].activeSelf)
+                    {
+                        allUIPages[2].SetActive(true);
+                        Time.timeScale = 0;
+                    }
+                }
+                Time.timeScale = 1;
             }
         }
     }
@@ -55,7 +67,6 @@ public class UIManager : Singleton<UIManager>
                 if (uiPage != null)
                 {
                     uiPage.gameObject.SetActive(false);
-                    inputUI.isPauseMenuOpen = true;
                 }
             }
 

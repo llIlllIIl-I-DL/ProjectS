@@ -10,9 +10,6 @@ public class PlayerUI : Singleton<PlayerUI>
     [SerializeField] private Image healthBarImage;
     [SerializeField] private Image healLight;
 
-    //[SerializeField] private int maxHP;
-    //[SerializeField] private int currentHP;
-    //[SerializeField] private int giveDamage;
     [SerializeField] private int healHP;
 
 

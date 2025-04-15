@@ -16,7 +16,6 @@ public class EnemyDust : BaseEnemy
 
     // 상태들
     private PatrolState patrolState;
-    private IdleState idleState;
 
     // 순찰 시작점
     private Vector2 startPosition;
@@ -67,7 +66,6 @@ public class EnemyDust : BaseEnemy
 
         // 상태 생성 (두 개의 웨이포인트 설정)
         patrolState = new PatrolState(this, stateMachine, new Vector2[] { leftPoint, rightPoint }, patrolWaitTime);
-        idleState = new IdleState(this, stateMachine, patrolWaitTime);
 
         // 상태 머신 초기화
         stateMachine.ChangeState(patrolState);
@@ -133,10 +131,6 @@ public class EnemyDust : BaseEnemy
     /// <summary>
     /// 대기 상태로 전환
     /// </summary>
-    public override void SwitchToIdleState()
-    {
-        stateMachine.ChangeState(idleState);
-    }
     
     #endregion
 }

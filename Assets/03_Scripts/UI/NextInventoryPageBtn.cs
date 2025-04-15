@@ -8,71 +8,44 @@ public class NextInventoryPageBtn : MonoBehaviour
     [SerializeField] public Button invenSlotLeftBtn;
     [SerializeField] public Button invenSlotRightBtn;
 
-    [SerializeField] public GameObject currentPage;
-    [SerializeField] public GameObject InventoryPage1;
-    [SerializeField] public GameObject InventoryPage2;
-    [SerializeField] public GameObject InventoryPage3;
+    [SerializeField] public List<GameObject> Pages = new List<GameObject>();
+
+    int currentPage = 0;
+    int totalPage;
 
     void Start()
     {
-        invenSlotLeftBtn.onClick.AddListener(() => MoveToLeftPage(currentPage));
-        invenSlotRightBtn.onClick.AddListener(() => MoveToRightPage(currentPage));
+        totalPage = Pages.Count;
+
+        invenSlotLeftBtn.onClick.AddListener(() => LeftPage());
+        invenSlotRightBtn.onClick.AddListener(() => RightPage());
     }
 
-    public void MoveToLeftPage(GameObject currentPage)
+    public void LeftPage()
     {
-        if (currentPage == InventoryPage1)
-        {
-            currentPage.SetActive(false);
-            InventoryPage3.SetActive(true);
+        Pages[currentPage].SetActive(false);
 
-            this.currentPage = InventoryPage3;
+        currentPage --;
+
+        if(currentPage < 0)
+        {
+            currentPage = totalPage -1;
         }
 
-
-        else if (currentPage == InventoryPage3)
-        {
-            currentPage.SetActive(false);
-            InventoryPage2.SetActive(true);
-
-            this.currentPage = InventoryPage2;
-        }
-
-        else if (currentPage == InventoryPage2)
-        {
-            currentPage.SetActive(false);
-            InventoryPage1.SetActive(true);
-
-            this.currentPage = InventoryPage1;
-        }
+        Pages[currentPage].SetActive(true);
     }
 
-
-    public void MoveToRightPage(GameObject currentPage)
+    public void RightPage()
     {
-        if (currentPage == InventoryPage1)
-        {
-            currentPage.SetActive(false);
-            InventoryPage2.SetActive(true);
+        Pages[currentPage].SetActive(false);
 
-            this.currentPage = InventoryPage2;
+        currentPage++; //식을 이렇게 하면 값을 영원히 저장한디야...
+
+        if (currentPage >= totalPage)
+        {
+            currentPage = 0;
         }
 
-
-        else if (currentPage == InventoryPage2)
-        {
-            currentPage.SetActive(false);
-            InventoryPage3.SetActive(true);
-
-            this.currentPage = InventoryPage3;
-        }
-
-        else if (currentPage == InventoryPage3)
-        {
-            currentPage.SetActive(false);
-            InventoryPage1.SetActive(true);
-
-            this.currentPage = InventoryPage1;
-        }
+        Pages[currentPage].SetActive(true);
     }
 }

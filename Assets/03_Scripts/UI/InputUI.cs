@@ -43,8 +43,15 @@ public class InputUI : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            PauseMenu(pauseMenu);
-
+            // 열려있는 UI가 있는지 확인합니다.
+            if (IsAnyUIActive())
+            {
+                UIManager.Instance.CloseAllPage();
+            }
+            else
+            {
+                PauseMenu(pauseMenu);
+            }
         }
 
         if (isPauseMenuOpen) //예외처리. 미리 체크하는 편이 좋당
@@ -61,6 +68,16 @@ public class InputUI : MonoBehaviour
         }
     }
 
+    bool IsAnyUIActive()
+    {
+        foreach (GameObject uiPage in UIManager.Instance.allUIPages)
+        {
+            if (uiPage != null && uiPage.activeSelf)
+                return true;
+        }
+        return false;
+    }
+
     public void SetMenu(GameObject menu)
     {
 
@@ -72,10 +89,10 @@ public class InputUI : MonoBehaviour
 
     public void PauseMenu(GameObject menu)
     {
-            pauseMenu.SetActive(!isPauseMenuOpen); //토글 작업 시 자주 사용하는 방식
-            Time.timeScale = isPauseMenuOpen ? 1 : 0; //삼항연산자
+        pauseMenu.SetActive(!isPauseMenuOpen); //토글 작업 시 자주 사용하는 방식
+        Time.timeScale = isPauseMenuOpen ? 1 : 0; //삼항연산자
 
-            isPauseMenuOpen = !isPauseMenuOpen;
+        isPauseMenuOpen = !isPauseMenuOpen;
     }
 
     public void UIInPauseMenu(GameObject menu)
@@ -87,7 +104,8 @@ public class InputUI : MonoBehaviour
 
     public void InfoMenu(GameObject menu)
     {
-        isPauseMenuOpen = false;
+        isPauseMenuOpen = true;
+        PauseMenu(pauseMenu);
         SetMenu(menu);
     }
 

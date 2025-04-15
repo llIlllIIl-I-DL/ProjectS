@@ -43,9 +43,9 @@ public class ItemDemoCreator : MonoBehaviour
     {
         // 소형 체력 회복 아이템
         ItemData smallHealItem = ScriptableObject.CreateInstance<ItemData>();
-        smallHealItem.itemName = "작은 에너지 팩";
-        smallHealItem.itemAttrivuteType = ItemAttrivuteType.HealItem;
-        smallHealItem.description = "체력을 20만큼 회복합니다.";
+        smallHealItem.ItemName = "작은 에너지 팩";
+        smallHealItem.itemAttributeType = ItemAttributeType.HealItem;
+        smallHealItem.ItemDescription = "체력을 20만큼 회복합니다.";
         smallHealItem.effectValue = 20f;
         smallHealItem.isConsumable = true;
         smallHealItem.isStackable = true;
@@ -55,9 +55,9 @@ public class ItemDemoCreator : MonoBehaviour
         
         // 대형 체력 회복 아이템
         ItemData largeHealItem = ScriptableObject.CreateInstance<ItemData>();
-        largeHealItem.itemName = "큰 에너지 팩";
-        largeHealItem.itemAttrivuteType = ItemAttrivuteType.HealItem;
-        largeHealItem.description = "체력을 50만큼 회복합니다.";
+        largeHealItem.ItemName = "큰 에너지 팩";
+        largeHealItem.itemAttributeType = ItemAttributeType.HealItem;
+        largeHealItem.ItemDescription = "체력을 50만큼 회복합니다.";
         largeHealItem.effectValue = 50f;
         largeHealItem.isConsumable = true;
         largeHealItem.isStackable = true;
@@ -70,9 +70,9 @@ public class ItemDemoCreator : MonoBehaviour
     {
         // 소형 최대 체력 증가 아이템
         ItemData smallMaxHPUpItem = ScriptableObject.CreateInstance<ItemData>();
-        smallMaxHPUpItem.itemName = "에너지 탱크";
-        smallMaxHPUpItem.itemAttrivuteType = ItemAttrivuteType.MaxHPUpItem;
-        smallMaxHPUpItem.description = "최대 체력을 10만큼 증가시킵니다.";
+        smallMaxHPUpItem.ItemName = "에너지 탱크";
+        smallMaxHPUpItem.itemAttributeType = ItemAttributeType.MaxHPUpItem;
+        smallMaxHPUpItem.ItemDescription = "최대 체력을 10만큼 증가시킵니다.";
         smallMaxHPUpItem.effectValue = 10f;
         smallMaxHPUpItem.isConsumable = true;
         smallMaxHPUpItem.isStackable = false;
@@ -81,9 +81,9 @@ public class ItemDemoCreator : MonoBehaviour
         
         // 대형 최대 체력 증가 아이템
         ItemData largeMaxHPUpItem = ScriptableObject.CreateInstance<ItemData>();
-        largeMaxHPUpItem.itemName = "생명력 탱크";
-        largeMaxHPUpItem.itemAttrivuteType = ItemAttrivuteType.MaxHPUpItem;
-        largeMaxHPUpItem.description = "최대 체력을 25만큼 증가시킵니다.";
+        largeMaxHPUpItem.ItemName = "생명력 탱크";
+        largeMaxHPUpItem.itemAttributeType = ItemAttributeType.MaxHPUpItem;
+        largeMaxHPUpItem.ItemDescription = "최대 체력을 25만큼 증가시킵니다.";
         largeMaxHPUpItem.effectValue = 25f;
         largeMaxHPUpItem.isConsumable = true;
         largeMaxHPUpItem.isStackable = false;
