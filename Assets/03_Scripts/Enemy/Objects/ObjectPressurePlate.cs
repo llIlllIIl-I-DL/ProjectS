@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using System.Linq;
 
 public class ObjectPressurePlate : BaseObject
 {
@@ -11,6 +13,15 @@ public class ObjectPressurePlate : BaseObject
     [SerializeField] private bool staysPressed = true; // 한번 눌리면 계속 활성화 유지
     [SerializeField] private float resetDelay = 1.0f; // 리셋 딜레이 (staysPressed가 false일 때)
     [SerializeField] private string activatedTag = "Player"; // 활성화시키는 태그
+
+    [Header("다중 태그 활성화 설정")]
+    [SerializeField] private bool requireMultipleTags = false;  // 여러 태그가 필요한지 여부
+    [SerializeField] private List<string> requiredTags = new List<string>();  // 필요한 태그 목록
+    [SerializeField] private bool allTagsOnSingleObject = false;  // 한 오브젝트가 모든 태그를 가져야 하는지
+
+    // 현재 발판 위에 있는 오브젝트와 태그 추적
+    private HashSet<string> presentTags = new HashSet<string>();
+    private Dictionary<int, string> objectsOnPlate = new Dictionary<int, string>();
 
     [Header("시각 효과")]
     [SerializeField] private Sprite normalSprite;
@@ -55,20 +66,86 @@ public class ObjectPressurePlate : BaseObject
     {
         base.OnTriggerEnter2D(other);
 
-        // 지정된 태그를 가진 오브젝트만 발판 활성화
-        if (!isActivated && other.CompareTag(activatedTag))
+        if (isActivated)
+            return;
+
+        if (requireMultipleTags)
         {
-            ActivatePlate();
+            // 다중 태그 모드
+            int objectId = other.gameObject.GetInstanceID();
+            
+            // 오브젝트의 태그 저장
+            string tag = other.tag;
+            objectsOnPlate[objectId] = tag;
+            
+            // 필요한 태그인 경우 저장
+            if (requiredTags.Contains(tag))
+            {
+                presentTags.Add(tag);
+                Debug.Log($"태그 '{tag}' 감지! ({presentTags.Count}/{requiredTags.Count})");
+            }
+            
+            // 모든 필요 태그가 있는지 확인
+            if (CheckAllTagsPresent())
+            {
+                ActivatePlate();
+            }
+        }
+        else
+        {
+            // 기존 단일 태그 모드
+            if (other.CompareTag(activatedTag))
+            {
+                ActivatePlate();
+            }
         }
     }
 
     protected override void OnTriggerExit2D(Collider2D other)
     {
         base.OnTriggerExit2D(other);
-
-        // staysPressed가 false면 객체가 떠날 때 리셋 시작
-        if (isActivated && !staysPressed && other.CompareTag(activatedTag))
+        
+        int objectId = other.gameObject.GetInstanceID();
+        
+        if (requireMultipleTags)
         {
+            // 발판에서 나간 오브젝트의 태그 제거
+            if (objectsOnPlate.TryGetValue(objectId, out string tagToRemove))
+            {
+                objectsOnPlate.Remove(objectId);
+                
+                // 같은 태그를 가진 다른 오브젝트가 없는 경우에만 제거
+                bool tagStillPresent = false;
+                foreach (var tag in objectsOnPlate.Values)
+                {
+                    if (tag == tagToRemove)
+                    {
+                        tagStillPresent = true;
+                        break;
+                    }
+                }
+                
+                if (!tagStillPresent && requiredTags.Contains(tagToRemove))
+                {
+                    presentTags.Remove(tagToRemove);
+                    Debug.Log($"태그 '{tagToRemove}' 제거됨");
+                }
+                
+                // 발판이 활성화되어 있고, staysPressed가 false라면
+                if (isActivated && !staysPressed)
+                {
+                    if (!CheckAllTagsPresent())
+                    {
+                        // 모든 태그가 있지 않으면 비활성화 또는 타이머 시작
+                        resetTimer = resetDelay;
+                        needsReset = true;
+                    }
+                }
+            }
+        }
+        else if (isActivated && !staysPressed && other.CompareTag(activatedTag))
+        {
+            // 기존 단일 태그 모드 로직
             resetTimer = resetDelay;
             needsReset = true;
         }
@@ -90,6 +167,9 @@ public class ObjectPressurePlate : BaseObject
         UpdateVisuals();
         PlayInteractSound();
 
+        // 매니저에 상태 등록
+        ObjectManager.Instance.RegisterTriggerState(objectId, true);
+
         // 이펙트 재생
         if (activationEffect != null)
         {
@@ -110,6 +190,9 @@ public class ObjectPressurePlate : BaseObject
 
         isActivated = false;
         UpdateVisuals();
+
+        // 매니저에 상태 등록
+        ObjectManager.Instance.RegisterTriggerState(objectId, false);
 
         // 이벤트 발생
         OnDeactivated.Invoke();
@@ -145,5 +228,39 @@ public class ObjectPressurePlate : BaseObject
         // 발판은 상호작용하지 않음
     }
 
-    # endregion
+    #endregion
+
+    /// <summary>
+    /// 모든 필요한 태그가 있는지 확인
+    /// </summary>
+    private bool CheckAllTagsPresent()
+    {
+        if (allTagsOnSingleObject)
+        {
+            // 한 오브젝트가 모든 태그를 가져야 하는 경우
+            foreach (var obj in objectsOnPlate.Values)
+            {
+                GameObject gameObj = GameObject.Find(obj); // 이름으로 찾기 (더 나은 방법이 있을 수 있음)
+                bool hasAllTags = true;
+                
+                foreach (string requiredTag in requiredTags)
+                {
+                    if (!gameObj.CompareTag(requiredTag))
+                    {
+                        hasAllTags = false;
+                        break;
+                    }
+                }
+                
+                if (hasAllTags)
+                    return true;
+            }
+            return false;
+        }
+        else
+        {
+            // 각 태그가 서로 다른 오브젝트에 있을 수 있는 경우
+            return presentTags.Count >= requiredTags.Count && requiredTags.All(tag => presentTags.Contains(tag));
+        }
+    }
 }
