@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: WingSuitParts 1
   m_EditorClassIdentifier: 
   itemName: "\uC719 \uC288\uD2B8 \uB0A0\uAC1C"
-  itemIcon: {fileID: 21300000, guid: 378e16a656ce9cf46b4f8fe5c3e03353, type: 3}
+  itemIcon: {fileID: 21300000, guid: b867906a3b3819345aa6fc0407e9b816, type: 3}
   itemType: 1
   itemUsageType: 1
   itemAttributeType: 0

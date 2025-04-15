@@ -69,6 +69,12 @@ public class CostumeSetUI : MonoBehaviour
 
         // 버튼 상태 업데이트
         UpdateButtonState();
+        
+        // 현재 복장이 활성화된 상태인지 확인하고 효과 처리
+        if (costumeManager != null && costumeManager.IsActiveCostume(costumeSetData.costumeId))
+        {
+            UpdateCostumeEffect(true);
+        }
     }
 
     // 슬롯 업데이트
@@ -208,6 +214,41 @@ public class CostumeSetUI : MonoBehaviour
         }
     }
 
+    // 복장 효과 업데이트
+    private void UpdateCostumeEffect(bool isActive)
+    {
+        // 윙슈트 복장인 경우 효과 활성화
+        if (costumeSetData != null && costumeSetData.costumeId == "wing" && isActive)
+        {
+            Debug.Log($"윙슈트 복장 '{costumeSetData.costumeName}'이 활성화되어 있습니다. 효과 활성화.");
+            
+            // 플레이어 객체 찾기
+            PlayerMovement playerMovement = FindObjectOfType<PlayerMovement>();
+            if (playerMovement != null)
+            {
+                // 윙슈트 효과 컴포넌트 가져오기 또는 추가
+                WingSuitEffect wingSuitEffect = playerMovement.GetComponent<WingSuitEffect>();
+                if (wingSuitEffect == null)
+                {
+                    wingSuitEffect = playerMovement.gameObject.AddComponent<WingSuitEffect>();
+                    Debug.Log("플레이어에 윙슈트 효과 컴포넌트를 추가했습니다.");
+                }
+                
+                // 효과 활성화
+                if (wingSuitEffect != null && !wingSuitEffect.enabled)
+                {
+                    wingSuitEffect.enabled = true;
+                    wingSuitEffect.ActivateEffect();
+                    Debug.Log("윙슈트 효과가 활성화되었습니다.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("PlayerMovement를 찾을 수 없어 윙슈트 효과를 적용할 수 없습니다.");
+            }
+        }
+    }
+
     // 해금/활성화 버튼 클릭 처리
     public void OnUnlockButtonClicked()
     {
@@ -266,6 +307,12 @@ public class CostumeSetUI : MonoBehaviour
             return;
         }
         
+        // 현재 활성화된 복장이 있으면 해당 효과 비활성화
+        if (costumeManager.GetActiveCostume() != null)
+        {
+            DeactivateCurrentCostumeEffect();
+        }
+        
         // 복장 활성화
         Debug.Log($"'{costumeSetData.costumeName}' 복장 활성화 시도...");
         bool success = costumeManager.ActivateCostume(costumeSetData.costumeId);
@@ -273,6 +320,12 @@ public class CostumeSetUI : MonoBehaviour
         if (success)
         {
             Debug.Log($"{costumeSetData.costumeName} 복장을 활성화했습니다!");
+            
+            // 윙슈트 효과 활성화
+            if (costumeSetData.costumeId == "wing")
+            {
+                UpdateCostumeEffect(true);
+            }
             
             // 게임 매니저를 통해 데이터 저장
             if (gameManager != null)
@@ -286,6 +339,26 @@ public class CostumeSetUI : MonoBehaviour
         else
         {
             Debug.LogWarning($"{costumeSetData.costumeName} 복장 활성화에 실패했습니다.");
+        }
+    }
+    
+    // 현재 활성화된 복장 효과 비활성화
+    private void DeactivateCurrentCostumeEffect()
+    {
+        CostumeSetData activeCostume = costumeManager.GetActiveCostume();
+        if (activeCostume != null && activeCostume.costumeId == "wing")
+        {
+            // 윙슈트 효과 찾아서 비활성화
+            PlayerMovement playerMovement = FindObjectOfType<PlayerMovement>();
+            if (playerMovement != null)
+            {
+                WingSuitEffect wingSuitEffect = playerMovement.GetComponent<WingSuitEffect>();
+                if (wingSuitEffect != null)
+                {
+                    wingSuitEffect.DeactivateEffect();
+                    Debug.Log("이전 윙슈트 효과를 비활성화했습니다.");
+                }
+            }
         }
     }
 
