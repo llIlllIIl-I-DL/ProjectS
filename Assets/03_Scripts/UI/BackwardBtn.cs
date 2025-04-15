@@ -17,6 +17,7 @@ public class BackwardBtn : MonoBehaviour
     public void Backward()
     {
         thisWindow.SetActive(false);
+        Time.timeScale = 1f;
     }
 
 }

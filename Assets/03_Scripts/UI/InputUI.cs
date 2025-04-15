@@ -28,6 +28,8 @@ public class InputUI : MonoBehaviour
 
     public bool isPauseMenuOpen = false;
 
+    [SerializeField] private InfoUI infoUI;
+
     private void Start()
     {
         characterInfoBtn.onClick.AddListener(() => InfoMenu(infoMenu));
@@ -43,8 +45,8 @@ public class InputUI : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // 열려있는 UI가 있는지 확인합니다.
-            if (IsAnyUIActive())
+            // 열려있는 UI가 있는지 확인.
+            if (IsAnyUIActive(true))
             {
                 UIManager.Instance.CloseAllPage();
             }
@@ -65,16 +67,18 @@ public class InputUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.I))
         {
             SetMenu(infoMenu);
+            infoUI.SetDefaultPage();
         }
     }
 
-    bool IsAnyUIActive()
+    bool IsAnyUIActive(bool isfalse)
     {
         foreach (GameObject uiPage in UIManager.Instance.allUIPages)
         {
             if (uiPage != null && uiPage.activeSelf)
                 return true;
         }
+
         return false;
     }
 

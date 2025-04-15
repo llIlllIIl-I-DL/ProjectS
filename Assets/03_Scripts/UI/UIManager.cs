@@ -16,20 +16,11 @@ public class UIManager : Singleton<UIManager>
         inputUI = FindObjectOfType<InputUI>();
     }
 
-    void Update()
-    {
-        /*
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            CloseAllPage();
-        }
-        */
-    }
-
     public void CloseAllPage()
-    { 
-        foreach (GameObject uiPage in allUIPages) 
+    {
+        foreach (GameObject uiPage in allUIPages)
         {
+            /*
             if (uiPage != null)
             {
                 if (uiPage.name == "SuitUI" && uiPage.activeSelf)
@@ -45,14 +36,14 @@ public class UIManager : Singleton<UIManager>
                     {
                         allUIPages[2].SetActive(true);
                         Time.timeScale = 0;
+                        Debug.Log("문열어!!");
                     }
                 }
-                Time.timeScale = 1;
-            }
+            */
+            uiPage.SetActive(false);
+            Time.timeScale = 1;
         }
     }
-
-
 
     public void YouAreOnlyOne(GameObject menu) //인게임 중 단 하나의 UI Canvas만 활성화되도록 함.
     {
