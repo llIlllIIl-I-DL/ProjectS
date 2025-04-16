@@ -19,7 +19,6 @@ GameObject:
   - component: {fileID: 3952546512422567701}
   - component: {fileID: 4975584541051327563}
   - component: {fileID: 6616998530533543458}
-  - component: {fileID: 2309167547581571758}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -316,26 +315,6 @@ MonoBehaviour:
     m_Bits: 512
   showDebugRays: 1
   wallCheckDistance: 0.3
---- !u!114 &2309167547581571758
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 418548494962307080}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f646ecb8c9dfd7a499d6862b93d3a5ac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  costumeData: {fileID: 11400000, guid: 82a653fbef7bbac46af353be95baaa97, type: 2}
-  hoverForce: 100
-  hoverDuration: 5
-  energyCostPerSecond: 10
-  normalGravityScale: 1
-  hoverGravityScale: 0.3
-  showDebugInfo: 1
-  hoverKey: 106
 --- !u!1 &1875409220644603860
 GameObject:
   m_ObjectHideFlags: 0

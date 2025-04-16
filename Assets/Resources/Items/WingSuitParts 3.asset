@@ -24,7 +24,7 @@ MonoBehaviour:
   isStackable: 0
   maxStackAmount: 1
   partsType: 4
-  costumeSetId: 1
+  costumeSetId: wing
   elementType: 0
   damage: 0
   attackSpeed: 0
