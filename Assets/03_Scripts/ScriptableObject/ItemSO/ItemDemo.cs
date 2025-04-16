@@ -8,7 +8,7 @@ public class ItemDemo : MonoBehaviour
     [Header("아이템 설정")]
     [SerializeField] private ItemData[] availableItems;
     [SerializeField] private Transform[] spawnPoints;
-    [SerializeField] private KeyCode spawnItemKey = KeyCode.I;
+    [SerializeField] private KeyCode spawnItemKey = KeyCode.Y;
     [SerializeField] private KeyCode useItemKey = KeyCode.U;
 
     private ItemManager itemManager;

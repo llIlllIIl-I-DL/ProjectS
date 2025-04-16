@@ -9,14 +9,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a99ba7c3e938834488d121c9a34dde3, type: 3}
+  m_Script: {fileID: 11500000, guid: 7097b409b10f4f341a2f17d06b8137a3, type: 3}
   m_Name: WingSuit
   m_EditorClassIdentifier: 
-  setName: "\uC719 \uC288\uD2B8"
-  description: "\uD65C\uACF5\uC744 \uC704\uD55C \uC288\uD2B8\uC785\uB2C8\uB2E4.\n"
-  costumeParts:
+  costumeId: 1
+  costumeName: "\uC719 \uC288\uD2B8"
+  description: "\uD65C\uACF5\uAE30\uB2A5 \uD0D1\uC7AC"
+  icon: {fileID: 21300000, guid: 063328a8eedbdb443a3c62bc3f0ac50e, type: 3}
+  requiredParts:
   - {fileID: 11400000, guid: 8b97c61018a3d6144baa4fb1198a31cb, type: 2}
   - {fileID: 11400000, guid: 8b97c61018a3d6144baa4fb1198a31cb, type: 2}
   - {fileID: 11400000, guid: 8b97c61018a3d6144baa4fb1198a31cb, type: 2}
   - {fileID: 11400000, guid: 8b97c61018a3d6144baa4fb1198a31cb, type: 2}
-  setReward: {fileID: 0}
+  abilityName: "\uD65C\uACF5"
+  abilityDescription: "\uD558\uB298\uC744 \uB0A0 \uC218 \uC788\uB2E4..."
+  isUnlocked: 1

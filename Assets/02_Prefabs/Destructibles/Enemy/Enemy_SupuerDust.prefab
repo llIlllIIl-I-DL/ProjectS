@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 579388948883600332}
   - component: {fileID: 5017729264597257390}
   - component: {fileID: 40246388733876270}
-  m_Layer: 10
+  m_Layer: 8
   m_Name: Enemy_SupuerDust
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -99,14 +99,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 213d1fc2209bc4d428f286943d0c12d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 10
-  currentHealth: 10
-  moveSpeed: 10
-  attackPower: 10
-  attackRange: 10
-  detectionRange: 10
+  maxHealth: 100
+  currentHealth: 100
   possibleDrops: []
   dropChance: 0.3
+  moveSpeed: 10
+  attackPower: 10
+  attackRange: 7
+  detectionRange: 7
+  contactDamage: 1
+  dealsDamageOnContact: 1
   firePoint: {fileID: 0}
   bulletPrefab: {fileID: 4363198470078929428, guid: 00c8892831c5e438faf6f7d95f95044a, type: 3}
   fireRate: 1.5

@@ -28,3 +28,8 @@ public interface IDestructible : IDamageable
     void DropItem();
     void PlayDestructionEffect();
 }
+
+public interface IInteractable
+{
+    void Interact(GameObject interactor);
+}
