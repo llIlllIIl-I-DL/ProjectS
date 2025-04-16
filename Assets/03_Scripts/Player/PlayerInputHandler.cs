@@ -218,6 +218,26 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
         }
     }
 
+    public void OnNext(InputAction.CallbackContext context)
+    {
+        // 선택 입력 처리A, S 로 작동
+        Debug.Log("선택 입력 감지");
+    }
+    public void OnPrev(InputAction.CallbackContext context)
+    {
+        // 선택 입력 처리A, S 로 작동
+        Debug.Log("선택 입력 감지");
+    }
+
+    public void OnSpecialAttack(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            Debug.Log("특수 공격 입력 감지");
+            // 특수 공격 처리
+        }
+    }
+
     public bool IsMoving()
     {
         return IsLeftPressed || IsRightPressed;
