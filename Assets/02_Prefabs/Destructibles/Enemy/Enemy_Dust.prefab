@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 2569704663752254736}
   - component: {fileID: 629705877621807215}
   - component: {fileID: 2645885010529420612}
-  m_Layer: 10
+  m_Layer: 8
   m_Name: Enemy_Dust
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -48,14 +48,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 278aafc7ce7e54fb09239bdf1681ab1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 10
-  currentHealth: 10
+  maxHealth: 100
+  currentHealth: 100
+  possibleDrops: []
+  dropChance: 0.3
   moveSpeed: 2
   attackPower: 10
   attackRange: 10
   detectionRange: 10
-  possibleDrops: []
-  dropChance: 0.3
+  contactDamage: 1
+  dealsDamageOnContact: 1
   patrolDistance: 5
   patrolWaitTime: 2
 --- !u!50 &4174171962346470661
@@ -117,18 +119,18 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.08340263}
+  m_Offset: {x: 0, y: 0.05601555}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2.048, y: 2.048}
+    oldSize: {x: 1.28, y: 1.28}
     newSize: {x: 10.24, y: 10.24}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1.5480745}
+  m_Size: {x: 1, y: 1.2692381}
   m_EdgeRadius: 0
 --- !u!95 &629705877621807215
 Animator:

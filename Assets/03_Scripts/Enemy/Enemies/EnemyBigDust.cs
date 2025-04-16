@@ -9,7 +9,7 @@ using Enemy.States;
 public class EnemyBigDust : BaseEnemy
 {
     #region Variables
-    
+
     [Header("순찰 설정")]
     [SerializeField] private float patrolDistance; // 순찰 거리
     [SerializeField] private float patrolWaitTime; // 방향 전환 시 대기 시간
@@ -34,13 +34,12 @@ public class EnemyBigDust : BaseEnemy
     [SerializeField] private float slamCooldown; // 내려찍기 쿨타임
 
     // 상태들
-    private IdleState idleState;
     private PatrolState patrolState;
     private AttackState attackState;
     private ChaseState chaseState;
     private ChargeAttackState chargeAttackState;
     private SlamAttackState slamAttackState;
-    
+
     // 쿨다운 관리
     private float chargeCooldownTimer = 0f;
     private bool chargeReady = true;
@@ -49,23 +48,22 @@ public class EnemyBigDust : BaseEnemy
 
     // 참조 및 속성
     private Vector2 startPosition; // 순찰 시작점
-    
+
     #endregion
 
     #region Properties
-    
+
     public IEnemyState currentState => stateMachine.CurrentState;
 
     // 상태 접근자 메서드들
-    public IdleState GetIdleState() => idleState;
     public AttackState GetAttackState() => attackState;
     public PatrolState GetPatrolState() => patrolState;
     public ChaseState GetChaseState() => chaseState;
-    
+
     #endregion
 
     #region Unity Lifecycle Methods
-    
+
     /// <summary>
     /// 컴포넌트 초기화 및 시작 위치 저장
     /// </summary>
@@ -90,7 +88,7 @@ public class EnemyBigDust : BaseEnemy
     {
         base.FixedUpdate(); // BaseEnemy의 FixedUpdate 호출
     }
-    
+
     /// <summary>
     /// 충돌 감지 처리
     /// </summary>
@@ -109,11 +107,11 @@ public class EnemyBigDust : BaseEnemy
         // 기본 충돌 처리 (데미지 등)
         base.OnCollisionEnter2D(collision);
     }
-    
+
     #endregion
 
     #region Core Methods
-    
+
     /// <summary>
     /// 적 초기화 및 상태 설정
     /// </summary>
@@ -125,10 +123,9 @@ public class EnemyBigDust : BaseEnemy
 
         // 상태 생성 및 초기화
         patrolState = new PatrolState(this, stateMachine, new Vector2[] { leftPoint, rightPoint }, patrolWaitTime);
-        idleState = new IdleState(this, stateMachine, patrolWaitTime);
         attackState = new AttackState(this, stateMachine, attackSpeed);
         chaseState = new ChaseState(this, stateMachine, chaseSpeed, moveInYAxis: false);
-        
+
         // 특수 공격 상태 초기화
         chargeAttackState = new ChargeAttackState(
             this,
@@ -138,7 +135,7 @@ public class EnemyBigDust : BaseEnemy
             chargePower,
             "Charge" // 애니메이션 트리거
         );
-        
+
         slamAttackState = new SlamAttackState(
             this,
             stateMachine,
@@ -161,11 +158,11 @@ public class EnemyBigDust : BaseEnemy
     {
         // 쿨다운 관리
         UpdateCooldowns();
-        
+
         // 공격 조건 확인 및 실행
         CheckAndPerformChargeAttack();
         CheckAndPerformSlamAttack();
-        
+
         // 상태 머신 업데이트
         stateMachine.Update();
     }
@@ -184,25 +181,25 @@ public class EnemyBigDust : BaseEnemy
     public override void PerformAttack()
     {
         Debug.Log("기본 공격 실행");
-        
+
         // 플레이어 방향 설정
         Vector2 direction = GetPlayerPosition() - (Vector2)transform.position;
         SetFacingDirection(direction);
-        
+
         // 애니메이션 트리거
         // GetComponent<Animator>()?.SetTrigger("Attack");
-        
+
         // 공격 로직 - 범위 내 플레이어에게 데미지
         if (IsInAttackRange())
         {
             // 플레이어에게 데미지 (구현 필요)
         }
     }
-    
+
     #endregion
 
     #region Player Detection
-    
+
     /// <summary>
     /// 플레이어 감지 시 호출됨
     /// </summary>
@@ -222,11 +219,11 @@ public class EnemyBigDust : BaseEnemy
     {
         // 플레이어 놓침 처리 (필요시 구현)
     }
-    
+
     #endregion
 
     #region State Switch Methods
-    
+
     /// <summary>
     /// 순찰 상태로 전환
     /// </summary>
@@ -234,7 +231,7 @@ public class EnemyBigDust : BaseEnemy
     {
         stateMachine.ChangeState(patrolState);
     }
-    
+
     /// <summary>
     /// 공격 상태로 전환
     /// </summary>
@@ -242,7 +239,7 @@ public class EnemyBigDust : BaseEnemy
     {
         stateMachine.ChangeState(attackState);
     }
-    
+
     /// <summary>
     /// 추격 상태로 전환
     /// </summary>
@@ -250,7 +247,7 @@ public class EnemyBigDust : BaseEnemy
     {
         stateMachine.ChangeState(chaseState);
     }
-    
+
     /// <summary>
     /// 내려찍기 상태로 전환
     /// </summary>
@@ -258,11 +255,19 @@ public class EnemyBigDust : BaseEnemy
     {
         stateMachine.ChangeState(slamAttackState);
     }
-    
+
+    /// <summary>
+    /// 돌진 상태로 전환
+    /// </summary>
+    public override void SwitchToChargeAttackState()
+    {
+        stateMachine.ChangeState(chargeAttackState);
+    }
+
     #endregion
 
     #region Attack Pattern Methods
-    
+
     /// <summary>
     /// 쿨다운 관리
     /// </summary>
@@ -278,7 +283,7 @@ public class EnemyBigDust : BaseEnemy
                 chargeCooldownTimer = 0f;
             }
         }
-        
+
         // 내려찍기 공격 쿨다운 관리
         if (!slamReady)
         {
@@ -299,12 +304,12 @@ public class EnemyBigDust : BaseEnemy
         // 이미 돌진 상태이거나 쿨다운 중이면 무시
         if (currentState == chargeAttackState || !chargeReady)
             return;
-        
+
         // 추격 중일 때만 돌진 판단
         if (currentState == chaseState && playerDetected)
         {
             float distanceToPlayer = Vector2.Distance(transform.position, GetPlayerPosition());
-            
+
             // 플레이어가 공격 범위 밖이면서 추격 범위 안에 있을 때
             if (!IsInAttackRange() && distanceToPlayer > attackRange && distanceToPlayer <= detectionRange)
             {
@@ -324,7 +329,7 @@ public class EnemyBigDust : BaseEnemy
         // 이미 내려찍기 상태이거나 쿨다운 중이면 무시
         if (currentState == slamAttackState || !slamReady)
             return;
-        
+
         // 공격 상태일 때만 내려찍기 판단
         if (currentState == attackState && playerDetected)
         {
@@ -338,6 +343,6 @@ public class EnemyBigDust : BaseEnemy
             }
         }
     }
-    
+
     #endregion
 }

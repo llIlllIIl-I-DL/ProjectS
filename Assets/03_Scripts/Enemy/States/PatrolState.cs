@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Enemy.States
 {
@@ -59,8 +60,8 @@ namespace Enemy.States
             if (enemy.IsPlayerDetected())
             {
                 // 플레이어 발견 시 추격 상태로 전환
-                enemy.SwitchToChaseState();
-                return;
+                // enemy.SwitchToChaseState();
+                // return;
             }
 
             // 대기 중이면 타이머 체크
