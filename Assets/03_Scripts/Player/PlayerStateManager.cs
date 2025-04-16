@@ -222,6 +222,7 @@ public class PlayerStateManager : MonoBehaviour
                  collisionDetector.IsTouchingWall &&
                  !collisionDetector.IsGrounded)
         {
+            Debug.Log("상태 전환 검사: 벽 슬라이딩 조건 충족");
             ChangeState(PlayerStateType.WallSliding);
         }
     }
@@ -376,24 +377,30 @@ public class PlayerStateManager : MonoBehaviour
 
     private void HandleWallTouchChanged(bool isTouchingWall)
     {
+        Debug.Log($"벽 접촉 상태 변경 이벤트: {isTouchingWall}, 현재 상태: {currentStateType}");
+        
         if (isTouchingWall && !collisionDetector.IsGrounded)
         {
             lastWallTime = settings.wallStickTime;
+            Debug.Log($"벽에 닿음: lastWallTime = {lastWallTime}");
 
             // 벽에 닿으면 WallSliding으로 상태 변경
             if (currentStateType != PlayerStateType.WallSliding &&
                 currentStateType != PlayerStateType.Dashing)
             {
+                Debug.Log("벽 슬라이딩 상태로 전환 시도");
                 ChangeState(PlayerStateType.WallSliding);
             }
         }
         else if (!isTouchingWall && isWallSliding)
         {
             isWallSliding = false;
+            Debug.Log("벽 슬라이딩 상태 해제");
 
             // 벽에서 떨어지면 Falling으로 상태 변경
             if (currentStateType == PlayerStateType.WallSliding && !collisionDetector.IsGrounded)
             {
+                Debug.Log("벽에서 떨어져 Falling 상태로 전환");
                 ChangeState(PlayerStateType.Falling);
             }
         }

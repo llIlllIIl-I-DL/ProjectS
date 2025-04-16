@@ -354,6 +354,9 @@ public class PlayerMovement : MonoBehaviour
 
     public void WallSlide(float slideSpeed, bool fastSlide = false)
     {
+        // 벽 슬라이딩 디버그 로그 추가
+        Debug.Log($"벽 슬라이딩 실행 중: 속도={slideSpeed}, 빠른 슬라이딩={fastSlide}");
+        
         float targetSpeed = fastSlide ? -settings.wallFastSlideSpeed : -settings.wallSlideSpeed;
 
         if (rb.velocity.y < targetSpeed)
@@ -369,6 +372,9 @@ public class PlayerMovement : MonoBehaviour
 
     public void WallJump(float force, Vector2 direction)
     {
+        // 벽 점프 디버그 로그 추가
+        Debug.Log($"벽 점프 실행: 힘={force}, 방향=({-facingDirection * direction.x}, {direction.y})");
+        
         rb.velocity = Vector2.zero;
         rb.AddForce(new Vector2(-facingDirection * direction.x, direction.y) * force, ForceMode2D.Impulse);
         StartCoroutine(DisableMovement(0.2f));
