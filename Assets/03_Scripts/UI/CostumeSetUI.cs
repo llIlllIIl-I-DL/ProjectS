@@ -217,13 +217,29 @@ public class CostumeSetUI : MonoBehaviour
     // 복장 효과 업데이트
     private void UpdateCostumeEffect(bool isActive)
     {
+        Debug.Log($"UpdateCostumeEffect 호출됨 - isActive: {isActive}, costumeId: {costumeSetData?.costumeId}");
+        
         // 윙슈트 복장인 경우 효과 활성화
         if (costumeSetData != null && costumeSetData.costumeId == "wing" && isActive)
         {
             Debug.Log($"윙슈트 복장 '{costumeSetData.costumeName}'이 활성화되어 있습니다. 효과 활성화.");
             
-            // 플레이어 객체 찾기
-            PlayerMovement playerMovement = FindObjectOfType<PlayerMovement>();
+            // 플레이어 객체 찾기 - 다양한 방법으로 시도
+            PlayerMovement playerMovement = FindObjectOfType<PlayerMovement>(true); // 비활성화된 오브젝트도 포함
+            
+            Debug.Log($"플레이어 찾기 결과: {(playerMovement != null ? "성공" : "실패")}");
+            
+            if (playerMovement == null)
+            {
+                // 태그로 찾기 시도
+                GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+                if (playerObject != null)
+                {
+                    Debug.Log("태그로 플레이어 찾기 성공");
+                    playerMovement = playerObject.GetComponent<PlayerMovement>();
+                }
+            }
+            
             if (playerMovement != null)
             {
                 // 윙슈트 효과 컴포넌트 가져오기 또는 추가
@@ -244,7 +260,7 @@ public class CostumeSetUI : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("PlayerMovement를 찾을 수 없어 윙슈트 효과를 적용할 수 없습니다.");
+                Debug.LogError("플레이어 오브젝트를 찾을 수 없어 윙슈트 효과를 적용할 수 없습니다. 플레이어에 'Player' 태그가 있는지, PlayerMovement 컴포넌트가 있는지 확인하세요.");
             }
         }
     }
@@ -321,7 +337,8 @@ public class CostumeSetUI : MonoBehaviour
         {
             Debug.Log($"{costumeSetData.costumeName} 복장을 활성화했습니다!");
             
-            // 윙슈트 효과 활성화
+            // 윙슈트 효과 활성화 - costumeId 값 확인 로그 추가
+            Debug.Log($"복장 ID 확인: {costumeSetData.costumeId}, 윙슈트 여부: {costumeSetData.costumeId == "wing"}");
             if (costumeSetData.costumeId == "wing")
             {
                 UpdateCostumeEffect(true);

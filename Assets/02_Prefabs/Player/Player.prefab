@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 3952546512422567701}
   - component: {fileID: 4975584541051327563}
   - component: {fileID: 6616998530533543458}
+  - component: {fileID: 2309167547581571758}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -236,6 +237,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   settings: {fileID: 11400000, guid: 83308ca141c58fe47a419e584bbc8df0, type: 2}
+  hasWingsuit: 0
 --- !u!114 &4995387987602289083
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -287,6 +289,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 099b2755d7773ad44a551f82c42a482d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  minClimbSpeedThreshold: 0.1
+  climbAnimFrameRate: 8
+  climbFrames: []
+  useAnimatorForClimbing: 1
 --- !u!114 &6616998530533543458
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -304,8 +310,32 @@ MonoBehaviour:
     m_Bits: 192
   wallLayer:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 192
+  ladderLayer:
+    serializedVersion: 2
+    m_Bits: 512
   showDebugRays: 1
+  wallCheckDistance: 0.3
+--- !u!114 &2309167547581571758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 418548494962307080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f646ecb8c9dfd7a499d6862b93d3a5ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  costumeData: {fileID: 11400000, guid: 82a653fbef7bbac46af353be95baaa97, type: 2}
+  hoverForce: 100
+  hoverDuration: 5
+  energyCostPerSecond: 10
+  normalGravityScale: 1
+  hoverGravityScale: 0.3
+  showDebugInfo: 1
+  hoverKey: 106
 --- !u!1 &1875409220644603860
 GameObject:
   m_ObjectHideFlags: 0
@@ -351,7 +381,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c09eaf9391143384c9a65b71fa71a65c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletPrefab: {fileID: 0}
+  bulletPrefab: {fileID: 6760042265540064826, guid: e4992159c28c2e24ba7b726d9457aee1, type: 3}
   firePoint: {fileID: 2417535978260025957}
   bulletSpeed: 15
   bulletLifetime: 3
@@ -432,7 +462,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 100
   m_Sprite: {fileID: -1228319855, guid: 73da35e5f9e8d964b9ed8500f1fb8478, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
