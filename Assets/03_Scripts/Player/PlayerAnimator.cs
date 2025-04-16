@@ -19,6 +19,9 @@ public class PlayerAnimator : MonoBehaviour
     // 애니메이터 기반 클라이밍 설정
     [SerializeField] private bool useAnimatorForClimbing = true; // true면 Animator 사용, false면 스프라이트 직접 교체
 
+    // 현재 설정된 상태 추적을 위한 변수
+    private bool isDeadState = false;
+
     private void Awake()
     {
         // 애니메이터 참조 가져오기 (자식 오브젝트에 있을 수 있음)
@@ -106,6 +109,20 @@ public class PlayerAnimator : MonoBehaviour
         // 앉기 상태 파라미터
         if (HasParameter("IsCrouching"))
             animator.SetBool("IsCrouching", state == PlayerStateType.Crouching);
+            
+        // 사망 상태 파라미터 - 이미 설정된 상태면 중복 설정하지 않음
+        if (HasParameter("IsDead"))
+        {
+            bool shouldBeDead = state == PlayerStateType.Death;
+            
+            // 상태가 변경되었을 때만 설정
+            if (isDeadState != shouldBeDead)
+            {
+                isDeadState = shouldBeDead;
+                animator.SetBool("IsDead", shouldBeDead);
+                Debug.Log($"UpdateAnimation에서 IsDead 상태 변경: {shouldBeDead}");
+            }
+        }
 
         // 사다리 오르기 상태 파라미터
         if (HasParameter("IsClimbing"))
@@ -275,5 +292,43 @@ public class PlayerAnimator : MonoBehaviour
         }
 
         return false;
+    }
+
+    // 애니메이터 속도 설정 메서드
+    public void SetAnimatorSpeed(float speed)
+    {
+        if (animator != null)
+        {
+            animator.speed = speed;
+        }
+    }
+    
+    // 애니메이터 가져오기
+    public Animator GetAnimator()
+    {
+        return animator;
+    }
+
+    // 사망 상태 설정 메서드
+    public void SetDead(bool isDead)
+    {
+        // 이미 같은 상태면 중복 설정 방지
+        if (isDeadState == isDead) 
+        {
+            Debug.Log($"SetDead 무시: 이미 {isDead} 상태입니다");
+            return;
+        }
+        
+        isDeadState = isDead;
+        
+        if (animator != null && HasParameter("IsDead"))
+        {
+            animator.SetBool("IsDead", isDead);
+            Debug.Log($"플레이어 애니메이터: IsDead = {isDead} 설정 완료");
+        }
+        else
+        {
+            Debug.LogWarning($"IsDead 파라미터를 설정할 수 없습니다. 애니메이터: {animator != null}, 파라미터 존재: {animator != null && HasParameter("IsDead")}");
+        }
     }
 }

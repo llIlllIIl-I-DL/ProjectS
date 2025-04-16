@@ -35,6 +35,17 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int score = 0;
     [SerializeField] private int playerLevel = 1;
     [SerializeField] private bool isGameInitialized = false;
+    
+    // 목숨 시스템 관련 변수
+    [SerializeField] private int maxLives = 3;
+    [SerializeField] private int currentLives;
+    [SerializeField] private float respawnDelay = 2f; // 부활 대기 시간
+    [SerializeField] private Transform respawnPoint; // 부활 위치
+    private bool isRespawning = false;
+    
+    // 프로퍼티
+    public int CurrentLives => currentLives;
+    public int MaxLives => maxLives;
 
     // 이벤트 델리게이트
     public delegate void GameStateChangedHandler(GameState newState);
@@ -102,6 +113,9 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("게임 매니저 초기화 중...");
 
+        // 목숨 초기화
+        currentLives = maxLives;
+        
         // 매니저 참조 가져오기
         itemManager = ItemManager.Instance;
         inventoryManager = InventoryManager.Instance;
@@ -330,6 +344,157 @@ public class GameManager : MonoBehaviour
         LoadCostumeState();
         
         Debug.Log("게임 데이터가 로드되었습니다.");
+    }
+
+    // 게임 상태 변경 메소드
+    public void ChangeGameState(GameState newState)
+    {
+        if (currentState == newState)
+            return;
+            
+        currentState = newState;
+        OnGameStateChanged?.Invoke(newState);
+        
+        // 게임 상태에 따른 처리
+        switch (newState)
+        {
+            case GameState.MainMenu:
+                Time.timeScale = 1f;
+                break;
+                
+            case GameState.Playing:
+                Time.timeScale = 1f;
+                break;
+                
+            case GameState.Paused:
+                Time.timeScale = 0f;
+                break;
+                
+            case GameState.GameOver:
+                Time.timeScale = 1f;
+                // 게임 오버 UI 표시
+                //UIManager.Instance?.ShowGameOverUI();
+                break;
+                
+            case GameState.Victory:
+                Time.timeScale = 1f;
+                // 승리 UI 표시
+                //UIManager.Instance?.ShowVictoryUI();
+                break;
+        }
+        
+        Debug.Log($"게임 상태가 {newState}로 변경되었습니다.");
+    }
+
+    // 플레이어 사망 처리
+    public void PlayerDied(GameObject player)
+    {
+        // 이미 부활 처리 중이면 무시
+        if (isRespawning) 
+        {
+            Debug.Log("이미 부활 처리 중입니다. 중복 사망 처리를 무시합니다.");
+            return;
+        }
+        
+        Debug.Log("GameManager: 플레이어 사망 처리 시작");
+        
+        // 목숨 감소
+        currentLives--;
+        Debug.Log($"플레이어 사망! 남은 목숨: {currentLives}");
+        
+        if (currentLives <= 0)
+        {
+            // 목숨이 없으면 게임 오버
+            GameOver();
+            return;
+        }
+        
+        // 목숨이 남아있으면 부활 처리
+        StartCoroutine(RespawnPlayer(player));
+    }
+    
+    // 플레이어 부활 코루틴
+    private IEnumerator RespawnPlayer(GameObject player)
+    {
+        isRespawning = true;
+        
+        // 부활 대기 시간
+        yield return new WaitForSeconds(respawnDelay);
+        
+        // 플레이어가 여전히 존재하는지 확인
+        if (player == null)
+        {
+            Debug.LogError("부활 처리 실패: 플레이어 객체가 존재하지 않습니다.");
+            isRespawning = false;
+            yield break;
+        }
+        
+        Debug.Log("리스폰 처리 시작: 체력 초기화 및 상태 리셋");
+        
+        // 1. 플레이어 체력 초기화
+        var playerHP = player.GetComponent<PlayerHP>();
+        if (playerHP != null)
+        {
+            playerHP.ResetHealth();
+        }
+        
+        // 2. 플레이어 위치 리셋
+        if (respawnPoint != null)
+        {
+            player.transform.position = respawnPoint.position;
+            Debug.Log($"플레이어 위치 리셋: {respawnPoint.position}");
+        }
+        else
+        {
+            // 지정된 부활 위치가 없으면 초기 위치 또는 기본 위치로 리셋
+            player.transform.position = Vector3.zero;
+            Debug.Log("플레이어 위치 리셋: (0,0,0)");
+        }
+        
+        // 3. 물리 속성 초기화
+        Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.velocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+            rb.isKinematic = false; // 물리 영향 다시 활성화
+            Debug.Log("Rigidbody2D 초기화 완료");
+        }
+        
+        // 4. 콜라이더 다시 활성화
+        Collider2D[] colliders = player.GetComponents<Collider2D>();
+        foreach (var collider in colliders)
+        {
+            collider.enabled = true;
+        }
+        Debug.Log("모든 콜라이더 활성화 완료");
+        
+        // 5. 중요: 애니메이터에서 사망 상태(IsDead) false로 설정
+        var playerAnimator = player.GetComponent<PlayerAnimator>();
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetDead(false);
+            playerAnimator.SetAnimatorSpeed(1.0f); // 애니메이션 속도 정상화
+            Debug.Log("애니메이터 사망 상태 해제 및 속도 정상화 완료");
+        }
+        
+        // 6. 플레이어 상태를 Idle로 변경
+        var playerStateManager = player.GetComponent<PlayerStateManager>();
+        if (playerStateManager != null)
+        {
+            // 상태 변경 전에 확실히 준비가 되었는지 확인
+            yield return new WaitForSeconds(0.1f); // 짧은 대기 시간으로 모든 상태가 리셋될 시간 확보
+            
+            Debug.Log("플레이어 상태를 Idle로 변경 시작");
+            playerStateManager.ChangeState(PlayerStateType.Idle);
+            Debug.Log("플레이어 상태 Idle로 변경 완료");
+        }
+        
+        // 게임 상태를 정상 플레이로 변경
+        SetGameState(GameState.Playing);
+        
+        isRespawning = false;
+        Debug.Log("플레이어 부활 완료!");
     }
 
     private void OnDestroy()

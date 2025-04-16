@@ -32,6 +32,7 @@ public class PlayerStateManager : MonoBehaviour
     private bool isCrouching;
     private bool isClimbing;
 
+
     // 프로퍼티
     public PlayerStateType CurrentState => currentStateType;
     public float LastGroundedTime => lastGroundedTime;
@@ -127,6 +128,7 @@ public class PlayerStateManager : MonoBehaviour
         states.Add(PlayerStateType.Hit, new PlayerHitState(this));
         states.Add(PlayerStateType.Crouching, new PlayerCrouchingState(this));
         states.Add(PlayerStateType.Climbing, new PlayerClimbingState(this));
+        states.Add(PlayerStateType.Death, new PlayerDeathState(this));
         // 초기 상태 설정
         ChangeState(PlayerStateType.Idle);
     }
@@ -229,20 +231,40 @@ public class PlayerStateManager : MonoBehaviour
 
     public void ChangeState(PlayerStateType newState)
     {
+        // 사망 상태에서 Idle로 전환 시(부활 처리) 추가 로그와 처리
+        if (currentStateType == PlayerStateType.Death && newState == PlayerStateType.Idle)
+        {
+            Debug.Log("사망 상태에서 Idle 상태로 전환 (부활 처리)");
+            
+            // 애니메이터 상태 확인 및 리셋
+            var playerAnimator = GetComponent<PlayerAnimator>();
+            if (playerAnimator != null)
+            {
+                playerAnimator.SetDead(false);
+                Debug.Log("사망->Idle 전환 시 애니메이터 사망 상태 명시적 해제");
+            }
+        }
+        
         // 같은 상태면 무시
-        if (currentStateType == newState) return;
+        if (currentStateType == newState) 
+        {
+            Debug.Log($"같은 상태({newState})로 전환 무시");
+            return;
+        }
 
         // 이전 상태 종료
         currentState?.Exit();
+        Debug.Log($"이전 상태({currentStateType}) Exit 호출 완료");
 
         // 새 상태로 변경
         currentStateType = newState;
         currentState = states[newState];
         currentState.Enter();
+        Debug.Log($"새 상태({newState}) Enter 호출 완료");
 
         // 상태 변경 이벤트 발생
         OnStateChanged?.Invoke(newState);
-        Debug.Log($"상태 변경: {newState}");
+        Debug.Log($"상태 변경 완료: {newState}");
     }
 
     private void HandleJumpInput(bool pressed)
@@ -421,6 +443,13 @@ public class PlayerStateManager : MonoBehaviour
 
     private void UpdateAnimation()
     {
+        // 사망 상태에서는 애니메이션 업데이트를 한 번만 실행하도록
+        if (currentStateType == PlayerStateType.Death && currentState is PlayerDeathState deathState && deathState.HasRespawned)
+        {
+            // 이미 리스폰 처리된 상태에서는 더 이상 애니메이션 업데이트 하지 않음
+            return;
+        }
+        
         playerAnimator?.UpdateAnimation(currentStateType, inputHandler.IsMoving(), movement.Velocity);
     }
 
