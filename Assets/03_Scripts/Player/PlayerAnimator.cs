@@ -5,9 +5,6 @@ public class PlayerAnimator : MonoBehaviour
 {
     private Animator animator;
     private bool isActuallyClimbing; // 실제로 사다리를 오르고 있는지 여부
-
-    [SerializeField] private float minClimbSpeedThreshold = 0.1f; // 오르기 애니메이션 재생을 위한 최소 속도
-
     private bool isPaused = false; // 애니메이션이 일시정지 상태인지
 
     [SerializeField] private float climbAnimFrameRate = 8f;

@@ -179,7 +179,7 @@ public class CostumeSetUI : MonoBehaviour
         }
 
         // 게임 상태는 무시하고 항상 활성화 가능하도록 설정
-        bool isGamePlaying = true;
+        // bool isGamePlaying = true; // 사용하지 않는 변수 제거
         
         if (gameManager != null) 
         {
