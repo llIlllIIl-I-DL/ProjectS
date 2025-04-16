@@ -46,7 +46,7 @@ public class PressTrap : BaseTrap
             isPressing = true;
             
             if (animator != null)
-                animator.SetTrigger("Press");
+                animator.SetTrigger("Press"); // 조금 더 자연스러운 연출을 위해 애니메이션은 차차 생각해봐야함
             else
                 StartCoroutine(PressCrush());
         }
@@ -64,7 +64,21 @@ public class PressTrap : BaseTrap
                 StartCoroutine(PressReturn());
         }
     }
-    
+
+    public override void ToggleAutoTrap()
+    {   
+        if (!autoActivate)
+        {
+            autoActivate = true;
+            StartCoroutine(AutoActivationCycle());
+        }
+        else
+        {
+            autoActivate = false;
+            StopCoroutine(AutoActivationCycle());
+        }
+    }
+
     private IEnumerator PressCrush()
     {
         float t = 0;

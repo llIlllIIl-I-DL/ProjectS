@@ -886,6 +886,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2316632141439518805, guid: 0e1dc5c226bb143b8acb537370443f7f, type: 3}
+      propertyPath: isActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8779343534293237699, guid: 0e1dc5c226bb143b8acb537370443f7f, type: 3}
       propertyPath: m_Name
       value: Object_Spike
@@ -2884,7 +2888,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2516238198933764045, guid: 1bec1c489ad934066a974744a6163ddc, type: 3}
       propertyPath: m_LocalScale.x
-      value: 8.138941
+      value: 6.329654
       objectReference: {fileID: 0}
     - target: {fileID: 2516238198933764045, guid: 1bec1c489ad934066a974744a6163ddc, type: 3}
       propertyPath: m_LocalScale.y
@@ -2892,7 +2896,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2516238198933764045, guid: 1bec1c489ad934066a974744a6163ddc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -8.2797
+      value: -7.7875
       objectReference: {fileID: 0}
     - target: {fileID: 2516238198933764045, guid: 1bec1c489ad934066a974744a6163ddc, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3013,11 +3017,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 358122391513329194, guid: 17c1967bfc65e44629bee56c9c6b029d, type: 3}
       propertyPath: OnActivated.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: DeactivateTrap
+      value: ToggleAutoTrap
       objectReference: {fileID: 0}
     - target: {fileID: 358122391513329194, guid: 17c1967bfc65e44629bee56c9c6b029d, type: 3}
       propertyPath: OnActivated.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
-      value: DeactivateTrap
+      value: ToggleAutoTrap
       objectReference: {fileID: 0}
     - target: {fileID: 358122391513329194, guid: 17c1967bfc65e44629bee56c9c6b029d, type: 3}
       propertyPath: OnActivated.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
@@ -3346,6 +3350,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2516238198933764045, guid: 1bec1c489ad934066a974744a6163ddc, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2774512415088332309, guid: 1bec1c489ad934066a974744a6163ddc, type: 3}
+      propertyPath: autoActivate
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

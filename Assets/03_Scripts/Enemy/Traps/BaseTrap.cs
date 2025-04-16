@@ -20,6 +20,9 @@ public abstract class BaseTrap : BaseObject
     
     // 트랩이 비활성화되는 메서드
     public abstract void DeactivateTrap();
+
+    // 트랩의 오토상태를 변경하는 메서드
+    public abstract void ToggleAutoTrap();
     
     // 플레이어와 접촉 시 호출
     protected virtual void OnTrapContact(GameObject target)
