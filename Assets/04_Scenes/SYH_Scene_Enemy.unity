@@ -281,7 +281,7 @@ Transform:
   m_GameObject: {fileID: 82373145}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.6427876, z: 0, w: 0.7660445}
-  m_LocalPosition: {x: -1.14, y: -3.15, z: -0.07486447}
+  m_LocalPosition: {x: -3.93, y: -3.15, z: -0.07486447}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -309,8 +309,8 @@ MonoBehaviour:
   doorAnimator: {fileID: 82373150}
   openAnimTrigger: Open
   closeAnimTrigger: Close
-  autoClose: 1
-  autoCloseDelay: 2
+  autoClose: 0
+  autoCloseDelay: 0
 --- !u!95 &82373150
 Animator:
   serializedVersion: 5
@@ -915,7 +915,7 @@ Transform:
   m_GameObject: {fileID: 1117781561}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.98, y: -3.944, z: -0.24066822}
+  m_LocalPosition: {x: -1.01, y: -3.944, z: -0.24066822}
   m_LocalScale: {x: 1, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1335,7 +1335,7 @@ MonoBehaviour:
   staysPressed: 0
   resetDelay: 2
   activatedTag: Player
-  requireMultipleTags: 0
+  requireMultipleTags: 1
   requiredTags:
   - Player
   - Cog
