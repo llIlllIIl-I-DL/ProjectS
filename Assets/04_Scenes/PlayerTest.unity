@@ -631,8 +631,8 @@ MonoBehaviour:
   equippedCostumeParts: []
   equippedWeaponAttribute: {fileID: 0}
   availableCostumeSets:
-  - {fileID: 11400000, guid: 707cf6b884200c04097ca8b687e6e4bf, type: 2}
-  activeCostumeSet: {fileID: 11400000, guid: 707cf6b884200c04097ca8b687e6e4bf, type: 2}
+  - {fileID: 11400000, guid: 82a653fbef7bbac46af353be95baaa97, type: 2}
+  activeCostumeSet: {fileID: 0}
   costumeManager: {fileID: 1916992650}
 --- !u!4 &327977206
 Transform:
@@ -1718,7 +1718,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7599131818407334981, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
   m_PrefabInstance: {fileID: 1204726306834690021}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1630461739}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d622d949d02964846852b8493a6fae40, type: 3}
@@ -2229,7 +2229,7 @@ MonoBehaviour:
   - {fileID: 1104314154}
   lockIcon: {fileID: 770469206}
   activeIndicator: {fileID: 450690604}
-  costumeSetData: {fileID: 11400000, guid: 707cf6b884200c04097ca8b687e6e4bf, type: 2}
+  costumeSetData: {fileID: 11400000, guid: 82a653fbef7bbac46af353be95baaa97, type: 2}
 --- !u!4 &1571185581 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3444311044526777892, guid: 8565e581de95f93488002f7099a59e66, type: 3}
@@ -2980,32 +2980,6 @@ Transform:
   - {fileID: 1664343117}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1630461739 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 418548494962307080, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
-  m_PrefabInstance: {fileID: 1204726306834690021}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1630461750
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1630461739}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f646ecb8c9dfd7a499d6862b93d3a5ac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  costumeData: {fileID: 11400000, guid: 82a653fbef7bbac46af353be95baaa97, type: 2}
-  hoverForce: 10
-  hoverDuration: 5
-  energyCostPerSecond: 10
-  normalGravityScale: 1
-  hoverGravityScale: 0.3
-  wingsuitGravityScale: 0.3
-  doubleTapTimeThreshold: 0.3
-  showDebugInfo: 1
 --- !u!1 &1664343114
 GameObject:
   m_ObjectHideFlags: 0
@@ -3616,10 +3590,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 418548494962307080, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1630461750}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
 --- !u!1001 &4525049859483918882
 PrefabInstance:

@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class WingSuitEffect : CostumeEffectBase
 {
-    public float hoverForce = 100f;  // 더 큰 힘으로 증가
-    public float hoverDuration = 5f;  // 더 긴 지속 시간
+    public float hoverForce = 3f;  // 더 큰 힘으로 증가
+    public float hoverDuration = 2.5f;  // 더 긴 지속 시간
     public float energyCostPerSecond = 10f;
     
     [Header("물리 설정")]
@@ -296,11 +296,6 @@ public class WingSuitEffect : CostumeEffectBase
     {
         if (playerMovement != null)
         {
-            // PlayerMovement 스크립트에 수직 이동 제한 메소드가 있다고 가정
-            // 아래 코드는 해당 메소드가 존재한다는 가정하에 작성됨
-            // playerMovement.DisableVerticalMovement();
-            
-            // 만약 위 메소드가 없다면 playerMovement에 관련 기능을 추가해야 함
             Debug.Log("수직 이동 제한 설정됨 - 좌우 이동만 가능");
         }
     }
@@ -309,9 +304,6 @@ public class WingSuitEffect : CostumeEffectBase
     {
         if (playerMovement != null)
         {
-            // PlayerMovement 스크립트에 수직 이동 제한 해제 메소드가 있다고 가정
-            // playerMovement.EnableVerticalMovement();
-            
             Debug.Log("수직 이동 제한 해제됨");
         }
     }
