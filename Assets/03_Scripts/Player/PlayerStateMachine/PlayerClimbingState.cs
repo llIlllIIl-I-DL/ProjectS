@@ -13,6 +13,8 @@ public class PlayerClimbingState : PlayerStateBase
     // 플레이어 레이어 관리 변수 추가
     private int originalPlayerLayer;
     private int ladderLayer;
+    private int platformLayer;
+    private int noCollisionLayer;
 
     // 사다리 중앙 고정 관련 변수
     private Collider2D currentLadderCollider;
@@ -31,6 +33,9 @@ public class PlayerClimbingState : PlayerStateBase
 
     // 사다리 바닥 체크 관련 변수 추가
     private bool isAtLadderBottom = false;
+    
+    // 플랫폼 관련 변수 추가
+    private List<GameObject> modifiedPlatforms = new List<GameObject>();
 
     public PlayerClimbingState(PlayerStateManager stateManager) : base(stateManager)
     {
@@ -42,11 +47,26 @@ public class PlayerClimbingState : PlayerStateBase
 
         playerAnimator = stateManager.GetComponent<PlayerAnimator>();
         
-        // NoCollision 레이어 미리 가져오기
-        ladderLayer = LayerMask.NameToLayer("NoCollision");
-        if (ladderLayer == -1)
+        // 레이어 미리 가져오기
+        noCollisionLayer = LayerMask.NameToLayer("NoCollision");
+        if (noCollisionLayer == -1)
         {
             Debug.LogError("NoCollision 레이어를 찾을 수 없습니다!");
+        }
+        
+        // 플랫폼 레이어 미리 가져오기
+        platformLayer = LayerMask.NameToLayer("Ground");
+        if (platformLayer == -1)
+        {
+            Debug.LogError("Platform 레이어를 찾을 수 없습니다! Default를 사용합니다.");
+            platformLayer = 0; // Default 레이어
+        }
+        
+        // Ladder 레이어도 미리 가져오기
+        ladderLayer = LayerMask.NameToLayer("Ladder");
+        if (ladderLayer == -1)
+        {
+            Debug.LogError("Ladder 레이어를 찾을 수 없습니다!");
         }
     }
 
@@ -106,11 +126,11 @@ public class PlayerClimbingState : PlayerStateBase
             playerAnimator.SetActuallyClimbing(false);
         }
 
-        // 플레이어 레이어를 NoCollision으로 즉시 변경 (모든 경우에 항상 변경)
-        ChangePlayerToLadderLayer();
-        
         // 사다리 찾기 및 플레이어 중앙 정렬
         FindLadderAndCenterPlayer();
+        
+        // 주변 플랫폼 레이어 변경
+        ChangeNearbyPlatformsLayer();
     }
 
     public override void Exit()
@@ -134,16 +154,16 @@ public class PlayerClimbingState : PlayerStateBase
             playerAnimator.SetClimbing(false);
             playerAnimator.SetActuallyClimbing(false);
         }
-
-        // 플레이어 레이어 원래대로 복원
-        RestorePlayerLayer();
+        
+        // 변경한 플랫폼 레이어 복원
+        RestoreAllPlatformsLayer();
     }
 
     // 플레이어 레이어 변경
     private void ChangePlayerToLadderLayer()
     {
         // 이미 레이어가 변경되었는지 확인
-        if (player.gameObject.layer == ladderLayer)
+        if (player.gameObject.layer == noCollisionLayer)
         {
             Debug.Log("플레이어 레이어가 이미 NoCollision으로 설정되어 있습니다.");
             return;
@@ -153,22 +173,16 @@ public class PlayerClimbingState : PlayerStateBase
         originalPlayerLayer = player.gameObject.layer;
 
         // 레이어가 올바르게 설정되었는지 확인
-        if (ladderLayer == -1)
+        if (noCollisionLayer == -1)
         {
             Debug.LogError("NoCollision 레이어가 정의되지 않았습니다. 레이어 설정을 확인하세요.");
-            // 대체 레이어를 찾아보기
-            ladderLayer = LayerMask.NameToLayer("NoCollision");
-            if (ladderLayer == -1)
-            {
-                Debug.LogError("NoCollision 레이어를 찾을 수 없습니다. 기본 레이어를 유지합니다.");
-                return;
-            }
+            return;
         }
 
         Debug.Log($"플레이어 레이어 변경 전: {player.gameObject.name}, 현재 레이어: {LayerMask.LayerToName(player.gameObject.layer)}");
 
         // 플레이어 레이어를 NoCollision으로 변경
-        player.gameObject.layer = ladderLayer;
+        player.gameObject.layer = noCollisionLayer;
 
         // 즉시 레이어가 변경되었는지 확인 (디버깅 목적)
         Debug.Log($"플레이어 레이어 변경 후: {player.gameObject.name}, 변경된 레이어: {LayerMask.LayerToName(player.gameObject.layer)}");
@@ -179,12 +193,12 @@ public class PlayerClimbingState : PlayerStateBase
         {
             if (collider.gameObject != player.gameObject)
             {
-                collider.gameObject.layer = ladderLayer;
+                collider.gameObject.layer = noCollisionLayer;
                 Debug.Log($"자식 콜라이더 레이어 변경: {collider.gameObject.name}, 레이어: {LayerMask.LayerToName(collider.gameObject.layer)}");
             }
         }
 
-        Debug.Log($"플레이어 레이어를 NoCollision으로 변경 완료: {LayerMask.LayerToName(originalPlayerLayer)} -> {LayerMask.LayerToName(ladderLayer)}");
+        Debug.Log($"플레이어 레이어를 NoCollision으로 변경 완료: {LayerMask.LayerToName(originalPlayerLayer)} -> {LayerMask.LayerToName(noCollisionLayer)}");
     }
 
     // 플레이어 레이어 복원
@@ -202,14 +216,82 @@ public class PlayerClimbingState : PlayerStateBase
             }
         }
 
-        Debug.Log($"플레이어 레이어 복원: {LayerMask.LayerToName(ladderLayer)} -> {LayerMask.LayerToName(originalPlayerLayer)}");
+        Debug.Log($"플레이어 레이어 복원: {LayerMask.LayerToName(noCollisionLayer)} -> {LayerMask.LayerToName(originalPlayerLayer)}");
+    }
+    
+    // 주변 플랫폼 레이어를 NoCollision으로 변경
+    private void ChangeNearbyPlatformsLayer()
+    {
+        if (noCollisionLayer == -1) return;
+        if (currentLadderCollider == null) return;
+        
+        // 현재 사다리의 위치 주변 영역 계산
+        Bounds ladderBounds = currentLadderCollider.bounds;
+        Vector2 ladderCenter = ladderBounds.center;
+        
+        // 사다리 위쪽까지의 거리를 계산 (위쪽으로 더 넓게 검색)
+        float searchRadius = 3f;
+        float extraHeight = 2f;
+        
+        // 위쪽 방향으로 더 넓은 검색 영역 생성
+        Vector2 searchCenter = new Vector2(ladderCenter.x, ladderCenter.y + (ladderBounds.size.y / 2) + (extraHeight / 2));
+        Vector2 searchSize = new Vector2(searchRadius, ladderBounds.size.y + extraHeight);
+        
+        // 해당 영역 내 모든 플랫폼 찾기
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(searchCenter, searchSize, 0f);
+        
+        // 변경 전에 이전 목록 초기화
+        modifiedPlatforms.Clear();
+        
+        Debug.Log($"사다리 주변 검색 영역: 중심={searchCenter}, 크기={searchSize}, 찾은 콜라이더 수={colliders.Length}");
+        
+        foreach (Collider2D collider in colliders)
+        {
+            // 플랫폼 레이어이고 사다리가 아닌 오브젝트만 처리
+            if ((collider.gameObject.layer == platformLayer || 
+                collider.CompareTag("Platform") || 
+                collider.CompareTag("Ground")) && 
+                !collider.CompareTag("Ladder"))
+            {
+                // 원래 레이어 정보를 저장하기 위해 태그에 임시 저장
+                if (!collider.gameObject.CompareTag("Ladder"))
+                {
+                    collider.gameObject.tag = "Ladder";
+                    // 목록에 추가
+                    modifiedPlatforms.Add(collider.gameObject);
+                    
+                    // 레이어 변경
+                    int originalLayer = collider.gameObject.layer;
+                    collider.gameObject.layer = noCollisionLayer;
+                    
+                    Debug.Log($"플랫폼 레이어 변경: {collider.gameObject.name}, {LayerMask.LayerToName(originalLayer)} -> {LayerMask.LayerToName(noCollisionLayer)}");
+                }
+            }
+        }
+        
+        Debug.Log($"총 {modifiedPlatforms.Count}개 플랫폼 레이어 변경 완료");
+    }
+    
+    // 모든 플랫폼 레이어 복원
+    private void RestoreAllPlatformsLayer()
+    {
+        foreach (GameObject platform in modifiedPlatforms)
+        {
+            if (platform != null)
+            {
+                platform.layer = platformLayer;
+                platform.tag = "Ground"; // 원래 태그로 복원 (이 부분은 프로젝트에 맞게 수정 필요)
+                Debug.Log($"플랫폼 레이어 복원: {platform.name}, {LayerMask.LayerToName(noCollisionLayer)} -> {LayerMask.LayerToName(platformLayer)}");
+            }
+        }
+        
+        modifiedPlatforms.Clear();
+        Debug.Log("모든 플랫폼 레이어 복원 완료");
     }
 
     // 현재 플레이어가 닿아있는 사다리 찾기 및 플레이어 중앙 정렬
     private void FindLadderAndCenterPlayer()
     {
-        if (ladderLayer == -1) return;
-
         // 플레이어와 겹치는 모든 콜라이더 찾기
         Collider2D playerCollider = player.GetComponent<Collider2D>();
         if (playerCollider == null)
@@ -283,13 +365,25 @@ public class PlayerClimbingState : PlayerStateBase
         var inputHandler = player.GetInputHandler();
         var rigidbody = player.GetComponent<Rigidbody2D>();
         
-        // 레이어가 제대로 설정되었는지 확인 (아래키로 사다리 진입 시 레이어 설정 문제 해결)
-        if (player.gameObject.layer != ladderLayer)
+        // 사다리에서 벗어났는지 확인
+        if (!collisionDetector.IsOnLadder && !isExitingLadder)
         {
-            Debug.LogWarning("플레이어 레이어가 NoCollision이 아닙니다. 다시 설정합니다.");
-            ChangePlayerToLadderLayer();
+            Debug.Log("사다리에서 벗어남 - 상태 종료");
+            player.ExitClimbingState(false);
+            return;
         }
-        
+
+        // 사다리의 바닥에 도달했는지 확인
+        CheckIfAtLadderBottom();
+
+        // 지면에 닿고 아래 방향으로 이동 중일 때 (사다리 바닥에 있을 때만 내리기)
+        if (collisionDetector.IsGrounded && inputHandler.MoveDirection.y < -0.1f && isAtLadderBottom)
+        {
+            Debug.Log("사다리 바닥에 도달하고 아래로 이동 중 - 상태 종료");
+            player.ExitClimbingState(false);
+            return;
+        }
+
         // 플랫폼에서 아래로 내려가기 처리
         if (isStartingFromPlatform && isEnteringFromBottom)
         {
@@ -322,33 +416,6 @@ public class PlayerClimbingState : PlayerStateBase
                 }
                 Debug.Log("플랫폼에서 사다리 진입 딜레이 종료");
             }
-        }
-
-        // 사다리에서 벗어났는지 확인
-        if (!collisionDetector.IsOnLadder && !isExitingLadder)
-        {
-            Debug.Log("사다리에서 벗어남 - 상태 종료");
-            player.ExitClimbingState(false);
-            return;
-        }
-
-        // 사다리의 바닥에 도달했는지 확인
-        CheckIfAtLadderBottom();
-
-        // 지면에 닿고 아래 방향으로 이동 중일 때 (사다리 바닥에 있을 때만 내리기)
-        if (collisionDetector.IsGrounded && inputHandler.MoveDirection.y < -0.1f && isAtLadderBottom)
-        {
-            Debug.Log("사다리 바닥에 도달하고 아래로 이동 중 - 상태 종료");
-            player.ExitClimbingState(false);
-            return;
-        }
-
-        // 사다리 위에 도달했는지 확인 (사다리 위로 올라갔을 때)
-        if (collisionDetector.IsAtTopOfLadder && inputHandler.MoveDirection.y > 0)
-        {
-            Debug.Log("사다리 상단에 도달 - 상태 종료");
-            player.ExitClimbingState(false);
-            return;
         }
 
         // 사다리 중앙 강제 정렬 (Update에서도 지속적으로 중앙 정렬)
