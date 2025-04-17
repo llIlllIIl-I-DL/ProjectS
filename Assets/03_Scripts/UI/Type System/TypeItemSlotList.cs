@@ -51,8 +51,5 @@ public class TypeItemSlotList : MonoBehaviour
         textColor[0].color = Color.white;
 
         Debug.Log($"{colorTemp[0].color}");
-
-
-
     }
 }

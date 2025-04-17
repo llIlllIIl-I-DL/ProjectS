@@ -28,7 +28,6 @@ public class PlayerUI : Singleton<PlayerUI>
     [SerializeField] public Image typeIcon;
 
     static PlayerHP playerHP;
-    public TypeItemSlotList typeItemSlotList;
 
     static int currentTypeIndex = 0;
 
