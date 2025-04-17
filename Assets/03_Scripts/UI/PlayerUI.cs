@@ -29,13 +29,25 @@ public class PlayerUI : Singleton<PlayerUI>
 
     static PlayerHP playerHP;
 
+    [Header("아이템슬롯리스트 활성화")]
+    [SerializeField] public GameObject typeItemSlotListObj;
+
     static int currentTypeIndex = 0;
+    static TypeItemSlotList typeItemSlotList;
 
     public Dictionary<AttributeTypeData, Sprite> TypeItemDic = new Dictionary<AttributeTypeData, Sprite>();
+
+    public void Awake()
+    {
+        typeItemSlotListObj.SetActive(true);
+        Debug.Log("켜졌음");
+
+    }
 
     public void Start()
     {
         playerHP = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHP>();
+        typeItemSlotList = GetComponentInChildren<TypeItemSlotList>(true);
 
         float maxHP = playerHP.MaxHP;
         float currentHP = playerHP.CurrentHP;
@@ -44,7 +56,25 @@ public class PlayerUI : Singleton<PlayerUI>
         Debug.Log($"{realPosition}");
 
         healthBarImage.fillAmount = 1f;
+        ClosedSlotList();
+
     }
+
+    public void ClosedSlotList()
+    {
+        StartCoroutine(ClosedSlotListCoroutine());
+    }
+
+    public IEnumerator ClosedSlotListCoroutine()
+    {
+        yield return null;
+        typeItemSlotListObj.SetActive(false);
+        Debug.Log("꺼졌음");
+    }
+
+
+
+
 
     public void Voscuro(Vector3 realPosition, float maxHP, float currentHP)
     {
@@ -148,6 +178,26 @@ public class PlayerUI : Singleton<PlayerUI>
 
         healLight.color = new Color32(255, 255, 255, 0);
     }
+
+    
+    public void CurrentPlayersTypeUIUpdate() //플레이어의 현재 속성(Type)이 무엇인지 나타내주는 역할의 UI 업데이트 함수
+    {
+        typeItemSlotList.realData = attributeType;
+
+        typeName.text = typeItemSlotList.realData.typeName;
+        typeIcon.sprite = typeItemSlotList.realData.typeIcon;
+
+        Image[] colorTemp = typeItemSlotList.currentTypePrefab.GetComponentsInChildren<Image>(true);
+        colorTemp[1].color = Color.white;
+
+        Debug.Log($"{colorTemp[0].color}");
+
+        TextMeshProUGUI[] textColor = typeItemSlotList.currentTypePrefab.GetComponentsInChildren<TextMeshProUGUI>(true);
+        textColor[0].color = Color.white;
+
+        Debug.Log($"{colorTemp[0].color}");
+    }
+    
 
     public void MovetoLeftType()
     {
