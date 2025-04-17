@@ -7,10 +7,14 @@ using UnityEngine.EventSystems;
 
 public class TypeItemSlot : MonoBehaviour
 {
+    //처음에는 무조건 normal슬롯이 플레이어의 속성이 됨, 혼자만 ui내에서 활성화.
+    //속성 먹었을 때 해당 슬롯 활성화. color.white로...
+
+
     [SerializeField] public TextMeshProUGUI typeName;
     [SerializeField] public Image typeIcon;
 
-    private AttributeTypeData attributeTypeData;
+    [SerializeField] public AttributeTypeData attributeTypeData;
 
     private int slotIndex = 0;
 
@@ -19,11 +23,15 @@ public class TypeItemSlot : MonoBehaviour
         attributeTypeData = new AttributeTypeData();
     }
 
+
+
+    /*
     public bool IsEmpty()
     {
         return attributeTypeData == null;
     }
 
+    
     public void AddItem(AttributeTypeData attributeTypeData)
     {
         SetItem(attributeTypeData);
@@ -52,4 +60,5 @@ public class TypeItemSlot : MonoBehaviour
             typeIcon.sprite = null;
         }
     }
+    */
 }

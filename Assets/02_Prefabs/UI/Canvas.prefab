@@ -2059,6 +2059,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeName: {fileID: 7353122065149932349}
   typeIcon: {fileID: 8365722012536987574}
+  attributeTypeData: {fileID: 11400000, guid: 91740f8d80f0fa94186d1ee4e66d28ce, type: 2}
 --- !u!1 &1600680469319375810
 GameObject:
   m_ObjectHideFlags: 0
@@ -2187,6 +2188,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeName: {fileID: 5419288516036031443}
   typeIcon: {fileID: 6520718073905962493}
+  attributeTypeData: {fileID: 11400000, guid: 2b5da9cba5dcaf949b21a20d0a8938fa, type: 2}
 --- !u!1 &1666983151326484826
 GameObject:
   m_ObjectHideFlags: 0
@@ -4578,6 +4580,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeName: {fileID: 6794206598601130822}
   typeIcon: {fileID: 4836571360351862888}
+  attributeTypeData: {fileID: 11400000, guid: b543e642b185b594085a8f99b1124220, type: 2}
 --- !u!1 &3384553232175554861
 GameObject:
   m_ObjectHideFlags: 0
@@ -4670,6 +4673,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeName: {fileID: 1989360842976137389}
   typeIcon: {fileID: 3250770811906094200}
+  attributeTypeData: {fileID: 11400000, guid: f0126009fce9e76449e27d372136fc33, type: 2}
 --- !u!1 &3560757885927535610
 GameObject:
   m_ObjectHideFlags: 0
@@ -9723,6 +9727,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeName: {fileID: 8953723083466721104}
   typeIcon: {fileID: 3488673691248440818}
+  attributeTypeData: {fileID: 11400000, guid: dace89d9feda08f479432d0d10d234d5, type: 2}
 --- !u!1 &6403658965939286045
 GameObject:
   m_ObjectHideFlags: 0
@@ -10732,6 +10737,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeName: {fileID: 2490829759579208295}
   typeIcon: {fileID: 4308557698587039694}
+  attributeTypeData: {fileID: 11400000, guid: 7762ae26352f9184c8aeac64b835d7dc, type: 2}
 --- !u!1 &7272604100208469818
 GameObject:
   m_ObjectHideFlags: 0
@@ -11221,6 +11227,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeName: {fileID: 3274315386973270160}
   typeIcon: {fileID: 2996770451689510863}
+  attributeTypeData: {fileID: 11400000, guid: 6d3c5ac7e03d7bb49a382e7bcab831eb, type: 2}
 --- !u!1 &7945983405022996389
 GameObject:
   m_ObjectHideFlags: 0
@@ -12027,6 +12034,7 @@ GameObject:
   - component: {fileID: 29484300825811182}
   - component: {fileID: 8920948982540573826}
   - component: {fileID: 2125423792627817427}
+  - component: {fileID: 4495620928409528767}
   m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
@@ -12057,7 +12065,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -116, y: -114}
+  m_AnchoredPosition: {x: -116, y: -73.25}
   m_SizeDelta: {x: 957.9, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &29484300825811182
@@ -12124,6 +12132,27 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &4495620928409528767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8355383941150570029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6a31ee73e78e3049ba55058c3382ad9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TypeAmountList:
+  - {fileID: 1591343885880674841}
+  - {fileID: 7933667124317160528}
+  - {fileID: 7074812658877312940}
+  - {fileID: 1603600782444673618}
+  - {fileID: 6293437369829818066}
+  - {fileID: 3228932837787510424}
+  - {fileID: 3384553232175554861}
+  currentAttributeType: {fileID: 0}
 --- !u!1 &8490849954526512033
 GameObject:
   m_ObjectHideFlags: 0
@@ -13625,6 +13654,10 @@ PrefabInstance:
       propertyPath: attributeType
       value: 
       objectReference: {fileID: 11400000, guid: 2b5da9cba5dcaf949b21a20d0a8938fa, type: 2}
+    - target: {fileID: 407776726001735577, guid: 9fad44f587baf4548b1b44c0ce02b1d4, type: 3}
+      propertyPath: typeItemSlotList
+      value: 
+      objectReference: {fileID: 4495620928409528767}
     - target: {fileID: 407776726001735577, guid: 9fad44f587baf4548b1b44c0ce02b1d4, type: 3}
       propertyPath: typeItemSlots.Array.size
       value: 6

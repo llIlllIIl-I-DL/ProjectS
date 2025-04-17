@@ -28,7 +28,6 @@ public class TypeItem : MonoBehaviour
         PlayerUI.Instance.TypeItemDic.Add(attributeTypeData, iconSprite);
 
         Debug.Log("키에엑");
-        PlayerUI.Instance.BeforeAddItem(attributeTypeData);
 
         Destroy(gameObject);
     }
