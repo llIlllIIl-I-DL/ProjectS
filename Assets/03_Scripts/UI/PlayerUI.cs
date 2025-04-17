@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class PlayerUI : Singleton<PlayerUI> 
+public class PlayerUI : Singleton<PlayerUI>
 {
     [Header("HP 바")]
     [SerializeField] private Scrollbar healthBar;
@@ -23,12 +23,19 @@ public class PlayerUI : Singleton<PlayerUI>
     public float shakeRange;
 
     [Header("플레이어 속성 아이콘 업데이트")]
-    [SerializeField] private AttributeType attributeType;
+    [SerializeField] private AttributeTypeData attributeType;
     [SerializeField] private TextMeshProUGUI typeName;
     [SerializeField] private Image typeIcon;
 
-    private PlayerHP playerHP;
+    [Header("플레이어 속성 슬롯")]
+    [SerializeField] public TypeItemSlot[] typeItemSlots;
 
+    static PlayerHP playerHP;
+
+    static int currentTypeIndex = 0;
+
+    static List<AttributeTypeData> TypeAmountList = new List<AttributeTypeData>();
+    public Dictionary<AttributeTypeData, Sprite> TypeItemDic = new Dictionary<AttributeTypeData, Sprite>();
 
     public void Start()
     {
@@ -123,7 +130,7 @@ public class PlayerUI : Singleton<PlayerUI>
 
 
         healthBar.transform.position = new Vector3(realPosition.x, realPosition.y, realPosition.z);
-        
+
 
         if (currentHP > maxHP)
         {
@@ -150,7 +157,69 @@ public class PlayerUI : Singleton<PlayerUI>
 
     public void UpdateTypeIcon()
     {
+        typeIcon.preserveAspect = true;
+
         typeName.text = attributeType.typeName;
         typeIcon.sprite = attributeType.typeIcon;
+    }
+
+    public void MovetoLeftType()
+    {
+            Debug.Log("왼발 왼발왼발왼발~");
+            Debug.Log(TypeItemDic.Count);
+
+        if (TypeAmountList.Count == 0) return;
+
+        currentTypeIndex--;
+        if (currentTypeIndex < 0)
+            currentTypeIndex = TypeAmountList.Count - 1;
+
+        UpdateTypeUI(TypeAmountList[currentTypeIndex]);
+    }
+
+    public void MovetoRightType()
+    {
+        Debug.Log("오른발 오른발 오른발 오른발");
+
+        if (TypeAmountList.Count == 0) return;
+
+        currentTypeIndex++;
+        if (currentTypeIndex >= TypeAmountList.Count)
+            currentTypeIndex = 0;
+
+        UpdateTypeUI(TypeAmountList[currentTypeIndex]);
+    }
+
+
+    public void BeforeAddItem(AttributeTypeData attributeType)
+    {
+        if (!TypeItemDic.ContainsKey(attributeType))
+        {
+            TypeItemDic.Add(attributeType, attributeType.typeIcon);
+            TypeAmountList.Add(attributeType);
+        }
+
+        foreach (var slot in PlayerUI.Instance.typeItemSlots)
+        {
+            if (slot.IsEmpty())
+            {
+                slot.gameObject.SetActive(true);
+                slot.AddItem(attributeType);
+                break;
+            }
+        }
+
+        
+        if (TypeAmountList.Count == 1)
+        {
+            UpdateTypeUI(attributeType);
+        }
+        
+    }
+
+    private void UpdateTypeUI(AttributeTypeData attributeType)
+    {
+        typeIcon.sprite = attributeType.typeIcon;
+        typeName.text = attributeType.typeName;
     }
 }

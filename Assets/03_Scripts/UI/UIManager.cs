@@ -20,26 +20,6 @@ public class UIManager : Singleton<UIManager>
     {
         foreach (GameObject uiPage in allUIPages)
         {
-            /*
-            if (uiPage != null)
-            {
-                if (uiPage.name == "SuitUI" && uiPage.activeSelf)
-                {
-                    allUIPages[3].SetActive(false);
-                }
-
-                else
-                {
-                    uiPage.gameObject.SetActive(false);//계속 닫기를 요청 중....
-
-                    if (allUIPages[3].activeSelf)
-                    {
-                        allUIPages[2].SetActive(true);
-                        Time.timeScale = 0;
-                        Debug.Log("문열어!!");
-                    }
-                }
-            */
             uiPage.SetActive(false);
             Time.timeScale = 1;
         }
