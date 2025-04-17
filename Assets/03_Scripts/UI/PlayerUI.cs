@@ -23,9 +23,9 @@ public class PlayerUI : Singleton<PlayerUI>
     public float shakeRange;
 
     [Header("플레이어 속성 아이콘 업데이트")]
-    [SerializeField] private AttributeTypeData attributeType;
-    [SerializeField] private TextMeshProUGUI typeName;
-    [SerializeField] private Image typeIcon;
+    [SerializeField] public AttributeTypeData attributeType;
+    [SerializeField] public TextMeshProUGUI typeName;
+    [SerializeField] public Image typeIcon;
 
     static PlayerHP playerHP;
     public TypeItemSlotList typeItemSlotList;
@@ -45,8 +45,6 @@ public class PlayerUI : Singleton<PlayerUI>
         Debug.Log($"{realPosition}");
 
         healthBarImage.fillAmount = 1f;
-
-        UpdateTypeIcon();
     }
 
     public void Voscuro(Vector3 realPosition, float maxHP, float currentHP)
@@ -150,14 +148,6 @@ public class PlayerUI : Singleton<PlayerUI>
         }
 
         healLight.color = new Color32(255, 255, 255, 0);
-    }
-
-    public void UpdateTypeIcon()
-    {
-        typeIcon.preserveAspect = true;
-
-        typeName.text = attributeType.typeName;
-        typeIcon.sprite = attributeType.typeIcon;
     }
 
     public void MovetoLeftType()

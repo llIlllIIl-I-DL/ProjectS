@@ -36,6 +36,12 @@ public class TypeItemSlotList : MonoBehaviour
 
     public void CurrentPlayersTypeUIUpdate()
     {
+        realData = PlayerUI.Instance.attributeType;
+        PlayerUI.Instance.typeName.text = realData.typeName;
+        PlayerUI.Instance.typeIcon.sprite = realData.typeIcon; 
+
+
+
         Image[] colorTemp = currentTypePrefab.GetComponentsInChildren<Image>();
         colorTemp[1].color = Color.white;
 
