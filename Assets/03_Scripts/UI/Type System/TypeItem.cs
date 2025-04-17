@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class TypeItem : MonoBehaviour
 {
-    [SerializeField] AttributeTypeData attributeTypeData;
+    [SerializeField] ItemData attributeTypeData;
     static Sprite iconSprite;
     
     static SpriteRenderer iconSpriteRenderer;
@@ -14,7 +14,7 @@ public class TypeItem : MonoBehaviour
     {
         iconSpriteRenderer = GetComponent<SpriteRenderer>();
 
-        iconSprite = attributeTypeData.typeIcon;
+        iconSprite = attributeTypeData.Icon;
         iconSpriteRenderer.sprite = iconSprite;
     }
 

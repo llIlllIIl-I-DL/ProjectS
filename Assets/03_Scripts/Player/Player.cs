@@ -15,7 +15,7 @@ public class Player : MonoBehaviour
     private PlayerAnimator playerAnimator;
 
     [HideInInspector]
-    public AttributeTypeData CurrentattributeTypeData;
+    public ItemData CurrentattributeTypeData;
 
     private void Awake()
     {

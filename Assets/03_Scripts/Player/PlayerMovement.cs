@@ -11,11 +11,22 @@ public class PlayerMovement : MonoBehaviour
     // 상태 플래그
     private bool isSprinting = false;
     private bool hasWingsuit = true;
+    private bool isOnSlope = false;
+    private float slopeAngle;
+    private Vector2 slopeNormalPerpendicular;
+    
+    [Header("경사로 설정")]
+    [SerializeField] private float maxSlopeAngle = 45f;
+    [SerializeField] private PhysicsMaterial2D noFriction;
+    [SerializeField] private PhysicsMaterial2D fullFriction;
+    [SerializeField] private float slopeCheckDistance = 0.5f;
+    [SerializeField] private LayerMask groundLayer;
     
     public int FacingDirection => facingDirection;
     public Vector2 Velocity => rb.velocity;
     
     public bool HasWingsuit { get => hasWingsuit; set => hasWingsuit = value; }
+    public bool IsOnSlope => isOnSlope;
 
     public event System.Action<int> OnDirectionChanged;
     public event System.Action OnDashEnd;
@@ -24,11 +35,23 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        
+        // 마찰력 자료 확인
+        if (noFriction == null || fullFriction == null)
+        {
+            Debug.LogWarning("마찰력 자료가 설정되지 않았습니다. 경사로 이동에 문제가 생길 수 있습니다.");
+        }
     }
     
     private void Update()
     {
         // 제트팩 관련 코드 제거
+    }
+    
+    private void FixedUpdate()
+    {
+        // 경사로 체크
+        SlopeCheck();
     }
 
     public void Move(Vector2 moveDirection, bool sprint = false)
@@ -60,11 +83,87 @@ public class PlayerMovement : MonoBehaviour
         }
 
         float targetSpeed = moveDirection.x * currentMoveSpeed;
-        float speedDiff = targetSpeed - rb.velocity.x;
+        
+        // 경사로에 있을 때 이동 처리
+        if (isOnSlope)
+        {
+            MoveOnSlope(targetSpeed);
+        }
+        else
+        {
+            float speedDiff = targetSpeed - rb.velocity.x;
+            float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? settings.acceleration : settings.deceleration;
+            float movement = Mathf.Pow(Mathf.Abs(speedDiff) * accelRate, settings.velocityPower) * Mathf.Sign(speedDiff);
+
+            rb.AddForce(movement * Vector2.right);
+        }
+    }
+    
+    // 경사로 체크
+    private void SlopeCheck()
+    {
+        Vector2 checkPos = transform.position;
+        
+        // 아래 방향으로 레이캐스트 발사
+        RaycastHit2D hit = Physics2D.Raycast(checkPos, Vector2.down, slopeCheckDistance, groundLayer);
+        
+        if (hit)
+        {
+            // 경사로 법선 벡터와 수직 벡터 계산
+            slopeNormalPerpendicular = Vector2.Perpendicular(hit.normal).normalized;
+            
+            // 경사로 각도 계산
+            slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+            
+            // 경사로 여부 확인
+            isOnSlope = slopeAngle != 0f && slopeAngle <= maxSlopeAngle;
+            
+            // 디버그 시각화
+            Debug.DrawRay(hit.point, hit.normal, Color.green);
+            Debug.DrawRay(hit.point, slopeNormalPerpendicular, Color.red);
+            
+            // 마찰력 조정
+            if (isOnSlope && rb.velocity.y <= 0.1f)
+            {
+                rb.sharedMaterial = fullFriction; // 경사로에서는 마찰력 있음
+            }
+            else
+            {
+                rb.sharedMaterial = noFriction; // 경사로 아니거나 움직일 때는 마찰력 없음
+            }
+        }
+        else
+        {
+            isOnSlope = false;
+        }
+    }
+    
+    // 경사로에서 이동
+    private void MoveOnSlope(float targetSpeed)
+    {
+        // 경사로를 따라 움직이는 힘 계산
+        Vector2 slopeForce = slopeNormalPerpendicular * targetSpeed;
+        
+        // 힘을 가하기 전에 현재 속도와 목표 속도의 차이 계산
+        float currentSlopeVelocity = Vector2.Dot(rb.velocity, slopeNormalPerpendicular);
+        float speedDiff = targetSpeed - currentSlopeVelocity;
+        
+        // 가속도 계산
         float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? settings.acceleration : settings.deceleration;
         float movement = Mathf.Pow(Mathf.Abs(speedDiff) * accelRate, settings.velocityPower) * Mathf.Sign(speedDiff);
-
-        rb.AddForce(movement * Vector2.right);
+        
+        // 경사로 방향으로 힘을 가함
+        rb.AddForce(movement * slopeNormalPerpendicular);
+        
+        // 경사로에서 중력에 의한 미끄러짐 방지
+        if (Mathf.Abs(targetSpeed) < 0.1f && rb.velocity.magnitude < 0.1f)
+        {
+            rb.constraints = RigidbodyConstraints2D.FreezeAll;
+        }
+        else
+        {
+            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        }
     }
     
     // Player.cs 스크립트와의 호환성을 위한 더미 메서드

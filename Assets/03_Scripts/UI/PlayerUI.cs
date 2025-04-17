@@ -23,31 +23,20 @@ public class PlayerUI : Singleton<PlayerUI>
     public float shakeRange;
 
     [Header("플레이어 속성 아이콘 업데이트")]
-    [SerializeField] public AttributeTypeData attributeType;
+    [SerializeField] public ItemData attributeType;
     [SerializeField] public TextMeshProUGUI typeName;
     [SerializeField] public Image typeIcon;
 
     static PlayerHP playerHP;
-
-    [Header("아이템슬롯리스트 활성화")]
-    [SerializeField] public GameObject typeItemSlotListObj;
+    public TypeItemSlotList typeItemSlotList;
 
     static int currentTypeIndex = 0;
-    static TypeItemSlotList typeItemSlotList;
 
-    public Dictionary<AttributeTypeData, Sprite> TypeItemDic = new Dictionary<AttributeTypeData, Sprite>();
-
-    public void Awake()
-    {
-        typeItemSlotListObj.SetActive(true);
-        Debug.Log("켜졌음");
-
-    }
+    public Dictionary<ItemData, Sprite> TypeItemDic = new Dictionary<ItemData, Sprite>();
 
     public void Start()
     {
         playerHP = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHP>();
-        typeItemSlotList = GetComponentInChildren<TypeItemSlotList>(true);
 
         float maxHP = playerHP.MaxHP;
         float currentHP = playerHP.CurrentHP;
@@ -56,25 +45,17 @@ public class PlayerUI : Singleton<PlayerUI>
         Debug.Log($"{realPosition}");
 
         healthBarImage.fillAmount = 1f;
-        ClosedSlotList();
+
+        // 인벤토리 매니저 이벤트 구독 - 무기 속성 변경 시 UI 업데이트
+        if (InventoryManager.Instance != null)
+        {
+            InventoryManager.Instance.OnWeaponAttributeChanged += UpdateWeaponAttributeUI;
+        }
+
+        // 초기 무기 속성 설정
+        UpdateWeaponAttributeUI(InventoryManager.Instance.EquippedWeaponAttribute);
 
     }
-
-    public void ClosedSlotList()
-    {
-        StartCoroutine(ClosedSlotListCoroutine());
-    }
-
-    public IEnumerator ClosedSlotListCoroutine()
-    {
-        yield return null;
-        typeItemSlotListObj.SetActive(false);
-        Debug.Log("꺼졌음");
-    }
-
-
-
-
 
     public void Voscuro(Vector3 realPosition, float maxHP, float currentHP)
     {
@@ -179,34 +160,94 @@ public class PlayerUI : Singleton<PlayerUI>
         healLight.color = new Color32(255, 255, 255, 0);
     }
 
-    
-    public void CurrentPlayersTypeUIUpdate() //플레이어의 현재 속성(Type)이 무엇인지 나타내주는 역할의 UI 업데이트 함수
+    // 무기 속성 UI 업데이트 메소드
+    private void UpdateWeaponAttributeUI(ItemData weaponAttribute)
     {
-        typeItemSlotList.realData = attributeType;
-
-        typeName.text = typeItemSlotList.realData.typeName;
-        typeIcon.sprite = typeItemSlotList.realData.typeIcon;
-
-        Image[] colorTemp = typeItemSlotList.currentTypePrefab.GetComponentsInChildren<Image>(true);
-        colorTemp[1].color = Color.white;
-
-        Debug.Log($"{colorTemp[0].color}");
-
-        TextMeshProUGUI[] textColor = typeItemSlotList.currentTypePrefab.GetComponentsInChildren<TextMeshProUGUI>(true);
-        textColor[0].color = Color.white;
-
-        Debug.Log($"{colorTemp[0].color}");
+        if (weaponAttribute != null)
+        {
+            attributeType = weaponAttribute;
+            typeName.text = weaponAttribute.ItemName;
+            typeIcon.sprite = weaponAttribute.Icon;
+        }
+        else
+        {
+            // 기본 노말 속성으로 되돌리기
+            // 기본 아이템 데이터 참조 필요
+        }
     }
-    
+
 
     public void MovetoLeftType()
     {
-            Debug.Log("왼발 왼발왼발왼발~");
-            Debug.Log(TypeItemDic.Count);
+        if (typeItemSlotList == null) return;
+        
+        // 인벤토리에서 사용 가능한 무기 속성 목록 가져오기
+        List<ItemData> availableTypes = null;
+        if (InventoryManager.Instance != null)
+        {
+            availableTypes = InventoryManager.Instance.GetWeaponAttributes();
+        }
+        
+        if (availableTypes == null || availableTypes.Count <= 1) return;
+        
+        // 현재 장착된 무기 속성 찾기
+        ItemData currentType = attributeType;
+        int currentIndex = -1;
+        
+        for (int i = 0; i < availableTypes.Count; i++)
+        {
+            if (availableTypes[i].elementType == currentType.elementType)
+            {
+                currentIndex = i;
+                break;
+            }
+        }
+        
+        // 이전 인덱스 계산 (순환)
+        int prevIndex = (currentIndex - 1 + availableTypes.Count) % availableTypes.Count;
+        
+        // 이전 무기 속성 장착
+        if (InventoryManager.Instance != null)
+        {
+            InventoryManager.Instance.EquipWeaponAttribute(availableTypes[prevIndex]);
+            Debug.Log($"무기 속성 변경: {availableTypes[prevIndex].ItemName}");
+        }
     }
 
     public void MovetoRightType()
     {
-        Debug.Log("오른발 오른발 오른발 오른발");
+        if (typeItemSlotList == null) return;
+        
+        // 인벤토리에서 사용 가능한 무기 속성 목록 가져오기
+        List<ItemData> availableTypes = null;
+        if (InventoryManager.Instance != null)
+        {
+            availableTypes = InventoryManager.Instance.GetWeaponAttributes();
+        }
+        
+        if (availableTypes == null || availableTypes.Count <= 1) return;
+        
+        // 현재 장착된 무기 속성 찾기
+        ItemData currentType = attributeType;
+        int currentIndex = -1;
+        
+        for (int i = 0; i < availableTypes.Count; i++)
+        {
+            if (availableTypes[i].elementType == currentType.elementType)
+            {
+                currentIndex = i;
+                break;
+            }
+        }
+        
+        // 다음 인덱스 계산 (순환)
+        int nextIndex = (currentIndex + 1) % availableTypes.Count;
+        
+        // 다음 무기 속성 장착
+        if (InventoryManager.Instance != null)
+        {
+            InventoryManager.Instance.EquipWeaponAttribute(availableTypes[nextIndex]);
+            Debug.Log($"무기 속성 변경: {availableTypes[nextIndex].ItemName}");
+        }
     }
 }
