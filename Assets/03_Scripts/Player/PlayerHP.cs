@@ -11,6 +11,8 @@ public class PlayerHP : MonoBehaviour, IDamageable
     private readonly float MAX_HP = 100f;
 
     private PlayerStateManager playerStateManager;
+    private bool isDead = false;
+    
     public float MaxHP => maxHP;
     public float CurrentHP => currentHP;
 
@@ -62,8 +64,35 @@ public class PlayerHP : MonoBehaviour, IDamageable
         Debug.Log($"최대 HP가 {maxHP - previousMaxHP}만큼 증가했습니다. 새로운 최대 HP: {maxHP}");
     }
 
+    // 체력 초기화 (부활 시 사용)
+    public void ResetHealth()
+    {
+        currentHP = maxHP;
+        isDead = false; // 사망 상태 초기화
+        Debug.Log($"플레이어 체력 초기화: {currentHP}/{maxHP}");
+        
+        // 체력바 UI 업데이트
+        PlayerUI.Instance?.SetHealthBar(maxHP, currentHP);
+    }
+
     private void Die()
     {
+        // 이미 사망 상태면 중복 처리 방지
+        if (isDead) return;
+        
+        isDead = true;
         Debug.Log("플레이어가 사망했습니다.");
+        
+        // 사망 상태로 전환
+        if (playerStateManager != null)
+        {
+            playerStateManager.ChangeState(PlayerStateType.Death);
+        }
+        
+        // GameManager에 사망 알림
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.PlayerDied(gameObject);
+        }
     }
 }

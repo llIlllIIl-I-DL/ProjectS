@@ -18,7 +18,7 @@ public class TestDamage : MonoBehaviour
                 Debug.LogWarning("PlayerMovement를 찾을 수 없습니다. F키 기능이 작동하지 않을 수 있습니다.");
             }
         }
-        
+
         // PlayerHP가 할당되지 않았다면 자동으로 찾아보기
         if (playerHP == null)
         {
@@ -55,24 +55,6 @@ public class TestDamage : MonoBehaviour
             // PlayerHP 클래스의 IncreaseMaxHP 메서드를 호출하여 최대 HP를 증가시킵니다.
             Debug.Log("최대 HP 증가 10");
         }
-        if (Input.GetKeyDown(KeyCode.F) && playerMovement != null)
-        {
-            playerMovement.ActivateJetpack(); // 제트팩 활성화
-            Debug.Log("제트팩 활성화");
-        }
-        
-        // R 키 - 제트팩 쿨타임 리셋
-        if (Input.GetKeyDown(KeyCode.R) && playerMovement != null)
-        {
-            playerMovement.ResetJetpackCooldown();
-            Debug.Log("제트팩 쿨타임 리셋됨");
-        }
-        
-        // X 키 - 제트팩 비활성화
-        if (Input.GetKeyDown(KeyCode.X) && playerMovement != null)
-        {
-            playerMovement.DeactivateJetpack();
-            Debug.Log("제트팩 강제 비활성화");
-        }
     }
+
 }

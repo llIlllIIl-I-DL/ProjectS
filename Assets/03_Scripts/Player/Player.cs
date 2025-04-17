@@ -14,9 +14,6 @@ public class Player : MonoBehaviour
     private PlayerStateManager stateManager;
     private PlayerAnimator playerAnimator;
 
-    // 윙슈트 관련 상태
-    private bool isJetpackActive = false;
-
     private void Awake()
     {
         // 필요한 컴포넌트 추가
@@ -31,12 +28,6 @@ public class Player : MonoBehaviour
             inputHandler.OnSprintActivated += HandleSprint;
             inputHandler.OnWingsuitActivated += HandleWingsuitToggle;
         }
-        
-        if (movement != null)
-        {
-            movement.OnJetpackActivated += HandleJetpackActivated;
-            movement.OnJetpackDeactivated += HandleJetpackDeactivated;
-        }
     }
 
     private void OnDisable()
@@ -46,12 +37,6 @@ public class Player : MonoBehaviour
         {
             inputHandler.OnSprintActivated -= HandleSprint;
             inputHandler.OnWingsuitActivated -= HandleWingsuitToggle;
-        }
-        
-        if (movement != null)
-        {
-            movement.OnJetpackActivated -= HandleJetpackActivated;
-            movement.OnJetpackDeactivated -= HandleJetpackDeactivated;
         }
     }
     
@@ -75,54 +60,8 @@ public class Player : MonoBehaviour
         }
     }
     
-    // 제트팩 활성화 이벤트 처리
-    private void HandleJetpackActivated()
-    {
-        isJetpackActive = true;
-        
-        // 애니메이션 업데이트
-        if (playerAnimator != null)
-        {
-            // playerAnimator.SetJetpackActive(true);
-            Debug.Log("제트팩 모드 활성화!");
-        }
-        
-        // 상태 매니저 업데이트
-        if (stateManager != null)
-        {
-            // 필요하다면 새로운 상태 추가 (PlayerStateType.Jetpack)
-            // stateManager.ChangeState(PlayerStateType.Jetpack);
-        }
-    }
-    
-    // 제트팩 비활성화 이벤트 처리
-    private void HandleJetpackDeactivated()
-    {
-        isJetpackActive = false;
-        
-        // 애니메이션 업데이트
-        if (playerAnimator != null)
-        {
-            // playerAnimator.SetJetpackActive(false);
-            Debug.Log("제트팩 모드 비활성화!");
-        }
-        
-        // 상태 매니저 업데이트 (공중이면 Falling, 지상이면 Idle)
-        if (stateManager != null && collisionDetector != null)
-        {
-            if (collisionDetector.IsGrounded)
-            {
-                stateManager.ChangeState(PlayerStateType.Idle);
-            }
-            else
-            {
-                stateManager.ChangeState(PlayerStateType.Falling);
-            }
-        }
-    }
-    
     // 윙슈트 장착/해제 메서드 (외부에서 호출 가능)
-    public void EquipWingsuit(bool equip)
+    /*public void EquipWingsuit(bool equip)
     {
         hasWingsuit = equip;
         if (movement != null)
@@ -131,7 +70,7 @@ public class Player : MonoBehaviour
         }
         
         Debug.Log(equip ? "윙슈트 장착!" : "윙슈트 해제!");
-    }
+    }*/
 
     private void HandleSprint()
     {

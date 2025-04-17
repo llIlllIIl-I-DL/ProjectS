@@ -3,25 +3,33 @@ using UnityEngine;
 
 public class WingSuitEffect : CostumeEffectBase
 {
-    public float hoverForce = 100f;  // 더 큰 힘으로 증가
-    public float hoverDuration = 5f;  // 더 긴 지속 시간
+    public float hoverForce = 3f;  // 더 큰 힘으로 증가
+    public float hoverDuration = 2.5f;  // 더 긴 지속 시간
     public float energyCostPerSecond = 10f;
     
     [Header("물리 설정")]
     public float normalGravityScale = 1f;     // 일반 중력 스케일
-    public float hoverGravityScale = 0.3f;    // 부양 중 중력 스케일
+    public float hoverGravityScale = 0f;      // 부양 중 무중력 (0)으로 변경
+    public float wingsuitGravityScale = 0.3f;  // 기존 윙슈트 모드의 중력 스케일
+    
+    [Header("더블 탭 설정")]
+    public float doubleTapTimeThreshold = 0.3f; // 더블 탭 인식 시간 임계값
     
     [Header("디버그 옵션")]
     public bool showDebugInfo = true;
-    public KeyCode hoverKey = KeyCode.J;
 
     private bool isHovering;
+    private bool isWingsuitActive;            // 기존 윙슈트 모드 활성화 상태
     private float hoverTimeRemaining;
     private Rigidbody2D playerRb;
     private PlayerMovement playerMovement;
     private float debugTimer = 0f;
     private GUIStyle debugStyle;
     private float originalGravityScale;
+    
+    // 더블 탭 감지용 변수
+    private float lastUpKeyPressTime = 0f;
+    private bool upKeyWasPressed = false;
 
     private void Awake()
     {
@@ -65,8 +73,11 @@ public class WingSuitEffect : CostumeEffectBase
     {
         Debug.Log("WingSuitEffect 비활성화됨");
         isHovering = false;
+        isWingsuitActive = false;
         // 중력 스케일 복원
         RestoreGravity();
+        // 플레이어 이동 제한 해제
+        EnableVerticalMovement();
         this.enabled = false;
     }
 
@@ -100,8 +111,11 @@ public class WingSuitEffect : CostumeEffectBase
             return;
         }
 
-        // 입력 확인 (J 키)
-        HandleInput();
+        // 더블 탭 입력 처리
+        HandleDoubleTapInput();
+
+        // C키 입력 처리 (기존 윙슈트 모드)
+        HandleWingsuitInput();
         
         // 부양 상태 업데이트
         UpdateHoverState();
@@ -122,54 +136,182 @@ public class WingSuitEffect : CostumeEffectBase
         }
     }
 
-    private void HandleInput()
+    private void HandleWingsuitInput()
     {
-        // 키가 눌렸고, 부양 시간이 남아있으면 부양 시작
-        if (Input.GetKeyDown(hoverKey) && hoverTimeRemaining > 0)
+        // C키가 눌렸고 호버링 중이 아닌 경우 기존 윙슈트 모드 활성화
+        if (Input.GetKeyDown(KeyCode.C) && !isHovering && hoverTimeRemaining > 0)
         {
-            isHovering = true;
-            
-            // 부양 시작 시 중력 스케일 변경
-            if (playerRb != null)
-            {
-                playerRb.gravityScale = hoverGravityScale;
-                Debug.Log($"부양 시작 - 중력 스케일 변경: {normalGravityScale} -> {hoverGravityScale}");
-            }
-            
-            Debug.Log($"Hovering 활성화: 남은 시간 = {hoverTimeRemaining:F1}초");
+            StartWingsuit();
         }
         
-        // 키를 누르고 있고, 이미 부양 중이고, 시간이 남아있으면 부양 유지
-        else if (Input.GetKey(hoverKey) && isHovering && hoverTimeRemaining > 0)
+        // C키를 계속 누르고 있으면 윙슈트 모드 유지
+        if (Input.GetKey(KeyCode.C) && isWingsuitActive && hoverTimeRemaining > 0)
         {
-            // 이미 부양 중이므로 상태 유지
+            // 이미 활성화되어 있으므로 유지
             if (debugTimer > 0.5f)
             {
-                Debug.Log($"Hovering 유지 중: 남은 시간 = {hoverTimeRemaining:F1}초");
+                Debug.Log($"윙슈트 모드 유지 중: 남은 시간 = {hoverTimeRemaining:F1}초");
                 debugTimer = 0f;
             }
         }
-
-        // 키가 떨어지면 부양 종료
-        if (Input.GetKeyUp(hoverKey) && isHovering)
+        
+        // C키를 떼면 윙슈트 모드 종료
+        if (Input.GetKeyUp(KeyCode.C) && isWingsuitActive)
         {
-            isHovering = false;
+            StopWingsuit();
+        }
+    }
+
+    private void HandleDoubleTapInput()
+    {
+        // 이미 윙슈트 모드가 활성화되어 있으면 호버링 시작하지 않음
+        if (isWingsuitActive)
+            return;
             
-            // 부양 종료 시 중력 스케일 복원
-            if (playerRb != null)
+        // 위쪽 방향키 감지
+        bool upKeyDown = Input.GetKeyDown(KeyCode.UpArrow);
+        
+        // 더블 탭 감지 로직
+        if (upKeyDown)
+        {
+            float currentTime = Time.time;
+            
+            // 이전에 위쪽 키가 눌렸고, 시간 임계값 내에 다시 눌렸다면 더블 탭으로 인식
+            if (upKeyWasPressed && (currentTime - lastUpKeyPressTime) < doubleTapTimeThreshold)
             {
-                playerRb.gravityScale = normalGravityScale;
-                Debug.Log($"부양 종료 - 중력 스케일 복원: {hoverGravityScale} -> {normalGravityScale}");
+                // 호버링 상태가 아니고 부양 시간이 남아있으면 호버링 시작
+                if (!isHovering && hoverTimeRemaining > 0)
+                {
+                    StartHovering();
+                }
+                // 더블 탭 상태 초기화
+                upKeyWasPressed = false;
             }
+            else
+            {
+                // 첫 번째 탭 기록
+                upKeyWasPressed = true;
+                lastUpKeyPressTime = currentTime;
+            }
+        }
+        
+        // 호버링 중 다시 더블 탭하면 호버링 종료
+        if (isHovering && upKeyDown)
+        {
+            float currentTime = Time.time;
+            if (upKeyWasPressed && (currentTime - lastUpKeyPressTime) < doubleTapTimeThreshold)
+            {
+                StopHovering();
+                upKeyWasPressed = false;
+            }
+            else
+            {
+                upKeyWasPressed = true;
+                lastUpKeyPressTime = currentTime;
+            }
+        }
+        
+        // 더블 탭 감지 시간 초과 시 상태 초기화
+        if (upKeyWasPressed && (Time.time - lastUpKeyPressTime) > doubleTapTimeThreshold)
+        {
+            upKeyWasPressed = false;
+        }
+    }
+
+    private void StartWingsuit()
+    {
+        isWingsuitActive = true;
+        
+        // 윙슈트 시작 시 중력 스케일 변경
+        if (playerRb != null)
+        {
+            playerRb.gravityScale = wingsuitGravityScale;
+            Debug.Log($"윙슈트 모드 시작 - 중력 스케일 변경: {normalGravityScale} -> {wingsuitGravityScale}");
+        }
+        
+        Debug.Log($"윙슈트 모드 활성화: 남은 시간 = {hoverTimeRemaining:F1}초");
+    }
+
+    private void StopWingsuit()
+    {
+        isWingsuitActive = false;
+        
+        // 윙슈트 종료 시 중력 스케일 복원
+        if (playerRb != null)
+        {
+            playerRb.gravityScale = normalGravityScale;
+            Debug.Log($"윙슈트 모드 종료 - 중력 스케일 복원: {wingsuitGravityScale} -> {normalGravityScale}");
+        }
+        
+        Debug.Log("윙슈트 모드 종료");
+    }
+
+    private void StartHovering()
+    {
+        // 윙슈트 모드가 활성화되어 있으면 먼저 종료
+        if (isWingsuitActive)
+        {
+            StopWingsuit();
+        }
+        
+        isHovering = true;
+        
+        // 부양 시작 시 중력 스케일 변경 (무중력)
+        if (playerRb != null)
+        {
+            // 수직 속도 초기화 (관성 제거)
+            Vector2 velocity = playerRb.velocity;
+            velocity.y = 0;
+            playerRb.velocity = velocity;
             
-            Debug.Log("키를 뗌 - Hovering 종료");
+            // 무중력 설정
+            playerRb.gravityScale = hoverGravityScale;
+            Debug.Log($"부양 시작 - 무중력 상태로 변경: {normalGravityScale} -> {hoverGravityScale}");
+        }
+        
+        // 수직 이동 제한 설정
+        DisableVerticalMovement();
+        
+        Debug.Log($"Hovering 활성화: 남은 시간 = {hoverTimeRemaining:F1}초");
+    }
+
+    private void StopHovering()
+    {
+        isHovering = false;
+        
+        // 부양 종료 시 중력 스케일 복원
+        if (playerRb != null)
+        {
+            playerRb.gravityScale = normalGravityScale;
+            Debug.Log($"부양 종료 - 중력 스케일 복원: {hoverGravityScale} -> {normalGravityScale}");
+        }
+        
+        // 수직 이동 제한 해제
+        EnableVerticalMovement();
+        
+        Debug.Log("Hovering 종료");
+    }
+
+    private void DisableVerticalMovement()
+    {
+        if (playerMovement != null)
+        {
+            Debug.Log("수직 이동 제한 설정됨 - 좌우 이동만 가능");
+        }
+    }
+
+    private void EnableVerticalMovement()
+    {
+        if (playerMovement != null)
+        {
+            Debug.Log("수직 이동 제한 해제됨");
         }
     }
 
     private void UpdateHoverState()
     {
-        // 부양 중이면 에너지 소모 및 시간 감소
-        if (isHovering)
+        // 부양 또는 윙슈트 모드 중이면 에너지 소모 및 시간 감소
+        if (isHovering || isWingsuitActive)
         {
             float energyCost = energyCostPerSecond * Time.deltaTime;
 
@@ -180,16 +322,19 @@ public class WingSuitEffect : CostumeEffectBase
                 if (hoverTimeRemaining <= 0)
                 {
                     hoverTimeRemaining = 0;
-                    isHovering = false;
                     
-                    // 시간 소진으로 부양 종료 시 중력 스케일 복원
-                    if (playerRb != null)
+                    // 시간이 다 되면 호버링과 윙슈트 모드 모두 종료
+                    if (isHovering)
                     {
-                        playerRb.gravityScale = normalGravityScale;
-                        Debug.Log($"시간 소진으로 부양 종료 - 중력 스케일 복원: {hoverGravityScale} -> {normalGravityScale}");
+                        StopHovering();
+                        Debug.Log("부양 시간 소진으로 Hovering 종료");
                     }
                     
-                    Debug.Log("부양 시간 소진으로 Hovering 종료");
+                    if (isWingsuitActive)
+                    {
+                        StopWingsuit();
+                        Debug.Log("부양 시간 소진으로 윙슈트 모드 종료");
+                    }
                 }
             }
         }
@@ -209,7 +354,7 @@ public class WingSuitEffect : CostumeEffectBase
         // 1초마다 상태 로그 출력
         if (debugTimer > 1f)
         {
-            Debug.Log($"WingSuitEffect 상태: isHovering={isHovering}, hoverTimeRemaining={hoverTimeRemaining:F1}, 현재 중력 스케일={playerRb?.gravityScale}");
+            Debug.Log($"WingSuitEffect 상태: isHovering={isHovering}, isWingsuit={isWingsuitActive}, hoverTimeRemaining={hoverTimeRemaining:F1}, 현재 중력 스케일={playerRb?.gravityScale}");
             debugTimer = 0f;
         }
     }
@@ -218,7 +363,20 @@ public class WingSuitEffect : CostumeEffectBase
     {
         if (isHovering && playerRb != null)
         {
-            // 중력에 반하는 힘 적용 (Force 대신 Impulse 사용)
+            // 호버링 중에는 좌우 이동만 가능하도록 수직 속도 제어
+            Vector2 velocity = playerRb.velocity;
+            velocity.y = 0; // 수직 속도를 0으로 유지
+            playerRb.velocity = velocity;
+            
+            if (debugTimer > 0.2f)
+            {
+                Debug.Log($"호버링 중: 현재 속도={playerRb.velocity}, 현재 위치={playerRb.transform.position.y:F1}");
+                debugTimer = 0f;
+            }
+        }
+        else if (isWingsuitActive && playerRb != null)
+        {
+            // 윙슈트 모드에서는 중력에 반하는 힘 적용
             Vector2 force = Vector2.up * hoverForce;
             
             // 중력 설정 확인
@@ -238,7 +396,7 @@ public class WingSuitEffect : CostumeEffectBase
             
             if (debugTimer > 0.2f)
             {
-                Debug.Log($"부양 힘 적용: {force.y:F1}, 설정된 hoverForce: {hoverForce}, 중력 스케일: {gravityScale}, 실제 중력: {gravityForce}");
+                Debug.Log($"윙슈트 모드: 부양 힘 적용={force.y:F1}, 중력 스케일={gravityScale}, 실제 중력={gravityForce}");
                 Debug.Log($"현재 속도: {playerRb.velocity.y:F1}, 현재 위치: {playerRb.transform.position.y:F1}");
                 debugTimer = 0f;
             }
@@ -256,7 +414,9 @@ public class WingSuitEffect : CostumeEffectBase
     {
         // 중력 스케일 복원
         RestoreGravity();
-        Debug.Log("WingSuitEffect 비활성화로 중력 스케일 복원");
+        // 수직 이동 제한 해제
+        EnableVerticalMovement();
+        Debug.Log("WingSuitEffect 비활성화로 중력 스케일 복원 및 이동 제한 해제");
     }
     
     private void OnGUI()
@@ -273,10 +433,23 @@ public class WingSuitEffect : CostumeEffectBase
     // 현재 상태 정보를 문자열로 반환
     public string GetStatusText()
     {
-        return $"WingSuit 상태: {(isHovering ? "활성화됨" : "비활성화됨")}\n" +
-               $"남은 시간: {hoverTimeRemaining:F1}/{hoverDuration:F1}초\n" +
-               $"부양 힘: {hoverForce}\n" +
+        string statusText = "";
+        
+        if (isHovering)
+        {
+            statusText = "윙슈트 상태: 호버링 중 (무중력)";
+        }
+        else if (isWingsuitActive)
+        {
+            statusText = "윙슈트 상태: 윙슈트 모드 (낙하 지연)";
+        }
+        else
+        {
+            statusText = "윙슈트 상태: 비활성화";
+        }
+        
+        return statusText + $"\n남은 시간: {hoverTimeRemaining:F1}/{hoverDuration:F1}초\n" +
                $"중력 스케일: {(playerRb != null ? playerRb.gravityScale.ToString("F2") : "N/A")}\n" +
-               $"조작: {hoverKey} 키를 눌러 부양";
+               "조작: 위쪽 화살표 더블 탭 = 호버링, C키 = 윙슈트 모드";
     }
 }
