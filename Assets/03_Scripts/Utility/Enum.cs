@@ -11,7 +11,6 @@ public enum PlayerStateType
     Hit,
     Crouching,
     CrouchWalking,
-    Climbing
-
-    
+    Climbing,
+    Death
 }

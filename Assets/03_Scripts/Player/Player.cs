@@ -5,6 +5,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] private PlayerSettings settings;
+    [SerializeField] private bool hasWingsuit = false; // 윙슈트 장착 여부
 
     // 필수 컴포넌트들
     private PlayerInputHandler inputHandler;
@@ -25,6 +26,7 @@ public class Player : MonoBehaviour
         if (inputHandler != null)
         {
             inputHandler.OnSprintActivated += HandleSprint;
+            inputHandler.OnWingsuitActivated += HandleWingsuitToggle;
         }
     }
 
@@ -34,8 +36,41 @@ public class Player : MonoBehaviour
         if (inputHandler != null)
         {
             inputHandler.OnSprintActivated -= HandleSprint;
+            inputHandler.OnWingsuitActivated -= HandleWingsuitToggle;
         }
     }
+    
+    private void Start()
+    {
+        // 윙슈트 상태 초기화
+        if (movement != null)
+        {
+            movement.HasWingsuit = hasWingsuit;
+        }
+    }
+    
+    // 윙슈트 토글 처리
+    private void HandleWingsuitToggle()
+    {
+        if (!hasWingsuit) return;
+        
+        if (movement != null)
+        {
+            movement.CheckUpKeyDoubleTap();
+        }
+    }
+    
+    // 윙슈트 장착/해제 메서드 (외부에서 호출 가능)
+    /*public void EquipWingsuit(bool equip)
+    {
+        hasWingsuit = equip;
+        if (movement != null)
+        {
+            movement.HasWingsuit = equip;
+        }
+        
+        Debug.Log(equip ? "윙슈트 장착!" : "윙슈트 해제!");
+    }*/
 
     private void HandleSprint()
     {

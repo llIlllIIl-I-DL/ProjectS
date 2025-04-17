@@ -10,9 +10,12 @@ public class PlayerMovement : MonoBehaviour
 
     // 상태 플래그
     private bool isSprinting = false;
-
+    private bool hasWingsuit = true;
+    
     public int FacingDirection => facingDirection;
     public Vector2 Velocity => rb.velocity;
+    
+    public bool HasWingsuit { get => hasWingsuit; set => hasWingsuit = value; }
 
     public event System.Action<int> OnDirectionChanged;
     public event System.Action OnDashEnd;
@@ -21,6 +24,11 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+    }
+    
+    private void Update()
+    {
+        // 제트팩 관련 코드 제거
     }
 
     public void Move(Vector2 moveDirection, bool sprint = false)
@@ -58,6 +66,14 @@ public class PlayerMovement : MonoBehaviour
 
         rb.AddForce(movement * Vector2.right);
     }
+    
+    // Player.cs 스크립트와의 호환성을 위한 더미 메서드
+    public void CheckUpKeyDoubleTap()
+    {
+        // 제트팩 기능이 제거되어 비어있는 메서드
+        Debug.Log("제트팩 기능이 제거되었습니다.");
+    }
+    
     public Rigidbody2D GetRigidbody()
     {
         return rb;
@@ -72,6 +88,7 @@ public class PlayerMovement : MonoBehaviour
             rb.velocity += Vector2.up * Physics2D.gravity.y * (multiplier - 1) * Time.deltaTime;
         }
     }
+    
     private void ApplyFriction()
     {
         // 속도가 매우 작으면 완전히 멈춤
@@ -140,6 +157,9 @@ public class PlayerMovement : MonoBehaviour
 
     public void WallSlide(float slideSpeed, bool fastSlide = false)
     {
+        // 벽 슬라이딩 디버그 로그 추가
+        Debug.Log($"벽 슬라이딩 실행 중: 속도={slideSpeed}, 빠른 슬라이딩={fastSlide}");
+        
         float targetSpeed = fastSlide ? -settings.wallFastSlideSpeed : -settings.wallSlideSpeed;
 
         if (rb.velocity.y < targetSpeed)
@@ -155,6 +175,9 @@ public class PlayerMovement : MonoBehaviour
 
     public void WallJump(float force, Vector2 direction)
     {
+        // 벽 점프 디버그 로그 추가
+        Debug.Log($"벽 점프 실행: 힘={force}, 방향=({-facingDirection * direction.x}, {direction.y})");
+        
         rb.velocity = Vector2.zero;
         rb.AddForce(new Vector2(-facingDirection * direction.x, direction.y) * force, ForceMode2D.Impulse);
         StartCoroutine(DisableMovement(0.2f));

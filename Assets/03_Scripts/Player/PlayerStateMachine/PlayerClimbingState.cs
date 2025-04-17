@@ -21,7 +21,6 @@ public class PlayerClimbingState : PlayerStateBase
 
     // 사다리 진입/진출 감지 관련 변수
     private bool isExitingLadder = false;
-    private float ladderExitTimer = 0f;
     private const float LADDER_EXIT_DELAY = 0.1f; // 사다리에서 나가는 딜레이
     
     // 아래에서 사다리 진입 관련 변수 추가
