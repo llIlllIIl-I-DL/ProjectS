@@ -191,6 +191,10 @@ public class PlayerUI : Singleton<PlayerUI>
     }
 
 
+
+
+
+
     public void BeforeAddItem(AttributeTypeData attributeType)
     {
         if (!TypeItemDic.ContainsKey(attributeType))
