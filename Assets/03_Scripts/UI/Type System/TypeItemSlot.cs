@@ -10,6 +10,9 @@ public class TypeItemSlot : MonoBehaviour
     //처음에는 무조건 normal슬롯이 플레이어의 속성이 됨, 혼자만 ui내에서 활성화.
     //속성 먹었을 때 해당 슬롯 활성화. color.white로...
 
+    //인스펙터는 에디터 상에서
+    //start는 런타임에서
+
 
     [SerializeField] public TextMeshProUGUI typeName;
     [SerializeField] public Image typeIcon;
@@ -17,12 +20,6 @@ public class TypeItemSlot : MonoBehaviour
     [SerializeField] public AttributeTypeData attributeTypeData;
 
     private int slotIndex = 0;
-
-    public void Start()
-    {
-        attributeTypeData = new AttributeTypeData();
-    }
-
 
 
     /*
