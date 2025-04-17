@@ -7,6 +7,7 @@ public class CollisionDetector : MonoBehaviour
     [SerializeField] private LayerMask wallLayer;
     [SerializeField] private LayerMask ladderLayer;
     [SerializeField] private bool showDebugRays = true;
+    [SerializeField] private float wallCheckDistance = 0.3f;
 
     private BoxCollider2D boxCollider;
     private int facingDirection = 1;
@@ -44,6 +45,7 @@ public class CollisionDetector : MonoBehaviour
         if (wasTouchingWall != IsTouchingWall)
         {
             OnWallTouchChanged?.Invoke(IsTouchingWall);
+            Debug.Log($"벽 접촉 상태 변경: {IsTouchingWall}");
         }
 
         if (wasOnLadder != IsOnLadder)
@@ -55,6 +57,7 @@ public class CollisionDetector : MonoBehaviour
     public void SetFacingDirection(int direction)
     {
         facingDirection = direction;
+        Debug.Log($"방향이 변경되었습니다: {facingDirection}");
     }
 
     private bool CheckIsGrounded()
@@ -87,47 +90,36 @@ public class CollisionDetector : MonoBehaviour
 
     private bool CheckIsTouchingWall()
     {
-        RaycastHit2D hit = Physics2D.BoxCast(
-            boxCollider.bounds.center,
-            new Vector2(0.2f, boxCollider.bounds.size.y * 0.8f),
-            0f,
-            new Vector2(facingDirection, 0),
-            0.3f,
-            wallLayer
-        );
-
-        if (hit.collider != null)
-        {
-            Debug.Log($"벽 감지됨! collider={hit.collider.name}, 거리={hit.distance}");
-        }
-
+        Vector2 rayOriginTop = boxCollider.bounds.center + new Vector3(0, boxCollider.bounds.extents.y * 0.7f, 0);
+        Vector2 rayOriginMiddle = boxCollider.bounds.center;
+        Vector2 rayOriginBottom = boxCollider.bounds.center - new Vector3(0, boxCollider.bounds.extents.y * 0.7f, 0);
+        
+        Vector2 rayDirection = new Vector2(facingDirection, 0);
+        
+        RaycastHit2D hitTop = Physics2D.Raycast(rayOriginTop, rayDirection, wallCheckDistance, wallLayer);
+        RaycastHit2D hitMiddle = Physics2D.Raycast(rayOriginMiddle, rayDirection, wallCheckDistance, wallLayer);
+        RaycastHit2D hitBottom = Physics2D.Raycast(rayOriginBottom, rayDirection, wallCheckDistance, wallLayer);
+        
         if (showDebugRays)
         {
-            Color rayColor = hit.collider != null ? Color.green : Color.blue;
-
-            Debug.DrawRay(
-                boxCollider.bounds.center + new Vector3(boxCollider.bounds.extents.x * facingDirection, boxCollider.bounds.extents.y * 0.8f, 0),
-                new Vector3(0.3f * facingDirection, 0, 0),
-                rayColor,
-                0.1f
-            );
-
-            Debug.DrawRay(
-                boxCollider.bounds.center + new Vector3(boxCollider.bounds.extents.x * facingDirection, 0, 0),
-                new Vector3(0.3f * facingDirection, 0, 0),
-                rayColor,
-                0.1f
-            );
-
-            Debug.DrawRay(
-                boxCollider.bounds.center + new Vector3(boxCollider.bounds.extents.x * facingDirection, -boxCollider.bounds.extents.y * 0.8f, 0),
-                new Vector3(0.3f * facingDirection, 0, 0),
-                rayColor,
-                0.1f
-            );
+            Color rayColorTop = hitTop.collider != null ? Color.green : Color.blue;
+            Color rayColorMiddle = hitMiddle.collider != null ? Color.green : Color.blue;
+            Color rayColorBottom = hitBottom.collider != null ? Color.green : Color.blue;
+            
+            Debug.DrawRay(rayOriginTop, rayDirection * wallCheckDistance, rayColorTop);
+            Debug.DrawRay(rayOriginMiddle, rayDirection * wallCheckDistance, rayColorMiddle);
+            Debug.DrawRay(rayOriginBottom, rayDirection * wallCheckDistance, rayColorBottom);
         }
-
-        return hit.collider != null;
+        
+        if (hitTop.collider != null || hitMiddle.collider != null || hitBottom.collider != null)
+        {
+            string hitObjectName = (hitTop.collider != null) ? hitTop.collider.name : 
+                                  (hitMiddle.collider != null) ? hitMiddle.collider.name : 
+                                  (hitBottom.collider != null) ? hitBottom.collider.name : "알 수 없음";
+            Debug.Log($"벽 감지됨! 충돌체: {hitObjectName}, 방향: {facingDirection}");
+        }
+        
+        return hitTop.collider != null || hitMiddle.collider != null || hitBottom.collider != null;
     }
 
     private bool CheckIsOnLadder()

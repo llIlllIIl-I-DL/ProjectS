@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
-public class PlayerUI : Singleton<PlayerUI> 
+public class PlayerUI : Singleton<PlayerUI>
 {
     [Header("HP 바")]
     [SerializeField] private Scrollbar healthBar;
@@ -12,21 +13,26 @@ public class PlayerUI : Singleton<PlayerUI>
 
     [SerializeField] private int healHP;
 
-
-    [Header("HP 바 기능 테스트를 위한 임시 버튼")]
-    //[SerializeField] public Button damageButton;
-    [SerializeField] public Button healButton;
-
     [Header("HP 바 깨짐")]
     [SerializeField] public GameObject Basic;
     [SerializeField] public GameObject Hurt;
     [SerializeField] public GameObject VeryHurt;
     [SerializeField] public GameObject killme;
 
-    private PlayerHP playerHP;
-
     public float shakeTime;
     public float shakeRange;
+
+    [Header("플레이어 속성 아이콘 업데이트")]
+    [SerializeField] public AttributeTypeData attributeType;
+    [SerializeField] public TextMeshProUGUI typeName;
+    [SerializeField] public Image typeIcon;
+
+    static PlayerHP playerHP;
+    public TypeItemSlotList typeItemSlotList;
+
+    static int currentTypeIndex = 0;
+
+    public Dictionary<AttributeTypeData, Sprite> TypeItemDic = new Dictionary<AttributeTypeData, Sprite>();
 
     public void Start()
     {
@@ -39,32 +45,12 @@ public class PlayerUI : Singleton<PlayerUI>
         Debug.Log($"{realPosition}");
 
         healthBarImage.fillAmount = 1f;
-
-        //damageButton.onClick.AddListener(KillEmAll);
-        //healButton.onClick.AddListener(() => Voscuro(realPosition, maxHP, currentHP));
     }
 
     public void Voscuro(Vector3 realPosition, float maxHP, float currentHP)
     {
-        //SetHealthBar(maxHP, currentHP);
         HealHP();
     }
-
-    /*
-    public void KillEmAll()
-    {
-        currentHP -= giveDamage;
-
-
-        if (currentHP < 0)
-        {
-            currentHP = 0;
-        }
-
-        SetHealthBar();
-        StartCoroutine(ShakingHPBar());
-    }
-    */
 
     public void SetHealthBar(float maxHP, float currentHP)
     {
@@ -139,7 +125,7 @@ public class PlayerUI : Singleton<PlayerUI>
 
 
         healthBar.transform.position = new Vector3(realPosition.x, realPosition.y, realPosition.z);
-        
+
 
         if (currentHP > maxHP)
         {
@@ -162,5 +148,16 @@ public class PlayerUI : Singleton<PlayerUI>
         }
 
         healLight.color = new Color32(255, 255, 255, 0);
+    }
+
+    public void MovetoLeftType()
+    {
+            Debug.Log("왼발 왼발왼발왼발~");
+            Debug.Log(TypeItemDic.Count);
+    }
+
+    public void MovetoRightType()
+    {
+        Debug.Log("오른발 오른발 오른발 오른발");
     }
 }

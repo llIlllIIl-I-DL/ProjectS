@@ -23,8 +23,10 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
     // 더블 탭 관련
     private float lastLeftTapTime;
     private float lastRightTapTime;
+    private float lastUpTapTime;
     public bool LeftDoubleTapped { get; private set; }
     public bool RightDoubleTapped { get; private set; }
+    public bool UpDoubleTapped { get; private set; }
 
     // 이벤트
     public event Action<bool> OnJumpInput;
@@ -33,6 +35,7 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
     public event Action OnSprintActivated;
     public event Action OnAttackInput;
     public event Action OnCrouchInput;
+    public event Action OnWingsuitActivated;
 
     private Vector2 moveDirection;
     public Vector2 MoveDirection => moveDirection;
@@ -103,6 +106,12 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
         {
             RightDoubleTapped = false;
         }
+        
+        // 위쪽 방향키 더블 탭 만료 체크
+        if (currentTime - lastUpTapTime > doubleTapTime)
+        {
+            UpDoubleTapped = false;
+        }
     }
 
     // PlayerInput.IPlayerActions 인터페이스 구현
@@ -115,6 +124,7 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
             // 이전 상태 저장
             bool wasLeftPressed = IsLeftPressed;
             bool wasRightPressed = IsRightPressed;
+            bool wasUpPressed = IsUpPressed;
 
             // 입력 상태 업데이트
             IsLeftPressed = inputVector.x < -0.1f;
@@ -145,6 +155,18 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
                     OnSprintActivated?.Invoke();
                 }
                 lastRightTapTime = Time.time;
+            }
+            
+            if (!wasUpPressed && IsUpPressed)
+            {
+                float timeSinceLastTap = Time.time - lastUpTapTime;
+                if (timeSinceLastTap <= doubleTapTime)
+                {
+                    UpDoubleTapped = true;
+                    Debug.Log("위쪽 방향키 더블 탭 감지! 윙슈트 모드 전환!");
+                    OnWingsuitActivated?.Invoke();
+                }
+                lastUpTapTime = Time.time;
             }
         }
     }
@@ -193,6 +215,26 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
         {
             Debug.Log("앉기 입력 감지");
             OnCrouchInput?.Invoke();
+        }
+    }
+
+    public void OnNext(InputAction.CallbackContext context)
+    {
+        // 선택 입력 처리A, S 로 작동
+        PlayerUI.Instance.MovetoLeftType();
+    }
+    public void OnPrev(InputAction.CallbackContext context)
+    {
+        // 선택 입력 처리A, S 로 작동
+        PlayerUI.Instance.MovetoRightType();
+    }
+
+    public void OnSpecialAttack(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            Debug.Log("특수 공격 입력 감지");
+            // 특수 공격 처리
         }
     }
 
