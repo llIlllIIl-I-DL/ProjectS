@@ -17,7 +17,7 @@ public class TypeItemSlot : MonoBehaviour
     [SerializeField] public TextMeshProUGUI typeName;
     [SerializeField] public Image typeIcon;
 
-    [SerializeField] public AttributeTypeData attributeTypeData;
+    [SerializeField] public ItemData attributeTypeData;
 
     private int slotIndex = 0;
 

@@ -23,7 +23,7 @@ public class PlayerUI : Singleton<PlayerUI>
     public float shakeRange;
 
     [Header("플레이어 속성 아이콘 업데이트")]
-    [SerializeField] public AttributeTypeData attributeType;
+    [SerializeField] public ItemData attributeType;
     [SerializeField] public TextMeshProUGUI typeName;
     [SerializeField] public Image typeIcon;
 
@@ -32,7 +32,7 @@ public class PlayerUI : Singleton<PlayerUI>
 
     static int currentTypeIndex = 0;
 
-    public Dictionary<AttributeTypeData, Sprite> TypeItemDic = new Dictionary<AttributeTypeData, Sprite>();
+    public Dictionary<ItemData, Sprite> TypeItemDic = new Dictionary<ItemData, Sprite>();
 
     public void Start()
     {
