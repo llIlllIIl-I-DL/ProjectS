@@ -14,6 +14,9 @@ public class Player : MonoBehaviour
     private PlayerStateManager stateManager;
     private PlayerAnimator playerAnimator;
 
+    [HideInInspector]
+    public AttributeTypeData CurrentattributeTypeData;
+
     private void Awake()
     {
         // 필요한 컴포넌트 추가
