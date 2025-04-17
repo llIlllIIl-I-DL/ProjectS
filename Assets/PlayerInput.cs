@@ -328,11 +328,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Attack.performed += instance.OnAttack;
             @Attack.canceled += instance.OnAttack;
             @Prev.started += instance.OnPrev;
-            @Prev.performed += instance.OnPrev;
-            @Prev.canceled += instance.OnPrev;
             @Next.started += instance.OnNext;
-            @Next.performed += instance.OnNext;
-            @Next.canceled += instance.OnNext;
             @SpecialAttack.started += instance.OnSpecialAttack;
             @SpecialAttack.performed += instance.OnSpecialAttack;
             @SpecialAttack.canceled += instance.OnSpecialAttack;
@@ -353,11 +349,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Attack.performed -= instance.OnAttack;
             @Attack.canceled -= instance.OnAttack;
             @Prev.started -= instance.OnPrev;
-            @Prev.performed -= instance.OnPrev;
-            @Prev.canceled -= instance.OnPrev;
             @Next.started -= instance.OnNext;
-            @Next.performed -= instance.OnNext;
-            @Next.canceled -= instance.OnNext;
             @SpecialAttack.started -= instance.OnSpecialAttack;
             @SpecialAttack.performed -= instance.OnSpecialAttack;
             @SpecialAttack.canceled -= instance.OnSpecialAttack;

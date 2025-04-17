@@ -220,13 +220,22 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
 
     public void OnNext(InputAction.CallbackContext context)
     {
-        // 선택 입력 처리A, S 로 작동
-        PlayerUI.Instance.MovetoLeftType();
+        // 키를 처음 눌렀을 때만(started) 한 번 실행
+        if (context.started)
+        {
+            // 선택 입력 처리A, S 로 작동
+            PlayerUI.Instance.MovetoLeftType();
+        }
     }
+    
     public void OnPrev(InputAction.CallbackContext context)
     {
-        // 선택 입력 처리A, S 로 작동
-        PlayerUI.Instance.MovetoRightType();
+        // 키를 처음 눌렀을 때만(started) 한 번 실행
+        if (context.started)
+        {
+            // 선택 입력 처리A, S 로 작동
+            PlayerUI.Instance.MovetoRightType();
+        }
     }
 
     public void OnSpecialAttack(InputAction.CallbackContext context)
