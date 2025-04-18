@@ -11,7 +11,7 @@ public abstract class BaseObject : MonoBehaviour
     [Header("기본 설정")]
     [SerializeField] protected bool isInteractable = true;
     [SerializeField] protected float interactionRange = 2f;
-    [SerializeField] protected string objectName = "Object";
+    [SerializeField] protected string objectId = "Object";
 
     [Header("사운드")]
     [SerializeField] protected AudioClip interactSound;
@@ -35,6 +35,8 @@ public abstract class BaseObject : MonoBehaviour
     {
         // 추가 초기화 작업
         Initialize();
+        // 오브젝트 매니저에 등록
+        ObjectManager.Instance.RegisterObject(objectId, this);
     }
 
     protected virtual void Update()
@@ -182,7 +184,7 @@ public abstract class BaseObject : MonoBehaviour
     /// </summary>
     public override string ToString()
     {
-        return $"{objectName} (Interactable: {isInteractable})";
+        return $"{objectId} (Interactable: {isInteractable})";
     }
 
     #endregion

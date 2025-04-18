@@ -48,3 +48,7 @@ MonoBehaviour:
   score: 0
   playerLevel: 1
   isGameInitialized: 0
+  maxLives: 3
+  currentLives: 0
+  respawnDelay: 2
+  respawnPoint: {fileID: 0}
