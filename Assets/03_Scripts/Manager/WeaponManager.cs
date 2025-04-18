@@ -18,9 +18,10 @@ public class WeaponManager : Singleton<WeaponManager>
     [Header("차징 공격 설정")]
     [SerializeField] private GameObject chargedBulletPrefab;
     [SerializeField] private float chargedBulletDamage = 20f;
-    [SerializeField] private float chargingTime = 1.0f; // 차지에 필요한 시간
+    [SerializeField] private float chargingTime = 0.7f; // 차지에 필요한 시간
     private bool isCharging = false;
     private float currentChargeTime = 0f;
+    [SerializeField] private bool debugCharging = false; // 디버그용 변수 추가
 
     [Header("과열 공격 설정")]
     [SerializeField] private GameObject overchargeBulletPrefab;
@@ -46,6 +47,20 @@ public class WeaponManager : Singleton<WeaponManager>
             Debug.LogError("WeaponManager: bulletPrefab이 인스펙터에서 할당되지 않았습니다");
         }
 
+        // 차징 공격 프리팹 검사
+        if (chargedBulletPrefab == null)
+        {
+            chargedBulletPrefab = bulletPrefab;
+            Debug.LogWarning("WeaponManager: chargedBulletPrefab이 할당되지 않아 일반 총알로 대체됩니다.");
+        }
+
+        // 과열 공격 프리팹 검사
+        if (overchargeBulletPrefab == null)
+        {
+            overchargeBulletPrefab = bulletPrefab;
+            Debug.LogWarning("WeaponManager: overchargeBulletPrefab이 할당되지 않아 일반 총알로 대체됩니다.");
+        }
+
         // 플레이어 컴포넌트 참조 가져오기
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
@@ -62,6 +77,12 @@ public class WeaponManager : Singleton<WeaponManager>
         {
             currentChargeTime += Time.deltaTime;
             
+            // 디버그 로그 출력 (필요시 활성화)
+            if (debugCharging && currentChargeTime % 0.5f < 0.02f)
+            {
+                Debug.Log($"현재 차징 시간: {currentChargeTime}초");
+            }
+            
             // 차징 단계 로그
             if (currentChargeTime >= chargingTime * 2 && currentChargeTime < chargingTime * 2 + Time.deltaTime)
                 Debug.Log("과열 공격 차징 완료!");
@@ -72,6 +93,8 @@ public class WeaponManager : Singleton<WeaponManager>
 
     public void StartCharging()
     {
+        if (isReloading || currentAmmo <= 0) return; // 재장전 중이거나 탄약이 없으면 차징 불가
+        
         isCharging = true;
         currentChargeTime = 0f;
         Debug.Log("차징 시작 - isCharging: " + isCharging);
@@ -79,12 +102,15 @@ public class WeaponManager : Singleton<WeaponManager>
     
     public void StopCharging()
     {
-        Debug.Log("StopCharging 호출됨 - 현재 isCharging: " + isCharging);
-        // 차징 상태가 아니거나 시간이 매우 짧으면 일반 공격 발사
-        if (!isCharging)
+        Debug.Log("StopCharging 호출됨 - 현재 isCharging: " + isCharging + ", 차징 시간: " + currentChargeTime);
+        
+        // 차징 상태가 아니거나 매우 짧은 클릭은 일반 공격으로 처리
+        if (!isCharging || currentChargeTime < 0.1f)
         {
             Debug.Log("일반 탭 공격 발사!");
             FireWeapon(GetAimDirection());
+            isCharging = false; // 상태 초기화 추가
+            currentChargeTime = 0f; // 시간 초기화 추가
             return;
         }
         
@@ -129,7 +155,7 @@ public class WeaponManager : Singleton<WeaponManager>
         // 차징 시간에 따라 총알 타입 결정
         if (currentChargeTime >= chargingTime * 2)
         {
-            Debug.Log("과열 공격 발사!");
+            Debug.Log("과열 공격 발사! 차징 시간: " + currentChargeTime);
             bulletToSpawn = overchargeBulletPrefab != null ? overchargeBulletPrefab : bulletPrefab;
             damage = overchargeBulletDamage;
             scale = new Vector3(2f, 2f, 2f);
@@ -143,14 +169,14 @@ public class WeaponManager : Singleton<WeaponManager>
         }
         else if (currentChargeTime >= chargingTime)
         {
-            Debug.Log("차징 공격 발사!");
+            Debug.Log("차징 공격 발사! 차징 시간: " + currentChargeTime);
             bulletToSpawn = chargedBulletPrefab != null ? chargedBulletPrefab : bulletPrefab;
             damage = chargedBulletDamage;
             scale = new Vector3(1.5f, 1.5f, 1.5f);
         }
         else
         {
-            Debug.Log("일반 공격 발사!");
+            Debug.Log("일반 공격 발사! 차징 시간: " + currentChargeTime);
             bulletToSpawn = bulletPrefab;
             damage = 10f;
         }

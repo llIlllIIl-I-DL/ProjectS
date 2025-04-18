@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
 {
+    private BaseObject baseObject;
+
     [SerializeField] private float doubleTapTime = 0.5f;
 
     private PlayerInput playerInputs;
@@ -213,7 +215,9 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
         {
             Debug.Log("공격 입력 감지 - 차징 시작");
             IsAttackPressed = true;
+            IsChargingAttack = true;
             OnAttackInput?.Invoke();
+            OnChargeAttackStart?.Invoke();
             
             // 차징 시작
             WeaponManager.Instance.StartCharging();
@@ -222,7 +226,9 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
         {
             Debug.Log("공격 입력 해제 - 발사");
             IsAttackPressed = false;
+            IsChargingAttack = false;
             OnAttackRelease?.Invoke();
+            OnChargeAttackRelease?.Invoke();
             
             // 차징 해제 및 발사
             WeaponManager.Instance.StopCharging();
@@ -266,6 +272,28 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
             // 특수 공격 처리
         }
     }
+
+
+    public void OnInteraction(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            Debug.Log("상호작용 입력 감지");
+
+
+            GameObject interactor = this.gameObject;
+
+            if (baseObject != null)
+            {
+                baseObject.TryInteract(interactor);
+            }
+            else
+            {
+                Debug.LogWarning("BaseObject가 설정되지 않았습니다.");
+            }
+        }
+    }
+
 
     public bool IsMoving()
     {

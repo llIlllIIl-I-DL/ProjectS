@@ -3295,6 +3295,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8565e581de95f93488002f7099a59e66, type: 3}
+--- !u!1 &1476420992 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1276430392115932357, guid: 7128b9b662e14ac4b8c651be37d8aa2d, type: 3}
+  m_PrefabInstance: {fileID: 1891246957}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1524960320 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1774279405096944252, guid: 7128b9b662e14ac4b8c651be37d8aa2d, type: 3}
@@ -5377,7 +5382,7 @@ PrefabInstance:
     - target: {fileID: 3094791353059250708, guid: fd00e2999b7ace24192d61966638e697, type: 3}
       propertyPath: allUIPages.Array.data[3]
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1476420992}
     - target: {fileID: 3094791353059250708, guid: fd00e2999b7ace24192d61966638e697, type: 3}
       propertyPath: allUIPages.Array.data[4]
       value: 
@@ -5503,6 +5508,26 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 519420031}
+    - target: {fileID: 8033034078652405491, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: currentWeapon
+      value: 
+      objectReference: {fileID: 11400000, guid: 16ec1a7a90049be4ebbba5e256b47a3c, type: 2}
+    - target: {fileID: 8033034078652405491, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: availableWeapons.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8033034078652405491, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: availableWeapons.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 16ec1a7a90049be4ebbba5e256b47a3c, type: 2}
+    - target: {fileID: 8033034078652405491, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: elementalBulletPrefabs.Array.data[0]
+      value: 
+      objectReference: {fileID: 6760042265540064826, guid: e4992159c28c2e24ba7b726d9457aee1, type: 3}
+    - target: {fileID: 8033034078652405491, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: elementalBulletPrefabs.Array.data[1]
+      value: 
+      objectReference: {fileID: 6760042265540064826, guid: e3f88664f8a1b864a95a08cf63db4315, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
