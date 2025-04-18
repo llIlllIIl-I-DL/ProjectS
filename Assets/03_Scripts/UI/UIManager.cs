@@ -76,7 +76,6 @@ public class UIManager : Singleton<UIManager>
 
         yield return new WaitForSeconds(1);
 
-
         while (alpha < 1f)
         {
             alpha += Time.deltaTime * fadeSpeed;
@@ -92,19 +91,18 @@ public class UIManager : Singleton<UIManager>
         if (gameOverWindow != null)
         {
             _gameOverWindow = Instantiate(gameOverWindow, gameOverWindowParents);
-            DontDestroyOnLoad(_gameOverWindow);
+            //DontDestroyOnLoad(gameOverWindowParents);
 
             yield return new WaitForSeconds(3);
 
             ToStartMenu(_gameOverWindow);
-
         }
     }
 
     public void ToStartMenu(GameObject _gameOverWindow)
     {
         SceneManager.LoadScene("TempStartScene", LoadSceneMode.Single);
-        StartSceneController.Instance.DestroyGameOverWindow(_gameOverWindow, fadeOut);
+        //StartSceneController.Instance.DestroyGameOverWindow(_gameOverWindow, fadeOut);
 
         Debug.Log("스타트씬 이동!!");
     }

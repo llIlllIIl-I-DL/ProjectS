@@ -169,7 +169,22 @@ public class ObjectDoor : BaseObject
     /// </summary>
     protected override void OnInteract(GameObject interactor)
     {
-        // 문은 상호작용 없음
+        if (!isOpen)
+        {
+            if (isLocked)
+            {
+                // 잠금 해제 애니메이션 재생
+                doorAnimator.SetTrigger("Unlock");
+            }
+            else
+            {
+                OpenDoor();
+            }
+        }
+        else
+        {
+            CloseDoor();
+        }
     }
     
     #endregion
