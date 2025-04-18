@@ -91,7 +91,7 @@ public class UIManager : Singleton<UIManager>
         if (gameOverWindow != null)
         {
             _gameOverWindow = Instantiate(gameOverWindow, gameOverWindowParents);
-            DontDestroyOnLoad(_gameOverWindow);
+            //DontDestroyOnLoad(gameOverWindowParents);
 
             yield return new WaitForSeconds(3);
 
@@ -102,7 +102,7 @@ public class UIManager : Singleton<UIManager>
     public void ToStartMenu(GameObject _gameOverWindow)
     {
         SceneManager.LoadScene("TempStartScene", LoadSceneMode.Single);
-        StartSceneController.Instance.DestroyGameOverWindow(_gameOverWindow, fadeOut);
+        //StartSceneController.Instance.DestroyGameOverWindow(_gameOverWindow, fadeOut);
 
         Debug.Log("스타트씬 이동!!");
     }
