@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public class Bullet : MonoBehaviour
+// 총알 추상 클래스
+public abstract class Bullet : MonoBehaviour
 {
     public float damage = 10f;
     public float knockbackForce = 5f;
@@ -9,10 +10,13 @@ public class Bullet : MonoBehaviour
     [Header("오버차지 설정")]
     public bool isOvercharged = false;  // 과열 상태 여부
     
-    private bool hasHitEnemy = false;
-    private GameObject playerObject; // 플레이어 게임오브젝트 참조
+    protected bool hasHitEnemy = false;
+    protected GameObject playerObject; // 플레이어 게임오브젝트 참조
 
-    private void Start()
+    // 총알 특수 효과 추상 메서드
+    protected abstract void ApplySpecialEffect(BaseEnemy enemy);
+
+    protected virtual void Start()
     {
         // 플레이어 찾기
         playerObject = GameObject.FindGameObjectWithTag("Player");
@@ -42,8 +46,14 @@ public class Bullet : MonoBehaviour
         // 디버그를 위한 로그 추가
         Debug.Log("총알 생성됨: " + transform.position + ", 레이어: " + LayerMask.LayerToName(gameObject.layer));
     }
+    
+    // 업데이트 가상 메서드 추가
+    protected virtual void Update()
+    {
+        // 파생 클래스에서 오버라이드 가능
+    }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    protected virtual void OnTriggerEnter2D(Collider2D other)
     {
         // 플레이어와의 충돌은 무시
         if (other.gameObject.CompareTag("Player") || 
@@ -63,6 +73,9 @@ public class Bullet : MonoBehaviour
             {
                 enemy.TakeDamage(damage);
                 hasHitEnemy = true;
+
+                // 각 타입별 특수 효과 적용
+                ApplySpecialEffect(enemy);
 
                 // 넉백 적용
                 Rigidbody2D enemyRb = other.GetComponent<Rigidbody2D>();
@@ -110,9 +123,8 @@ public class Bullet : MonoBehaviour
     }
     
     // 총알이 파괴될 때 호출되는 함수
-    private void OnDestroy()
+    protected virtual void OnDestroy()
     {
-        // 과열 공격이고 적에게 명중했을 경우, PlayerWeapon에서 이미 처리됩니다.
-        // 여기서는 추가적인 처리가 필요 없습니다.
+        // 파생 클래스에서 오버라이드 가능
     }
 }

@@ -35,6 +35,10 @@ public class WeaponManager : Singleton<WeaponManager>
     [SerializeField] private AudioClip pressureReleaseSound;    // 압력 방출 사운드
     [SerializeField] private AudioClip steamHissSound;          // 증기 분출 사운드
 
+    [Header("불릿 팩토리 설정")]
+    [SerializeField] private BulletFactory bulletFactory;    // 불릿 팩토리 참조
+    [SerializeField] private ElementType currentBulletType = ElementType.Normal; // 현재 총알 속성
+
     // 차징 상태 관리
     private bool isCharging = false;
     private float currentChargeTime = 0f;
@@ -86,6 +90,18 @@ public class WeaponManager : Singleton<WeaponManager>
                 audioSource = gameObject.AddComponent<AudioSource>();
                 audioSource.volume = 0.7f;
                 audioSource.pitch = 1.0f;
+            }
+        }
+
+        // BulletFactory를 찾아서 할당 (아직 할당되지 않은 경우)
+        if (bulletFactory == null)
+        {
+            bulletFactory = FindObjectOfType<BulletFactory>();
+            if (bulletFactory == null)
+            {
+                GameObject factoryObj = new GameObject("BulletFactory");
+                bulletFactory = factoryObj.AddComponent<BulletFactory>();
+                Debug.LogWarning("WeaponManager: BulletFactory가 씬에 없어 새로 생성합니다.");
             }
         }
 
@@ -361,8 +377,8 @@ public class WeaponManager : Singleton<WeaponManager>
         Vector2 direction = GetAimDirection();
         Vector3 spawnPosition = firePoint.position + new Vector3(direction.x * 0.2f, 0, 0);
 
-        // 일반 총알 생성
-        GameObject bullet = Instantiate(bulletPrefab, spawnPosition, Quaternion.identity);
+        // BulletFactory를 사용하여 총알 생성
+        GameObject bullet = bulletFactory.CreateBullet(currentBulletType, spawnPosition, Quaternion.identity);
         
         // 총알 크기 설정
         bullet.transform.localScale = normalBulletScale;
@@ -381,16 +397,6 @@ public class WeaponManager : Singleton<WeaponManager>
         // 총알 회전 설정
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         bullet.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-
-        // 총알 데미지 설정 (기본 10)
-        Bullet bulletComponent = bullet.GetComponent<Bullet>();
-        if (bulletComponent != null)
-        {
-            bulletComponent.damage = 10f;
-        }
-
-        // 총알 소멸 처리
-        Destroy(bullet, bulletLifetime);
 
         // 탄약 감소
         currentAmmo--;
@@ -419,18 +425,18 @@ public class WeaponManager : Singleton<WeaponManager>
         nextFireTime = Time.time + fireRate;
 
         // 압력 차징 레벨에 따른 총알 타입 결정
-        GameObject bulletToSpawn;
         float damage;
         Vector3 scale;
         Color bulletColor = Color.white;
+        bool isOvercharged = false; // 2단계에서만 오버차지 상태 설정
 
         if (currentChargeLevel == 2)
         {
-            // 2단계 차징샷 (강력한 증기압)
-            bulletToSpawn = level2BulletPrefab;
+            // 2단계 차징샷 (강력한 증기압) - 오버차지 상태
             damage = level2Damage;
             scale = level2BulletScale;
             bulletColor = new Color(1.0f, 0.5f, 0.1f, 1.0f); // 주황색 (고온 증기)
+            isOvercharged = true; // 최대 압력일 때 오버차지 상태로 설정
             Debug.Log("최대 증기압 발사!");
 
             // 최대 압력 방출 사운드
@@ -443,7 +449,6 @@ public class WeaponManager : Singleton<WeaponManager>
         else if (currentChargeLevel == 1)
         {
             // 1단계 차징샷 (중간 증기압)
-            bulletToSpawn = level1BulletPrefab;
             damage = level1Damage;
             scale = level1BulletScale;
             bulletColor = new Color(0.7f, 0.7f, 0.7f, 1.0f); // 회색 (일반 증기)
@@ -459,7 +464,6 @@ public class WeaponManager : Singleton<WeaponManager>
         else
         {
             // 차징이 충분하지 않으면 일반 총알
-            bulletToSpawn = bulletPrefab;
             damage = 10f;
             scale = normalBulletScale;
             bulletColor = Color.white;
@@ -476,8 +480,10 @@ public class WeaponManager : Singleton<WeaponManager>
         Vector2 direction = GetAimDirection();
         Vector3 spawnPosition = firePoint.position + new Vector3(direction.x * 0.2f, 0, 0);
 
-        // 총알 생성 및 설정
-        GameObject bullet = Instantiate(bulletToSpawn, spawnPosition, Quaternion.identity);
+        // BulletFactory를 사용하여 총알 생성 (오버차지 여부 전달)
+        GameObject bullet = bulletFactory.CreateBullet(currentBulletType, spawnPosition, Quaternion.identity, isOvercharged);
+        
+        // 총알 크기 설정
         bullet.transform.localScale = scale;
 
         // 총알 색상 설정 (증기 색상)
@@ -499,13 +505,6 @@ public class WeaponManager : Singleton<WeaponManager>
         // 총알 회전 설정
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         bullet.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-
-        // 총알 데미지 설정
-        Bullet bulletComponent = bullet.GetComponent<Bullet>();
-        if (bulletComponent != null)
-        {
-            bulletComponent.damage = damage;
-        }
 
         // 증기 파티클 효과 추가 (총알에 트레일 효과)
         if (currentChargeLevel > 0)
@@ -579,5 +578,18 @@ public class WeaponManager : Singleton<WeaponManager>
         currentAmmo = maxAmmo;
         isReloading = false;
         Debug.Log("재장전 완료!");
+    }
+
+    // 현재 사용 중인 총알 속성 설정
+    public void SetBulletType(ElementType type)
+    {
+        currentBulletType = type;
+        Debug.Log($"무기 속성이 {type}으로 변경되었습니다.");
+    }
+
+    // 총알 속성 가져오기
+    public ElementType GetBulletType()
+    {
+        return currentBulletType;
     }
 }

@@ -169,6 +169,7 @@ MonoBehaviour:
   damage: 10
   knockbackForce: 5
   bulletType: 0
+  isOvercharged: 0
 --- !u!50 &6407862367436263255
 Rigidbody2D:
   serializedVersion: 4
