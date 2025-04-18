@@ -4,10 +4,23 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class PlayerUI : Singleton<PlayerUI>
-
-    //상속말고 그냥 싱글턴으로
+public class PlayerUI : MonoBehaviour
 {
+    public static PlayerUI Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+
     [Header("HP 바")]
     [SerializeField] private Scrollbar healthBar;
     [SerializeField] private Image healthBarImage;
