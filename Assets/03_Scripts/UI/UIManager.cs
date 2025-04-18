@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 
@@ -18,7 +19,12 @@ public class UIManager : Singleton<UIManager>
     float fadeOutAlpha;
 
     InputUI inputUI;
+    GameObject _gameOverWindow;
 
+    private void Awake()
+    {
+        DontDestroyOnLoad(fadeOut);
+    }
 
     private void Start()
     {
@@ -85,7 +91,21 @@ public class UIManager : Singleton<UIManager>
 
         if (gameOverWindow != null)
         {
-            Instantiate(gameOverWindow, gameOverWindowParents);
+            _gameOverWindow = Instantiate(gameOverWindow, gameOverWindowParents);
+            DontDestroyOnLoad(_gameOverWindow);
+
+            yield return new WaitForSeconds(3);
+
+            ToStartMenu(_gameOverWindow);
+
         }
+    }
+
+    public void ToStartMenu(GameObject _gameOverWindow)
+    {
+        SceneManager.LoadScene("TempStartScene", LoadSceneMode.Single);
+        StartSceneController.Instance.DestroyGameOverWindow(_gameOverWindow, fadeOut);
+
+        Debug.Log("스타트씬 이동!!");
     }
 }
