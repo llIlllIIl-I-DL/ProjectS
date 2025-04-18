@@ -72,9 +72,11 @@ public class ItemData : ScriptableObject
 
 public enum ElementType
 {
-    None,
-    Fire,
+    Normal,
+    Rust,
+    Iron,
+    Poison,
     Water,
-    Electric,
-    Wind
+    Flame,
+    Ice
 }
