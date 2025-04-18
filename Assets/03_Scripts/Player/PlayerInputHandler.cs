@@ -33,12 +33,21 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
     public event Action OnJumpRelease;
     public event Action OnDashInput;
     public event Action OnSprintActivated;
-    public event Action OnAttackInput;
+    public event Action<Vector2, bool> OnNormalAttack;    // 방향, 연타 여부
+    public event Action<Vector2, bool> OnChargedAttack;   // 방향, 오버차지 여부
     public event Action OnCrouchInput;
     public event Action OnWingsuitActivated;
+    public event Action OnAttackInput;    // PlayerStateManager에서 필요한 공격 입력 이벤트
 
     private Vector2 moveDirection;
     public Vector2 MoveDirection => moveDirection;
+
+    // 공격 관련 상태
+    private bool isAttackButtonHeld = false;
+    private float attackButtonHoldTime = 0f;
+    private float lastAttackTime = 0f;
+
+    private WeaponManager weaponManager;
 
     private void Awake()
     {
@@ -46,6 +55,9 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
 
         // 콜백 설정
         playerInputs.Player.SetCallbacks(this);
+        
+        // WeaponManager 참조 가져오기
+        weaponManager = WeaponManager.Instance;
     }
 
     private void OnEnable()
@@ -72,6 +84,18 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
 
         // 이동 벡터 업데이트
         UpdateMovementVector();
+        
+        // 공격 버튼 홀드 시간 업데이트
+        if (isAttackButtonHeld)
+        {
+            attackButtonHoldTime += Time.deltaTime;
+            
+            // WeaponManager의 차징 업데이트
+            if (weaponManager != null)
+            {
+                weaponManager.UpdateCharging(Time.deltaTime);
+            }
+        }
     }
 
     private void UpdateMovementVector()
@@ -205,8 +229,65 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
         if (context.started)
         {
             Debug.Log("공격 입력 감지");
+            isAttackButtonHeld = true;
+            attackButtonHoldTime = 0f;
+            
+            // 차징 시작
+            if (weaponManager != null)
+            {
+                weaponManager.StartCharging();
+            }
+            
+            // 공격 입력 이벤트 호출
             OnAttackInput?.Invoke();
         }
+        else if (context.canceled)
+        {
+            isAttackButtonHeld = false;
+            
+            // 버튼을 뗐을 때 차지 상태에 따라 공격 결정
+            Vector2 direction = GetAttackDirection();
+            
+            if (attackButtonHoldTime < 0.3f)
+            {
+                // 짧게 눌렀을 때 - 일반 공격
+                if (weaponManager != null)
+                {
+                    weaponManager.FireWeapon(direction);
+                }
+                OnNormalAttack?.Invoke(direction, false);
+            }
+            else if (attackButtonHoldTime >= 0.3f)
+            {
+                // 차징된 공격 발사
+                if (weaponManager != null)
+                {
+                    weaponManager.ReleaseCharge(direction);
+                }
+                
+                // 오버차지 여부 확인 (2초 이상 차지)
+                bool isOvercharged = attackButtonHoldTime >= 2.0f;
+                OnChargedAttack?.Invoke(direction, isOvercharged);
+            }
+            
+            lastAttackTime = Time.time;
+            attackButtonHoldTime = 0f;
+        }
+    }
+
+    // 공격 방향 계산 (플레이어가 바라보는 방향 기준)
+    private Vector2 GetAttackDirection()
+    {
+        // 플레이어의 이동 방향 컴포넌트 얻기
+        PlayerMovement playerMovement = GetComponent<PlayerMovement>();
+        if (playerMovement != null)
+        {
+            // 플레이어가 바라보는 방향으로 설정
+            return new Vector2(playerMovement.FacingDirection, 0).normalized;
+        }
+        
+        // 기본적으로 오른쪽 방향 반환
+        return Vector2.right;
     }
 
     public void OnCrouch(InputAction.CallbackContext context)

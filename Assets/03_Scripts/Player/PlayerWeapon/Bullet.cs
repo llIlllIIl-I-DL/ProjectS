@@ -2,8 +2,21 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    public float damage = 10f;
-    public float knockbackForce = 5f;
+    [SerializeField] private float baseDamage = 10f;
+    private float damageMultiplier = 1f;
+    private float knockbackForce = 5f;
+    private bool isOvercharge = false;
+
+    public void SetDamage(float multiplier)
+    {
+        damageMultiplier = multiplier;
+    }
+
+    // 오버차지 상태 설정
+    public void SetIsOvercharge(bool overcharge)
+    {
+        isOvercharge = overcharge;
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -11,11 +24,17 @@ public class Bullet : MonoBehaviour
         if (other.CompareTag("Enemy"))
         {
             // 적에게 데미지 주기
-            BaseEnemy enemy = other.GetComponent<BaseEnemy>();//Enemy로 수정 필요
-
-            if (enemy != null)
+            IDamageable damageable = other.GetComponent<IDamageable>();
+            if (damageable != null)
             {
-                enemy.TakeDamage(damage);
+                float damage = baseDamage * damageMultiplier;
+                damageable.TakeDamage(damage);
+
+                // 오버차지 상태이고 적에게 명중했다면 플레이어에게 데미지
+                if (isOvercharge)
+                {
+                    WeaponManager.Instance.ApplyOverchargeDamageToPlayer();
+                }
 
                 // 넉백 적용
                 Rigidbody2D enemyRb = other.GetComponent<Rigidbody2D>();
