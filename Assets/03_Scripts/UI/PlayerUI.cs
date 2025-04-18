@@ -168,6 +168,8 @@ public class PlayerUI : Singleton<PlayerUI>
             attributeType = weaponAttribute;
             typeName.text = weaponAttribute.ItemName;
             typeIcon.sprite = weaponAttribute.Icon;
+
+            typeIcon.preserveAspect = true;
         }
         else
         {

@@ -1,12 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class UIManager : Singleton<UIManager>
 {
+
+    [Header("GameOver Window")]
+    public float fadeSpeed = 1.5f;
+    [SerializeField] public GameObject gameOverWindow;
+    [SerializeField] public Transform gameOverWindowParents;
+    [SerializeField] public Image fadeOut;
+
     public List<GameObject> allUIPages = new List<GameObject>();
+
+    float fadeOutAlpha;
 
     InputUI inputUI;
 
@@ -14,6 +23,9 @@ public class UIManager : Singleton<UIManager>
     private void Start()
     {
         inputUI = FindObjectOfType<InputUI>();
+
+        fadeOut.color = new Color(0, 0, 0, 0);
+
     }
 
     public void CloseAllPage()
@@ -43,6 +55,37 @@ public class UIManager : Singleton<UIManager>
 
             inputUI.currentPage.SetActive(!isActive);
             Time.timeScale = isActive ? 1 : 0;
+        }
+    }
+
+
+    public void ShowGameOverUI()
+    {
+        StartCoroutine(FadeOut());
+    }
+
+    IEnumerator FadeOut()
+    {
+        float alpha = fadeOut.color.a;
+
+        yield return new WaitForSeconds(1);
+
+
+        while (alpha < 1f)
+        {
+            alpha += Time.deltaTime * fadeSpeed;
+
+            Color temp = fadeOut.color;
+            temp.a = alpha;
+            fadeOut.color = temp;
+
+            yield return null;
+        }
+
+
+        if (gameOverWindow != null)
+        {
+            Instantiate(gameOverWindow, gameOverWindowParents);
         }
     }
 }
