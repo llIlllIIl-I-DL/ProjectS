@@ -47,6 +47,7 @@ public abstract class DestructibleEntity : MonoBehaviour, IDestructible
         
         // 지연 파괴
         Destroy(gameObject, 1f);
+        Debug.Log($"{gameObject.name} 파괴 됨");
     }
     
     public virtual void DropItem()
