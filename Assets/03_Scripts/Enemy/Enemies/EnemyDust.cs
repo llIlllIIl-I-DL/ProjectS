@@ -50,7 +50,18 @@ public class EnemyDust : BaseEnemy
         base.FixedUpdate(); // BaseEnemy의 FixedUpdate 호출
         // Debug.Log($"Current Position: {transform.position}"); // 디버그 로그 - 개발 완료 후 제거
     }
-    
+
+    /// <summary>
+    /// 데미지 처리
+    /// </summary>
+    public override void TakeDamage(float damage)
+    {
+        base.TakeDamage(damage);
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
     #endregion
 
     #region Core Methods
