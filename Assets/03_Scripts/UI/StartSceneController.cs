@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class StartSceneController : Singleton<StartSceneController>
 {
-
     void Start()
     {
 
@@ -16,7 +15,5 @@ public class StartSceneController : Singleton<StartSceneController>
     {
         Destroy(_gameOverWindow);
         Destroy(fadeOut);
-
     }
-
 }
