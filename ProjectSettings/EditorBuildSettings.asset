@@ -12,4 +12,5 @@ EditorBuildSettings:
     path: Assets/04_Scenes/TempStartScene.unity
     guid: 5d9cef26029ad984b93f958258b434d8
   m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: ed948e066811e4b14ab37a3c4c222e2b, type: 2}
     com.unity.input.settings: {fileID: 11400000, guid: 4a0f9785b9b8e814ba5cc04fca27a5cb, type: 2}

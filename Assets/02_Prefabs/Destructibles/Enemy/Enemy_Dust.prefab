@@ -52,13 +52,13 @@ MonoBehaviour:
   currentHealth: 100
   possibleDrops: []
   dropChance: 0.3
-  moveSpeed: 2
+  moveSpeed: 1
   attackPower: 10
   attackRange: 10
   detectionRange: 10
   contactDamage: 1
   dealsDamageOnContact: 1
-  patrolDistance: 5
+  patrolDistance: 1
   patrolWaitTime: 2
 --- !u!50 &4174171962346470661
 Rigidbody2D:
@@ -119,18 +119,18 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.05601555}
+  m_Offset: {x: 0.000000014901161, y: -0.024984479}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.28, y: 1.28}
+    oldSize: {x: 0.85333335, y: 0.85333335}
     newSize: {x: 10.24, y: 10.24}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1.2692381}
+  m_Size: {x: 0.53957963, y: 0.6979754}
   m_EdgeRadius: 0
 --- !u!95 &629705877621807215
 Animator:

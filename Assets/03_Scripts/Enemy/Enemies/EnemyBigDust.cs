@@ -108,6 +108,14 @@ public class EnemyBigDust : BaseEnemy
         base.OnCollisionEnter2D(collision);
     }
 
+    /// <summary>
+    /// 데미지 처리
+    /// </summary>
+    public override void TakeDamage(float damage)
+    {
+        base.TakeDamage(damage);
+    }
+
     #endregion
 
     #region Core Methods

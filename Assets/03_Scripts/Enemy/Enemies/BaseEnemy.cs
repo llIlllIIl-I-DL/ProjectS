@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -31,6 +32,9 @@ public abstract class BaseEnemy : DestructibleEntity
 
     // 상태 관리
     protected EnemyStateMachine stateMachine; // 상태 머신
+
+    private string poolKey; // 어느 풀에 속하는지 식별
+    private EnemyManager manager;
     
     #endregion
 
@@ -154,7 +158,6 @@ public abstract class BaseEnemy : DestructibleEntity
         isDestroyed = true;
         StopMoving(); // 이동 정지
         PlayDestructionEffect(); // 파괴 효과 재생
-        Destroy(gameObject, 1f); // 1초 후 파괴
     }
     
     #endregion
@@ -365,4 +368,41 @@ public abstract class BaseEnemy : DestructibleEntity
     }
 
     #endregion
+
+    public void Initialize(string key, EnemyManager mgr)
+    {
+        poolKey = key;
+        manager = mgr;
+    }
+
+    // 풀로 돌아가기
+    public void ReturnToPool()
+    {
+        if (manager != null)
+            manager.ReturnToPool(this, poolKey);
+            Debug.Log($"{gameObject.name}이(가) 풀로 {poolKey} 반환");
+    }
+
+    // 스폰될 때 호출
+    public virtual void OnSpawned()
+    {
+        // 체력 리셋, 상태 리셋 등
+        currentHealth = maxHealth;
+        isDestroyed = false;
+        GetComponent<Collider2D>().enabled = true; // 콜라이더 활성화
+        // 기타 초기화 로직
+    }
+
+    // 죽었을 때
+    protected virtual void Die()
+    {
+        Invoke("ReturnToPool", 1f);
+        // 죽음 애니메이션, 효과음 등
+        isDestroyed = true;
+        PlayDestructionEffect();
+        DropItem();
+        // 콜라이더 비활성화
+        GetComponent<Collider2D>().enabled = false;
+        Debug.Log($"{gameObject.name} Detroy가 아니라 Die로 호출 됨");
+    }
 }
