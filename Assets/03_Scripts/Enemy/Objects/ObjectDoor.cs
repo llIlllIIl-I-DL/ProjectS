@@ -5,7 +5,7 @@ using UnityEngine;
 /// 문 오브젝트 - 플레이어와 상호작용 시 열림, 닫힘 또는 다른 오브젝트와 상호작용
 /// </summary>
 
-public class ObjectsDoor : BaseObject
+public class ObjectDoor : BaseObject
 {
     #region Variables
     [Header("문 설정")]
@@ -43,8 +43,6 @@ public class ObjectsDoor : BaseObject
     protected override void Start() 
     {
         base.Start();
-        
-        // 초기 상태 설정
         UpdateDoorState(isOpen, false);
     }
     
@@ -156,6 +154,11 @@ public class ObjectsDoor : BaseObject
     {
         ToggleLock(false);
     }
+
+    /// <summary>
+    /// 발판 두개 이상으로 문 열기
+    /// </summary>
+    
     
     #endregion
     

@@ -237,6 +237,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   settings: {fileID: 11400000, guid: 83308ca141c58fe47a419e584bbc8df0, type: 2}
   hasWingsuit: 0
+  CurrentattributeTypeData: {fileID: 0}
 --- !u!114 &4995387987602289083
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -250,6 +251,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   settings: {fileID: 11400000, guid: 83308ca141c58fe47a419e584bbc8df0, type: 2}
+  maxSlopeAngle: 45
+  noFriction: {fileID: 0}
+  fullFriction: {fileID: 0}
+  slopeCheckDistance: 0.5
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &9117129434088997854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288,7 +296,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 099b2755d7773ad44a551f82c42a482d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minClimbSpeedThreshold: 0.1
   climbAnimFrameRate: 8
   climbFrames: []
   useAnimatorForClimbing: 1
