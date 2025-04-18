@@ -5,6 +5,8 @@ using UnityEngine.UI;
 using TMPro;
 
 public class PlayerUI : Singleton<PlayerUI>
+
+    //상속말고 그냥 싱글턴으로
 {
     [Header("HP 바")]
     [SerializeField] private Scrollbar healthBar;
@@ -168,6 +170,8 @@ public class PlayerUI : Singleton<PlayerUI>
             attributeType = weaponAttribute;
             typeName.text = weaponAttribute.ItemName;
             typeIcon.sprite = weaponAttribute.Icon;
+
+            typeIcon.preserveAspect = true;
         }
         else
         {

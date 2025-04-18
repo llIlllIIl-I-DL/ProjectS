@@ -222,11 +222,13 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
     {
         // 선택 입력 처리A, S 로 작동
         PlayerUI.Instance.MovetoLeftType();
+        Debug.Log("S");
     }
     public void OnPrev(InputAction.CallbackContext context)
     {
         // 선택 입력 처리A, S 로 작동
         PlayerUI.Instance.MovetoRightType();
+        Debug.Log("A");
     }
 
     public void OnSpecialAttack(InputAction.CallbackContext context)

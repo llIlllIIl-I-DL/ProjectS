@@ -373,7 +373,7 @@ public class GameManager : MonoBehaviour
             case GameState.GameOver:
                 Time.timeScale = 1f;
                 // 게임 오버 UI 표시
-                //UIManager.Instance?.ShowGameOverUI();
+                UIManager.Instance.ShowGameOverUI();
                 break;
                 
             case GameState.Victory:
