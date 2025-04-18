@@ -35,13 +35,6 @@ public class InventoryManager : MonoBehaviour
     [Header("연결된 매니저")]
     [SerializeField] private CostumeManager costumeManager;
 
-    [Header("무기 인벤토리")]
-    [SerializeField] private List<WeaponData> playerWeapons = new List<WeaponData>();
-    [SerializeField] private int currentWeaponIndex = 0;
-    
-    [Header("인벤토리 설정")]
-    [SerializeField] private int maxWeapons = 6;  // 최대 소지 가능 무기 수
-
     // 이벤트 델리게이트
     public delegate void ItemEventHandler(ItemData item);
     public event ItemEventHandler OnItemAdded;
@@ -75,17 +68,6 @@ public class InventoryManager : MonoBehaviour
 
         // 복장 세트 정보 초기화
         InitializeCostumeSets();
-
-        // 무기 목록이 비어있으면 경고
-        if (playerWeapons.Count == 0)
-        {
-            Debug.LogWarning("InventoryManager: 플레이어가 소지한 무기가 없습니다!");
-        }
-        else
-        {
-            // 기본 무기 장착
-            EquipWeapon(currentWeaponIndex);
-        }
     }
 
     // ItemManager에서 아이템 로드
@@ -451,120 +433,4 @@ public class InventoryManager : MonoBehaviour
     {
         return equippedWeaponAttribute;
     }
-
-    // 특정 인덱스의 무기 장착
-    public void EquipWeapon(int index)
-    {
-        if (index < 0 || index >= playerWeapons.Count)
-        {
-            Debug.LogError($"InventoryManager: 잘못된 무기 인덱스 - {index}");
-            return;
-        }
-        
-        currentWeaponIndex = index;
-        WeaponManager.Instance.EquipWeapon(playerWeapons[index]);
-        Debug.Log($"무기 장착: {playerWeapons[index].weaponName}");
-    }
-    
-    // 다음 무기 가져오기
-    public WeaponData GetNextWeapon()
-    {
-        if (playerWeapons.Count <= 1) return null;
-        
-        int nextIndex = (currentWeaponIndex + 1) % playerWeapons.Count;
-        currentWeaponIndex = nextIndex;
-        
-        return playerWeapons[nextIndex];
-    }
-    
-    // 이전 무기 가져오기
-    public WeaponData GetPreviousWeapon()
-    {
-        if (playerWeapons.Count <= 1) return null;
-        
-        int prevIndex = (currentWeaponIndex - 1 + playerWeapons.Count) % playerWeapons.Count;
-        currentWeaponIndex = prevIndex;
-        
-        return playerWeapons[prevIndex];
-    }
-    
-    // 새 무기 추가 (아이템 획득 등)
-    public bool AddWeapon(WeaponData newWeapon)
-    {
-        // 이미 같은 무기를 가지고 있는지 확인
-        if (playerWeapons.Contains(newWeapon))
-        {
-            Debug.Log($"이미 {newWeapon.weaponName} 무기를 소지하고 있습니다.");
-            return false;
-        }
-        
-        // 인벤토리가 가득 찼는지 확인
-        if (playerWeapons.Count >= maxWeapons)
-        {
-            Debug.Log("무기 인벤토리가 가득 찼습니다!");
-            return false;
-        }
-        
-        // 새 무기 추가
-        playerWeapons.Add(newWeapon);
-        Debug.Log($"새 무기 획득: {newWeapon.weaponName}");
-        return true;
-    }
-    
-    // 무기 제거
-    public bool RemoveWeapon(WeaponData weaponToRemove)
-    {
-        if (!playerWeapons.Contains(weaponToRemove))
-        {
-            Debug.Log($"{weaponToRemove.weaponName} 무기를 소지하고 있지 않습니다.");
-            return false;
-        }
-        
-        int removeIndex = playerWeapons.IndexOf(weaponToRemove);
-        playerWeapons.Remove(weaponToRemove);
-        
-        // 제거된 무기가 현재 장착 중이었다면 다른 무기로 교체
-        if (removeIndex == currentWeaponIndex)
-        {
-            if (playerWeapons.Count > 0)
-            {
-                currentWeaponIndex = 0;
-                WeaponManager.Instance.EquipWeapon(playerWeapons[0]);
-            }
-        }
-        // 현재 인덱스보다 앞에 있는 무기가 제거되었다면 인덱스 조정
-        else if (removeIndex < currentWeaponIndex)
-        {
-            currentWeaponIndex--;
-        }
-        
-        Debug.Log($"무기 제거: {weaponToRemove.weaponName}");
-        return true;
-    }
-    
-    // 현재 장착 무기 인덱스 가져오기
-    public int GetCurrentWeaponIndex() => currentWeaponIndex;
-    
-    // 특정 인덱스의 무기 가져오기
-    public WeaponData GetWeaponAt(int index)
-    {
-        if (index < 0 || index >= playerWeapons.Count)
-        {
-            return null;
-        }
-        return playerWeapons[index];
-    }
-    
-    // 현재 무기 가져오기
-    public WeaponData GetCurrentWeapon()
-    {
-        if (playerWeapons.Count == 0)
-        {
-            return null;
-        }
-        return playerWeapons[currentWeaponIndex];
-    }
-    
-    // 모든 소지 무기 목록 가져오기
-    public List<WeaponData> GetAllWeapons() => new List<WeaponData>(playerWeapons);
 }
