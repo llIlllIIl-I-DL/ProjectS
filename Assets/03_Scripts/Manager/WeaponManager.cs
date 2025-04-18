@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class WeaponManager : Singleton<WeaponManager>
@@ -8,39 +9,39 @@ public class WeaponManager : Singleton<WeaponManager>
     [SerializeField] private Transform firePoint;           // 총알이 발사되는 위치
     [SerializeField] private float bulletSpeed = 15f;
     [SerializeField] private float bulletLifetime = 3f;
+    [SerializeField] private Vector3 normalBulletScale = new Vector3(0.5f, 0.5f, 0.5f);  // 일반 총알 크기
+    [SerializeField] private float fireRate = 0.3f;         // 발사 속도 (초)
 
     [Header("무기 상태")]
     public int currentAmmo = 30;
     public int maxAmmo = 30;
     public float reloadTime = 1.5f;
     public bool isReloading = false;
+    private float nextFireTime = 0f;                        // 다음 발사 가능 시간
 
-    [Header("차징 공격 설정")]
-    [SerializeField] private GameObject level1BulletPrefab; // 1단계 차지샷 (중간 차지)
-    [SerializeField] private GameObject level2BulletPrefab; // 2단계 차지샷 (최대 차지)
-    [SerializeField] private GameObject overchargeBulletPrefab; // 오버차지샷 (과열)
+    [Header("스팀 압력 차징 설정")]
+    [SerializeField] private GameObject level1BulletPrefab; // 1단계 차지샷 (중간 압력)
+    [SerializeField] private GameObject level2BulletPrefab; // 2단계 차지샷 (최대 압력)
     [SerializeField] private float chargingLevel1Time = 1.0f; // 1단계 차지에 필요한 시간
     [SerializeField] private float chargingLevel2Time = 2.5f; // 2단계 차지에 필요한 시간
-    [SerializeField] private float overchargeTime = 4.0f;    // 오버차지에 필요한 시간
-    [SerializeField] private float level1Damage = 15f;      // 1단계 차지샷 데미지
-    [SerializeField] private float level2Damage = 30f;      // 2단계 차지샷 데미지
+    [SerializeField] private float level1Damage = 2f;      // 1단계 차지샷 데미지
+    [SerializeField] private float level2Damage = 5f;      // 2단계 차지샷 데미지
+    [SerializeField] private Vector3 level1BulletScale = new Vector3(0.7f, 0.7f, 0.7f);  // 1단계 차지샷 크기
+    [SerializeField] private Vector3 level2BulletScale = new Vector3(1.0f, 1.0f, 1.0f);  // 2단계 차지샷 크기
 
-    [Header("차징 이펙트")]
-    [SerializeField] private GameObject chargingLevel1Effect;    // 1단계 차징 이펙트
-    [SerializeField] private GameObject chargingLevel2Effect;    // 2단계 차징 이펙트
-    [SerializeField] private GameObject overchargeEffect;        // 오버차지 이펙트
-    [SerializeField] private AudioClip chargingStartSound;       // 차징 시작 소리
-    [SerializeField] private AudioClip chargingLevel1Sound;      // 1단계 차징 도달 소리
-    [SerializeField] private AudioClip chargingLevel2Sound;      // 2단계 차징 도달 소리
-    [SerializeField] private AudioClip overchargeSound;          // 오버차지 도달 소리
-    [SerializeField] private AudioClip chargingShotSound;        // 차징샷 발사 소리
+    [Header("스팀 압력 이펙트")]
+    [SerializeField] private GameObject steamPressureEffectPrefab; // 압력 이펙트 프리팹
+    [SerializeField] private AudioClip pressureBuildSound;      // 압력 증가 사운드
+    [SerializeField] private AudioClip pressureReleaseSound;    // 압력 방출 사운드
+    [SerializeField] private AudioClip steamHissSound;          // 증기 분출 사운드
 
     // 차징 상태 관리
     private bool isCharging = false;
     private float currentChargeTime = 0f;
     private int currentChargeLevel = 0;
-    private GameObject activeChargingEffect = null;
+    private SteamPressureEffect pressureEffect;
     private AudioSource audioSource;
+    private Coroutine effectCoroutine; // 이펙트 코루틴 참조 저장
 
     private PlayerMovement playerMovement;
 
@@ -71,28 +72,25 @@ public class WeaponManager : Singleton<WeaponManager>
             level2BulletPrefab = bulletPrefab;
             Debug.LogWarning("WeaponManager: level2BulletPrefab이 할당되지 않아 일반 총알로 대체됩니다.");
         }
-        
-        if (overchargeBulletPrefab == null)
-        {
-            overchargeBulletPrefab = level2BulletPrefab;
-            Debug.LogWarning("WeaponManager: overchargeBulletPrefab이 할당되지 않아 2단계 차지샷으로 대체됩니다.");
-        }
 
         // 플레이어 컴포넌트 참조 가져오기
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
             playerMovement = player.GetComponent<PlayerMovement>();
-            audioSource = player.GetComponent<AudioSource>();
+            audioSource = GetComponent<AudioSource>();
 
             // 오디오 소스가 없으면 추가
-            if (audioSource == null && (chargingStartSound != null || chargingLevel1Sound != null || chargingLevel2Sound != null || overchargeSound != null))
+            if (audioSource == null)
             {
-                audioSource = player.AddComponent<AudioSource>();
+                audioSource = gameObject.AddComponent<AudioSource>();
                 audioSource.volume = 0.7f;
                 audioSource.pitch = 1.0f;
             }
         }
+
+        // 스팀 압력 이펙트 생성
+        CreatePressureEffect();
     }
 
     private void Update()
@@ -101,6 +99,43 @@ public class WeaponManager : Singleton<WeaponManager>
         if (isCharging && !isReloading && currentAmmo > 0)
         {
             UpdateCharging();
+        }
+    }
+
+    private void CreatePressureEffect()
+    {
+        if (steamPressureEffectPrefab != null)
+        {
+            // 플레이어 객체 찾기
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player == null)
+            {
+                Debug.LogError("WeaponManager: 플레이어를 찾을 수 없습니다.");
+                return;
+            }
+
+            // 이펙트를 플레이어의 자식으로 생성
+            GameObject effectObj = Instantiate(steamPressureEffectPrefab, player.transform.position, Quaternion.identity);
+            effectObj.transform.SetParent(player.transform); // 플레이어의 자식으로 설정
+            effectObj.SetActive(false); // 초기에는 비활성화 상태로 설정
+            
+            pressureEffect = effectObj.GetComponent<SteamPressureEffect>();
+
+            // 압력 이펙트에 사운드 설정
+            if (pressureEffect != null)
+            {
+                // 스크립트에 접근하여 사운드 클립 설정
+                var effectAudio = effectObj.GetComponent<AudioSource>();
+                if (effectAudio != null)
+                {
+                    // 사운드 클립 전달
+                    effectAudio.clip = pressureBuildSound;
+                }
+            }
+        }
+        else
+        {
+            Debug.LogWarning("WeaponManager: steamPressureEffectPrefab이 할당되지 않아 압력 이펙트가 없습니다.");
         }
     }
 
@@ -113,11 +148,7 @@ public class WeaponManager : Singleton<WeaponManager>
         int previousLevel = currentChargeLevel;
 
         // 차징 레벨 결정
-        if (currentChargeTime >= overchargeTime)
-        {
-            currentChargeLevel = 3; // 오버차지 레벨
-        }
-        else if (currentChargeTime >= chargingLevel2Time)
+        if (currentChargeTime >= chargingLevel2Time)
         {
             currentChargeLevel = 2;
         }
@@ -130,119 +161,36 @@ public class WeaponManager : Singleton<WeaponManager>
             currentChargeLevel = 0;
         }
 
-        // 레벨이 변경되었을 때 이펙트 업데이트
+        // 압력 이펙트 업데이트
+        if (pressureEffect != null)
+        {
+            // 현재 충전 시간에 비례하여 압력 설정 (0-1 사이 값)
+            float pressure = Mathf.Clamp01(currentChargeTime / chargingLevel2Time);
+            pressureEffect.SetPressure(pressure);
+        }
+
+        // 레벨이 변경되었을 때 사운드 재생
         if (previousLevel != currentChargeLevel)
         {
-            StartCoroutine(UpdateChargingEffectsCoroutine(previousLevel, currentChargeLevel));
-        }
-    }
-
-    // 코루틴을 사용하여 이펙트 전환 시 시간차를 둠
-    private IEnumerator UpdateChargingEffectsCoroutine(int previousLevel, int newLevel)
-    {
-        // 이전 이펙트 제거를 안전하게 처리
-        if (activeChargingEffect != null)
-        {
-            // 이전 이펙트를 제거하기 전에 부모 연결 해제 (Transform 이슈 방지)
-            activeChargingEffect.transform.SetParent(null);
-            
-            // 렌더러 비활성화로 시각적으로 즉시 사라지게 함
-            SpriteRenderer[] renderers = activeChargingEffect.GetComponentsInChildren<SpriteRenderer>();
-            foreach (SpriteRenderer renderer in renderers)
+            if (currentChargeLevel == 1)
             {
-                if (renderer != null)
+                Debug.Log("1단계 압력 충전 완료!");
+                if (audioSource != null && pressureBuildSound != null)
                 {
-                    renderer.enabled = false;
+                    audioSource.pitch = 1.0f;
+                    audioSource.PlayOneShot(pressureBuildSound, 0.5f);
                 }
             }
-            
-            // 이전 이펙트 제거
-            Destroy(activeChargingEffect);
-            activeChargingEffect = null;
-            
-            // 이펙트 전환 사이에 약간의 딜레이 추가
-            yield return new WaitForSeconds(0.05f);
-        }
-
-        // 안전한 스폰 위치 설정 (Z값은 항상 0으로 고정)
-        Vector3 safeSpawnPosition = firePoint.position;
-        safeSpawnPosition.z = 0f;
-
-        // 새 이펙트 생성 및 사운드 재생
-        GameObject effectPrefab = null;
-        AudioClip soundToPlay = null;
-        string logMessage = "";
-
-        if (newLevel == 1)
-        {
-            effectPrefab = chargingLevel1Effect;
-            soundToPlay = chargingLevel1Sound;
-            logMessage = "1단계 차징 완료!";
-        }
-        else if (newLevel == 2)
-        {
-            effectPrefab = chargingLevel2Effect;
-            soundToPlay = chargingLevel2Sound;
-            logMessage = "2단계 차징 완료!";
-        }
-        else if (newLevel == 3)
-        {
-            effectPrefab = overchargeEffect;
-            soundToPlay = overchargeSound;
-            logMessage = "오버차지 완료! 반동 데미지 주의!";
-        }
-
-        // 이펙트 프리팹이 있는 경우에만 생성
-        if (effectPrefab != null)
-        {
-            try
+            else if (currentChargeLevel == 2)
             {
-                // 이펙트 생성
-                activeChargingEffect = Instantiate(effectPrefab, safeSpawnPosition, Quaternion.identity);
-                
-                // 바로 부모를 설정하지 않고 한 프레임 기다림
-                yield return null;
-                
-                // 이제 부모 설정 (부모-자식 관계로 인한 Transform 문제 방지)
-                if (activeChargingEffect != null)
+                Debug.Log("2단계 압력 충전 완료!");
+                if (audioSource != null && pressureBuildSound != null)
                 {
-                    activeChargingEffect.transform.SetParent(firePoint);
-                    
-                    // Z 위치를 명시적으로 0으로 설정 (정렬 문제 방지)
-                    Vector3 localPos = activeChargingEffect.transform.localPosition;
-                    localPos.z = 0f;
-                    activeChargingEffect.transform.localPosition = localPos;
-                    
-                    // 모든 자식 오브젝트의 Z 위치도 0으로 설정
-                    foreach (Transform child in activeChargingEffect.transform)
-                    {
-                        if (child != null)
-                        {
-                            Vector3 childLocalPos = child.localPosition;
-                            childLocalPos.z = 0f;
-                            child.localPosition = childLocalPos;
-                        }
-                    }
-                }
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError($"이펙트 생성 중 오류 발생: {e.Message}");
-                if (activeChargingEffect != null)
-                {
-                    Destroy(activeChargingEffect);
-                    activeChargingEffect = null;
+                    audioSource.pitch = 1.2f;
+                    audioSource.PlayOneShot(pressureBuildSound, 0.7f);
                 }
             }
         }
-
-        // 사운드 재생
-        if (audioSource != null && soundToPlay != null)
-        {
-            audioSource.PlayOneShot(soundToPlay);
-        }
-
-        Debug.Log(logMessage);
     }
 
     public void StartCharging()
@@ -254,20 +202,21 @@ public class WeaponManager : Singleton<WeaponManager>
         currentChargeTime = 0f;
         currentChargeLevel = 0;
 
-        // 이미 활성화된 이펙트가 있다면 제거
-        if (activeChargingEffect != null)
+        // 압력 이펙트 활성화
+        if (pressureEffect != null)
         {
-            Destroy(activeChargingEffect);
-            activeChargingEffect = null;
+            // 진행 중인 이펙트 코루틴이 있다면 중지
+            if (effectCoroutine != null)
+            {
+                StopCoroutine(effectCoroutine);
+                effectCoroutine = null;
+            }
+            
+            pressureEffect.gameObject.SetActive(true); // 이펙트 활성화
+            pressureEffect.SetPressure(0f);
         }
 
-        // 차징 시작 사운드 재생
-        if (audioSource != null && chargingStartSound != null)
-        {
-            audioSource.PlayOneShot(chargingStartSound);
-        }
-
-        Debug.Log("차징 시작");
+        Debug.Log("압력 충전 시작");
     }
 
     public void StopCharging()
@@ -280,31 +229,70 @@ public class WeaponManager : Singleton<WeaponManager>
         }
 
         // 차징 상태였다면 차징 레벨에 따른 공격 발사
-        FireChargedBullet();
+        FireSteamPressureBullet();
 
-        // 차징 상태 및 이펙트 초기화
+        // 차징 상태 초기화
         isCharging = false;
         currentChargeTime = 0f;
         currentChargeLevel = 0;
 
-        // 이펙트 제거 - 안전하게 처리
-        if (activeChargingEffect != null)
+        // 압력 방출 효과를 코루틴으로 처리
+        // 이전 코루틴이 있다면 중지하고 새로운 코루틴 시작
+        if (effectCoroutine != null)
         {
-            // 부모 연결 해제
-            activeChargingEffect.transform.SetParent(null);
+            StopCoroutine(effectCoroutine);
+        }
+        effectCoroutine = StartCoroutine(ReleasePressureEffect());
+    }
+
+    // 압력 방출 효과를 처리하는 코루틴
+    private IEnumerator ReleasePressureEffect()
+    {
+        if (pressureEffect != null && pressureEffect.gameObject.activeSelf)
+        {
+            // 압력 게이지를 0으로 설정하고 방출 효과 준비
+            pressureEffect.SetPressure(0f);
             
-            // 렌더러 비활성화
-            SpriteRenderer[] renderers = activeChargingEffect.GetComponentsInChildren<SpriteRenderer>();
-            foreach (SpriteRenderer renderer in renderers)
+            // 증기 파티클 방출 효과를 직접 처리
+            StartCoroutine(BurstSteamParticles());
+            
+            // 압력 방출 사운드를 재생하기 위해 약간의 지연
+            yield return new WaitForSeconds(0.1f);
+            
+            // 압력 방출 애니메이션 완료를 위한 대기 시간
+            yield return new WaitForSeconds(1.5f);
+            
+            // 차징 중이 아닐 때만 이펙트 비활성화
+            if (!isCharging)
             {
-                if (renderer != null)
-                {
-                    renderer.enabled = false;
-                }
+                pressureEffect.gameObject.SetActive(false);
             }
-            
-            Destroy(activeChargingEffect);
-            activeChargingEffect = null;
+        }
+        
+        effectCoroutine = null;
+    }
+
+    // 압력 방출 시 증기 폭발 효과
+    private IEnumerator BurstSteamParticles()
+    {
+        if (pressureEffect != null && pressureEffect.gameObject.activeSelf)
+        {
+            int burstAmount = 20; // 기본 증기 파티클 수
+            float currentPressure = pressureEffect.GetComponent<SteamPressureEffect>().GetCurrentPressure();
+            burstAmount = Mathf.RoundToInt(burstAmount * (1f + currentPressure));
+
+            // 압력 방출 사운드 재생
+            if (audioSource != null && pressureReleaseSound != null && currentPressure > 0.3f)
+            {
+                audioSource.pitch = Random.Range(0.8f, 1.2f);
+                audioSource.PlayOneShot(pressureReleaseSound, Mathf.Min(1.0f, currentPressure));
+            }
+
+            for (int i = 0; i < burstAmount; i++)
+            {
+                pressureEffect.EmitSteamParticleExternal();
+                yield return new WaitForSeconds(0.03f);
+            }
         }
     }
 
@@ -361,46 +349,29 @@ public class WeaponManager : Singleton<WeaponManager>
             return;
         }
 
+        // 발사 쿨다운 체크
+        if (Time.time < nextFireTime)
+        {
+            return; // 아직 발사할 수 없음
+        }
+
+        // 다음 발사 시간 설정
+        nextFireTime = Time.time + fireRate;
+
         Vector2 direction = GetAimDirection();
-        
-        // 총알 스폰 위치를 플레이어 콜라이더 밖으로 더 멀리 설정 (0.2f에서 0.5f로 증가)
-        Vector3 spawnPosition = firePoint.position + new Vector3(direction.x * 0.5f, 0, 0);
-        
-        Debug.Log($"총알 발사 - 방향: {direction}, 생성 위치: {spawnPosition}");
+        Vector3 spawnPosition = firePoint.position + new Vector3(direction.x * 0.2f, 0, 0);
 
         // 일반 총알 생성
         GameObject bullet = Instantiate(bulletPrefab, spawnPosition, Quaternion.identity);
         
-        // 기본 총알 크기 약간 키우기 (기존 크기가 너무 작았음)
-        bullet.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
-
-        // 총알 콜라이더 크기 로깅
-        Collider2D bulletCollider = bullet.GetComponent<Collider2D>();
-        if (bulletCollider != null)
-        {
-            if (bulletCollider is CircleCollider2D)
-            {
-                CircleCollider2D circleCollider = bulletCollider as CircleCollider2D;
-                Debug.Log($"총알 원형 콜라이더 - 반지름: {circleCollider.radius}, 오프셋: {circleCollider.offset}");
-            }
-            else if (bulletCollider is BoxCollider2D)
-            {
-                BoxCollider2D boxCollider = bulletCollider as BoxCollider2D;
-                Debug.Log($"총알 박스 콜라이더 - 크기: {boxCollider.size}, 오프셋: {boxCollider.offset}");
-            }
-            else if (bulletCollider is CapsuleCollider2D)
-            {
-                CapsuleCollider2D capsuleCollider = bulletCollider as CapsuleCollider2D;
-                Debug.Log($"총알 캡슐 콜라이더 - 크기: {capsuleCollider.size}, 오프셋: {capsuleCollider.offset}");
-            }
-        }
+        // 총알 크기 설정
+        bullet.transform.localScale = normalBulletScale;
 
         // 총알 속도 설정
         Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
         if (bulletRb != null)
         {
             bulletRb.velocity = direction * bulletSpeed;
-            Debug.Log($"총알 속도 설정: {bulletRb.velocity}, 속력: {bulletSpeed}");
         }
         else
         {
@@ -431,7 +402,7 @@ public class WeaponManager : Singleton<WeaponManager>
         }
     }
 
-    private void FireChargedBullet()
+    private void FireSteamPressureBullet()
     {
         // 재장전 중이거나 탄약 없으면 발사 불가
         if (isReloading || currentAmmo <= 0)
@@ -443,71 +414,86 @@ public class WeaponManager : Singleton<WeaponManager>
             return;
         }
 
-        // 차징 레벨에 따른 총알 타입 결정
+        // 발사 쿨다운 체크 - 차징샷은 쿨다운 없이 항상 발사 가능
+        // 대신 차징 후에는 다음 발사 시간을 설정하여 연속 발사 방지
+        nextFireTime = Time.time + fireRate;
+
+        // 압력 차징 레벨에 따른 총알 타입 결정
         GameObject bulletToSpawn;
         float damage;
-        Vector3 scale = Vector3.one;
-        bool isOvercharged = false;
+        Vector3 scale;
+        Color bulletColor = Color.white;
 
-        if (currentChargeLevel == 3)
+        if (currentChargeLevel == 2)
         {
-            // 오버차지샷 (과열)
-            bulletToSpawn = overchargeBulletPrefab;
-            damage = level2Damage * 3f; // 기본 데미지의 3배
-            scale = new Vector3(1.0f, 1.0f, 1.0f); // 크기 조정 (이전 2.0f에서 더 작게)
-            isOvercharged = true;
-            Debug.Log("과열 상태 차징샷 발사! 주의: 적중 시 반동 데미지!");
-        }
-        else if (currentChargeLevel == 2)
-        {
-            // 2단계 차징샷
+            // 2단계 차징샷 (강력한 증기압)
             bulletToSpawn = level2BulletPrefab;
             damage = level2Damage;
-            scale = new Vector3(0.7f, 0.7f, 0.7f); // 크기 조정 (이전 1.5f에서 더 작게)
-            Debug.Log("2단계 차징샷 발사!");
+            scale = level2BulletScale;
+            bulletColor = new Color(1.0f, 0.5f, 0.1f, 1.0f); // 주황색 (고온 증기)
+            Debug.Log("최대 증기압 발사!");
+
+            // 최대 압력 방출 사운드
+            if (audioSource != null && pressureReleaseSound != null)
+            {
+                audioSource.pitch = 0.8f;
+                audioSource.PlayOneShot(pressureReleaseSound, 1.0f);
+            }
         }
         else if (currentChargeLevel == 1)
         {
-            // 1단계 차징샷
+            // 1단계 차징샷 (중간 증기압)
             bulletToSpawn = level1BulletPrefab;
             damage = level1Damage;
-            scale = new Vector3(0.4f, 0.4f, 0.4f); // 크기 조정 (이전 1.2f에서 더 작게)
-            Debug.Log("1단계 차징샷 발사!");
+            scale = level1BulletScale;
+            bulletColor = new Color(0.7f, 0.7f, 0.7f, 1.0f); // 회색 (일반 증기)
+            Debug.Log("중간 증기압 발사!");
+
+            // 중간 압력 방출 사운드
+            if (audioSource != null && pressureReleaseSound != null)
+            {
+                audioSource.pitch = 1.0f;
+                audioSource.PlayOneShot(pressureReleaseSound, 0.7f);
+            }
         }
         else
         {
             // 차징이 충분하지 않으면 일반 총알
             bulletToSpawn = bulletPrefab;
             damage = 10f;
-            scale = new Vector3(0.25f, 0.25f, 0.25f); // 기본 총알과 동일한 크기
+            scale = normalBulletScale;
+            bulletColor = Color.white;
             Debug.Log("일반 공격 발사!");
-        }
 
-        // 차징샷 사운드 재생
-        if (audioSource != null && chargingShotSound != null && currentChargeLevel > 0)
-        {
-            audioSource.PlayOneShot(chargingShotSound);
+            // 일반 발사 사운드
+            if (audioSource != null && steamHissSound != null)
+            {
+                audioSource.pitch = 1.2f;
+                audioSource.PlayOneShot(steamHissSound, 0.5f);
+            }
         }
 
         Vector2 direction = GetAimDirection();
-        
-        // 총알 스폰 위치를 플레이어 콜라이더 밖으로 더 멀리 설정 (0.2f에서 0.5f로 증가)
-        Vector3 spawnPosition = firePoint.position + new Vector3(direction.x * 0.5f, 0, 0);
-        
-        Debug.Log($"차징 총알 발사 - 레벨: {currentChargeLevel}, 방향: {direction}, 생성 위치: {spawnPosition}, 크기: {scale}");
+        Vector3 spawnPosition = firePoint.position + new Vector3(direction.x * 0.2f, 0, 0);
 
         // 총알 생성 및 설정
         GameObject bullet = Instantiate(bulletToSpawn, spawnPosition, Quaternion.identity);
         bullet.transform.localScale = scale;
 
-        // 총알 속도 설정 (차징샷은 약간 더 빠름)
-        float finalBulletSpeed = bulletSpeed * (1f + currentChargeLevel * 0.2f);
+        // 총알 색상 설정 (증기 색상)
+        SpriteRenderer bulletRenderer = bullet.GetComponent<SpriteRenderer>();
+        if (bulletRenderer != null)
+        {
+            bulletRenderer.color = bulletColor;
+        }
+
+        // 총알 속도 설정 (압력에 따라 더 빠름)
+        float finalBulletSpeed = bulletSpeed * (1f + currentChargeLevel * 0.3f);
 
         Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
         if (bulletRb != null)
         {
             bulletRb.velocity = direction * finalBulletSpeed;
-            Debug.Log($"차징 총알 속도 설정: {bulletRb.velocity}, 속력: {finalBulletSpeed}");
         }
 
         // 총알 회전 설정
@@ -519,15 +505,39 @@ public class WeaponManager : Singleton<WeaponManager>
         if (bulletComponent != null)
         {
             bulletComponent.damage = damage;
-            
-            // 과열 상태 설정
-            bulletComponent.isOvercharged = isOvercharged;
+        }
+
+        // 증기 파티클 효과 추가 (총알에 트레일 효과)
+        if (currentChargeLevel > 0)
+        {
+            TrailRenderer trail = bullet.GetComponent<TrailRenderer>();
+            if (trail == null)
+            {
+                trail = bullet.AddComponent<TrailRenderer>();
+                trail.startWidth = 0.1f * scale.x;
+                trail.endWidth = 0.01f;
+                trail.time = 0.1f;
+
+                // 증기 트레일 색상 설정
+                Gradient gradient = new Gradient();
+                gradient.SetKeys(
+                    new GradientColorKey[] {
+                        new GradientColorKey(bulletColor, 0.0f),
+                        new GradientColorKey(new Color(0.8f, 0.8f, 0.8f, 1f), 1.0f)
+                    },
+                    new GradientAlphaKey[] {
+                        new GradientAlphaKey(0.7f, 0.0f),
+                        new GradientAlphaKey(0.0f, 1.0f)
+                    }
+                );
+                trail.colorGradient = gradient;
+            }
         }
 
         // 총알 소멸 처리
         Destroy(bullet, bulletLifetime);
 
-        // 탄약 감소 (차징샷도 한 발만 소모)
+        // 탄약 감소
         currentAmmo--;
 
         // 탄약 소진 시 재장전
@@ -549,24 +559,18 @@ public class WeaponManager : Singleton<WeaponManager>
             currentChargeTime = 0f;
             currentChargeLevel = 0;
 
-            // 이펙트 제거 - 안전하게 처리
-            if (activeChargingEffect != null)
+            // 압력 이펙트 비활성화
+            if (pressureEffect != null)
             {
-                // 부모 연결 해제
-                activeChargingEffect.transform.SetParent(null);
+                pressureEffect.SetPressure(0f);
                 
-                // 렌더러 비활성화
-                SpriteRenderer[] renderers = activeChargingEffect.GetComponentsInChildren<SpriteRenderer>();
-                foreach (SpriteRenderer renderer in renderers)
+                // 이펙트 코루틴 중지 및 이펙트 비활성화
+                if (effectCoroutine != null)
                 {
-                    if (renderer != null)
-                    {
-                        renderer.enabled = false;
-                    }
+                    StopCoroutine(effectCoroutine);
+                    effectCoroutine = null;
                 }
-                
-                Destroy(activeChargingEffect);
-                activeChargingEffect = null;
+                pressureEffect.gameObject.SetActive(false);
             }
         }
 

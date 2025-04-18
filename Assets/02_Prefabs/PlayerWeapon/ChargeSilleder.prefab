@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7931724891098488312}
-  - component: {fileID: 2404656568313387329}
+  - component: {fileID: -74512542607055172}
   m_Layer: 0
-  m_Name: 2LevelCharge
+  m_Name: ChargeSilleder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26,13 +26,13 @@ Transform:
   m_GameObject: {fileID: 8055816082711127519}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -17.425, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2404656568313387329
+--- !u!114 &-74512542607055172
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,25 +41,35 @@ MonoBehaviour:
   m_GameObject: {fileID: 8055816082711127519}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18eef706006217340aaddbae1f9c4525, type: 3}
+  m_Script: {fileID: 11500000, guid: a6bbf81fdd619844791b570a21d3a7ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeed: 120
-  pulseSpeed: 3
-  pulseMinScale: 0.9
-  pulseMaxScale: 1.5
-  effectColor: {r: 1, g: 0.8254717, b: 0.8254717, a: 1}
-  alphaValue: 0.8
-  useOuterRing: 1
-  outerRingSize: 1.5
-  outerRingRotationSpeed: -90
-  outerRingColor: {r: 1, g: 0.93657047, b: 0.8726415, a: 0.6}
-  useParticles: 1
-  particleCount: 12
-  particleSpeed: 1.5
-  particleSize: 0.15
-  useEnergyBalls: 0
-  energyBallCount: 4
-  energyBallSize: 0.2
-  energyBallOrbitSpeed: 2
-  energyBallOrbitRadius: 0.8
+  attachPoint: {fileID: 7931724891098488312}
+  baseScale: 1
+  currentPressure: 0
+  showPressureGauge: 1
+  gaugeSize: 0.5
+  lowPressureColor: {r: 0.2, g: 0.8, b: 0.2, a: 1}
+  mediumPressureColor: {r: 0.9, g: 0.9, b: 0.2, a: 1}
+  highPressureColor: {r: 0.9, g: 0.2, b: 0.2, a: 1}
+  emitSteam: 1
+  maxSteamParticles: 20
+  steamParticleSize: 1
+  steamSpeed: 1.5
+  steamLifetime: 1
+  steamColor: {r: 0.9, g: 0.9, b: 0.9, a: 0.7}
+  showGears: 1
+  gearCount: 7
+  gearMinSize: 0.15
+  gearMaxSize: 0.3
+  gearColor: {r: 0.7, g: 0.5, b: 0.2, a: 1}
+  showPipes: 1
+  pipeSegments: 4
+  pipeThickness: 0.08
+  pipeColor: {r: 0.6, g: 0.4, b: 0.2, a: 1}
+  playSounds: 1
+  pressureBuildSound: {fileID: 0}
+  pressureReleaseSound: {fileID: 0}
+  steamHissSound: {fileID: 0}
+  minPitchVariation: 0.8
+  maxPitchVariation: 1.2
