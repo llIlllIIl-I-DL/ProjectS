@@ -6,7 +6,8 @@ using UnityEngine.InputSystem;
 public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
 {
     private BaseObject baseObject;
-
+    
+    [SerializeField] private float interactionRadius = 2f; // 상호작용 가능 범위
     [SerializeField] private float doubleTapTime = 0.5f;
 
     private PlayerInput playerInputs;
@@ -273,6 +274,53 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
         }
     }
 
+    // 다른 오브젝트와 충돌 감지
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        // 상호작용 가능한 오브젝트 확인
+        BaseObject obj = other.GetComponent<BaseObject>();
+        if (obj != null)
+        {
+            baseObject = obj;
+        }
+    }
+
+    // 충돌 종료 감지
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        // 상호작용 가능한 오브젝트에서 벗어났는지 확인
+        BaseObject obj = other.GetComponent<BaseObject>();
+        if (obj != null && obj == baseObject)
+        {
+            baseObject = null;
+        }
+    }
+    
+    // 가장 가까운 상호작용 가능한 오브젝트 찾기
+    private BaseObject FindNearestInteractableObject()
+    {
+        // 주변의 모든 콜라이더 탐색
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, interactionRadius);
+        
+        BaseObject nearestObject = null;
+        float minDistance = interactionRadius;
+        
+        foreach (Collider2D collider in colliders)
+        {
+            BaseObject obj = collider.GetComponent<BaseObject>();
+            if (obj != null)
+            {
+                float distance = Vector2.Distance(transform.position, obj.transform.position);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    nearestObject = obj;
+                }
+            }
+        }
+        
+        return nearestObject;
+    }
 
     public void OnInteraction(InputAction.CallbackContext context)
     {
@@ -280,8 +328,13 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
         {
             Debug.Log("상호작용 입력 감지");
 
-
             GameObject interactor = this.gameObject;
+            
+            // 이미 감지된 오브젝트가 없으면 가장 가까운 오브젝트 찾기
+            if (baseObject == null)
+            {
+                baseObject = FindNearestInteractableObject();
+            }
 
             if (baseObject != null)
             {
@@ -289,7 +342,7 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
             }
             else
             {
-                Debug.LogWarning("BaseObject가 설정되지 않았습니다.");
+                Debug.LogWarning("상호작용 가능한 오브젝트가 범위 내에 없습니다.");
             }
         }
     }
