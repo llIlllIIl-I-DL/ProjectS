@@ -68,6 +68,12 @@ public class InventoryManager : MonoBehaviour
 
         // 복장 세트 정보 초기화
         InitializeCostumeSets();
+        
+        // 시작 시 현재 무기 속성이 있으면 WeaponManager에 설정
+        if (equippedWeaponAttribute != null)
+        {
+            UpdateWeaponBulletType(equippedWeaponAttribute);
+        }
     }
 
     // ItemManager에서 아이템 로드
@@ -215,7 +221,11 @@ public class InventoryManager : MonoBehaviour
                 weaponAttributes.Remove(item);
                 // 장착된 무기 속성이면 장착 해제
                 if (equippedWeaponAttribute == item)
+                {
                     equippedWeaponAttribute = null;
+                    // WeaponManager에 Normal 타입으로 설정
+                    UpdateWeaponBulletType(null);
+                }
                 break;
             case ItemType.CostumeParts:
                 costumeParts.Remove(item);
@@ -250,10 +260,36 @@ public class InventoryManager : MonoBehaviour
             // 무기 속성 장착 이벤트 발생
             OnItemEquipped?.Invoke(weaponAttribute);
             
+            // 무기 속성 변경 이벤트 발생
+            OnWeaponAttributeChanged?.Invoke(weaponAttribute);
+            
+            // WeaponManager에 불릿 타입 설정
+            UpdateWeaponBulletType(weaponAttribute);
+            
             Debug.Log($"무기 속성 장착: {weaponAttribute.ItemName}");
         }
         
         return true;
+    }
+    
+    // WeaponManager의 총알 타입 업데이트
+    private void UpdateWeaponBulletType(ItemData weaponAttribute)
+    {
+        if (WeaponManager.Instance != null)
+        {
+            ElementType bulletType = ElementType.Normal; // 기본값
+            
+            // 무기 속성이 있으면 해당 속성의 ElementType으로 설정
+            if (weaponAttribute != null && weaponAttribute.itemType == ItemType.WeaponAttribute)
+            {
+                bulletType = weaponAttribute.elementType;
+            }
+            
+            // WeaponManager에 총알 타입 설정
+            WeaponManager.Instance.SetBulletType(bulletType);
+            
+            Debug.Log($"무기 총알 타입이 {bulletType}으로 변경되었습니다.");
+        }
     }
 
     // 코스튬 파츠 장착

@@ -5,7 +5,6 @@ using UnityEngine;
 public class WeaponManager : Singleton<WeaponManager>
 {
     [Header("총알 설정")]
-    [SerializeField] private GameObject bulletPrefab;       // 일반 총알
     [SerializeField] private Transform firePoint;           // 총알이 발사되는 위치
     [SerializeField] private float bulletSpeed = 15f;
     [SerializeField] private float bulletLifetime = 3f;
@@ -20,8 +19,6 @@ public class WeaponManager : Singleton<WeaponManager>
     private float nextFireTime = 0f;                        // 다음 발사 가능 시간
 
     [Header("스팀 압력 차징 설정")]
-    [SerializeField] private GameObject level1BulletPrefab; // 1단계 차지샷 (중간 압력)
-    [SerializeField] private GameObject level2BulletPrefab; // 2단계 차지샷 (최대 압력)
     [SerializeField] private float chargingLevel1Time = 1.0f; // 1단계 차지에 필요한 시간
     [SerializeField] private float chargingLevel2Time = 2.5f; // 2단계 차지에 필요한 시간
     [SerializeField] private float level1Damage = 2f;      // 1단계 차지샷 데미지
@@ -56,25 +53,6 @@ public class WeaponManager : Singleton<WeaponManager>
         {
             firePoint = transform;
             Debug.LogWarning("WeaponManager: firePoint가 설정되지 않아 플레이어 위치로 기본 설정됩니다.");
-        }
-
-        // 총알 프리팹이 할당되었는지 검사
-        if (bulletPrefab == null)
-        {
-            Debug.LogError("WeaponManager: bulletPrefab이 인스펙터에서 할당되지 않았습니다");
-        }
-
-        // 차징 공격 프리팹 검사 및 대체
-        if (level1BulletPrefab == null)
-        {
-            level1BulletPrefab = bulletPrefab;
-            Debug.LogWarning("WeaponManager: level1BulletPrefab이 할당되지 않아 일반 총알로 대체됩니다.");
-        }
-
-        if (level2BulletPrefab == null)
-        {
-            level2BulletPrefab = bulletPrefab;
-            Debug.LogWarning("WeaponManager: level2BulletPrefab이 할당되지 않아 일반 총알로 대체됩니다.");
         }
 
         // 플레이어 컴포넌트 참조 가져오기
@@ -398,6 +376,9 @@ public class WeaponManager : Singleton<WeaponManager>
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         bullet.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
+        // 총알 소멸 처리
+        Destroy(bullet, bulletLifetime);
+
         // 탄약 감소
         currentAmmo--;
 
@@ -425,7 +406,6 @@ public class WeaponManager : Singleton<WeaponManager>
         nextFireTime = Time.time + fireRate;
 
         // 압력 차징 레벨에 따른 총알 타입 결정
-        float damage;
         Vector3 scale;
         Color bulletColor = Color.white;
         bool isOvercharged = false; // 2단계에서만 오버차지 상태 설정
@@ -433,7 +413,6 @@ public class WeaponManager : Singleton<WeaponManager>
         if (currentChargeLevel == 2)
         {
             // 2단계 차징샷 (강력한 증기압) - 오버차지 상태
-            damage = level2Damage;
             scale = level2BulletScale;
             bulletColor = new Color(1.0f, 0.5f, 0.1f, 1.0f); // 주황색 (고온 증기)
             isOvercharged = true; // 최대 압력일 때 오버차지 상태로 설정
@@ -449,7 +428,6 @@ public class WeaponManager : Singleton<WeaponManager>
         else if (currentChargeLevel == 1)
         {
             // 1단계 차징샷 (중간 증기압)
-            damage = level1Damage;
             scale = level1BulletScale;
             bulletColor = new Color(0.7f, 0.7f, 0.7f, 1.0f); // 회색 (일반 증기)
             Debug.Log("중간 증기압 발사!");
@@ -464,7 +442,6 @@ public class WeaponManager : Singleton<WeaponManager>
         else
         {
             // 차징이 충분하지 않으면 일반 총알
-            damage = 10f;
             scale = normalBulletScale;
             bulletColor = Color.white;
             Debug.Log("일반 공격 발사!");

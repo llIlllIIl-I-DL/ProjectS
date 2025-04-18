@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3706757852589720071}
   - component: {fileID: 3355249557366785551}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -73,8 +73,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0.21226418, g: 1, b: 0.21619432, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 6bd720690e505d444b560a9f8c54819b, type: 3}
+  m_Color: {r: 0.38679248, g: 0.38679248, b: 0.38679248, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -95,8 +95,9 @@ GameObject:
   - component: {fileID: 3993583324721861071}
   - component: {fileID: 2594896412087212949}
   - component: {fileID: 6407862367436263255}
-  m_Layer: 0
-  m_Name: ChargeBullet
+  - component: {fileID: 6305969457568904122}
+  m_Layer: 12
+  m_Name: IronBullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -151,7 +152,7 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.3, y: 0.3}
   m_Direction: 0
 --- !u!50 &6407862367436263255
 Rigidbody2D:
@@ -180,3 +181,22 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &6305969457568904122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6760042265540064826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ce67b9469728374cb1144dbe3882af9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 3
+  knockbackForce: 5
+  bulletType: 2
+  isOvercharged: 1
+  extraDamageMultiplier: 1.5
+  overchargedLifetime: 3
+  overchargedScale: 1.2
