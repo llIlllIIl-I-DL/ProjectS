@@ -17,6 +17,9 @@ public class BossSmashAttackState : IEnemyState
     [SerializeField] private float smashRange = 2f; // 타격 판정 범위
     [SerializeField] private int smashDamage = 20; // 타격 데미지
 
+    private enum SmashType { Slash, Kick } // 근접 공격 타입 정의
+    private SmashType currentAttackType;
+
     public BossSmashAttackState(BossStateMachine stateMachine)
     {
         BossStateMachine = stateMachine;
