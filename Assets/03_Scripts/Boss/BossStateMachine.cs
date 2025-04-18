@@ -1,22 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 public enum BossState
 {
     Idle,
-    Attack,
+    ProjectileAttack,
+    SmashAttack,
     Move,
 }
-public abstract class BossStateMachine : MonoBehaviour
+public class BossStateMachine : MonoBehaviour
 {
     protected IEnemyState currentState;
-
     private Dictionary<BossState, IEnemyState> states = new Dictionary<BossState, IEnemyState>();
+
+    public Transform playerTransform; //플레이어 위치 참조
+    public GameObject projectilePrefab; //투사체 프리팹
+    public Transform firePoint; //투사체 발사 위치
 
     public void Start()
     {
+
+        playerTransform = GameObject.FindWithTag("Player")?.transform;
+
         states.Add(BossState.Idle, new BossIdleState(this));
-        states.Add(BossState.Attack, new BossAttackState(this));
+        states.Add(BossState.ProjectileAttack, new BossProjectileAttackState(this));
+        states.Add(BossState.SmashAttack, new BossSmashAttackState(this));
         states.Add(BossState.Move, new BossMoveState(this));
 
         ChangeState(BossState.Idle);

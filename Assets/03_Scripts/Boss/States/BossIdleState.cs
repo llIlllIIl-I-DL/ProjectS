@@ -6,49 +6,65 @@ public class BossIdleState : IEnemyState
 {
 
     BossStateMachine BossStateMachine;
+    private Transform bossTransform;
+    private Transform playerTransform;
 
-    public Transform player;  // 플레이어 Transform 연결 필요
-    private Transform boss;   // 이 스크립트가 붙은 오브젝트가 보스라고 가정
+    [SerializeField] private float detectionRange = 10f; // 보스가 플레이어를 감지할 수 있는 거리
+    [SerializeField] private float attackRange = 5f;     // 보스 근거리 공격 기준 거리
 
     public BossIdleState(BossStateMachine stateMachine)
     {
         BossStateMachine = stateMachine;
+
+        //보스와 플레이어의 Transform을 생성자에서 가져와서 초기화
+        bossTransform = stateMachine.transform;
+        playerTransform = stateMachine.playerTransform;
     }
 
     public void Enter()
     {
-        throw new System.NotImplementedException();
+        Debug.Log("Boss Idle 상태 진입");
+        // 보스 대기 또는 등장 연출 등 처리 가능
     }
 
     public void Exit()
     {
-        throw new System.NotImplementedException();
+        Debug.Log("Idle 상태 종료");
     }
 
     public void FixedUpdate()
     {
-        throw new System.NotImplementedException();
+        // Idle 상태에서는 별도 움직임 없으므로 생략 가능
     }
 
     public void OnTriggerEnter2D(Collider2D other)
     {
-        throw new System.NotImplementedException();
+        // 필요 시 구현 (예: 공격 판정 등)
     }
 
     public void Update()
     {
-        //아이들 상태가 됐을때 어떤 작업이 계속 될지
-        //ex)거리 체크
+        if (playerTransform == null || bossTransform == null) return;
 
-        float distance = Vector3.Distance(player.position, boss.position);
+        //플레이어와 보스 사이 거리 측정
+        float distance = Vector3.Distance(playerTransform.position, bossTransform.position);
         Debug.Log("플레이어와 보스 사이 거리: " + distance);
 
-        // 예시: 거리가 5 이하면 공격 시작
-        if (distance < 5f)
+        // 거리 기반 상태 전환 로직
+        if (distance >= detectionRange)
         {
-            Debug.Log("플레이어가 가까움! 공격 시작!");
+            Debug.Log("Move 상태로 전환");
+            BossStateMachine.ChangeState(BossState.Move);
         }
-
-        BossStateMachine.ChangeState(BossState.Move);
+        else if (distance < detectionRange && distance >= attackRange)
+        {
+            Debug.Log("ProjectileAttack 상태로 전환");
+            BossStateMachine.ChangeState(BossState.ProjectileAttack);
+        }
+        else
+        {
+            Debug.Log("SmashAttack 상태로 전환");
+            BossStateMachine.ChangeState(BossState.SmashAttack);
+        }
     }
 }
