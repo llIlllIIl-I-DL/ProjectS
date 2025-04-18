@@ -76,7 +76,6 @@ public class UIManager : Singleton<UIManager>
 
         yield return new WaitForSeconds(1);
 
-
         while (alpha < 1f)
         {
             alpha += Time.deltaTime * fadeSpeed;
@@ -97,7 +96,6 @@ public class UIManager : Singleton<UIManager>
             yield return new WaitForSeconds(3);
 
             ToStartMenu(_gameOverWindow);
-
         }
     }
 
