@@ -19,6 +19,10 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
     public bool JumpPressed { get; private set; }
     public bool JumpReleased { get; private set; } = true;
     public bool DashPressed { get; private set; }
+    
+    // 공격 입력 상태
+    public bool IsAttackPressed { get; private set; }
+    public bool IsChargingAttack { get; private set; }
 
     // 더블 탭 관련
     private float lastLeftTapTime;
@@ -34,6 +38,9 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
     public event Action OnDashInput;
     public event Action OnSprintActivated;
     public event Action OnAttackInput;
+    public event Action OnAttackRelease;
+    public event Action OnChargeAttackStart;
+    public event Action OnChargeAttackRelease;
     public event Action OnCrouchInput;
     public event Action OnWingsuitActivated;
 
@@ -204,8 +211,21 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
     {
         if (context.started)
         {
-            Debug.Log("공격 입력 감지");
+            Debug.Log("공격 입력 감지 - 차징 시작");
+            IsAttackPressed = true;
             OnAttackInput?.Invoke();
+            
+            // 차징 시작
+            WeaponManager.Instance.StartCharging();
+        }
+        else if (context.canceled)
+        {
+            Debug.Log("공격 입력 해제 - 발사");
+            IsAttackPressed = false;
+            OnAttackRelease?.Invoke();
+            
+            // 차징 해제 및 발사
+            WeaponManager.Instance.StopCharging();
         }
     }
 
@@ -256,5 +276,7 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
     {
         JumpPressed = false;
         DashPressed = false;
+        IsAttackPressed = false;
+        IsChargingAttack = false;
     }
 }
