@@ -11,11 +11,13 @@ public class CollisionDetector : MonoBehaviour
 
     private BoxCollider2D boxCollider;
     private int facingDirection = 1;
+    private int wallDirection = 0; // 0: 벽 없음, 1: 오른쪽 벽, -1: 왼쪽 벽
 
     public bool IsGrounded { get; private set; }
     public bool IsTouchingWall { get; private set; }
     public bool IsOnLadder { get; private set; }
     public bool IsAtTopOfLadder { get; private set; }
+    public int WallDirection => wallDirection; // 벽 방향 속성 추가
 
     public event Action<bool> OnGroundedChanged;
     public event Action<bool> OnWallTouchChanged;
@@ -33,7 +35,7 @@ public class CollisionDetector : MonoBehaviour
         bool wasOnLadder = IsOnLadder;
 
         IsGrounded = CheckIsGrounded();
-        IsTouchingWall = CheckIsTouchingWall();
+        CheckWallContact(); // 벽 접촉 확인과 방향 설정
         IsOnLadder = CheckIsOnLadder();
         IsAtTopOfLadder = CheckIsAtTopOfLadder();
 
@@ -45,7 +47,7 @@ public class CollisionDetector : MonoBehaviour
         if (wasTouchingWall != IsTouchingWall)
         {
             OnWallTouchChanged?.Invoke(IsTouchingWall);
-            Debug.Log($"벽 접촉 상태 변경: {IsTouchingWall}");
+            Debug.Log($"벽 접촉 상태 변경: {IsTouchingWall}, 벽 방향: {wallDirection}");
         }
 
         if (wasOnLadder != IsOnLadder)
@@ -88,38 +90,61 @@ public class CollisionDetector : MonoBehaviour
         return hit.collider != null;
     }
 
-    private bool CheckIsTouchingWall()
+    private void CheckWallContact()
     {
+        // 오른쪽과 왼쪽 두 방향으로 레이캐스트 발사
         Vector2 rayOriginTop = boxCollider.bounds.center + new Vector3(0, boxCollider.bounds.extents.y * 0.7f, 0);
         Vector2 rayOriginMiddle = boxCollider.bounds.center;
         Vector2 rayOriginBottom = boxCollider.bounds.center - new Vector3(0, boxCollider.bounds.extents.y * 0.7f, 0);
         
-        Vector2 rayDirection = new Vector2(facingDirection, 0);
+        // 오른쪽 방향 체크
+        RaycastHit2D hitRightTop = Physics2D.Raycast(rayOriginTop, Vector2.right, wallCheckDistance, wallLayer);
+        RaycastHit2D hitRightMiddle = Physics2D.Raycast(rayOriginMiddle, Vector2.right, wallCheckDistance, wallLayer);
+        RaycastHit2D hitRightBottom = Physics2D.Raycast(rayOriginBottom, Vector2.right, wallCheckDistance, wallLayer);
         
-        RaycastHit2D hitTop = Physics2D.Raycast(rayOriginTop, rayDirection, wallCheckDistance, wallLayer);
-        RaycastHit2D hitMiddle = Physics2D.Raycast(rayOriginMiddle, rayDirection, wallCheckDistance, wallLayer);
-        RaycastHit2D hitBottom = Physics2D.Raycast(rayOriginBottom, rayDirection, wallCheckDistance, wallLayer);
+        // 왼쪽 방향 체크
+        RaycastHit2D hitLeftTop = Physics2D.Raycast(rayOriginTop, Vector2.left, wallCheckDistance, wallLayer);
+        RaycastHit2D hitLeftMiddle = Physics2D.Raycast(rayOriginMiddle, Vector2.left, wallCheckDistance, wallLayer);
+        RaycastHit2D hitLeftBottom = Physics2D.Raycast(rayOriginBottom, Vector2.left, wallCheckDistance, wallLayer);
         
+        // 디버그 레이 그리기
         if (showDebugRays)
         {
-            Color rayColorTop = hitTop.collider != null ? Color.green : Color.blue;
-            Color rayColorMiddle = hitMiddle.collider != null ? Color.green : Color.blue;
-            Color rayColorBottom = hitBottom.collider != null ? Color.green : Color.blue;
+            // 오른쪽 레이 그리기
+            Color rayColorRightTop = hitRightTop.collider != null ? Color.green : Color.blue;
+            Color rayColorRightMiddle = hitRightMiddle.collider != null ? Color.green : Color.blue;
+            Color rayColorRightBottom = hitRightBottom.collider != null ? Color.green : Color.blue;
             
-            Debug.DrawRay(rayOriginTop, rayDirection * wallCheckDistance, rayColorTop);
-            Debug.DrawRay(rayOriginMiddle, rayDirection * wallCheckDistance, rayColorMiddle);
-            Debug.DrawRay(rayOriginBottom, rayDirection * wallCheckDistance, rayColorBottom);
+            Debug.DrawRay(rayOriginTop, Vector2.right * wallCheckDistance, rayColorRightTop);
+            Debug.DrawRay(rayOriginMiddle, Vector2.right * wallCheckDistance, rayColorRightMiddle);
+            Debug.DrawRay(rayOriginBottom, Vector2.right * wallCheckDistance, rayColorRightBottom);
+            
+            // 왼쪽 레이 그리기
+            Color rayColorLeftTop = hitLeftTop.collider != null ? Color.red : Color.yellow;
+            Color rayColorLeftMiddle = hitLeftMiddle.collider != null ? Color.red : Color.yellow;
+            Color rayColorLeftBottom = hitLeftBottom.collider != null ? Color.red : Color.yellow;
+            
+            Debug.DrawRay(rayOriginTop, Vector2.left * wallCheckDistance, rayColorLeftTop);
+            Debug.DrawRay(rayOriginMiddle, Vector2.left * wallCheckDistance, rayColorLeftMiddle);
+            Debug.DrawRay(rayOriginBottom, Vector2.left * wallCheckDistance, rayColorLeftBottom);
         }
         
-        if (hitTop.collider != null || hitMiddle.collider != null || hitBottom.collider != null)
+        bool rightWall = hitRightTop.collider != null || hitRightMiddle.collider != null || hitRightBottom.collider != null;
+        bool leftWall = hitLeftTop.collider != null || hitLeftMiddle.collider != null || hitLeftBottom.collider != null;
+        
+        // 벽 방향 설정
+        if (rightWall) wallDirection = 1;      // 오른쪽 벽
+        else if (leftWall) wallDirection = -1; // 왼쪽 벽
+        else wallDirection = 0;                // 벽 없음
+        
+        // 벽 접촉 상태 업데이트
+        IsTouchingWall = rightWall || leftWall;
+        
+        if (IsTouchingWall)
         {
-            string hitObjectName = (hitTop.collider != null) ? hitTop.collider.name : 
-                                  (hitMiddle.collider != null) ? hitMiddle.collider.name : 
-                                  (hitBottom.collider != null) ? hitBottom.collider.name : "알 수 없음";
-            Debug.Log($"벽 감지됨! 충돌체: {hitObjectName}, 방향: {facingDirection}");
+            string wallSide = wallDirection > 0 ? "오른쪽" : "왼쪽";
+            Debug.Log($"벽 감지됨! 벽 위치: {wallSide}, 방향: {wallDirection}");
         }
-        
-        return hitTop.collider != null || hitMiddle.collider != null || hitBottom.collider != null;
     }
 
     private bool CheckIsOnLadder()

@@ -312,23 +312,41 @@ public class PlayerAnimator : MonoBehaviour
     // 사망 상태 설정 메서드
     public void SetDead(bool isDead)
     {
-        // 이미 같은 상태면 중복 설정 방지
-        if (isDeadState == isDead) 
-        {
-            Debug.Log($"SetDead 무시: 이미 {isDead} 상태입니다");
-            return;
-        }
-        
-        isDeadState = isDead;
-        
         if (animator != null && HasParameter("IsDead"))
         {
+            isDeadState = isDead;
             animator.SetBool("IsDead", isDead);
-            Debug.Log($"플레이어 애니메이터: IsDead = {isDead} 설정 완료");
+            Debug.Log($"SetDead 메서드에서 IsDead 상태 변경: {isDead}");
         }
-        else
+    }
+
+    // 벽 슬라이딩 상태 설정 메서드
+    public void SetWallSliding(bool isWallSliding, int wallDirection)
+    {
+        if (animator != null)
         {
-            Debug.LogWarning($"IsDead 파라미터를 설정할 수 없습니다. 애니메이터: {animator != null}, 파라미터 존재: {animator != null && HasParameter("IsDead")}");
+            // 애니메이터 파라미터 설정
+            if (HasParameter("IsWallSliding"))
+            {
+                animator.SetBool("IsWallSliding", isWallSliding);
+            }
+            
+            // 벽 방향에 따라 애니메이션 좌우 반전 설정
+            if (isWallSliding && wallDirection != 0)
+            {
+                // 스프라이트 렌더러 찾기
+                SpriteRenderer spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+                if (spriteRenderer != null)
+                {
+                    // 벽 방향에 따라 반전 설정 (벽 방향의 반대로 플레이어가 바라봄)
+                    // wallDirection: 1 = 오른쪽 벽, -1 = 왼쪽 벽
+                    // 벽이 오른쪽에 있으면 플레이어는 왼쪽을 봐야 함 (flipX = true)
+                    // 벽이 왼쪽에 있으면 플레이어는 오른쪽을 봐야 함 (flipX = false)
+                    spriteRenderer.flipX = (wallDirection > 0);
+                    
+                    Debug.Log($"벽 슬라이딩 애니메이션 반전: 벽 방향 {wallDirection}, flipX={spriteRenderer.flipX}");
+                }
+            }
         }
     }
 }
