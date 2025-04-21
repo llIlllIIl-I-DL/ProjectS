@@ -42,6 +42,10 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] public TextMeshProUGUI typeName;
     [SerializeField] public Image typeIcon;
 
+    [Header("Utility Point")]
+    [SerializeField] public TextMeshProUGUI utilityPointText;
+    static int utilityPoint;
+
     static PlayerHP playerHP;
     public TypeItemSlotList typeItemSlotList;
 
@@ -69,7 +73,6 @@ public class PlayerUI : MonoBehaviour
 
         // 초기 무기 속성 설정
         UpdateWeaponAttributeUI(InventoryManager.Instance.EquippedWeaponAttribute);
-
     }
 
     public void Voscuro(Vector3 realPosition, float maxHP, float currentHP)
@@ -77,7 +80,7 @@ public class PlayerUI : MonoBehaviour
         HealHP();
     }
 
-    public void SetHealthBar(float maxHP, float currentHP)
+    public void SetHealthBar(float maxHP, float currentHP) //여기 언젠가 리팩토리 필요...
     {
         StartCoroutine(ShakingHPBar());
 
@@ -266,5 +269,12 @@ public class PlayerUI : MonoBehaviour
             InventoryManager.Instance.EquipWeaponAttribute(availableTypes[nextIndex]);
             Debug.Log($"무기 속성 변경: {availableTypes[nextIndex].ItemName}");
         }
+    }
+
+    public void AddUtilityPoint(int utilityPointForOneWay)
+    {
+        utilityPoint += utilityPointForOneWay;
+
+        utilityPointText.text = utilityPoint.ToString();
     }
 }
