@@ -7,16 +7,14 @@ using UnityEngine.UI;
 
 public class UIManager : Singleton<UIManager>
 {
-
     [Header("GameOver Window")]
     public float fadeSpeed = 1.5f;
+
     [SerializeField] public GameObject gameOverWindow;
     [SerializeField] public Transform gameOverWindowParents;
     [SerializeField] public Image fadeOut;
 
     public List<GameObject> allUIPages = new List<GameObject>();
-
-    float fadeOutAlpha;
 
     InputUI inputUI;
     GameObject _gameOverWindow;
@@ -91,7 +89,6 @@ public class UIManager : Singleton<UIManager>
         if (gameOverWindow != null)
         {
             _gameOverWindow = Instantiate(gameOverWindow, gameOverWindowParents);
-            //DontDestroyOnLoad(gameOverWindowParents);
 
             yield return new WaitForSeconds(3);
 
@@ -102,7 +99,6 @@ public class UIManager : Singleton<UIManager>
     public void ToStartMenu(GameObject _gameOverWindow)
     {
         SceneManager.LoadScene("TempStartScene", LoadSceneMode.Single);
-        //StartSceneController.Instance.DestroyGameOverWindow(_gameOverWindow, fadeOut);
 
         Debug.Log("스타트씬 이동!!");
     }
