@@ -318,4 +318,17 @@ public class PlayerMovement : MonoBehaviour
             OnDirectionChanged?.Invoke(facingDirection);
         }
     }
+
+    public float GetCurrentMoveSpeed()
+    {
+        // settings.moveSpeed에 스프린트 상태를 고려한 값을 반환
+        float currentSpeed = settings.moveSpeed;
+        if (isSprinting)
+        {
+            currentSpeed *= settings.sprintMultiplier;
+        }
+        
+        // 최소값 보장
+        return Mathf.Max(currentSpeed, 5f);
+    }
 }

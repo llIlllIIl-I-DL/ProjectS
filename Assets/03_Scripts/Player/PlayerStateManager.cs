@@ -32,7 +32,7 @@ public class PlayerStateManager : MonoBehaviour
     private bool isCrouching;
     private bool isClimbing;
 
-
+    
     // 프로퍼티
     public PlayerStateType CurrentState => currentStateType;
     public float LastGroundedTime => lastGroundedTime;
@@ -58,7 +58,6 @@ public class PlayerStateManager : MonoBehaviour
         movement = GetComponent<PlayerMovement>();
         collisionDetector = GetComponent<CollisionDetector>();
         playerAnimator = GetComponent<PlayerAnimator>();
-
         // 상태 초기화
         InitializeStates();
     }

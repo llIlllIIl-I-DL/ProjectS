@@ -175,7 +175,13 @@ public class Item : MonoBehaviour
                 // NotificationManager.ShowNotification($"복장 파츠 획득: {itemData.ItemName}");
             }
 
-            return added;
+            if (added && itemData.itemType == ItemType.UtilityPoint)
+            {
+                PlayerUI.Instance.AddUtilityPoint(itemData.utilityPointForOneWay);
+                Debug.Log($"특성 포인트 획득 {itemData.utilityPointForOneWay}");
+            }
+
+                return added;
         }
 
         return false;

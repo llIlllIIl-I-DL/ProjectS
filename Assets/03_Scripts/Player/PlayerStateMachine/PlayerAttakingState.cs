@@ -66,12 +66,12 @@ public class PlayerAttackingState : PlayerStateBase
         var weaponManager = player.GetComponent<WeaponManager>();
         if (weaponManager != null)
         {
-            weaponManager.FireWeapon(lastAimDirection);
+            weaponManager.FireNormalBullet();
         }
         else
         {
             // 임시 총알 생성 로직 (WeaponManager가 없을 경우)
-            WeaponManager.Instance.FireWeapon(lastAimDirection);
+            WeaponManager.Instance.FireNormalBullet();
         }
 
         // 공격 쿨다운 시작

@@ -36,7 +36,7 @@ public abstract class BaseObject : MonoBehaviour
         // 추가 초기화 작업
         Initialize();
         // 오브젝트 매니저에 등록
-        ObjectManager.Instance.RegisterObject(objectId, this);
+        //ObjectManager.Instance.RegisterObject(objectId, this);
     }
 
     protected virtual void Update()

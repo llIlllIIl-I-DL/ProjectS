@@ -26,5 +26,5 @@ MonoBehaviour:
   partsType: 0
   costumeSetId: 
   elementType: 2
-  damage: 15
+  damage: 7
   attackSpeed: 2

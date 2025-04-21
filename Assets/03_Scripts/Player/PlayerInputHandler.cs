@@ -1,10 +1,15 @@
 using System;
+using Unity.VisualScripting;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 
 public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
 {
+    private BaseObject baseObject;
+
+    [SerializeField] private float interactionRadius = 2f; // 상호작용 가능 범위
     [SerializeField] private float doubleTapTime = 0.5f;
 
     private PlayerInput playerInputs;
@@ -19,6 +24,10 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
     public bool JumpPressed { get; private set; }
     public bool JumpReleased { get; private set; } = true;
     public bool DashPressed { get; private set; }
+    
+    // 공격 입력 상태
+    public bool IsAttackPressed { get; private set; }
+    public bool IsChargingAttack { get; private set; }
 
     // 더블 탭 관련
     private float lastLeftTapTime;
@@ -34,6 +43,9 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
     public event Action OnDashInput;
     public event Action OnSprintActivated;
     public event Action OnAttackInput;
+    public event Action OnAttackRelease;
+    public event Action OnChargeAttackStart;
+    public event Action OnChargeAttackRelease;
     public event Action OnCrouchInput;
     public event Action OnWingsuitActivated;
 
@@ -204,8 +216,25 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
     {
         if (context.started)
         {
-            Debug.Log("공격 입력 감지");
+            Debug.Log("공격 입력 감지 - 차징 시작");
+            IsAttackPressed = true;
+            IsChargingAttack = true;
             OnAttackInput?.Invoke();
+            OnChargeAttackStart?.Invoke();
+            
+            // 차징 시작
+            WeaponManager.Instance.StartCharging();
+        }
+        else if (context.canceled)
+        {
+            Debug.Log("공격 입력 해제 - 발사");
+            IsAttackPressed = false;
+            IsChargingAttack = false;
+            OnAttackRelease?.Invoke();
+            OnChargeAttackRelease?.Invoke();
+            
+            // 차징 해제 및 발사
+            WeaponManager.Instance.StopCharging();
         }
     }
 
@@ -220,15 +249,22 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
 
     public void OnNext(InputAction.CallbackContext context)
     {
-        // 선택 입력 처리A, S 로 작동
-        PlayerUI.Instance.MovetoLeftType();
-        Debug.Log("S");
+        // 키를 처음 눌렀을 때만(started) 한 번 실행
+        if (context.started)
+        {
+            // 선택 입력 처리A, S 로 작동
+            PlayerUI.Instance.MovetoLeftType();
+        }
     }
+    
     public void OnPrev(InputAction.CallbackContext context)
     {
-        // 선택 입력 처리A, S 로 작동
-        PlayerUI.Instance.MovetoRightType();
-        Debug.Log("A");
+        // 키를 처음 눌렀을 때만(started) 한 번 실행
+        if (context.started)
+        {
+            // 선택 입력 처리A, S 로 작동
+            PlayerUI.Instance.MovetoRightType();
+        }
     }
 
     public void OnSpecialAttack(InputAction.CallbackContext context)
@@ -240,6 +276,94 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
         }
     }
 
+    // 다른 오브젝트와 충돌 감지
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        // 상호작용 가능한 오브젝트 확인
+        BaseObject obj = other.GetComponent<BaseObject>();
+        if (obj != null)
+        {
+            baseObject = obj;
+        }
+    }
+
+    // 충돌 종료 감지
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        // 상호작용 가능한 오브젝트에서 벗어났는지 확인
+        BaseObject obj = other.GetComponent<BaseObject>();
+        if (obj != null && obj == baseObject)
+        {
+            baseObject = null;
+        }
+    }
+    
+    // 가장 가까운 상호작용 가능한 오브젝트 찾기
+    private BaseObject FindNearestInteractableObject()
+    {
+        // 주변의 모든 콜라이더 탐색
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, interactionRadius);
+        
+        BaseObject nearestObject = null;
+        float minDistance = interactionRadius;
+        
+        foreach (Collider2D collider in colliders)
+        {
+            BaseObject obj = collider.GetComponent<BaseObject>();
+            if (obj != null)
+            {
+                float distance = Vector2.Distance(transform.position, obj.transform.position);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    nearestObject = obj;
+                }
+            }
+        }
+        
+        return nearestObject;
+    }
+
+    public void OnInteraction(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            Debug.Log("상호작용 입력 감지");
+
+            GameObject interactor = this.gameObject;
+            
+            // 이미 감지된 오브젝트가 없으면 가장 가까운 오브젝트 찾기
+            if (baseObject == null)
+            {
+                baseObject = FindNearestInteractableObject();
+            }
+
+            if (baseObject != null)
+            {
+                BossWarningUI.Instance.BossWarningWindowUI(interactor); //보스룸 진입 시 경고창 팝업
+            }
+            else
+            {
+                Debug.LogWarning("상호작용 가능한 오브젝트가 범위 내에 없습니다.");
+            }
+        }
+    }
+
+    public void OnEntrance(GameObject _interactor, bool isApproved) //BossWarningWindowUI의 네/아니오에 따른 조건문
+    {
+        if (isApproved == true) //네
+        {
+            baseObject.TryInteract(_interactor);
+        }
+
+        else //아니오(준비가 필요하다)
+        {
+            Debug.Log("당신은 들어가지 않기로 결정했다.");
+            return;
+        }
+    }
+
+
     public bool IsMoving()
     {
         return IsLeftPressed || IsRightPressed;
@@ -249,5 +373,7 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
     {
         JumpPressed = false;
         DashPressed = false;
+        IsAttackPressed = false;
+        IsChargingAttack = false;
     }
 }

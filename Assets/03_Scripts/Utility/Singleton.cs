@@ -21,6 +21,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
                 {
                     GameObject singletonObj = new GameObject(typeof(T).Name);
                     _instance = singletonObj.AddComponent<T>();
+                    // 루트 오브젝트이므로 DontDestroyOnLoad 호출 가능
                     DontDestroyOnLoad(singletonObj);
                 }
             }
@@ -33,6 +34,14 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
         if (_instance == null)
         {
             _instance = this as T;
+            
+            // 오브젝트가 다른 게임오브젝트의 자식이면 부모에서 분리
+            if (transform.parent != null)
+            {
+                Debug.Log($"싱글톤 객체 '{gameObject.name}'는 자식 오브젝트입니다. DontDestroyOnLoad를 위해 부모에서 분리합니다.");
+                transform.SetParent(null);
+            }
+            
             DontDestroyOnLoad(gameObject);
         }
         else

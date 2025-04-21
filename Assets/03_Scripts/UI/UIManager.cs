@@ -7,31 +7,23 @@ using UnityEngine.UI;
 
 public class UIManager : Singleton<UIManager>
 {
-
     [Header("GameOver Window")]
     public float fadeSpeed = 1.5f;
+
     [SerializeField] public GameObject gameOverWindow;
     [SerializeField] public Transform gameOverWindowParents;
-    [SerializeField] public Image fadeOut;
+    [SerializeField] public CanvasGroup fadeOut;
 
     public List<GameObject> allUIPages = new List<GameObject>();
 
-    float fadeOutAlpha;
-
     InputUI inputUI;
-    GameObject _gameOverWindow;
 
-    private void Awake()
-    {
-        DontDestroyOnLoad(fadeOut);
-    }
+    GameObject _gameOverWindow;
+    CanvasGroup _fadeOut;
 
     private void Start()
     {
         inputUI = FindObjectOfType<InputUI>();
-
-        fadeOut.color = new Color(0, 0, 0, 0);
-
     }
 
     public void CloseAllPage()
@@ -67,12 +59,15 @@ public class UIManager : Singleton<UIManager>
 
     public void ShowGameOverUI()
     {
-        StartCoroutine(FadeOut());
+        _fadeOut = Instantiate(fadeOut, gameOverWindowParents);
+        _fadeOut.alpha = 0;
+
+        StartCoroutine(FadeOut(_fadeOut));
     }
 
-    IEnumerator FadeOut()
+    IEnumerator FadeOut(CanvasGroup _fadeOut)
     {
-        float alpha = fadeOut.color.a;
+        float alpha = _fadeOut.alpha;
 
         yield return new WaitForSeconds(1);
 
@@ -80,9 +75,9 @@ public class UIManager : Singleton<UIManager>
         {
             alpha += Time.deltaTime * fadeSpeed;
 
-            Color temp = fadeOut.color;
-            temp.a = alpha;
-            fadeOut.color = temp;
+            float temp = _fadeOut.alpha;
+            temp = alpha;
+            _fadeOut.alpha = temp;
 
             yield return null;
         }
@@ -91,7 +86,6 @@ public class UIManager : Singleton<UIManager>
         if (gameOverWindow != null)
         {
             _gameOverWindow = Instantiate(gameOverWindow, gameOverWindowParents);
-            //DontDestroyOnLoad(gameOverWindowParents);
 
             yield return new WaitForSeconds(3);
 
@@ -102,7 +96,6 @@ public class UIManager : Singleton<UIManager>
     public void ToStartMenu(GameObject _gameOverWindow)
     {
         SceneManager.LoadScene("TempStartScene", LoadSceneMode.Single);
-        //StartSceneController.Instance.DestroyGameOverWindow(_gameOverWindow, fadeOut);
 
         Debug.Log("스타트씬 이동!!");
     }
