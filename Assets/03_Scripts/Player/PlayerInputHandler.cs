@@ -1,4 +1,6 @@
 using System;
+using Unity.VisualScripting;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,7 +8,7 @@ using UnityEngine.InputSystem;
 public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
 {
     private BaseObject baseObject;
-    
+
     [SerializeField] private float interactionRadius = 2f; // 상호작용 가능 범위
     [SerializeField] private float doubleTapTime = 0.5f;
 
@@ -338,12 +340,26 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
 
             if (baseObject != null)
             {
-                baseObject.TryInteract(interactor);
+                BossWarningUI.Instance.BossWarningWindowUI(interactor); //보스룸 진입 시 경고창 팝업
             }
             else
             {
                 Debug.LogWarning("상호작용 가능한 오브젝트가 범위 내에 없습니다.");
             }
+        }
+    }
+
+    public void OnEntrance(GameObject _interactor, bool isApproved) //BossWarningWindowUI의 네/아니오에 따른 조건문
+    {
+        if (isApproved == true) //네
+        {
+            baseObject.TryInteract(_interactor);
+        }
+
+        else //아니오(준비가 필요하다)
+        {
+            Debug.Log("당신은 들어가지 않기로 결정했다.");
+            return;
         }
     }
 
