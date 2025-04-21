@@ -8,6 +8,7 @@ public enum BossState
     ProjectileAttack,
     SmashAttack,
     Move,
+    Die,
 }
 public class BossStateMachine : MonoBehaviour
 {
@@ -27,6 +28,7 @@ public class BossStateMachine : MonoBehaviour
         states.Add(BossState.ProjectileAttack, new BossProjectileAttackState(this));
         states.Add(BossState.SmashAttack, new BossSmashAttackState(this));
         states.Add(BossState.Move, new BossMoveState(this));
+        states.Add(BossState.Die, new BossDieState(this));
 
         ChangeState(BossState.Idle);
     }
@@ -46,5 +48,12 @@ public class BossStateMachine : MonoBehaviour
     public void FixedUpdate()
     {
         currentState?.FixedUpdate();
+    }
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, 10f); // detectionRange
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, 5f);  // attackRange
     }
 }

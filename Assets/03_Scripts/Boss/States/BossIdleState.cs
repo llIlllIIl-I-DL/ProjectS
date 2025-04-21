@@ -29,7 +29,7 @@ public class BossIdleState : IEnemyState
 
     public void Exit()
     {
-        Debug.Log("Idle 상태 종료");
+        Debug.Log(" Boss Idle 상태 종료");
     }
 
     public void FixedUpdate()
@@ -53,17 +53,17 @@ public class BossIdleState : IEnemyState
         // 거리 기반 상태 전환 로직
         if (distance >= detectionRange)
         {
-            Debug.Log("Move 상태로 전환");
+            Debug.Log(" Boss Move 상태로 전환");
             BossStateMachine.ChangeState(BossState.Move);
         }
         else if (distance < detectionRange && distance >= attackRange)
         {
-            Debug.Log("ProjectileAttack 상태로 전환");
+            Debug.Log("Boss ProjectileAttack 상태로 전환");
             BossStateMachine.ChangeState(BossState.ProjectileAttack);
         }
         else
         {
-            Debug.Log("SmashAttack 상태로 전환");
+            Debug.Log("Boss SmashAttack 상태로 전환");
             BossStateMachine.ChangeState(BossState.SmashAttack);
         }
     }

@@ -9,6 +9,7 @@ public class BossSmashAttackState : IEnemyState
 
     private Transform boss;
     private Transform player;
+    private Animator animator;
 
     private bool hasAttacked = false; // 한 번만 공격하도록 방지
     private float smashDelay = 0.5f; // 공격 전 딜레이
@@ -25,6 +26,7 @@ public class BossSmashAttackState : IEnemyState
         BossStateMachine = stateMachine;
         boss = BossStateMachine.transform;
         player = BossStateMachine.playerTransform;
+        animator = stateMachine.GetComponent<Animator>();
     }
 
     public void Enter()
@@ -34,6 +36,12 @@ public class BossSmashAttackState : IEnemyState
 
         // 여기서 애니메이션 트리거 호출 가능: ex) animator.SetTrigger("Smash")
         BossStateMachine.StartCoroutine(SmashAttackCoroutine());
+
+        // 애니메이션 트리거 설정
+        if (animator != null)
+        {
+            animator.SetTrigger("ProjectileAttack");
+        }
     }
 
     public void Exit()
@@ -48,7 +56,17 @@ public class BossSmashAttackState : IEnemyState
 
     public void OnTriggerEnter2D(Collider2D other)
     {
-        // 필요시 구현 가능
+        // 플레이어와의 충돌 감지
+        if (other.CompareTag("Player") && !hasAttacked)
+        {
+            var damageable = other.GetComponent<IDamageable>();
+            if (damageable != null)
+            {
+                damageable.TakeDamage(smashDamage);
+                hasAttacked = true;
+                Debug.Log("플레이어와 충돌! 데미지: " + smashDamage);
+            }
+        }
     }
 
     public void Update()
@@ -75,7 +93,7 @@ public class BossSmashAttackState : IEnemyState
     // 실제 공격 판정 및 데미지 처리
     private void PerformSmashAttack()
     {
-        Debug.Log("보스가 근거리 공격을 시도!");
+        Debug.Log("Boss 근거리 공격 시도");
 
         // 플레이어와의 거리 체크 (정밀 판정용)
         float distance = Vector2.Distance(boss.position, player.position);
@@ -93,7 +111,14 @@ public class BossSmashAttackState : IEnemyState
         }
         else
         {
-            Debug.Log("근접 공격 범위 밖입니다.");
+            Debug.Log("Boss 근접 공격 범위 밖입니다.");
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        // 공격 범위 시각화 (에디터에서만 보임)
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(boss.position, smashRange);
     }
 }

@@ -16,60 +16,84 @@ public class BossProjectileAttackState : IEnemyState
     [SerializeField] private float detectionRange = 10f; //보스가 플레이어를 감지할 수 있는 거리
     [SerializeField] private float attackRange = 5f; //보스공격 기준 거리
 
-    [SerializeField] private float projectileDelay = 0.5f; //투사체 발사 딜레이
-    [SerializeField] private float returnToIdleDelay = 1.5f; //
+    [SerializeField] private float projectileDelay = 0.01f; //투사체 발사 딜레이
+    [SerializeField] private float returnToIdleDelay = 0.5f; //
+
+    private Animator animator;
 
     public BossProjectileAttackState(BossStateMachine stateMachine) //상태 생성자
     {
         BossStateMachine = stateMachine;
         boss = BossStateMachine.transform;
         player = BossStateMachine.playerTransform;
+        animator = stateMachine.GetComponent<Animator>();
     }
 
     public void Enter()
     {
+        Debug.Log("Boss 원거리 공격 상태 진입");
         attackCoolTime = 0;
         canAttack = true;
+
+        // 애니메이션 트리거 설정 이후 추가
+        //if (animator != null)
+        //{
+        //    animator.SetTrigger("ProjectileAttack");
+        //}
 
         BossStateMachine.StartCoroutine(FireProjectileCoroutine());
     }
 
     public void Exit()
     {
-        throw new System.NotImplementedException();
+        Debug.Log("BossProjectileAttackState 상태 종료");
     }
 
     public void FixedUpdate()
     {
-        throw new System.NotImplementedException();
+        // 필요시 구현
     }
 
     public void OnTriggerEnter2D(Collider2D other)
     {
-        throw new System.NotImplementedException();
+        //필요시 구현
     }
 
     public void Update()
     {
-        throw new System.NotImplementedException();
+
     }
 
     // 투사체 발사를 코루틴으로 타이밍 조절
     private IEnumerator FireProjectileCoroutine()
     {
-        // 투사체를 발사하기 전 약간 대기 (애니메이션 고려 가능)
-        yield return new WaitForSeconds(projectileDelay);
+        float attackDuration = 3f; // 총 공격 지속 시간
+        float fireRate = 0.8f;     // 발사 간격
+        float timer = 0f;
 
-        if (!hasAttacked && player != null)
+        while (timer < attackDuration)
         {
-            FireProjectile();    // 투사체 발사
-            hasAttacked = true;  // 중복 발사 방지
+            if (player != null)
+            {
+                if (animator != null)
+                {
+                    animator.SetTrigger("FireProjectile");
+                }
+
+                FireProjectile();
+            }
+
+            yield return new WaitForSeconds(fireRate);
+            timer += fireRate;
         }
 
-        // 공격 후 다음 상태로 넘어가기 전까지 대기
-        yield return new WaitForSeconds(returnToIdleDelay);
+        // 애니메이션 리셋
+        if (animator != null)
+        {
+            animator.ResetTrigger("ProjectileAttack");
+            animator.ResetTrigger("FireProjectile");
+        }
 
-        // Idle 또는 Move 상태로 전환
         BossStateMachine.ChangeState(BossState.Idle);
     }
 
@@ -77,12 +101,13 @@ public class BossProjectileAttackState : IEnemyState
     // 실제 투사체를 발사하는 로직
     private void FireProjectile()
     {
-        Debug.Log("보스가 투사체를 발사!");
+        Debug.Log("Boss 투사체 발사!");
 
-        //투사체 발사 로직
+        // 발사에 필요한 프리팹과 발사 위치가 설정되지 않았다면 실행하지 않음
         if (BossStateMachine.projectilePrefab == null || BossStateMachine.firePoint == null) return;
 
         // 투사체 인스턴스 생성
+        // firePoint 위치에서 projectilePrefab을 생성 (회전은 기본값 Quaternion.identity)
         GameObject projectile = Object.Instantiate(
             BossStateMachine.projectilePrefab,
             BossStateMachine.firePoint.position,
@@ -90,13 +115,14 @@ public class BossProjectileAttackState : IEnemyState
         );
 
         // 방향 계산
-        Vector2 direction = (player.position - boss.position).normalized;
+        Vector2 direction = (player.position - BossStateMachine.firePoint.position).normalized;
 
-        // Rigidbody2D 컴포넌트 가져오기
         Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
         if (rb != null)
         {
-            float projectileSpeed = 10f; // 원하는 속도로 설정
+            float projectileSpeed = 10f; // 투사체의 속도를 설정 (값은 상황에 맞게 조정 가능)
+
+            // 계산한 방향 벡터에 속도를 곱해 velocity에 적용 → 투사체가 해당 방향으로 날아감
             rb.velocity = direction * projectileSpeed;
         }
     }
