@@ -1,15 +1,29 @@
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 // 모듈 데이터를 저장하기 위한 스크립터블 오브젝트
 [CreateAssetMenu(fileName = "New Room Module", menuName = "Metroidvania/Room Module")]
 public class RoomModule : ScriptableObject
 {
+    // 에셋 GUID 저장 필드 (런타임에 GUID로 매핑하기 위해)
+    public string assetGUID;
+
     public GameObject modulePrefab;
     public Texture2D thumbnail;
     public ModuleCategory category;
     public EnvironmentTheme theme;
     public ConnectionPoint[] connectionPoints;
     public bool isSpecialRoom; // 보스룸, 아이템룸 등 특별한 방인지
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        string path = AssetDatabase.GetAssetPath(this);
+        assetGUID = AssetDatabase.AssetPathToGUID(path);
+    }
+#endif
 
     public enum ModuleCategory
     {
