@@ -1,0 +1,74 @@
+{
+    "placedModules": [
+        {
+            "moduleGUID": "bb5d65318f34aa94bb271f5f7c4a87be",
+            "position": {
+                "x": -150.0,
+                "y": -50.0
+            },
+            "rotationStep": 0,
+            "connections": [
+                {
+                    "connectionPointIndex": 0,
+                    "connectedModuleGUID": "ee6e65f7245b426488a12049b23591f2",
+                    "connectedPointIndex": 0
+                }
+            ]
+        },
+        {
+            "moduleGUID": "ee6e65f7245b426488a12049b23591f2",
+            "position": {
+                "x": -50.0,
+                "y": -50.0
+            },
+            "rotationStep": 0,
+            "connections": [
+                {
+                    "connectionPointIndex": 0,
+                    "connectedModuleGUID": "bb5d65318f34aa94bb271f5f7c4a87be",
+                    "connectedPointIndex": 0
+                },
+                {
+                    "connectionPointIndex": 1,
+                    "connectedModuleGUID": "ee6e65f7245b426488a12049b23591f2",
+                    "connectedPointIndex": 0
+                }
+            ]
+        },
+        {
+            "moduleGUID": "ee6e65f7245b426488a12049b23591f2",
+            "position": {
+                "x": 50.0,
+                "y": -50.0
+            },
+            "rotationStep": 0,
+            "connections": [
+                {
+                    "connectionPointIndex": 0,
+                    "connectedModuleGUID": "ee6e65f7245b426488a12049b23591f2",
+                    "connectedPointIndex": 1
+                },
+                {
+                    "connectionPointIndex": 1,
+                    "connectedModuleGUID": "ee6e65f7245b426488a12049b23591f2",
+                    "connectedPointIndex": 0
+                }
+            ]
+        },
+        {
+            "moduleGUID": "ee6e65f7245b426488a12049b23591f2",
+            "position": {
+                "x": 150.0,
+                "y": -50.0
+            },
+            "rotationStep": 0,
+            "connections": [
+                {
+                    "connectionPointIndex": 0,
+                    "connectedModuleGUID": "ee6e65f7245b426488a12049b23591f2",
+                    "connectedPointIndex": 1
+                }
+            ]
+        }
+    ]
+}

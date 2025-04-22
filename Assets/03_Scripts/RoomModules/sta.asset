@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baed70ff6524cce40ac40885f49719f4, type: 3}
+  m_Name: sta
+  m_EditorClassIdentifier: 
+  modulePrefab: {fileID: 9118378337675771776, guid: f66ebf736853cf44ea65505ec93f4321, type: 3}
+  thumbnail: {fileID: 2800000, guid: 2ac19edf66beb5b499c640c04acf11ab, type: 3}
+  category: 0
+  theme: 0
+  connectionPoints:
+  - position: {x: 32, y: 0}
+    direction: 1
+    type: 0
+  isSpecialRoom: 0

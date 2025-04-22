@@ -8,14 +8,19 @@ public class ModuleTemplateCreator : EditorWindow
     private GameObject modulePrefab;
     private Texture2D thumbnail;
     private RoomModule.ModuleCategory category;
+    private RoomModule.EnvironmentTheme theme;
     private string moduleName = "New Room Module";
     private List<ConnectionPoint> connectionPoints = new List<ConnectionPoint>();
     private bool isSpecialRoom = false;
+    private string modulePath = "Assets/03_Scripts/RoomModules/";
 
     [MenuItem("Metroidvania/Module Template Creator")]
     public static void ShowWindow()
     {
-        GetWindow<ModuleTemplateCreator>("Module Creator");
+        // 에디터 윈도우를 열 때 문자열 변수를 사용하여 타이틀 설정
+        string windowTitle = "Module Creator";
+        EditorWindow window = GetWindow(typeof(ModuleTemplateCreator));
+        window.titleContent = new GUIContent(windowTitle);
     }
 
     private void OnGUI()
@@ -26,6 +31,7 @@ public class ModuleTemplateCreator : EditorWindow
         modulePrefab = (GameObject)EditorGUILayout.ObjectField("Module Prefab:", modulePrefab, typeof(GameObject), false);
         thumbnail = (Texture2D)EditorGUILayout.ObjectField("Thumbnail:", thumbnail, typeof(Texture2D), false);
         category = (RoomModule.ModuleCategory)EditorGUILayout.EnumPopup("Category:", category);
+        theme = (RoomModule.EnvironmentTheme)EditorGUILayout.EnumPopup("Theme:", theme);
         isSpecialRoom = EditorGUILayout.Toggle("Is Special Room:", isSpecialRoom);
 
         EditorGUILayout.Space();
@@ -80,10 +86,9 @@ public class ModuleTemplateCreator : EditorWindow
         }
 
         // 저장 경로 확인 및 생성
-        string path = "Assets/MetroidvaniaModules/";
-        if (!Directory.Exists(path))
+        if (!Directory.Exists(modulePath))
         {
-            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(modulePath);
         }
 
         // 스크립터블 오브젝트 생성
@@ -91,11 +96,12 @@ public class ModuleTemplateCreator : EditorWindow
         moduleAsset.modulePrefab = modulePrefab;
         moduleAsset.thumbnail = thumbnail;
         moduleAsset.category = category;
+        moduleAsset.theme = theme;
         moduleAsset.isSpecialRoom = isSpecialRoom;
         moduleAsset.connectionPoints = connectionPoints.ToArray();
 
         // 에셋 저장
-        string assetPath = path + moduleName + ".asset";
+        string assetPath = modulePath + moduleName + ".asset";
         AssetDatabase.CreateAsset(moduleAsset, assetPath);
         AssetDatabase.SaveAssets();
 

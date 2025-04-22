@@ -1,14 +1,32 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MapManager : MonoBehaviour
 {
     public TextAsset mapJsonFile;
     public Transform mapParent;
+    
+    // 씬 관리 변수 추가
+    [Header("Scene Management")]
+    public bool useMultiSceneSetup = false;
+    public float sceneLoadDistance = 30f;
+    public List<SceneModuleData> sceneModules = new List<SceneModuleData>();
+    
+    private Transform playerTransform;
+    private Dictionary<string, string> moduleSceneMap = new Dictionary<string, string>(); // 모듈ID -> 씬이름 매핑
+    private HashSet<string> loadedScenes = new HashSet<string>();
 
     private Dictionary<string, RoomModule> moduleCache = new Dictionary<string, RoomModule>();
     private Dictionary<string, GameObject> instancedModules = new Dictionary<string, GameObject>();
+
+    [System.Serializable]
+    public class SceneModuleData
+    {
+        public string sceneName;
+        public List<string> moduleGuids = new List<string>();
+    }
 
     private void Start()
     {
@@ -16,6 +34,101 @@ public class MapManager : MonoBehaviour
         {
             LoadMap(mapJsonFile.text);
         }
+        
+        // 플레이어 찾기
+        playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
+        
+        // 모듈-씬 매핑 생성
+        if (useMultiSceneSetup)
+        {
+            InitModuleSceneMapping();
+        }
+    }
+    
+    private void Update()
+    {
+        // 멀티씬 사용 시 플레이어 위치에 따라 씬 로드/언로드
+        if (useMultiSceneSetup && playerTransform != null)
+        {
+            ManageSceneLoading();
+        }
+    }
+    
+    private void InitModuleSceneMapping()
+    {
+        moduleSceneMap.Clear();
+        foreach (var sceneData in sceneModules)
+        {
+            foreach (var guid in sceneData.moduleGuids)
+            {
+                moduleSceneMap[guid] = sceneData.sceneName;
+            }
+        }
+        
+        // 기본 씬은 항상 로드
+        loadedScenes.Add(SceneManager.GetActiveScene().name);
+    }
+    
+    private void ManageSceneLoading()
+    {
+        // 플레이어 위치를 기준으로 근처에 있는 모듈 확인
+        Vector3 playerPos = playerTransform.position;
+        HashSet<string> neededScenes = new HashSet<string> { SceneManager.GetActiveScene().name };
+        
+        foreach (var moduleEntry in instancedModules)
+        {
+            GameObject moduleInstance = moduleEntry.Value;
+            float distance = Vector3.Distance(playerPos, moduleInstance.transform.position);
+            
+            if (distance < sceneLoadDistance)
+            {
+                string moduleGuid = moduleEntry.Key.Split('_')[0]; // instanceId에서 GUID 추출
+                
+                if (moduleSceneMap.TryGetValue(moduleGuid, out string sceneName))
+                {
+                    neededScenes.Add(sceneName);
+                }
+            }
+        }
+        
+        // 로드해야 할 씬 로드
+        foreach (string sceneName in neededScenes)
+        {
+            if (!loadedScenes.Contains(sceneName))
+            {
+                LoadScene(sceneName);
+            }
+        }
+        
+        // 필요 없는 씬 언로드
+        List<string> scenesToUnload = new List<string>();
+        foreach (string loadedScene in loadedScenes)
+        {
+            if (!neededScenes.Contains(loadedScene) && 
+                loadedScene != SceneManager.GetActiveScene().name) // 활성 씬은 언로드하지 않음
+            {
+                scenesToUnload.Add(loadedScene);
+            }
+        }
+        
+        foreach (string sceneToUnload in scenesToUnload)
+        {
+            UnloadScene(sceneToUnload);
+        }
+    }
+    
+    private void LoadScene(string sceneName)
+    {
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+        asyncLoad.completed += (op) => { loadedScenes.Add(sceneName); };
+        Debug.Log($"Loading scene: {sceneName}");
+    }
+    
+    private void UnloadScene(string sceneName)
+    {
+        AsyncOperation asyncUnload = SceneManager.UnloadSceneAsync(sceneName);
+        asyncUnload.completed += (op) => { loadedScenes.Remove(sceneName); };
+        Debug.Log($"Unloading scene: {sceneName}");
     }
 
     public void LoadMap(string json)
@@ -147,4 +260,46 @@ public class MapManager : MonoBehaviour
 
         return module;
     }
+    
+    // 씬 그룹화 도구 (에디터 모드용)
+    #if UNITY_EDITOR
+    public void OrganizeModulesIntoScenes()
+    {
+        Dictionary<RoomModule.EnvironmentTheme, List<string>> themeModules = new Dictionary<RoomModule.EnvironmentTheme, List<string>>();
+        
+        // 테마별로 모듈 분류
+        foreach (var entry in instancedModules)
+        {
+            string guid = entry.Key.Split('_')[0];
+            RoomModule moduleAsset = GetModuleByGUID(guid);
+            
+            if (moduleAsset != null)
+            {
+                if (!themeModules.ContainsKey(moduleAsset.theme))
+                {
+                    themeModules[moduleAsset.theme] = new List<string>();
+                }
+                
+                themeModules[moduleAsset.theme].Add(guid);
+            }
+        }
+        
+        // SceneModuleData 생성
+        sceneModules.Clear();
+        foreach (var themePair in themeModules)
+        {
+            string sceneName = $"Scene_{themePair.Key}";
+            
+            SceneModuleData sceneData = new SceneModuleData
+            {
+                sceneName = sceneName,
+                moduleGuids = themePair.Value
+            };
+            
+            sceneModules.Add(sceneData);
+        }
+        
+        Debug.Log($"Organized modules into {sceneModules.Count} scenes based on themes.");
+    }
+    #endif
 }

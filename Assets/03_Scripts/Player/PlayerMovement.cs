@@ -89,7 +89,7 @@ public class PlayerMovement : MonoBehaviour
         float currentMoveSpeed = settings.moveSpeed;
         if (sprint || isSprinting)
         {
-            currentMoveSpeed *= settings.sprintMultiplier;
+            currentMoveSpeed += settings.sprintMultiplier;
         }
 
         float targetSpeed = moveDirection.x * currentMoveSpeed;
