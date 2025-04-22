@@ -18,23 +18,19 @@ public class InputUI : MonoBehaviour
     [SerializeField] public Button settingBtn;
     [SerializeField] public Button toMainMenuBtn;
 
-    [Header("Info → Suit UI")]
-    [SerializeField] public GameObject suitMenu;
-    [SerializeField] public Button suitBtn;
-
     [Header("PauseManu UI 창")]
     [SerializeField] public GameObject settingMenu;
     [SerializeField] public GameObject checkPointMenu;
 
     public bool isPauseMenuOpen = false;
 
+    [SerializeField] private InfoUI infoUI;
+
     private void Start()
     {
         characterInfoBtn.onClick.AddListener(() => InfoMenu(infoMenu));
         toCheckPointBtn.onClick.AddListener(() => UIInPauseMenu(checkPointMenu));
         settingBtn.onClick.AddListener(() => UIInPauseMenu(settingMenu));
-
-        suitBtn.onClick.AddListener(() => SuitMenu());
 
         toMainMenuBtn.onClick.AddListener(() => ToMainMenu());
     }
@@ -43,8 +39,8 @@ public class InputUI : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // 열려있는 UI가 있는지 확인합니다.
-            if (IsAnyUIActive())
+            // 열려있는 UI가 있는지 확인.
+            if (IsAnyUIActive(true))
             {
                 UIManager.Instance.CloseAllPage();
             }
@@ -65,16 +61,18 @@ public class InputUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.I))
         {
             SetMenu(infoMenu);
+            infoUI.SetDefaultPage();
         }
     }
 
-    bool IsAnyUIActive()
+    bool IsAnyUIActive(bool isfalse)
     {
         foreach (GameObject uiPage in UIManager.Instance.allUIPages)
         {
             if (uiPage != null && uiPage.activeSelf)
                 return true;
         }
+
         return false;
     }
 
@@ -109,15 +107,8 @@ public class InputUI : MonoBehaviour
         SetMenu(menu);
     }
 
-    public void SuitMenu()
-    {
-        suitMenu.SetActive(true);
-    }
-
-
     public void ToMainMenu()
     {
-        SceneManager.LoadScene("YJ_UI_Scene", LoadSceneMode.Single);
+        SceneManager.LoadScene("TempMainScene", LoadSceneMode.Single);
     }
 }
-

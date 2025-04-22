@@ -2,9 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
-public class PlayerUI : Singleton<PlayerUI> 
+public class PlayerUI : MonoBehaviour
 {
+    public static PlayerUI Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+
     [Header("HP 바")]
     [SerializeField] private Scrollbar healthBar;
     [SerializeField] private Image healthBarImage;
@@ -12,21 +28,30 @@ public class PlayerUI : Singleton<PlayerUI>
 
     [SerializeField] private int healHP;
 
-
-    [Header("HP 바 기능 테스트를 위한 임시 버튼")]
-    //[SerializeField] public Button damageButton;
-    [SerializeField] public Button healButton;
-
     [Header("HP 바 깨짐")]
     [SerializeField] public GameObject Basic;
     [SerializeField] public GameObject Hurt;
     [SerializeField] public GameObject VeryHurt;
     [SerializeField] public GameObject killme;
 
-    private PlayerHP playerHP;
-
     public float shakeTime;
     public float shakeRange;
+
+    [Header("플레이어 속성 아이콘 업데이트")]
+    [SerializeField] public ItemData attributeType;
+    [SerializeField] public TextMeshProUGUI typeName;
+    [SerializeField] public Image typeIcon;
+
+    [Header("Utility Point")]
+    [SerializeField] public TextMeshProUGUI utilityPointText;
+    static int utilityPoint;
+
+    static PlayerHP playerHP;
+    public TypeItemSlotList typeItemSlotList;
+
+    static int currentTypeIndex = 0;
+
+    public Dictionary<ItemData, Sprite> TypeItemDic = new Dictionary<ItemData, Sprite>();
 
     public void Start()
     {
@@ -40,33 +65,22 @@ public class PlayerUI : Singleton<PlayerUI>
 
         healthBarImage.fillAmount = 1f;
 
-        //damageButton.onClick.AddListener(KillEmAll);
-        //healButton.onClick.AddListener(() => Voscuro(realPosition, maxHP, currentHP));
+        // 인벤토리 매니저 이벤트 구독 - 무기 속성 변경 시 UI 업데이트
+        if (InventoryManager.Instance != null)
+        {
+            InventoryManager.Instance.OnWeaponAttributeChanged += UpdateWeaponAttributeUI;
+        }
+
+        // 초기 무기 속성 설정
+        UpdateWeaponAttributeUI(InventoryManager.Instance.EquippedWeaponAttribute);
     }
 
     public void Voscuro(Vector3 realPosition, float maxHP, float currentHP)
     {
-        //SetHealthBar(maxHP, currentHP);
         HealHP();
     }
 
-    /*
-    public void KillEmAll()
-    {
-        currentHP -= giveDamage;
-
-
-        if (currentHP < 0)
-        {
-            currentHP = 0;
-        }
-
-        SetHealthBar();
-        StartCoroutine(ShakingHPBar());
-    }
-    */
-
-    public void SetHealthBar(float maxHP, float currentHP)
+    public void SetHealthBar(float maxHP, float currentHP) //여기 언젠가 리팩토리 필요...
     {
         StartCoroutine(ShakingHPBar());
 
@@ -139,7 +153,7 @@ public class PlayerUI : Singleton<PlayerUI>
 
 
         healthBar.transform.position = new Vector3(realPosition.x, realPosition.y, realPosition.z);
-        
+
 
         if (currentHP > maxHP)
         {
@@ -162,5 +176,105 @@ public class PlayerUI : Singleton<PlayerUI>
         }
 
         healLight.color = new Color32(255, 255, 255, 0);
+    }
+
+    // 무기 속성 UI 업데이트 메소드
+    private void UpdateWeaponAttributeUI(ItemData weaponAttribute)
+    {
+        if (weaponAttribute != null)
+        {
+            attributeType = weaponAttribute;
+            typeName.text = weaponAttribute.ItemName;
+            typeIcon.sprite = weaponAttribute.Icon;
+
+            typeIcon.preserveAspect = true;
+        }
+        else
+        {
+            // 기본 노말 속성으로 되돌리기
+            // 기본 아이템 데이터 참조 필요
+        }
+    }
+
+
+    public void MovetoLeftType()
+    {
+        if (typeItemSlotList == null) return;
+        
+        // 인벤토리에서 사용 가능한 무기 속성 목록 가져오기
+        List<ItemData> availableTypes = null;
+        if (InventoryManager.Instance != null)
+        {
+            availableTypes = InventoryManager.Instance.GetWeaponAttributes();
+        }
+        
+        if (availableTypes == null || availableTypes.Count <= 1) return;
+        
+        // 현재 장착된 무기 속성 찾기
+        ItemData currentType = attributeType;
+        int currentIndex = -1;
+        
+        for (int i = 0; i < availableTypes.Count; i++)
+        {
+            if (availableTypes[i].elementType == currentType.elementType)
+            {
+                currentIndex = i;
+                break;
+            }
+        }
+        
+        // 이전 인덱스 계산 (순환)
+        int prevIndex = (currentIndex - 1 + availableTypes.Count) % availableTypes.Count;
+        
+        // 이전 무기 속성 장착
+        if (InventoryManager.Instance != null)
+        {
+            InventoryManager.Instance.EquipWeaponAttribute(availableTypes[prevIndex]);
+            Debug.Log($"무기 속성 변경: {availableTypes[prevIndex].ItemName}");
+        }
+    }
+
+    public void MovetoRightType()
+    {
+        if (typeItemSlotList == null) return;
+        
+        // 인벤토리에서 사용 가능한 무기 속성 목록 가져오기
+        List<ItemData> availableTypes = null;
+        if (InventoryManager.Instance != null)
+        {
+            availableTypes = InventoryManager.Instance.GetWeaponAttributes();
+        }
+        
+        if (availableTypes == null || availableTypes.Count <= 1) return;
+        
+        // 현재 장착된 무기 속성 찾기
+        ItemData currentType = attributeType;
+        int currentIndex = -1;
+        
+        for (int i = 0; i < availableTypes.Count; i++)
+        {
+            if (availableTypes[i].elementType == currentType.elementType)
+            {
+                currentIndex = i;
+                break;
+            }
+        }
+        
+        // 다음 인덱스 계산 (순환)
+        int nextIndex = (currentIndex + 1) % availableTypes.Count;
+        
+        // 다음 무기 속성 장착
+        if (InventoryManager.Instance != null)
+        {
+            InventoryManager.Instance.EquipWeaponAttribute(availableTypes[nextIndex]);
+            Debug.Log($"무기 속성 변경: {availableTypes[nextIndex].ItemName}");
+        }
+    }
+
+    public void AddUtilityPoint(int utilityPointForOneWay)
+    {
+        utilityPoint += utilityPointForOneWay;
+
+        utilityPointText.text = utilityPoint.ToString();
     }
 }

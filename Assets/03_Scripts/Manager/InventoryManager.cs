@@ -17,11 +17,20 @@ public class InventoryManager : MonoBehaviour
     [Header("복장 및 세트 관리")]
     // 현재 장착된 복장 아이템
     [SerializeField] private ItemData[] equippedCostumeParts = new ItemData[4]; // 헤드, 바디, 암즈, 레그
+
+    public ItemData[] EquippedCostumeParts => equippedCostumeParts;
+
     // 현재 장착된 무기 속성
     [SerializeField] private ItemData equippedWeaponAttribute;
+
+    public ItemData EquippedWeaponAttribute => equippedWeaponAttribute;
     // 복장 세트 참조
     [SerializeField] private List<CostumeSetData> availableCostumeSets = new List<CostumeSetData>();
+
+    public List<CostumeSetData> AvailableCostumeSets => availableCostumeSets;
     [SerializeField] private CostumeSetData activeCostumeSet;
+
+    public CostumeSetData ActiveCostumeSet => activeCostumeSet;
 
     [Header("연결된 매니저")]
     [SerializeField] private CostumeManager costumeManager;
@@ -32,7 +41,7 @@ public class InventoryManager : MonoBehaviour
     public event ItemEventHandler OnItemRemoved;
     public event ItemEventHandler OnItemUsed;
     public event ItemEventHandler OnItemEquipped;
-
+    public event ItemEventHandler OnWeaponAttributeChanged;// 무기 속성 변경 이벤트
     private void Awake()
     {
         if (instance == null)
@@ -59,6 +68,12 @@ public class InventoryManager : MonoBehaviour
 
         // 복장 세트 정보 초기화
         InitializeCostumeSets();
+        
+        // 시작 시 현재 무기 속성이 있으면 WeaponManager에 설정
+        if (equippedWeaponAttribute != null)
+        {
+            UpdateWeaponBulletType(equippedWeaponAttribute);
+        }
     }
 
     // ItemManager에서 아이템 로드
@@ -206,7 +221,11 @@ public class InventoryManager : MonoBehaviour
                 weaponAttributes.Remove(item);
                 // 장착된 무기 속성이면 장착 해제
                 if (equippedWeaponAttribute == item)
+                {
                     equippedWeaponAttribute = null;
+                    // WeaponManager에 Normal 타입으로 설정
+                    UpdateWeaponBulletType(null);
+                }
                 break;
             case ItemType.CostumeParts:
                 costumeParts.Remove(item);
@@ -233,13 +252,44 @@ public class InventoryManager : MonoBehaviour
     {
         if (weaponAttribute == null || !weaponAttributes.Contains(weaponAttribute)) return false;
 
-        equippedWeaponAttribute = weaponAttribute;
-
-        // 이벤트 발생
-        OnItemEquipped?.Invoke(weaponAttribute);
-
-        Debug.Log($"{weaponAttribute.ItemName} 무기 속성을 장착했습니다.");
+        // 이전 속성과 다를 때만 이벤트 발생
+        if (equippedWeaponAttribute != weaponAttribute)
+        {
+            equippedWeaponAttribute = weaponAttribute;
+            
+            // 무기 속성 장착 이벤트 발생
+            OnItemEquipped?.Invoke(weaponAttribute);
+            
+            // 무기 속성 변경 이벤트 발생
+            OnWeaponAttributeChanged?.Invoke(weaponAttribute);
+            
+            // WeaponManager에 불릿 타입 설정
+            UpdateWeaponBulletType(weaponAttribute);
+            
+            Debug.Log($"무기 속성 장착: {weaponAttribute.ItemName}");
+        }
+        
         return true;
+    }
+    
+    // WeaponManager의 총알 타입 업데이트
+    private void UpdateWeaponBulletType(ItemData weaponAttribute)
+    {
+        if (WeaponManager.Instance != null)
+        {
+            ElementType bulletType = ElementType.Normal; // 기본값
+            
+            // 무기 속성이 있으면 해당 속성의 ElementType으로 설정
+            if (weaponAttribute != null && weaponAttribute.itemType == ItemType.WeaponAttribute)
+            {
+                bulletType = weaponAttribute.elementType;
+            }
+            
+            // WeaponManager에 총알 타입 설정
+            WeaponManager.Instance.SetBulletType(bulletType);
+            
+            Debug.Log($"무기 총알 타입이 {bulletType}으로 변경되었습니다.");
+        }
     }
 
     // 코스튬 파츠 장착
@@ -342,12 +392,6 @@ public class InventoryManager : MonoBehaviour
         return true;
     }
 
-    // 현재 장착된 무기 속성 반환
-    public ItemData GetEquippedWeaponAttribute()
-    {
-        return equippedWeaponAttribute;
-    }
-
     // 인벤토리에 있는 모든 아이템 반환
     public List<ItemData> GetAllItems()
     {
@@ -418,5 +462,11 @@ public class InventoryManager : MonoBehaviour
     {
         CostumeSetData set = availableCostumeSets.Find(s => s.costumeId == costumeId);
         return set != null && set.isUnlocked;
+    }
+
+    // 현재 장착된 무기 속성 getter 추가
+    public ItemData GetCurrentWeaponAttribute()
+    {
+        return equippedWeaponAttribute;
     }
 }

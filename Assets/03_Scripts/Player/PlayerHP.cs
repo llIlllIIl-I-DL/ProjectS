@@ -95,4 +95,10 @@ public class PlayerHP : MonoBehaviour, IDamageable
             GameManager.Instance.PlayerDied(gameObject);
         }
     }
+
+    // 최대 체력을 반환하는 메서드
+    public float GetMaxHealth()
+    {
+        return maxHP;
+    }
 }

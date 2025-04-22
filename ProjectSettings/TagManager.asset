@@ -6,6 +6,7 @@ TagManager:
   tags:
   - InputUI
   - Enemy
+  - InfoUI
   - Cog
   layers:
   - Default
@@ -21,6 +22,8 @@ TagManager:
   - NoCollision
   - Mirror
   - 
+  - Boss
+  - Projectile
   - 
   - 
   - 
