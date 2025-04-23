@@ -37,7 +37,34 @@
             "moduleGUID": "be37de2bb7ee5fa428e211191b409cd1",
             "position": {
                 "x": 30.0,
-                "y": -240.0
+                "y": -210.0
+            },
+            "rotationStep": 0,
+            "connections": []
+        },
+        {
+            "moduleGUID": "b12f08229855271448bb9ffd08bbea72",
+            "position": {
+                "x": 30.0,
+                "y": -210.0
+            },
+            "rotationStep": 0,
+            "connections": []
+        },
+        {
+            "moduleGUID": "585b4ac1f654ea642bcf13d9f60f477b",
+            "position": {
+                "x": 30.0,
+                "y": -210.0
+            },
+            "rotationStep": 0,
+            "connections": []
+        },
+        {
+            "moduleGUID": "2063a5fe5a19b4b43a0ce8624381de7b",
+            "position": {
+                "x": 30.0,
+                "y": -190.0
             },
             "rotationStep": 0,
             "connections": []
