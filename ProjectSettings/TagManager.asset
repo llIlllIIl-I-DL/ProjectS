@@ -21,6 +21,8 @@ TagManager:
   - Enemy
   - Ladder
   - NoCollision
+  - Mirror
+  - 
   - Boss
   - Projectile
   - 
