@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: baed70ff6524cce40ac40885f49719f4, type: 3}
-  m_Name: Start
+  m_Name: StartPosition
   m_EditorClassIdentifier: 
+  assetGUID: 707c39880b2858b47aee46ecdd4ab4b1
   modulePrefab: {fileID: 9118378337675771776, guid: f66ebf736853cf44ea65505ec93f4321, type: 3}
-  thumbnail: {fileID: 2800000, guid: 2ac19edf66beb5b499c640c04acf11ab, type: 3}
+  thumbnail: {fileID: 0}
   category: 0
   theme: 0
   connectionPoints:
-  - position: {x: -32, y: 0}
-    direction: 3
-    type: 0
-  - position: {x: 32, y: 0}
-    direction: 1
-    type: 0
+  - position: {x: 75, y: 45}
+    direction: 2
+    type: 1
   isSpecialRoom: 0
+  moduleSize: {x: 4, y: 2}
+  useCustomSize: 1
