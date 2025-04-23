@@ -93,14 +93,14 @@ public class BossSmashAttackState : IEnemyState
     // 실제 공격 판정 및 데미지 처리
     private void PerformSmashAttack()
     {
-        Debug.Log("Boss 근거리 공격 시도");
+        Debug.Log("Boss Kick 공격 시도");
 
         // 플레이어와의 거리 체크 (정밀 판정용)
         float distance = Vector2.Distance(boss.position, player.position);
         if (distance <= smashRange)
         {
             // 예: 플레이어에게 데미지 전달
-            Debug.Log("근접 공격 적중! 플레이어에게 데미지: " + smashDamage);
+            Debug.Log("Kick 적중! 플레이어에게 데미지: " + smashDamage);
 
             // 예시로 플레이어에 IDamageable 인터페이스가 있다고 가정
             var damageable = player.GetComponent<IDamageable>();

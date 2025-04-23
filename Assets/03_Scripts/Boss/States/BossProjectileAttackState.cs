@@ -1,27 +1,20 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BossProjectileAttackState : IEnemyState
 {
     BossStateMachine BossStateMachine;
 
-    protected float attackCoolTime; //공격 쿨타임
-    protected bool canAttack = false; //공격 할 수 있는지
-    private bool hasAttacked = false; //투사체가 연사 되지 않도록 하기 위함
-
     private Transform boss;
     private Transform player;
-
-    [SerializeField] private float detectionRange = 10f; //보스가 플레이어를 감지할 수 있는 거리
-    [SerializeField] private float attackRange = 5f; //보스공격 기준 거리
-
-    [SerializeField] private float projectileDelay = 0.01f; //투사체 발사 딜레이
-    [SerializeField] private float returnToIdleDelay = 0.5f; //
-
     private Animator animator;
 
-    public BossProjectileAttackState(BossStateMachine stateMachine) //상태 생성자
+    private bool canChargeAttack = true;  // 차징 공격 가능 여부
+    [SerializeField] private float chargeAttackCooldown = 5f; // 차징 공격 후 쿨타임
+    [SerializeField] private float chargeTime = 1.5f;          // 차징 공격을 위해 기다릴 시간
+
+    // 생성자
+    public BossProjectileAttackState(BossStateMachine stateMachine)
     {
         BossStateMachine = stateMachine;
         boss = BossStateMachine.transform;
@@ -32,15 +25,7 @@ public class BossProjectileAttackState : IEnemyState
     public void Enter()
     {
         Debug.Log("Boss 원거리 공격 상태 진입");
-        attackCoolTime = 0;
-        canAttack = true;
-
-        // 애니메이션 트리거 설정 이후 추가
-        //if (animator != null)
-        //{
-        //    animator.SetTrigger("ProjectileAttack");
-        //}
-
+        // 원거리 공격을 시작하는 코루틴 실행
         BossStateMachine.StartCoroutine(FireProjectileCoroutine());
     }
 
@@ -49,81 +34,119 @@ public class BossProjectileAttackState : IEnemyState
         Debug.Log("BossProjectileAttackState 상태 종료");
     }
 
-    public void FixedUpdate()
-    {
-        // 필요시 구현
-    }
+    public void FixedUpdate() { }
 
-    public void OnTriggerEnter2D(Collider2D other)
-    {
-        //필요시 구현
-    }
+    public void Update() { }
 
-    public void Update()
-    {
+    public void OnTriggerEnter2D(Collider2D other) { }
 
-    }
-
-    // 투사체 발사를 코루틴으로 타이밍 조절
+    /// <summary>
+    /// 일반 투사체를 일정 시간 동안 반복 발사하는 코루틴
+    /// </summary>
     private IEnumerator FireProjectileCoroutine()
     {
-        float attackDuration = 3f; // 총 공격 지속 시간
-        float fireRate = 0.8f;     // 발사 간격
-        float timer = 0f;
+        float attackDuration = 3f;   // 공격 지속 시간
+        float fireRate = 0.8f;       // 발사 간격
+        float timer = 0f;            // 타이머
 
         while (timer < attackDuration)
         {
             if (player != null)
             {
-                if (animator != null)
-                {
-                    animator.SetTrigger("FireProjectile");
-                }
-
-                FireProjectile();
+                // 투사체 발사 애니메이션 실행
+                animator?.SetTrigger("FireProjectile");
+                FireProjectile(strong: false);  // 일반 투사체 발사
             }
 
-            yield return new WaitForSeconds(fireRate);
+            yield return new WaitForSeconds(fireRate);  // 지정된 간격으로 대기
             timer += fireRate;
         }
 
-        // 애니메이션 리셋
-        if (animator != null)
-        {
-            animator.ResetTrigger("ProjectileAttack");
-            animator.ResetTrigger("FireProjectile");
-        }
-
-        BossStateMachine.ChangeState(BossState.Idle);
+        // 일정 시간 후 차징 공격을 시도
+        TryFireChargedProjectile();
     }
 
-
-    // 실제 투사체를 발사하는 로직
-    private void FireProjectile()
+    /// <summary>
+    /// 차징 공격을 시도하는 함수 (쿨타임 체크)
+    /// </summary>
+    private void TryFireChargedProjectile()
     {
-        Debug.Log("Boss 투사체 발사!");
+        if (!canChargeAttack)  // 차징 공격이 가능하면
+        {
+            Debug.Log("차징 공격 쿨타임 중입니다.");
+            BossStateMachine.ChangeState(BossState.Idle);  // 원래 상태로 복귀
+            return;
+        }
 
-        // 발사에 필요한 프리팹과 발사 위치가 설정되지 않았다면 실행하지 않음
+        // 차징 공격을 위한 코루틴 실행
+        BossStateMachine.StartCoroutine(FireChargedProjectileCoroutine());
+    }
+
+    /// <summary>
+    /// 차징 공격을 실행하는 코루틴
+    /// </summary>
+    private IEnumerator FireChargedProjectileCoroutine()
+    {
+        canChargeAttack = false;  // 차징 공격 시작 후 쿨타임 진행 중
+
+        Debug.Log("차징 시작...");
+        yield return new WaitForSeconds(chargeTime);  // 차징 시간 동안 대기
+
+        if (player != null)
+        {
+            // 차징 투사체 발사 애니메이션 실행
+            animator?.SetTrigger("FireChargedProjectile");
+            FireProjectile(strong: true);  // 강력한 차징 투사체 발사
+        }
+
+        // 차징 공격 쿨타임 후 차징 공격을 다시 시도할 수 있게 설정
+        yield return new WaitForSeconds(chargeAttackCooldown);
+        canChargeAttack = true;
+        Debug.Log("차징 공격 쿨타임 종료");
+
+        BossStateMachine.ChangeState(BossState.Idle);  // 상태를 Idle로 전환
+    }
+
+    /// <summary>
+    /// 투사체 발사 함수 (일반/강력 구분)
+    /// </summary>
+    /// <param name="strong">강력한 투사체인지 여부</param>
+    private void FireProjectile(bool strong)
+    {
         if (BossStateMachine.projectilePrefab == null || BossStateMachine.firePoint == null) return;
 
-        // 투사체 인스턴스 생성
-        // firePoint 위치에서 projectilePrefab을 생성 (회전은 기본값 Quaternion.identity)
+        // 투사체 프리팹을 생성
         GameObject projectile = Object.Instantiate(
             BossStateMachine.projectilePrefab,
             BossStateMachine.firePoint.position,
             Quaternion.identity
         );
 
-        // 방향 계산
+        // 플레이어 방향 계산
         Vector2 direction = (player.position - BossStateMachine.firePoint.position).normalized;
-
         Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
+
         if (rb != null)
         {
-            float projectileSpeed = 10f; // 투사체의 속도를 설정 (값은 상황에 맞게 조정 가능)
-
-            // 계산한 방향 벡터에 속도를 곱해 velocity에 적용 → 투사체가 해당 방향으로 날아감
-            rb.velocity = direction * projectileSpeed;
+            // 일반/차징 공격에 따라 속도 설정
+            float speed = strong ? 15f : 10f;
+            rb.velocity = direction * speed;  // 속도 적용
         }
+
+        // 투사체 스크립트에서 데미지 및 관통 여부 설정
+        Projectile projectileScript = projectile.GetComponent<Projectile>();
+        if (projectileScript != null)
+        {
+            projectileScript.damage = strong ? 50f : 10f;  // 차징 공격은 데미지 증가
+            projectileScript.isPiercing = strong;  // 차징 공격은 관통 가능
+
+            // 차징 공격일 경우 크기 증가
+            if (strong)
+            {
+                projectile.transform.localScale = new Vector3(3f, 3f, 1f);  // 크기 증가시킴
+            }
+        }
+
+        Debug.Log(strong ? "강력한 투사체 발사!" : "일반 투사체 발사!");  // 로그 출력
     }
 }
