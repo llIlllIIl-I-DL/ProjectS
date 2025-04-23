@@ -331,7 +331,7 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
             Debug.Log("상호작용 입력 감지");
 
             GameObject interactor = this.gameObject;
-            
+
             // 이미 감지된 오브젝트가 없으면 가장 가까운 오브젝트 찾기
             if (baseObject == null)
             {
@@ -340,7 +340,7 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
 
             if (baseObject != null)
             {
-                BossWarningUI.Instance.BossWarningWindowUI(interactor); //보스룸 진입 시 경고창 팝업
+                baseObject.TryInteract(interactor);
             }
             else
             {
@@ -348,21 +348,6 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
             }
         }
     }
-
-    public void OnEntrance(GameObject _interactor, bool isApproved) //BossWarningWindowUI의 네/아니오에 따른 조건문
-    {
-        if (isApproved == true) //네
-        {
-            baseObject.TryInteract(_interactor);
-        }
-
-        else //아니오(준비가 필요하다)
-        {
-            Debug.Log("당신은 들어가지 않기로 결정했다.");
-            return;
-        }
-    }
-
 
     public bool IsMoving()
     {
