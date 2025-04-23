@@ -6,30 +6,32 @@ using System.Collections;
 /// </summary>
 public class ObjectLazer : BaseObject
 {
-    // 레이저가 지금 너무 안이쁘게 나감
-    // 메터리얼이랑 쉐이더를 바꿔야할 듯 
-    
+    #region Variables
+
     [Header("레이저 설정")]
-    [SerializeField] private float laserRange; // 레이저 최대 사거리
-    [SerializeField] private float laserDuration ; // 레이저 지속 시간
-    [SerializeField] private float cooldownTime; // 재사용 대기시간
-    [SerializeField] private LayerMask hitLayers; // 레이저가 충돌할 레이어
-    [SerializeField] private int maxReflections; // 최대 반사 횟수
-    
+    [SerializeField] private float laserRange;       // 레이저 최대 사거리
+    [SerializeField] private float laserDuration;    // 레이저 지속 시간
+    [SerializeField] private float cooldownTime;     // 재사용 대기시간
+    [SerializeField] private LayerMask hitLayers;    // 레이저가 충돌할 레이어
+    [SerializeField] private int maxReflections;     // 최대 반사 횟수
+
     [Header("시각 효과")]
     [SerializeField] private LineRenderer laserLine; // 레이저 라인 렌더러
-    [SerializeField] private float laserWidth; // 레이저 두께
+    [SerializeField] private float laserWidth;       // 레이저 두께
     [SerializeField] private GameObject impactEffect; // 충돌 효과
-    [SerializeField] private Transform firePoint; // 레이저 발사 위치
-    
+    [SerializeField] private Transform firePoint;    // 레이저 발사 위치
+
     [Header("소리 효과")]
-    [SerializeField] private AudioClip chargeSound; // 충전 소리
-    [SerializeField] private AudioClip fireSound; // 발사 소리
-    
-    
-    private bool isOnCooldown = false;
-    private AudioSource audioSource;
-    
+    [SerializeField] private AudioClip chargeSound;  // 충전 소리
+    [SerializeField] private AudioClip fireSound;    // 발사 소리
+
+    private bool isOnCooldown = false;               // 쿨다운 상태
+    private AudioSource audioSource;                 // 오디오 소스 컴포넌트
+
+    #endregion
+
+    #region Unity Lifecycle
+
     protected override void Start()
     {
         base.Start();
@@ -52,11 +54,20 @@ public class ObjectLazer : BaseObject
             firePoint = transform;
             
         laserLine.enabled = false;
+        
+        // 오디오 소스 설정
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
     }
-    
+
+    #endregion
+
+    #region Interaction
+
+    /// <summary>
+    /// 플레이어가 상호작용할 때 호출됨
+    /// </summary>
     protected override void OnInteract(GameObject interactor)
     {
         if (isOnCooldown)
@@ -68,6 +79,13 @@ public class ObjectLazer : BaseObject
         StartCoroutine(FireLaser());
     }
 
+    #endregion
+
+    #region Laser Control
+
+    /// <summary>
+    /// 레이저 발사 (외부에서 호출 가능)
+    /// </summary>
     public void OnLazer()
     {
         if (isOnCooldown)
@@ -79,6 +97,9 @@ public class ObjectLazer : BaseObject
         StartCoroutine(FireLaser());
     }
     
+    /// <summary>
+    /// 레이저 중지 (외부에서 호출 가능)
+    /// </summary>
     public void OffLazer()
     {
         if (laserLine != null)
@@ -92,6 +113,9 @@ public class ObjectLazer : BaseObject
         }
     }
 
+    /// <summary>
+    /// 레이저 발사 코루틴
+    /// </summary>
     private IEnumerator FireLaser()
     {
         isOnCooldown = true;
@@ -138,7 +162,13 @@ public class ObjectLazer : BaseObject
         SetInteractable(true);
     }
 
-    // 반사를 고려한 레이저 처리 메서드
+    #endregion
+
+    #region Laser Physics
+
+    /// <summary>
+    /// 반사를 고려한 레이저 처리 메서드
+    /// </summary>
     private void ProcessLaserWithReflections()
     {
         // 시작점과 방향 설정
@@ -165,7 +195,9 @@ public class ObjectLazer : BaseObject
         }
     }
 
-    // 재귀적 레이저 처리
+    /// <summary>
+    /// 재귀적 레이저 처리 - 반사 구현
+    /// </summary>
     private void CastLaserRecursive(Vector2 startPos, Vector2 direction, int reflectionCount, ref int pointIndex)
     {
         // 최대 반사 횟수 초과 검사
@@ -187,9 +219,6 @@ public class ObjectLazer : BaseObject
                 Destroy(impact, 0.2f);
             }
             
-            // 디버깅용 로그
-            Debug.Log($"레이저가 {hit.collider.name}과 충돌, 위치: {hit.point}");
-            
             // 반사경 체크
             ObjectMirror mirror = hit.collider.GetComponent<ObjectMirror>();
             if (mirror != null && reflectionCount < maxReflections)
@@ -200,8 +229,6 @@ public class ObjectLazer : BaseObject
                 // 디버깅: 법선 및 반사 벡터 시각화
                 Debug.DrawRay(hit.point, hit.normal, Color.blue, 0.5f);
                 Debug.DrawRay(hit.point, reflectedDir * 5, Color.green, 0.5f);
-                
-                Debug.Log($"반사경 회전: {mirror.transform.eulerAngles.z}, 법선: {mirror.transform.up}, 반사 방향: {reflectedDir}");
                 
                 // 다음 반사점 시작 위치 (약간 오프셋)
                 Vector2 nextStartPos = hit.point + reflectedDir * 0.05f;
@@ -219,6 +246,7 @@ public class ObjectLazer : BaseObject
                 if (damageable != null)
                 {
                     // 데미지 처리 로직
+                    // damageable.TakeDamage(laserDamage);
                 }
             }
         }
@@ -229,7 +257,11 @@ public class ObjectLazer : BaseObject
             laserLine.SetPosition(pointIndex++, endPos);
         }
     }
-    
+
+    #endregion
+
+    #region Editor
+
     #if UNITY_EDITOR
     // 편집기에서 레이저 방향 시각화
     private void OnDrawGizmos()
@@ -241,4 +273,6 @@ public class ObjectLazer : BaseObject
         }
     }
     #endif
+
+    #endregion
 }

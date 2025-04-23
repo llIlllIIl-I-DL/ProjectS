@@ -6,14 +6,17 @@ using System.Collections.Generic;
 /// </summary>
 public class ObjectConveyor : BaseObject
 {
-
-    // 현재 컨베이어 벨트 밀리는 효과는 작동하나 점프가 씹히거나 밀리는 방향으로 이동속도가 증가하지 않는 문제가 발생
+    // 현재 컨베이어 벨트 밀리는 효과는 작동하나 점프가 씹히거나 
+    // 밀리는 방향으로 이동속도가 증가하지 않는 문제가 발생
     // PlayerMovement.cs에서 점프를 처리하는 부분을 수정해야 할 듯
+
+    #region Variables
+
     [Header("컨베이어 벨트 설정")]
-    [SerializeField] private float moveSpeed; // 이동 속도
+    [SerializeField] private float moveSpeed;                  // 이동 속도
     [SerializeField] private Vector2 moveDirection = Vector2.right; // 이동 방향
-    [SerializeField] private bool isActive = true; // 활성화 상태
-    [SerializeField] private bool canToggle = true; // 상호작용으로 토글 가능 여부
+    [SerializeField] private bool isActive = true;             // 활성화 상태
+    [SerializeField] private bool canToggle = true;            // 상호작용으로 토글 가능 여부
 
     [Header("시각 효과")]
     [SerializeField] private SpriteRenderer beltRenderer;
@@ -21,12 +24,16 @@ public class ObjectConveyor : BaseObject
     [SerializeField] private Material scrollingMaterial;
 
     [Header("물리 설정")]
-    [SerializeField] private bool usePhysics = true; // 물리 기반 이동 사용 여부
-    [SerializeField] private LayerMask affectedLayers; // 영향받는 레이어
+    [SerializeField] private bool usePhysics = true;          // 물리 기반 이동 사용 여부
+    [SerializeField] private LayerMask affectedLayers;        // 영향받는 레이어
 
     private Material instanceMaterial;
     private List<Rigidbody2D> objectsOnBelt = new List<Rigidbody2D>();
     private float offset = 0;
+
+    #endregion
+
+    #region Unity Lifecycle
 
     protected override void Start()
     {
@@ -80,6 +87,10 @@ public class ObjectConveyor : BaseObject
         }
     }
 
+    #endregion
+
+    #region Movement Methods
+
     private void MoveObjectsWithPhysics()
     {
         foreach (var rb in objectsOnBelt)
@@ -119,6 +130,10 @@ public class ObjectConveyor : BaseObject
         }
     }
 
+    #endregion
+
+    #region Interaction
+
     // 상호작용으로 컨베이어 토글
     protected override void OnInteract(GameObject interactor)
     {
@@ -134,6 +149,10 @@ public class ObjectConveyor : BaseObject
             }
         }
     }
+
+    #endregion
+
+    #region Collision Handlers
 
     // 컨베이어 벨트 위에 오브젝트 올라왔을 때
     private void OnCollisionStay2D(Collision2D collision)
@@ -192,6 +211,10 @@ public class ObjectConveyor : BaseObject
         }
     }
 
+    #endregion
+
+    #region Public Methods
+
     // 방향 설정 메서드
     public void SetDirection(Vector2 newDirection)
     {
@@ -210,13 +233,19 @@ public class ObjectConveyor : BaseObject
         isActive = active;
     }
 
+    #endregion
+
+    #region Editor
+
     // 에디터 시각화
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.blue;
         Vector3 dir = new Vector3(moveDirection.x, moveDirection.y, 0).normalized;
         Gizmos.DrawRay(transform.position, dir * moveSpeed);
     }
-#endif
+    #endif
+
+    #endregion
 }

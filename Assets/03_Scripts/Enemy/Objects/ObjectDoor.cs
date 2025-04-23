@@ -4,28 +4,25 @@ using UnityEngine;
 /// <summary>
 /// 문 오브젝트 - 플레이어와 상호작용 시 열림, 닫힘 또는 다른 오브젝트와 상호작용
 /// </summary>
-
 public class ObjectDoor : BaseObject
 {
     #region Variables
+    
     [Header("문 설정")]
-    [SerializeField] private bool isOpen = false; // 문이 열려있는지 여부
+    [SerializeField] private bool isOpen = false;  // 문이 열려있는지 여부
     [SerializeField] private bool isLocked = true; // 문이 잠겨있는지 여부
     
     [Header("애니메이션")]
-    [SerializeField] private Animator doorAnimator; // 문 애니메이터
-    [SerializeField] private string openAnimTrigger = "Open"; // 열기 애니메이션 트리거
+    [SerializeField] private Animator doorAnimator;            // 문 애니메이터
+    [SerializeField] private string openAnimTrigger = "Open";  // 열기 애니메이션 트리거
     [SerializeField] private string closeAnimTrigger = "Close"; // 닫기 애니메이션 트리거
     
     [Header("자동 닫힘")]
-    [SerializeField] private bool autoClose = false; // 자동으로 닫히는지 여부
-    [SerializeField] private float autoCloseDelay; // 자동 닫힘 지연 시간
+    [SerializeField] private bool autoClose = false;   // 자동으로 닫히는지 여부
+    [SerializeField] private float autoCloseDelay;     // 자동 닫힘 지연 시간
     
-    // 필요한 컴포넌트 참조
-    private Collider2D doorCollider;
-    
-    // 자동 닫힘 타이머
-    private float autoCloseTimer;
+    private Collider2D doorCollider;  // 문 콜라이더
+    private float autoCloseTimer;     // 자동 닫힘 타이머
     
     #endregion
     
@@ -113,10 +110,6 @@ public class ObjectDoor : BaseObject
         {
             UpdateDoorState(true);
         }
-        else if (isLocked)
-        {
-            
-        }
     }
     
     /// <summary>
@@ -139,12 +132,6 @@ public class ObjectDoor : BaseObject
             return;
             
         isLocked = locked;
-        
-        // 잠금 해제 사운드 재생
-        if (!isLocked)
-        {
-
-        }
     }
     
     /// <summary>
@@ -154,11 +141,6 @@ public class ObjectDoor : BaseObject
     {
         ToggleLock(false);
     }
-
-    /// <summary>
-    /// 발판 두개 이상으로 문 열기
-    /// </summary>
-    
     
     #endregion
     
@@ -167,16 +149,12 @@ public class ObjectDoor : BaseObject
     protected override void OnPlayerEnterRange(GameObject player)
     {
         base.OnPlayerEnterRange(player);
-        
-        // 상호작용 UI 표시
         ShowInteractionPrompt();
     }
 
     protected override void OnPlayerExitRange(GameObject player)
     {
         base.OnPlayerExitRange(player);
-        
-        // 상호작용 UI 숨김
         HideInteractionPrompt();
     }
 
@@ -193,50 +171,43 @@ public class ObjectDoor : BaseObject
                 if (BossWarningUI.Instance != null)
                 {
                     BossWarningUI.Instance.BossWarningWindowUI(interactor, this);
-                    // 실제 문 열기는 UI에서 "예" 선택 시 호출될 것이므로 여기서는 리턴
                     return;
                 }
                 break;
                 
-            case "LockedDoor": // 예시
-                // 잠긴 문 메시지 표시
-                if (isLocked)
-                {
-                    // UIManager.Instance.ShowMessage("이 문은 잠겨 있습니다.");
-                    AudioManager.Instance.PlaySFX("DoorLocked");
-                    return;
-                }
-                break;
+            // case "LockedDoor":
+            //     // 잠긴 문 메시지 표시
+            //     if (isLocked)
+            //     {
+            //         AudioManager.Instance.PlaySFX("DoorLocked");
+            //         return;
+            //     }
+            //     break;
                 
-            case "SecretDoor": // 예시
-                // 비밀 문 발견 로직
-                // GameManager.Instance.UnlockAchievement("SecretFound");
-                break;
+            // case "SecretDoor":
+            //     // 비밀 문 발견 로직
+            //     // GameManager.Instance.UnlockAchievement("SecretFound");
+            //     break;
                 
-            case "TimedDoor": // 예시
-                // 시간제한 문 열기
-                if (isOpen)
-                {
-                    CloseDoor();
-                }
-                else
-                {
-                    OpenDoor();
-                    // 타이머 시작
-                    autoClose = true;
-                    autoCloseTimer = autoCloseDelay;
-                }
-                return;
-                
-            // 필요에 따라 더 많은 케이스 추가
+            // case "TimedDoor":
+            //     // 시간제한 문 열기
+            //     if (isOpen)
+            //     {
+            //         CloseDoor();
+            //     }
+            //     else
+            //     {
+            //         OpenDoor();
+            //         autoClose = true;
+            //         autoCloseTimer = autoCloseDelay;
+            //     }
+            //     return;
         }
         
         // 기본 문 상호작용 (특수 케이스가 아닐 경우)
         if (isLocked)
         {
-            // 잠긴 문 피드백 제공
             AudioManager.Instance.PlaySFX("DoorLocked");
-            // UIManager.Instance.ShowMessage("이 문은 잠겨 있습니다.");
             return;
         }
         
@@ -251,18 +222,20 @@ public class ObjectDoor : BaseObject
         }
     }
 
-    public void OnEntrance(bool isApproved) //BossWarningWindowUI의 네/아니오에 따른 조건문
+    /// <summary>
+    /// 보스 방 입장 결정에 따른 처리
+    /// </summary>
+    /// <param name="isApproved">입장 승인 여부</param>
+    public void OnEntrance(bool isApproved)
     {
-        if (isApproved == true) //네
+        if (isApproved)
         {
             OpenDoor();
             Debug.Log("당신은 들어가기로 결정했다.");
         }
-
-        else //아니오(준비가 필요하다)
+        else
         {
             Debug.Log("당신은 들어가지 않기로 결정했다.");
-            return;
         }
     }
     

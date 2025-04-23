@@ -1,8 +1,13 @@
 using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// 파괴 가능한 벽 오브젝트 - 차징 공격으로만 파괴 가능 (하지만 현재는 일반공격 가능)
+/// /// </summary>
 public class ObjectCrackedWall : DestructibleObject
 {
+    #region Variables
+
     [Header("벽 속성")]
     [SerializeField] private bool requiresChargedAttack = true; // 차징 공격만 허용
     
@@ -11,6 +16,8 @@ public class ObjectCrackedWall : DestructibleObject
     [SerializeField] private int maxBrickCount = 10; // 최대 벽돌 개수
     [SerializeField] private float brickForce = 5f; // 벽돌 튕김 힘
     [SerializeField] private float brickLifetime = 3f; // 벽돌 지속 시간
+
+    #endregion
     
     // 특수 데미지 처리를 위한 메서드 오버라이드
     public override void TakeDamage(float damage)
