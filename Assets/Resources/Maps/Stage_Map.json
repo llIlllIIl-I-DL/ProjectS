@@ -7,13 +7,7 @@
                 "y": -190.0
             },
             "rotationStep": 0,
-            "connections": [
-                {
-                    "connectionPointIndex": 0,
-                    "connectedModuleGUID": "30de75c168ca40748b535003ec42b551",
-                    "connectedPointIndex": 1
-                }
-            ]
+            "connections": []
         },
         {
             "moduleGUID": "30de75c168ca40748b535003ec42b551",
@@ -29,6 +23,24 @@
                     "connectedPointIndex": 0
                 }
             ]
+        },
+        {
+            "moduleGUID": "aa929fc7419e16c478dfc4ed000edcab",
+            "position": {
+                "x": 60.0,
+                "y": -240.0
+            },
+            "rotationStep": 0,
+            "connections": []
+        },
+        {
+            "moduleGUID": "be37de2bb7ee5fa428e211191b409cd1",
+            "position": {
+                "x": 30.0,
+                "y": -240.0
+            },
+            "rotationStep": 0,
+            "connections": []
         }
     ]
 }

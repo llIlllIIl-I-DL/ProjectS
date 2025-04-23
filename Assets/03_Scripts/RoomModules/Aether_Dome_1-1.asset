@@ -10,20 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: baed70ff6524cce40ac40885f49719f4, type: 3}
-  m_Name: StartCorrider
+  m_Name: Aether_Dome_1-1
   m_EditorClassIdentifier: 
-  assetGUID: 30de75c168ca40748b535003ec42b551
-  modulePrefab: {fileID: 8424664971840446818, guid: d7e6df4626cdf684a92ca3c8573981e6, type: 3}
+  assetGUID: aa929fc7419e16c478dfc4ed000edcab
+  modulePrefab: {fileID: 6487850698782976006, guid: 07a7693c11d18d0469380cea25829ba7, type: 3}
   thumbnail: {fileID: 0}
   category: 0
   theme: 0
   connectionPoints:
-  - position: {x: 0, y: 120}
-    direction: 2
-    type: 0
-  - position: {x: 0, y: -120}
+  - position: {x: -22, y: -29}
     direction: 0
     type: 0
+  - position: {x: 50, y: 0}
+    direction: 3
+    type: 0
   isSpecialRoom: 0
-  moduleSize: {x: 1, y: 3}
+  moduleSize: {x: 2, y: 2}
   useCustomSize: 1

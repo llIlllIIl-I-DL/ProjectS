@@ -61,7 +61,7 @@ public class MetroidvaniaMapEditor : EditorWindow
     private const int UNITY_TILES_PER_MODULE_TILE = 10; // 모듈 1타일 = 유니티 타일맵 10칸
 
     private string mapName = "New Map";
-    private string savePath = "Assets/03_Scripts/RoomData/";
+    private string savePath = "Assets/Resources/Maps";
     private string modulePath = "Assets/03_Scripts/RoomModules/";
     
     // 모듈 생성에 필요한 변수들
