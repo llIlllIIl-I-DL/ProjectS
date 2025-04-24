@@ -12,6 +12,7 @@ public enum ItemType // 아이템 주요 분류
     WeaponAttribute, // 무기속성
     CostumeParts,   // 복장파츠
     UsableItem,      // 사용 아이템
+    UtilityItem,    //특성 아이템(해금 필요)
     UtilityPoint    //특성 해금용 포인트
 }
 public enum ItemUsageType // 사용 아이템 사용 방식
@@ -74,6 +75,9 @@ public class ItemData : ScriptableObject
     [Tooltip("아이템 타입이 UtilityPoint일 경우에만 사용")]
     public int utilityPointForOneWay;
 
+    [Header("특성 해금 포인트")]
+    [Tooltip("아이템 타입이 UtilityItem일 경우에만 사용")]
+    public int utilityPointForUnLock;
 }
 
 public enum ElementType

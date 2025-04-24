@@ -12,6 +12,8 @@ public class PlayerHP : MonoBehaviour, IDamageable
 
     private PlayerStateManager playerStateManager;
     private bool isDead = false;
+
+    private Player player;
     
     public float MaxHP => maxHP;
     public float CurrentHP => currentHP;
@@ -22,6 +24,7 @@ public class PlayerHP : MonoBehaviour, IDamageable
         maxHP = Mathf.Clamp(maxHP, MIN_HP, MAX_HP);
         currentHP = maxHP;
         playerStateManager = GetComponent<PlayerStateManager>();
+        player = GetComponent<Player>();
     }
 
 
@@ -62,6 +65,8 @@ public class PlayerHP : MonoBehaviour, IDamageable
         currentHP = Mathf.Clamp(currentHP + actualIncrease, MIN_HP, maxHP);
 
         Debug.Log($"최대 HP가 {maxHP - previousMaxHP}만큼 증가했습니다. 새로운 최대 HP: {maxHP}");
+
+        player.UpdateCurrentPlayerHP();
     }
 
     // 체력 초기화 (부활 시 사용)

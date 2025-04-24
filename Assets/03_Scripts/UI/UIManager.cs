@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -14,6 +15,8 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] public Transform gameOverWindowParents;
     [SerializeField] public CanvasGroup fadeOut;
 
+    [SerializeField] public UtilityItemList utilityItemList;
+
     public List<GameObject> allUIPages = new List<GameObject>();
 
     InputUI inputUI;
@@ -24,6 +27,8 @@ public class UIManager : Singleton<UIManager>
     private void Start()
     {
         inputUI = FindObjectOfType<InputUI>();
+
+        utilityItemList.GetUtility();
     }
 
     public void CloseAllPage()
