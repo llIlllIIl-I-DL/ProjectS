@@ -82,15 +82,6 @@
             "connections": []
         },
         {
-            "moduleGUID": "8644cc7e124d9224db0006cad004b214",
-            "position": {
-                "x": 165.0,
-                "y": -50.0
-            },
-            "rotationStep": 0,
-            "connections": []
-        },
-        {
             "moduleGUID": "c6d4777bea50fba4ea1a64329f0f63e6",
             "position": {
                 "x": 95.0,
@@ -99,6 +90,16 @@
             "rotationStep": 0,
             "connections": []
         },
+        {
+            "moduleGUID": "8644cc7e124d9224db0006cad004b214",
+            "position": {
+                "x": 165.0,
+                "y": -50.0
+            },
+            "rotationStep": 0,
+            "connections": []
+        },
+        
         {
             "moduleGUID": "03ab5932640e4254687f2de418b7140f",
             "position": {
