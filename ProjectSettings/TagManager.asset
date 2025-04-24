@@ -20,10 +20,10 @@ TagManager:
   - Enemy
   - Ladder
   - NoCollision
+  - Mirror
+  - Object
   - Boss
   - Projectile
-  - 
-  - 
   - 
   - 
   - 

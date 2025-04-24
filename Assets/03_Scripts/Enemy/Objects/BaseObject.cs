@@ -10,12 +10,12 @@ public abstract class BaseObject : MonoBehaviour
 
     [Header("기본 설정")]
     [SerializeField] protected bool isInteractable = true;
-    [SerializeField] protected float interactionRange = 2f;
+    [SerializeField] protected float interactionRange;
     [SerializeField] protected string objectId = "Object";
 
     [Header("사운드")]
     [SerializeField] protected AudioClip interactSound;
-    [SerializeField] protected float interactSoundVolume = 1f;
+    [SerializeField] protected float interactSoundVolume;
     
     // 참조 및 상태
     protected SpriteRenderer spriteRenderer;

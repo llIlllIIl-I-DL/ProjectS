@@ -74,10 +74,13 @@ public class ItemManager : MonoBehaviour
     {
         if (itemData == null) return false;
 
-        // 중복 아이템 체크
-        if (playerItems.Contains(itemData))
+        if (itemData.itemType != ItemType.UtilityPoint) //UtilityPoint는 계속해서 획득 할 수 있어야 하니까...
         {
-            return false; // 이미 있는 아이템이면 추가하지 않음
+            // 중복 아이템 체크
+            if (playerItems.Contains(itemData))
+            {
+                return false; // 이미 있는 아이템이면 추가하지 않음
+            }
         }
 
         // 아이템 목록에 추가

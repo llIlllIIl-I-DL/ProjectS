@@ -1,11 +1,18 @@
 using UnityEngine;
 
+/// <summary>
+/// 파괴 가능한 오브젝트 - 파괴 시 이펙트 및 힘 적용 (테스트용으로 만든 거)
+/// </summary>
 public class ExplosiveObject : DestructibleObject
 {
+    #region Variables
+
     [Header("폭발 속성")]
     [SerializeField] private float explosionRadius = 3f;
     [SerializeField] private float explosionDamage = 5f;
     [SerializeField] private GameObject explosionEffectPrefab;
+
+    #endregion
     
     public override void PlayDestructionEffect()
     {

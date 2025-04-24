@@ -1,4 +1,6 @@
 using System;
+using Unity.VisualScripting;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,7 +8,7 @@ using UnityEngine.InputSystem;
 public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
 {
     private BaseObject baseObject;
-    
+
     [SerializeField] private float interactionRadius = 2f; // 상호작용 가능 범위
     [SerializeField] private float doubleTapTime = 0.5f;
 
@@ -329,7 +331,7 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
             Debug.Log("상호작용 입력 감지");
 
             GameObject interactor = this.gameObject;
-            
+
             // 이미 감지된 오브젝트가 없으면 가장 가까운 오브젝트 찾기
             if (baseObject == null)
             {
@@ -346,7 +348,6 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
             }
         }
     }
-
 
     public bool IsMoving()
     {
