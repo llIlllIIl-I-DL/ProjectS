@@ -56,7 +56,7 @@ public class MetroidvaniaMapEditor : EditorWindow
     private const float TILE_WIDTH = 1.0f; // 모듈 타일 가로 크기
     private const float TILE_HEIGHT = 1.0f; // 모듈 타일 세로 크기
     // 화면에서 한 모듈 타일이 차지하는 픽셀 크기
-    private const float TILE_PIXEL_SIZE = 50f;
+    private const float TILE_PIXEL_SIZE = 20f; // 한 모듈 타일이 차지하는 픽셀 크기를 축소하여 그리드 확대 효과
     private bool useRoomTileGrid = true; // 룸 타일 그리드 사용 여부
     
     // 유니티 타일맵과 모듈 타일 크기 비율
@@ -99,10 +99,12 @@ public class MetroidvaniaMapEditor : EditorWindow
     [MenuItem("Metroidvania/Map Editor")]
     public static void ShowWindow()
     {
-        // 에디터 윈도우를 열 때 문자열 변수를 사용하여 타이틀 설정
+        // 에디터 윈도우를 열 때 문자열 변수를 사용하여 타이틀 및 최소 크기 설정
         string windowTitle = "Metroidvania Map Editor";
-        EditorWindow window = GetWindow(typeof(MetroidvaniaMapEditor));
+        var window = GetWindow<MetroidvaniaMapEditor>();
         window.titleContent = new GUIContent(windowTitle);
+        // 기본 최소 크기를 설정하여 모듈과 맵이 충분히 보이도록 함
+        window.minSize = new Vector2(1200, 700);
     }
 
     private void OnEnable()
@@ -681,7 +683,11 @@ public class MetroidvaniaMapEditor : EditorWindow
 
     private void DrawModule(Rect mapRect, PlacedModule module)
     {
-        Vector2 screenPos = GetScreenPosition(module.position, mapRect);
+        // 홀수 크기 블록 보정: 0.5 타일만큼 오프셋
+        Vector2 drawWorldPos = module.position;
+        if ((int)module.moduleData.moduleSize.x % 2 != 0) drawWorldPos.x += TILE_WIDTH * 0.5f;
+        if ((int)module.moduleData.moduleSize.y % 2 != 0) drawWorldPos.y += TILE_HEIGHT * 0.5f;
+        Vector2 screenPos = GetScreenPosition(drawWorldPos, mapRect);
         
         // 모듈 위치가 화면 범위를 벗어나면 그리지 않음
         if (screenPos.x < -100 || screenPos.x > mapRect.width + 100 || 
@@ -1766,6 +1772,28 @@ public class MetroidvaniaMapEditor : EditorWindow
         mapName = Path.GetFileNameWithoutExtension(path);
         
         Repaint();
+        // 맵 로드 후 자동 Fit 플래그 설정
+        if (placedModules.Count > 0)
+        {
+            // 월드 좌표 기준 최소/최대 값 계산
+            fitMinX = float.MaxValue; fitMaxX = float.MinValue;
+            fitMinY = float.MaxValue; fitMaxY = float.MinValue;
+            foreach (var mod in placedModules)
+            {
+                // 모듈 크기 절반 (world unit)
+                float halfW = mod.moduleData.moduleSize.x * TILE_WIDTH * 0.5f;
+                float halfH = mod.moduleData.moduleSize.y * TILE_HEIGHT * 0.5f;
+                float x0 = mod.position.x - halfW;
+                float x1 = mod.position.x + halfW;
+                float y0 = mod.position.y - halfH;
+                float y1 = mod.position.y + halfH;
+                fitMinX = Mathf.Min(fitMinX, x0);
+                fitMaxX = Mathf.Max(fitMaxX, x1);
+                fitMinY = Mathf.Min(fitMinY, y0);
+                fitMaxY = Mathf.Max(fitMaxY, y1);
+            }
+            needsFitOnNextDraw = true;
+        }
     }
 
     private void NewMap()
@@ -2118,10 +2146,13 @@ public class MetroidvaniaMapEditor : EditorWindow
             );
         }
         
-        // 모듈 위치에서 스크린 위치 계산
-        Vector2 screenPos = GetScreenPosition(adjustedPosition, mapRect);
+        // 홀수 크기 블록 보정: 0.5 타일 오프셋
+        Vector2 drawWorldPos = adjustedPosition;
+        if ((int)module.moduleSize.x % 2 != 0) drawWorldPos.x += TILE_WIDTH * 0.5f;
+        if ((int)module.moduleSize.y % 2 != 0) drawWorldPos.y += TILE_HEIGHT * 0.5f;
+        Vector2 screenPos = GetScreenPosition(drawWorldPos, mapRect);
         
-        // 모듈 크기 적용
+        // 모듈 위치에서 스크린 위치 계산
         Vector2 moduleSize = module.moduleSize;
         float width = moduleSize.x * 50 * zoomLevel;
         float height = moduleSize.y * 50 * zoomLevel;
@@ -2779,5 +2810,32 @@ public class MetroidvaniaMapEditor : EditorWindow
         info += "좌표 변환: 1 모듈 타일 = " + RoomModule.UNITY_TILES_PER_MODULE_TILE + " 유니티 타일맵 타일";
         
         EditorUtility.DisplayDialog("좌표 검증", info, "확인");
+    }
+
+    // Load 이후 초기 자동 줌/센터링 플래그 및 바운드
+    private bool needsFitOnNextDraw = false;
+    private float fitMinX, fitMaxX, fitMinY, fitMaxY;
+
+    // 맵 바운드에 맞춰 줌 레벨과 오프셋을 설정
+    private void FitToMap(Rect mapRect)
+    {
+        // 월드 크기
+        float worldW = fitMaxX - fitMinX;
+        float worldH = fitMaxY - fitMinY;
+        if (worldW <= 0 || worldH <= 0) return;
+        // 필요한 픽셀 크기
+        float pixW = worldW * TILE_PIXEL_SIZE;
+        float pixH = worldH * TILE_PIXEL_SIZE;
+        // 여유 마진
+        float margin = 20f;
+        // 적합한 줌 레벨
+        float zX = (mapRect.width - margin*2) / pixW;
+        float zY = (mapRect.height - margin*2) / pixH;
+        zoomLevel = Mathf.Min(zX, zY);
+        // 중심 맞추기
+        float centerX = (fitMinX + fitMaxX) * 0.5f;
+        float centerY = (fitMinY + fitMaxY) * 0.5f;
+        mapOffset.x = mapRect.width * 0.5f - centerX * TILE_PIXEL_SIZE * zoomLevel;
+        mapOffset.y = mapRect.height * 0.5f - centerY * TILE_PIXEL_SIZE * zoomLevel;
     }
 }

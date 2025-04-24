@@ -25,5 +25,5 @@ MonoBehaviour:
     direction: 3
     type: 0
   isSpecialRoom: 0
-  moduleSize: {x: 4, y: 1}
+  moduleSize: {x: 3, y: 2}
   useCustomSize: 1

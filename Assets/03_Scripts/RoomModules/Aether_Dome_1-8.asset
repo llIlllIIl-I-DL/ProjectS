@@ -10,17 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: baed70ff6524cce40ac40885f49719f4, type: 3}
-  m_Name: StartPosition
+  m_Name: Aether_Dome_1-8
   m_EditorClassIdentifier: 
-  assetGUID: 707c39880b2858b47aee46ecdd4ab4b1
-  modulePrefab: {fileID: 9118378337675771776, guid: f66ebf736853cf44ea65505ec93f4321, type: 3}
+  assetGUID: 8644cc7e124d9224db0006cad004b214
+  modulePrefab: {fileID: 3189813134239274427, guid: 6331df1885957f64690452992da55b5b, type: 3}
   thumbnail: {fileID: 0}
   category: 0
   theme: 0
   connectionPoints:
-  - position: {x: 75, y: 45}
-    direction: 2
-    type: 1
+  - position: {x: -22, y: -29}
+    direction: 0
+    type: 0
+  - position: {x: 50, y: 0}
+    direction: 3
+    type: 0
   isSpecialRoom: 0
-  moduleSize: {x: 4, y: 2}
-  useCustomSize: 0
+  moduleSize: {x: 3, y: 3}
+  useCustomSize: 1
