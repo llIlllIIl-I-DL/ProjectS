@@ -50,8 +50,18 @@ public class PlayerMovement : MonoBehaviour
     
     private void FixedUpdate()
     {
-        // 경사로 체크
-        SlopeCheck();
+        // 경사로 체크 (지상에 있을 때만)
+        if (IsGrounded())
+        {
+            SlopeCheck();
+        }
+        else
+        {
+            // 공중에 있을 때는 경사로 상태를 리셋하고 마찰력 제거
+            isOnSlope = false;
+            rb.sharedMaterial = noFriction;
+            rb.constraints = RigidbodyConstraints2D.FreezeRotation; // 회전만 고정
+        }
     }
 
     public void Move(Vector2 moveDirection, bool sprint = false)
@@ -79,7 +89,7 @@ public class PlayerMovement : MonoBehaviour
         float currentMoveSpeed = settings.moveSpeed;
         if (sprint || isSprinting)
         {
-            currentMoveSpeed *= settings.sprintMultiplier;
+            currentMoveSpeed += settings.sprintMultiplier;
         }
 
         float targetSpeed = moveDirection.x * currentMoveSpeed;
@@ -122,8 +132,8 @@ public class PlayerMovement : MonoBehaviour
             Debug.DrawRay(hit.point, hit.normal, Color.green);
             Debug.DrawRay(hit.point, slopeNormalPerpendicular, Color.red);
             
-            // 마찰력 조정
-            if (isOnSlope && rb.velocity.y <= 0.1f)
+            // 마찰력 조정 - 지상에 있고 경사로에 있을 때만 마찰력 적용
+            if (IsGrounded() && isOnSlope && rb.velocity.y <= 0.1f)
             {
                 rb.sharedMaterial = fullFriction; // 경사로에서는 마찰력 있음
             }
@@ -135,6 +145,7 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             isOnSlope = false;
+            rb.sharedMaterial = noFriction; // 경사로 감지되지 않으면 마찰력 없음
         }
     }
     
@@ -155,8 +166,8 @@ public class PlayerMovement : MonoBehaviour
         // 경사로 방향으로 힘을 가함
         rb.AddForce(movement * slopeNormalPerpendicular);
         
-        // 경사로에서 중력에 의한 미끄러짐 방지
-        if (Mathf.Abs(targetSpeed) < 0.1f && rb.velocity.magnitude < 0.1f)
+        // 경사로에서 중력에 의한 미끄러짐 방지 (지상에 있을 때만 적용)
+        if (IsGrounded() && Mathf.Abs(targetSpeed) < 0.1f && rb.velocity.magnitude < 0.1f)
         {
             rb.constraints = RigidbodyConstraints2D.FreezeAll;
         }
@@ -164,6 +175,14 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
+    }
+    
+    // 지상에 있는지 체크하는 메서드 추가
+    private bool IsGrounded()
+    {
+        // 간단한 지상 체크, 아래 방향으로 짧은 레이캐스트
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 0.1f, groundLayer);
+        return hit.collider != null;
     }
     
     // Player.cs 스크립트와의 호환성을 위한 더미 메서드
