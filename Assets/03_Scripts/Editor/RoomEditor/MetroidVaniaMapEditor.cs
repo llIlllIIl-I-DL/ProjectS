@@ -55,6 +55,8 @@ public class MetroidvaniaMapEditor : EditorWindow
     private const float GRID_SIZE = 1f; // 모듈 그리드 기본 크기
     private const float TILE_WIDTH = 1.0f; // 모듈 타일 가로 크기
     private const float TILE_HEIGHT = 1.0f; // 모듈 타일 세로 크기
+    // 화면에서 한 모듈 타일이 차지하는 픽셀 크기
+    private const float TILE_PIXEL_SIZE = 50f;
     private bool useRoomTileGrid = true; // 룸 타일 그리드 사용 여부
     
     // 유니티 타일맵과 모듈 타일 크기 비율
@@ -584,8 +586,8 @@ public class MetroidvaniaMapEditor : EditorWindow
         }
         
         // 그리드 크기 설정 - 줌 레벨에 따라 스케일링
-        float scaledGridX = gridSizeX * zoomLevel;
-        float scaledGridY = gridSizeY * zoomLevel;
+        float scaledGridX = gridSizeX * TILE_PIXEL_SIZE * zoomLevel;
+        float scaledGridY = gridSizeY * TILE_PIXEL_SIZE * zoomLevel;
         
         // 그리드 오프셋 계산
         float offsetX = mapOffset.x % scaledGridX;
@@ -2658,16 +2660,16 @@ public class MetroidvaniaMapEditor : EditorWindow
     private Vector2 GetScreenPosition(Vector2 worldPosition, Rect mapRect)
     {
         return new Vector2(
-            mapRect.x + mapOffset.x + worldPosition.x * zoomLevel,
-            mapRect.y + mapOffset.y + worldPosition.y * zoomLevel
+            mapRect.x + mapOffset.x + worldPosition.x * TILE_PIXEL_SIZE * zoomLevel,
+            mapRect.y + mapOffset.y + worldPosition.y * TILE_PIXEL_SIZE * zoomLevel
         );
     }
 
     private Vector2 GetWorldPosition(Vector2 screenPosition, Rect mapRect)
     {
         return new Vector2(
-            (screenPosition.x - mapRect.x - mapOffset.x) / zoomLevel,
-            (screenPosition.y - mapRect.y - mapOffset.y) / zoomLevel
+            (screenPosition.x - mapRect.x - mapOffset.x) / (TILE_PIXEL_SIZE * zoomLevel),
+            (screenPosition.y - mapRect.y - mapOffset.y) / (TILE_PIXEL_SIZE * zoomLevel)
         );
     }
 
