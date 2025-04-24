@@ -20,6 +20,7 @@ public class UIManager : Singleton<UIManager>
     public List<GameObject> allUIPages = new List<GameObject>();
 
     InputUI inputUI;
+    Player player;
 
     GameObject _gameOverWindow;
     CanvasGroup _fadeOut;
@@ -27,8 +28,9 @@ public class UIManager : Singleton<UIManager>
     private void Start()
     {
         inputUI = FindObjectOfType<InputUI>();
+        player = FindObjectOfType<Player>();
 
-        utilityItemList.GetUtility();
+        utilityItemList.GetUtility(player);
     }
 
     public void CloseAllPage()

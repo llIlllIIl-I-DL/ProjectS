@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Utility Point
   itemIcon: {fileID: 21300000, guid: 15373f7ee0fa71a4bb810b95c4942e13, type: 3}
-  itemType: 3
+  itemType: 4
   itemUsageType: 1
   itemAttributeType: 0
   description: "\uD2B9\uC131 \uD574\uAE08\uC6A9 \uD3EC\uC778\uD2B8\uC785\uB2C8\uB2E4."
@@ -29,3 +29,4 @@ MonoBehaviour:
   damage: 0
   attackSpeed: 0
   utilityPointForOneWay: 10
+  utilityPointForUnLock: 0

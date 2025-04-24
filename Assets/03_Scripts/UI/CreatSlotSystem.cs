@@ -18,6 +18,8 @@ public class CreatSlotSystem : MonoBehaviour
     [SerializeField] private InvenSlotUI slotPrefab;
     [SerializeField] private Transform slotParent;
 
+    Player player;
+
 
     private void Awake()
     {
@@ -77,11 +79,11 @@ public class CreatSlotSystem : MonoBehaviour
 
   
 
-    public void AddItem(ItemData ItemData)
+    public void AddItem(ItemData ItemData, Player player)
     {
         if (slotIndex < slotList.Count)
         {
-            slotList[slotIndex].SetItem(ItemData);
+            slotList[slotIndex].SetItem(ItemData, player);
             slotIndex++;
         }
     }

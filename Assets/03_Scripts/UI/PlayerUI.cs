@@ -44,10 +44,13 @@ public class PlayerUI : MonoBehaviour
 
     [Header("Utility Point")]
     [SerializeField] public TextMeshProUGUI utilityPointText;
-    static int utilityPoint;
 
+
+    public Player player;
     static PlayerHP playerHP;
     public TypeItemSlotList typeItemSlotList;
+
+    [SerializeField] public InvenSlotUI invenSlotUI;
 
     static int currentTypeIndex = 0;
 
@@ -55,6 +58,7 @@ public class PlayerUI : MonoBehaviour
 
     public void Start()
     {
+        player = FindObjectOfType<Player>();
         playerHP = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHP>();
 
         float maxHP = playerHP.MaxHP;
@@ -273,8 +277,9 @@ public class PlayerUI : MonoBehaviour
 
     public void AddUtilityPoint(int utilityPointForOneWay)
     {
-        utilityPoint += utilityPointForOneWay;
+        player.utilityPoint += utilityPointForOneWay;
 
-        utilityPointText.text = utilityPoint.ToString();
+        utilityPointText.text = player.utilityPoint.ToString();
+        invenSlotUI.RefreshUI();
     }
 }

@@ -15,10 +15,14 @@ public class Player : MonoBehaviour
     private PlayerAnimator playerAnimator;
     private PlayerHP playerHP;
 
+    public int utilityPoint;
+
 
     [HideInInspector] public float CurrentMoveSpeed { get; private set; } //현재 이동 속도
     [HideInInspector] public float CurrentJumpForce { get; private set; } //점프 높이
     [HideInInspector] public float CurrentMaxHP { get; private set; } //점프 높이
+
+    [HideInInspector] public int CurrentUtilityPoint { get; private set; } //특성 포인트 보유 현황
 
 
 
@@ -29,6 +33,8 @@ public class Player : MonoBehaviour
     {
         // 필요한 컴포넌트 추가
         EnsureComponents();
+
+        utilityPoint = 0;
     }
 
     private void OnEnable()
@@ -183,6 +189,7 @@ public class Player : MonoBehaviour
     {
         // I키를 눌렀을 때 나타나는 모든 정보를 여기에 취합. 특성 포인트라든지, 획득한 복장이라든지...
 
-
+        int nowUtilityPoint = utilityPoint;
+        CurrentUtilityPoint = nowUtilityPoint;
     }
 }

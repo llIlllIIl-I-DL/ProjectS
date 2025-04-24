@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1de8bda6a1396294abeb76d9d2ba17cb, type: 3}
   m_Name: UtilityItemForTest14
   m_EditorClassIdentifier: 
-  itemName: "\uD14C\uC2A4\uD2B8\uC6A9"
+  itemName: "\uD14C\uC2A4\uD2B8 14"
   itemIcon: {fileID: 21300000, guid: 3b0ded277fe832149be97bf6878c0a0a, type: 3}
   itemType: 3
   itemUsageType: 1

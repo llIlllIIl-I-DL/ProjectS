@@ -60,6 +60,7 @@ public class InputUI : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.I))
         {
+            Debug.Log("I키가 눌렸습니다");
             SetMenu(infoMenu);
             infoUI.SetDefaultPage();
         }
