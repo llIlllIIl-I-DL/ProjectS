@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baed70ff6524cce40ac40885f49719f4, type: 3}
+  m_Name: Aether_Dome_1-11
+  m_EditorClassIdentifier: 
+  assetGUID: f4dbe31d4f7a9c14aa1af8e232f1e9ba
+  modulePrefab: {fileID: 2423742585759405885, guid: d5ac24b94c1a0dd408905d4296e91d9a, type: 3}
+  thumbnail: {fileID: 0}
+  category: 0
+  theme: 0
+  connectionPoints:
+  - position: {x: -22, y: -29}
+    direction: 0
+    type: 0
+  - position: {x: 50, y: 0}
+    direction: 3
+    type: 0
+  isSpecialRoom: 0
+  moduleSize: {x: 3, y: 3}
+  useCustomSize: 1
