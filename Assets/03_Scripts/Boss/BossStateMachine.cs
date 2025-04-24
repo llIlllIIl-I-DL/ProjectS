@@ -18,6 +18,9 @@ public class BossStateMachine : MonoBehaviour
     public Transform playerTransform; //플레이어 위치 참조
     public GameObject projectilePrefab; //투사체 프리팹
     public Transform firePoint; //투사체 발사 위치
+    public GameObject slashEffectPrefab; // 휘두르기 이펙트 추가
+    public GameObject kickEffectPrefab; // 발차기 이펙트 추가
+
 
     public void Start()
     {

@@ -1,25 +1,22 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BossSmashAttackState : IEnemyState
 {
-
     private BossStateMachine BossStateMachine;
 
     private Transform boss;
     private Transform player;
     private Animator animator;
 
-    private bool hasAttacked = false; // 한 번만 공격하도록 방지
-    private float smashDelay = 0.5f; // 공격 전 딜레이
-    private float returnToIdleDelay = 1.2f; // 공격 후 대기 시간
+    private bool hasAttacked = false;
+    private float smashDelay = 0.5f;
+    private float returnToIdleDelay = 1.2f;
 
-    [SerializeField] private float smashRange = 2f; // 타격 판정 범위
-    [SerializeField] private int smashDamage = 20; // 타격 데미지
-
-    private enum SmashType { Slash, Kick } // 근접 공격 타입 정의
-    private SmashType currentAttackType;
+    [SerializeField] private float smashRange = 2f;
+    [SerializeField] private int smashDamage = 20;
+    [SerializeField] private int kickDamage = 10;
+    [SerializeField] private float knockbackForce = 10f;
 
     public BossSmashAttackState(BossStateMachine stateMachine)
     {
@@ -33,14 +30,12 @@ public class BossSmashAttackState : IEnemyState
     {
         Debug.Log("Boss SmashAttack 상태 진입");
         hasAttacked = false;
-
-        // 여기서 애니메이션 트리거 호출 가능: ex) animator.SetTrigger("Smash")
         BossStateMachine.StartCoroutine(SmashAttackCoroutine());
 
-        // 애니메이션 트리거 설정
+        // 휘두르기 애니메이션 트리거
         if (animator != null)
         {
-            animator.SetTrigger("ProjectileAttack");
+            animator.SetTrigger("Slash");
         }
     }
 
@@ -49,76 +44,101 @@ public class BossSmashAttackState : IEnemyState
         Debug.Log("Boss SmashAttack 상태 종료");
     }
 
-    public void FixedUpdate()
-    {
-        // 근접 공격은 이동하지 않음
-    }
+    public void FixedUpdate() { }
+    public void Update() { }
 
+    // ▶ 킥 공격 - 충돌 시 넉백 처리
     public void OnTriggerEnter2D(Collider2D other)
     {
-        // 플레이어와의 충돌 감지
-        if (other.CompareTag("Player") && !hasAttacked)
+        if (other.CompareTag("Player"))
         {
+            Debug.Log("플레이어와 충돌 - 킥 공격 실행");
+
+            if (animator != null)
+            {
+                animator.SetTrigger("Kick"); // 킥 애니메이션 트리거
+            }
+
             var damageable = other.GetComponent<IDamageable>();
             if (damageable != null)
             {
-                damageable.TakeDamage(smashDamage);
-                hasAttacked = true;
-                Debug.Log("플레이어와 충돌! 데미지: " + smashDamage);
+                damageable.TakeDamage(kickDamage);
+                Debug.Log("Kick 데미지: " + kickDamage);
+            }
+
+            Rigidbody2D rb = other.GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                Vector2 dir = (other.transform.position - boss.position).normalized;
+                rb.velocity = Vector2.zero;
+                rb.AddForce(dir * knockbackForce, ForceMode2D.Impulse);
+                Debug.Log("킥 넉백 적용");
+            }
+
+            // 이펙트 (킥 이펙트가 있다면)
+            if (BossStateMachine.kickEffectPrefab != null)
+            {
+                GameObject effect = Object.Instantiate(
+                    BossStateMachine.kickEffectPrefab,
+                    other.transform.position,
+                    Quaternion.identity
+                );
+                Object.Destroy(effect, 1f); // 일정 시간 후 제거
             }
         }
     }
 
-    public void Update()
-    {
-        // 공격 로직은 코루틴에서 처리하므로 별도 필요 없음
-    }
-
-    // 근접 공격 처리 코루틴
+    // ▶ 휘두르기 공격 처리
     private IEnumerator SmashAttackCoroutine()
     {
         yield return new WaitForSeconds(smashDelay);
 
         if (!hasAttacked && player != null)
         {
-            PerformSmashAttack();
+            PerformSlashAttack(); // 휘두르기 실행
             hasAttacked = true;
         }
 
         yield return new WaitForSeconds(returnToIdleDelay);
-
         BossStateMachine.ChangeState(BossState.Idle);
     }
 
-    // 실제 공격 판정 및 데미지 처리
-    private void PerformSmashAttack()
+    private void PerformSlashAttack()
     {
-        Debug.Log("Boss Kick 공격 시도");
-
-        // 플레이어와의 거리 체크 (정밀 판정용)
         float distance = Vector2.Distance(boss.position, player.position);
         if (distance <= smashRange)
         {
-            // 예: 플레이어에게 데미지 전달
-            Debug.Log("Kick 적중! 플레이어에게 데미지: " + smashDamage);
+            if (animator != null)
+                animator.SetTrigger("Slash"); // 휘두르기 트리거 (한 번 더 가능)
 
-            // 예시로 플레이어에 IDamageable 인터페이스가 있다고 가정
             var damageable = player.GetComponent<IDamageable>();
             if (damageable != null)
             {
                 damageable.TakeDamage(smashDamage);
+                Debug.Log("휘두르기 적중 - 데미지: " + smashDamage);
+            }
+
+            // 이펙트 (휘두르기 이펙트가 있다면)
+            if (BossStateMachine.slashEffectPrefab != null)
+            {
+                GameObject effect = Object.Instantiate(
+                    BossStateMachine.slashEffectPrefab,
+                    player.position,
+                    Quaternion.identity
+                );
+                Object.Destroy(effect, 1f); // 일정 시간 후 제거
             }
         }
         else
         {
-            Debug.Log("Boss 근접 공격 범위 밖입니다.");
+            Debug.Log("플레이어가 휘두르기 범위 밖에 있음");
         }
     }
 
     private void OnDrawGizmos()
     {
-        // 공격 범위 시각화 (에디터에서만 보임)
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(boss.position, smashRange);
+        if (boss != null)
+            Gizmos.DrawWireSphere(boss.position, smashRange);
     }
 }
