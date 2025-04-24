@@ -1,8 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 유리창 오브젝트 - 파괴 시 유리 파편 생성 일반 공격으로 파괴 가능
+/// </summary>
 public class ObjectWindow : DestructibleObject
 {
+    #region Variables
+
     [Header("유리 속성")]
     [SerializeField] private Material glassMaterial; // 유리 재질
     
@@ -11,6 +16,8 @@ public class ObjectWindow : DestructibleObject
     [SerializeField] private int maxShardCount; // 최대 파편 개수
     [SerializeField] private float shardForce; // 파편 튕김 힘
     [SerializeField] private float shardLifetime; // 파편 지속 시간
+
+    #endregion
     
     private void Start()
     {

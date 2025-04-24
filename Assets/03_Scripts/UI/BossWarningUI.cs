@@ -18,14 +18,15 @@ public class BossWarningUI : Singleton<BossWarningUI>
     [HideInInspector] GameObject _bossWarningUI;
     [HideInInspector] public bool isApproved;
 
-    [SerializeField] public PlayerInputHandler PlayerInputHandler;
+    private ObjectDoor currentDoor;
 
     GameObject _interactor;
 
-    public void BossWarningWindowUI(GameObject interactor)
+    public void BossWarningWindowUI(GameObject interactor, ObjectDoor door)
     {
         _bossWarningUI = Instantiate(bossWarningUI, bossWarningUIParents);
         _interactor = interactor;
+        currentDoor = door;
 
         Btn = _bossWarningUI.GetComponentsInChildren<Button>();
 
@@ -54,6 +55,13 @@ public class BossWarningUI : Singleton<BossWarningUI>
         Destroy(_bossWarningUI);
         Time.timeScale = 1f;
 
-        PlayerInputHandler.OnEntrance(_interactor, isApproved);
+        if (currentDoor != null)
+        {
+            currentDoor.OnEntrance(isApproved);
+        }
+        else
+        {
+            Debug.Log("상호작용할 대상이 설정되지 않았습니다.");
+        }
     }
 }

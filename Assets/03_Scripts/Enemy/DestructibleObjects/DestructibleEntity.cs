@@ -1,8 +1,14 @@
 using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// 파괴 가능한 오브젝트의 기본 클래스
+/// 상속하여 다양한 파괴 가능한 오브젝트를 구현할 수 있음
+/// </summary>
 public abstract class DestructibleEntity : MonoBehaviour, IDestructible
 {
+    #region Variables
+
     [Header("기본 속성")]
     [SerializeField] protected float maxHealth;
     [SerializeField] protected float currentHealth;
@@ -14,12 +20,17 @@ public abstract class DestructibleEntity : MonoBehaviour, IDestructible
     protected bool isDestroyed = false;
     protected SpriteRenderer spriteRenderer;
     
+    #endregion
+
     protected virtual void Awake()
     {
         currentHealth = maxHealth;
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
     
+    // <summary>
+    // 피격 처리 - 외부에서 호출
+    // </summary>
     public virtual void TakeDamage(float damage)
     {
         if (isDestroyed) return;
@@ -36,6 +47,9 @@ public abstract class DestructibleEntity : MonoBehaviour, IDestructible
         }
     }
     
+    // <summary>
+    // 파괴 처리
+    // </summary>
     protected virtual void Destroy()
     {
         isDestroyed = true;
@@ -50,6 +64,9 @@ public abstract class DestructibleEntity : MonoBehaviour, IDestructible
         Debug.Log($"{gameObject.name} 파괴 됨");
     }
     
+    // <summary>
+    // 드롭 아이템 생성
+    // </summary>
     public virtual void DropItem()
     {
         if (possibleDrops == null || possibleDrops.Length == 0) return;
@@ -61,9 +78,15 @@ public abstract class DestructibleEntity : MonoBehaviour, IDestructible
         }
     }
     
+    // <summary>
+    // 파괴 이펙트 재생
+    // </summary>
+    // 하위 클래스에서 구현
     public abstract void PlayDestructionEffect();
     
-    // 피격 효과
+    // <summary>
+    // 피격 시 깜박임 효과
+    // </summary>
     protected virtual IEnumerator FlashEffect()
     {
         if (spriteRenderer == null) yield break;

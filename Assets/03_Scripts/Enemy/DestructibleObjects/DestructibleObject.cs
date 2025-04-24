@@ -1,7 +1,15 @@
 using UnityEngine;
 
+/// <summary>
+/// 파괴 가능한 오브젝트 - 파괴 시 이펙트 및 힘 적용
+/// </summary>
+/// <remarks>
+/// 이 클래스는 파괴 가능한 오브젝트의 기본 기능을 구현
+/// 상속하여 다양한 파괴 가능한 오브젝트를 구현할 수 있음
 public class DestructibleObject : DestructibleEntity
 {
+    #region Variables
+
     [Header("파괴 이펙트")]
     [SerializeField] protected GameObject destroyEffectPrefab; // 파괴 이펙트 프리팹
     [SerializeField] protected GameObject dustEffectPrefab; // 먼지 이펙트 프리팹(선택 사항)
@@ -19,6 +27,8 @@ public class DestructibleObject : DestructibleEntity
     private float damageThreshold;
     private bool isDamaged = false;
     
+    #endregion
+
     protected override void Awake()
     {
         base.Awake();
@@ -26,7 +36,7 @@ public class DestructibleObject : DestructibleEntity
         // 50% 손상되었을 때 외형 변경 기준점
         damageThreshold = maxHealth * 0.5f;
     }
-    
+
     public override void TakeDamage(float damage)
     {
         base.TakeDamage(damage);
