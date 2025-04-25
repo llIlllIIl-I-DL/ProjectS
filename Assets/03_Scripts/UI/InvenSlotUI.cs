@@ -53,16 +53,23 @@ public class InvenSlotUI : MonoBehaviour
 
             //itemDescription.text = utilityItemData.ItemDescription;
 
-            itemOwnPoint.text = player.utilityPoint.ToString();
+            itemOwnPoint.text = player.utilityPoint.ToString(); //Player를 받아와야 함
             itemNeedPoint.text = utilityItemData.utilityPointForUnLock.ToString();
             
             itemIcon.sprite = utilityItemData.Icon;
         }
+
+        Debug.Log($"{itemOwnPoint.text}");
+    }
+
+    public void UpdateOwnPoint(ItemData item, Player player)
+    {
+        itemOwnPoint.text = player.utilityPoint.ToString();
     }
 
 
 
-    public void UnLockUtilitySlot()
+    public void UnLockUtilitySlot() //각각의 특성 해금까지의 필요 포인트 도달 시 아이콘 활성화. 기본은 어둡게 깔려있음
     {
 
     }

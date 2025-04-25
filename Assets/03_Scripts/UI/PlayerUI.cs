@@ -50,8 +50,6 @@ public class PlayerUI : MonoBehaviour
     static PlayerHP playerHP;
     public TypeItemSlotList typeItemSlotList;
 
-    [SerializeField] public InvenSlotUI invenSlotUI;
-
     static int currentTypeIndex = 0;
 
     public Dictionary<ItemData, Sprite> TypeItemDic = new Dictionary<ItemData, Sprite>();
@@ -278,8 +276,6 @@ public class PlayerUI : MonoBehaviour
     public void AddUtilityPoint(int utilityPointForOneWay)
     {
         player.utilityPoint += utilityPointForOneWay;
-
         utilityPointText.text = player.utilityPoint.ToString();
-        invenSlotUI.RefreshUI();
     }
 }
