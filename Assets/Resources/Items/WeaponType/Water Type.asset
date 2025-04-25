@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1de8bda6a1396294abeb76d9d2ba17cb, type: 3}
   m_Name: Water Type
   m_EditorClassIdentifier: 
-  itemName: "\uAC15\uCCA0 \uC18D\uC131"
+  itemName: "\uBB3C \uC18D\uC131"
   itemIcon: {fileID: 21300000, guid: a3bd74c0eb540464fb0794e6286a69a5, type: 3}
   itemType: 0
   itemUsageType: 0
@@ -28,3 +28,4 @@ MonoBehaviour:
   elementType: 4
   damage: 15
   attackSpeed: 2
+  utilityPointForOneWay: 0
