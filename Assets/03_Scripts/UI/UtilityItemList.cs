@@ -13,9 +13,9 @@ public class UtilityItemList : ScriptableObject
     {
         for (int i = 1; i < 16; i++)
         {
-            ItemData utilityItemData10n = GetUtilityItemDataForList(100 + i);
+            ItemData utilityItemData100n = GetUtilityItemDataForList(1000 + i);
 
-            CreatSlotSystem.Instance.AddItem(utilityItemData10n, player);
+            CreatSlotSystem.Instance.AddItem(utilityItemData100n, player);
         }
     }
 

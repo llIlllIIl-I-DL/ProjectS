@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
+using VInspector.Libs;
 
 public class CreatSlotSystem : MonoBehaviour
 {
@@ -19,6 +21,7 @@ public class CreatSlotSystem : MonoBehaviour
     [SerializeField] private Transform slotParent;
 
     Player player;
+    private ItemData utilityItemData;
 
 
     private void Awake()
@@ -32,16 +35,28 @@ public class CreatSlotSystem : MonoBehaviour
             Destroy(gameObject);
         }
 
-        InitInventoryUI();
+
+        InitUtilityItemDataList();
     }
 
 
-    void Start()
+    public void Start()
     {
-        InitUtilityItemDataList();
+        //UnLockUtilitySlot();
+ 
 
+        InitInventoryUI();
         RefreshSlotUI();
     }
+
+    public void UnLockUtilitySlot() //각각의 특성 해금까지의 필요 포인트 도달 시 아이콘 활성화. 기본은 어둡게 깔려있음
+    {
+        foreach (var slot in slotList)
+        {
+            slot.itemIcon.color = Color.black;
+        }
+    }
+
 
     public void RefreshSlotUI()
     {
@@ -51,11 +66,16 @@ public class CreatSlotSystem : MonoBehaviour
         }
     }
 
+    public ItemData GetItemData()
+    {
+        return utilityItemData;
+    }
+
     public void InitUtilityItemDataList()
     {
         foreach (var slot in slotList)
         {
-            var utilityItemData = slot.GetUtilityItemData();
+            var utilityItemData = GetItemData();
 
             utilityItemList.Add(utilityItemData);
             //var utilityItemData에 데이터를 넣어준 뒤, List<InvenSlotUI> slotList의 갯수만큼 데이터를 Add
@@ -80,6 +100,7 @@ public class CreatSlotSystem : MonoBehaviour
             slotIndex++;
         }
     }
+
     public void RefreshAllOwnPoints()
     {
         foreach (var slot in slotList)

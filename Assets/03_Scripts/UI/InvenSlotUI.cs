@@ -9,7 +9,7 @@ public class InvenSlotUI : MonoBehaviour
 {
     [Header("슬롯 정보")]
     [SerializeField] private TextMeshProUGUI itemName;
-    [SerializeField] private Image itemIcon;
+    [SerializeField] public Image itemIcon;
     [SerializeField] private TextMeshProUGUI itemNeedPoint;
     [SerializeField] private TextMeshProUGUI itemOwnPoint;
     //[SerializeField] private TextMeshProUGUI itemDescription;
@@ -28,12 +28,6 @@ public class InvenSlotUI : MonoBehaviour
     public void Start()
     {
         //unLockButton.onClick.AddListener(() => UnLockUtilitySlot());
-    }
-
-
-    public ItemData GetUtilityItemData()
-    {
-        return utilityItemData; //ItemData를 슬롯에 각각 할당해줘야 하기 때문에 이 함수에서 ItemData를 utilityItemData라는 이름으로 리턴
     }
 
     public void SetItem(ItemData item, Player player)
@@ -55,22 +49,39 @@ public class InvenSlotUI : MonoBehaviour
 
             itemOwnPoint.text = player.utilityPoint.ToString(); //Player를 받아와야 함
             itemNeedPoint.text = utilityItemData.utilityPointForUnLock.ToString();
-            
+
+            if (player.utilityPoint >= utilityItemData.utilityPointForUnLock)
+            {
+                itemIcon.sprite = utilityItemData.Icon;
+            }
+
+            else
+            {
+                itemIcon.sprite = utilityItemData.UnLockedIcon;
+            }
+        }
+    }
+
+    public void UpdateOwnPoint() //각 슬롯 내부에 있는 플레이어의 특성 포인트 현황을 업데이트 해주는 함수
+    {
+        itemOwnPoint.text = player.utilityPoint.ToString();
+
+        if (player.utilityPoint >= utilityItemData.utilityPointForUnLock)
+        {
             itemIcon.sprite = utilityItemData.Icon;
         }
 
-        Debug.Log($"{itemOwnPoint.text}");
-    }
-
-    public void UpdateOwnPoint()
-    {
-        itemOwnPoint.text = player.utilityPoint.ToString();
-    }
+        else
+        {
+            itemIcon.sprite = utilityItemData.UnLockedIcon;
+        }
 
 
-
-    public void UnLockUtilitySlot() //각각의 특성 해금까지의 필요 포인트 도달 시 아이콘 활성화. 기본은 어둡게 깔려있음
-    {
+        if (player.utilityPoint >= utilityItemData.utilityPointForUnLock)
+        {
+            int maxPoint = utilityItemData.utilityPointForUnLock;
+            itemOwnPoint.text = maxPoint.ToString();
+        }
 
     }
 }

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Utility Point
   itemIcon: {fileID: 21300000, guid: 15373f7ee0fa71a4bb810b95c4942e13, type: 3}
+  unLockedItemIcon: {fileID: 0}
   itemType: 4
   itemUsageType: 1
   itemAttributeType: 0
@@ -28,5 +29,5 @@ MonoBehaviour:
   elementType: 0
   damage: 0
   attackSpeed: 0
-  utilityPointForOneWay: 10
+  utilityPointForNow: 1
   utilityPointForUnLock: 0

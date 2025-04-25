@@ -183,10 +183,8 @@ public class Item : MonoBehaviour
 
             if (added && itemData.itemType == ItemType.UtilityPoint)
             {
-                PlayerUI.Instance.AddUtilityPoint(itemData.utilityPointForOneWay);
-
+                PlayerUI.Instance.AddUtilityPoint(itemData.utilityPointForNow);
                 CreatSlotSystem.Instance.RefreshAllOwnPoints();
-                Debug.Log($"특성 포인트 획득 {itemData.utilityPointForOneWay}");
             }
 
                 return added;

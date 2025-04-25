@@ -40,6 +40,9 @@ public class ItemData : ScriptableObject
     [SerializeField] private Sprite itemIcon;
     public Sprite Icon { get { return itemIcon; } set { itemIcon = value; } }
 
+    [SerializeField] private Sprite unLockedItemIcon;
+    public Sprite UnLockedIcon { get { return unLockedItemIcon; } set { unLockedItemIcon = value; } }
+
     public ItemType itemType;
 
     [Header("사용 아이템 설정")]
@@ -73,7 +76,7 @@ public class ItemData : ScriptableObject
 
     [Header("특성 포인트 획득 수치")]
     [Tooltip("아이템 타입이 UtilityPoint일 경우에만 사용")]
-    public int utilityPointForOneWay;
+    public int utilityPointForNow;
 
     [Header("특성 해금 포인트")]
     [Tooltip("아이템 타입이 UtilityItem일 경우에만 사용")]

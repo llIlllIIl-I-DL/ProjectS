@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1de8bda6a1396294abeb76d9d2ba17cb, type: 3}
   m_Name: UtilityItemForTest01
   m_EditorClassIdentifier: 
-  itemName: "\uD14C\uC2A4\uD2B8 1"
-  itemIcon: {fileID: 21300000, guid: 3b0ded277fe832149be97bf6878c0a0a, type: 3}
+  itemName: HP +
+  itemIcon: {fileID: 21300000, guid: 98ab324fd8dec464aa31921eb779a57c, type: 3}
+  unLockedItemIcon: {fileID: 21300000, guid: e591438762fac8147a774785e97b231e, type: 3}
   itemType: 3
   itemUsageType: 1
   itemAttributeType: 0
-  description: "\uC2A4\uD504\uB9B0\uD2B8 \uC2DC \uB2EC\uB9AC\uAE30 \uC18D\uB3C4 &
-    \uC2DC\uAC04 \uC0C1\uC2B9\n(\uAC19\uC740 \uB290\uB08C\uC73C\uB85C \uC124\uBA85)"
-  id: 101
+  description: "\uCCB4\uB825 \uC99D\uAC00."
+  id: 1001
   effectValue: 0
   isConsumable: 1
   isStackable: 1
@@ -29,5 +29,5 @@ MonoBehaviour:
   elementType: 0
   damage: 0
   attackSpeed: 0
-  utilityPointForOneWay: 0
-  utilityPointForUnLock: 10
+  utilityPointForNow: 0
+  utilityPointForUnLock: 1
