@@ -1,0 +1,49 @@
+{
+    "placedModules": [
+        {
+            "moduleGUID": "be3c9f190efc01e428d3cfa0b76d748d",
+            "position": {
+                "x": 126.5,
+                "y": -9.0
+            },
+            "rotationStep": 0,
+            "connections": []
+        },
+        {
+            "moduleGUID": "d121ee7796d3d3245a8aca69a6b95a4f",
+            "position": {
+                "x": 150.0,
+                "y": -30.0
+            },
+            "rotationStep": 0,
+            "connections": []
+        },
+        {
+            "moduleGUID": "8644cc7e124d9224db0006cad004b214",
+            "position": {
+                "x": 165.0,
+                "y": -50.0
+            },
+            "rotationStep": 0,
+            "connections": []
+        },
+        {
+            "moduleGUID": "03ab5932640e4254687f2de418b7140f",
+            "position": {
+                "x": 146.0,
+                "y": -72.0
+            },
+            "rotationStep": 0,
+            "connections": []
+        },
+        {
+            "moduleGUID": "bd50b70819e6f90419a57297f04de1f8",
+            "position": {
+                "x": 194.0,
+                "y": -80.0
+            },
+            "rotationStep": 0,
+            "connections": []
+        }
+    ]
+}

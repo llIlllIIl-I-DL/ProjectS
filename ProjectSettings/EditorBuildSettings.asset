@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/04_Scenes/TempStartScene.unity
     guid: 5d9cef26029ad984b93f958258b434d8
   - enabled: 1
+    path: Assets/04_Scenes/MapEditorTest.unity
+    guid: 4832abbb618d88c4cb9af39c1570a421
+  - enabled: 1
     path: Assets/04_Scenes/StageScene/Registance_BaseCamp.unity
     guid: 2017d5a7a59be5448b1ea283daa67aca
   m_configObjects:
