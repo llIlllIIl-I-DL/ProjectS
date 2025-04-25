@@ -17,6 +17,24 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/04_Scenes/StageScene/Registance_BaseCamp.unity
     guid: 2017d5a7a59be5448b1ea283daa67aca
+  - enabled: 1
+    path: Assets/04_Scenes/Chunks/Scenes/Chunk_0_-1.unity
+    guid: 47cbaea430160284faf2f2dcfda3eba2
+  - enabled: 1
+    path: Assets/04_Scenes/Chunks/Scenes/Chunk_0_0.unity
+    guid: 746e8c2b7b9b1ed458c460a133a9ae65
+  - enabled: 1
+    path: Assets/04_Scenes/Chunks/Scenes/Chunk_1_-1.unity
+    guid: f0991023744ad9f428b0b4637fe5a36e
+  - enabled: 1
+    path: Assets/04_Scenes/Chunks/Scenes/Chunk_1_-2.unity
+    guid: d8ec997f783f0b846bd00e9f493112c3
+  - enabled: 1
+    path: Assets/04_Scenes/Chunks/Scenes/Chunk_2_-1.unity
+    guid: c62f0960668a2be42a67d92de9c13b08
+  - enabled: 1
+    path: Assets/04_Scenes/Chunks/Scenes/Chunk_2_-2.unity
+    guid: f57fb5ec41bf05c4bb8b3412bcf6a0db
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: ed948e066811e4b14ab37a3c4c222e2b, type: 2}
     com.unity.input.settings: {fileID: 11400000, guid: 4a0f9785b9b8e814ba5cc04fca27a5cb, type: 2}
