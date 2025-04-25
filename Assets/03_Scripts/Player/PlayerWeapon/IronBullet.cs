@@ -176,8 +176,7 @@ public class IronBullet : Bullet
         // 오버차징 상태에서는 추가 효과 (필요시 구현)
         if (isOvercharged)
         {
-            // 추가적인 효과 적용 (예: 방어력 감소)
-            Debug.Log($"오버차징된 철 총알로 적 {enemy.name}의 방어력이 감소됩니다.");
+           
         }
     }
 } 

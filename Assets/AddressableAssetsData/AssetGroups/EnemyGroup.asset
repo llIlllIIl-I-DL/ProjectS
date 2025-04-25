@@ -35,12 +35,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - default
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 7ae02adaecc87457cbf3b057611aef7f
-    m_Address: Assets/02_Prefabs/Destructibles/Enemy/Enemy_Scrap.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - default
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 614a0f21ad7914181a98678b447e60db
     m_Address: Assets/02_Prefabs/Destructibles/Enemy/Enemy_SupuerDust.prefab
     m_ReadOnly: 0
