@@ -62,7 +62,7 @@ public class InvenSlotUI : MonoBehaviour
         Debug.Log($"{itemOwnPoint.text}");
     }
 
-    public void UpdateOwnPoint(ItemData item, Player player)
+    public void UpdateOwnPoint()
     {
         itemOwnPoint.text = player.utilityPoint.ToString();
     }

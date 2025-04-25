@@ -185,7 +185,7 @@ public class Item : MonoBehaviour
             {
                 PlayerUI.Instance.AddUtilityPoint(itemData.utilityPointForOneWay);
 
-                invenSlotUI.UpdateOwnPoint(itemData, player);
+                CreatSlotSystem.Instance.RefreshAllOwnPoints();
                 Debug.Log($"특성 포인트 획득 {itemData.utilityPointForOneWay}");
             }
 

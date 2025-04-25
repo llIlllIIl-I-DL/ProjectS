@@ -62,9 +62,6 @@ public class CreatSlotSystem : MonoBehaviour
         }
     }
 
-
-
-
     public void InitInventoryUI()
     {
         for (int i = 0; i < slotCount; i++)
@@ -75,16 +72,19 @@ public class CreatSlotSystem : MonoBehaviour
         }
     }
 
-
-
-  
-
     public void AddItem(ItemData ItemData, Player player)
     {
         if (slotIndex < slotList.Count)
         {
             slotList[slotIndex].SetItem(ItemData, player);
             slotIndex++;
+        }
+    }
+    public void RefreshAllOwnPoints()
+    {
+        foreach (var slot in slotList)
+        {
+            slot.UpdateOwnPoint();
         }
     }
 }
