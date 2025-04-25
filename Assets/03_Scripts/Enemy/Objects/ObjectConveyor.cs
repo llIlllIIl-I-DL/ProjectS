@@ -16,13 +16,12 @@ public class ObjectConveyor : BaseObject
 
     [Header("컨베이어 벨트 설정")]
     [SerializeField] private float moveSpeed;                  // 이동 속도
-    [SerializeField] private Vector2 moveDirection; // 이동 방향
+    [SerializeField] private Vector2 moveDirection;            // 이동 방향 // 스크롤링과 반대로 음수면 <-
     [SerializeField] private bool isActive = true;             // 활성화 상태
-    [SerializeField] private bool canToggle = true;            // 상호작용으로 토글 가능 여부
 
     [Header("시각 효과")]
     [SerializeField] private SpriteRenderer beltRenderer;
-    // [SerializeField] private float textureScrollSpeed; // 1로 설정하면 방향 <- -1로 설정하면 방향 ->
+    // [SerializeField] private float textureScrollSpeed;      // 1로 설정하면 방향 <-, -1로 설정하면 방향 ->
     [SerializeField] private Material scrollingMaterial;
 
     [Header("물리 설정")]
@@ -30,7 +29,6 @@ public class ObjectConveyor : BaseObject
     [SerializeField] private LayerMask affectedLayers;        // 영향받는 레이어
 
     private Material instanceMaterial;
-    private List<Rigidbody2D> objectsOnBelt = new List<Rigidbody2D>();
     // private float offset = 0;
 
     #endregion
@@ -70,84 +68,20 @@ public class ObjectConveyor : BaseObject
 
             //     instanceMaterial.SetTextureOffset("_MainTex", new Vector2(offset, 0));
             // }
-
-            // 물리 기반 아닌 경우 직접 이동
-            if (!usePhysics)
-            {
-                MoveObjectsDirectly();
-            }
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (isActive && usePhysics)
-        {
-            // 물리 이동 적용
-            MoveObjectsWithPhysics();
         }
     }
 
     #endregion
 
-    #region Movement Methods
-
-    private void MoveObjectsWithPhysics()
-    {
-        foreach (var rb in objectsOnBelt)
-        {
-            if (rb != null)
-            {
-                // 등속 이동을 위한 힘 계산
-                Vector2 targetVelocity = moveDirection.normalized * moveSpeed;
-                Vector2 velocityChange = targetVelocity - rb.velocity;
-
-                // 힘 적용
-                rb.AddForce(velocityChange, ForceMode2D.Impulse);
-            }
-        }
-
-        // 목록 정리 (null 항목 제거)
-        objectsOnBelt.RemoveAll(rb => rb == null);
-    }
-
-    private void MoveObjectsDirectly()
-    {
-        // 컨베이어 벨트 위의 모든 오브젝트 찾기
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(
-            transform.position,
-            transform.localScale,
-            transform.rotation.eulerAngles.z,
-            affectedLayers
-        );
-
-        foreach (var collider in colliders)
-        {
-            if (collider.attachedRigidbody != null)
-            {
-                // 직접 위치 이동
-                collider.transform.Translate(moveDirection.normalized * moveSpeed * Time.deltaTime);
-            }
-        }
-    }
-
-    #endregion
 
     #region Interaction
 
     // 상호작용으로 컨베이어 토글
     protected override void OnInteract(GameObject interactor)
     {
-        if (canToggle)
+        if (isInteractable)
         {
             isActive = !isActive;
-            PlayInteractSound();
-
-            // 활성화/비활성화 효과 (선택적)
-            if (beltRenderer != null)
-            {
-                beltRenderer.color = isActive ? Color.white : new Color(0.7f, 0.7f, 0.7f);
-            }
         }
     }
 
@@ -163,52 +97,12 @@ public class ObjectConveyor : BaseObject
         Rigidbody2D rb = collision.gameObject.GetComponent<Rigidbody2D>();
         if (rb != null && (affectedLayers & (1 << collision.gameObject.layer)) != 0)
         {
-            // 플레이어 감지
-            PlayerMovement player = collision.gameObject.GetComponent<PlayerMovement>();
-            if (player != null)
-            {
-                // player.SetOnConveyor(true);
-                
-                // 플레이어의 경우 입력 움직임 보존 + 컨베이어 속도 추가
-                Vector2 playerVelocity = rb.velocity;
-                Vector2 conveyorEffect = moveDirection.normalized * moveSpeed;
-                
-                // 입력 방향 속도는 유지하고 컨베이어 효과만 추가
-                float inputSpeedInConveyorDirection = Vector2.Dot(playerVelocity, moveDirection.normalized);
-                float effectiveSpeed = Mathf.Max(0, inputSpeedInConveyorDirection); // 음수가 되지 않도록
-                
-                // 최종 속도 = 입력 속도 + 컨베이어 속도
-                Vector2 finalVelocity = playerVelocity + conveyorEffect;
-                
-                // 속도 직접 설정 (AddForce 대신)
-                rb.velocity = finalVelocity;
-            }
-            else
-            {
-                // 다른 오브젝트는 기존 방식으로
-                Vector2 targetVelocity = moveDirection.normalized * moveSpeed;
-                rb.velocity = targetVelocity;
-            }
-            
-            if (!objectsOnBelt.Contains(rb))
-                objectsOnBelt.Add(rb);
-        }
-    }
+            Vector2 targetVelocity = moveDirection.normalized * moveSpeed;
+            //x축만 컨베이어 영향 적용
+            Vector2 newVelocity = rb.velocity;
+            newVelocity.x = targetVelocity.x;
+            rb.velocity = newVelocity;
 
-    // 컨베이어 벨트에서 오브젝트 내려갔을 때
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        Rigidbody2D rb = collision.gameObject.GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            // 플레이어라면 컨베이어 상태 해제
-            PlayerMovement player = collision.gameObject.GetComponent<PlayerMovement>();
-            if (player != null)
-            {
-                // player.SetOnConveyor(false);
-            }
-            
-            objectsOnBelt.Remove(rb);
         }
     }
 
@@ -238,15 +132,13 @@ public class ObjectConveyor : BaseObject
 
     #region Editor
 
-    // 에디터 시각화
-    #if UNITY_EDITOR
+    // 컨베이어에 굳이 기즈모가 필요할까? 방향 표시만??
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.blue;
-        Vector3 dir = new Vector3(moveDirection.x, moveDirection.y, 0).normalized;
-        Gizmos.DrawRay(transform.position, dir * moveSpeed);
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position, transform.position + (Vector3)moveDirection * 2f);
+        Gizmos.DrawWireSphere(transform.position, 0.5f);
     }
-    #endif
 
     #endregion
 }

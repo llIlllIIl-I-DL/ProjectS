@@ -1871,7 +1871,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 464583991163238351, guid: d3cf60638c9ff4888aa7ef20ba6bc1c5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.6469165
+      value: -0.52
       objectReference: {fileID: 0}
     - target: {fileID: 464583991163238351, guid: d3cf60638c9ff4888aa7ef20ba6bc1c5, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1910,7 +1910,15 @@ PrefabInstance:
       value: Object_Conveyor
       objectReference: {fileID: 0}
     - target: {fileID: 2191265883687012615, guid: d3cf60638c9ff4888aa7ef20ba6bc1c5, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2191265883687012615, guid: d3cf60638c9ff4888aa7ef20ba6bc1c5, type: 3}
       propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2415162849948342880, guid: d3cf60638c9ff4888aa7ef20ba6bc1c5, type: 3}
+      propertyPath: isActive
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2415162849948342880, guid: d3cf60638c9ff4888aa7ef20ba6bc1c5, type: 3}
@@ -1922,8 +1930,20 @@ PrefabInstance:
       value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 2415162849948342880, guid: d3cf60638c9ff4888aa7ef20ba6bc1c5, type: 3}
+      propertyPath: moveDirection.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2415162849948342880, guid: d3cf60638c9ff4888aa7ef20ba6bc1c5, type: 3}
       propertyPath: textureScrollSpeed
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2415162849948342880, guid: d3cf60638c9ff4888aa7ef20ba6bc1c5, type: 3}
+      propertyPath: affectedLayers.m_Bits
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7026216753318597539, guid: d3cf60638c9ff4888aa7ef20ba6bc1c5, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
