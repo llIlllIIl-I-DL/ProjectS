@@ -16,7 +16,7 @@ public class ObjectConveyor : BaseObject
 
     [Header("컨베이어 벨트 설정")]
     [SerializeField] private float moveSpeed;                  // 이동 속도
-    [SerializeField] private Vector2 moveDirection = Vector2.right; // 이동 방향
+    [SerializeField] private Vector2 moveDirection; // 이동 방향
     [SerializeField] private bool isActive = true;             // 활성화 상태
     [SerializeField] private bool canToggle = true;            // 상호작용으로 토글 가능 여부
 
@@ -31,7 +31,7 @@ public class ObjectConveyor : BaseObject
 
     private Material instanceMaterial;
     private List<Rigidbody2D> objectsOnBelt = new List<Rigidbody2D>();
-    private float offset = 0;
+    // private float offset = 0;
 
     #endregion
 
@@ -49,9 +49,8 @@ public class ObjectConveyor : BaseObject
         {
             instanceMaterial = new Material(scrollingMaterial);
             beltRenderer.material = instanceMaterial;
-
             // 타일링 값을 증가시켜 반복 패턴을 더 촘촘하게 만듦
-            instanceMaterial.SetTextureScale("_MainTex", new Vector2(2f, 1f));
+            // instanceMaterial.SetTextureScale("_MainTex", new Vector2(2f, 1f));
         }
     }
 
