@@ -3,6 +3,7 @@ using UnityEngine;
 // 총알 추상 클래스
 public abstract class Bullet : MonoBehaviour
 {
+    public float bulletSpeed = 4f;
     public float damage = 10f;
     public float knockbackForce = 5f;
     public ElementType bulletType = ElementType.Normal;

@@ -40,7 +40,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6829746258756189484}
-  - {fileID: 4055790223504996370}
+  - {fileID: 8993827512999552491}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &3643135106655314618
@@ -252,12 +252,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   settings: {fileID: 11400000, guid: 83308ca141c58fe47a419e584bbc8df0, type: 2}
   maxSlopeAngle: 45
-  noFriction: {fileID: 0}
-  fullFriction: {fileID: 0}
+  noFriction: {fileID: 6200000, guid: 84c1361112644e047a16945a2839c1f6, type: 2}
+  fullFriction: {fileID: 6200000, guid: 3ac02f60dbce7d54eb9b547c3ca07857, type: 2}
   slopeCheckDistance: 0.5
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
 --- !u!114 &9117129434088997854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -283,6 +283,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee62d861d9d3b074da481deae43ef2c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  interactionRadius: 2
   doubleTapTime: 0.3
 --- !u!114 &4975584541051327563
 MonoBehaviour:
@@ -322,59 +323,6 @@ MonoBehaviour:
     m_Bits: 512
   showDebugRays: 1
   wallCheckDistance: 0.3
---- !u!1 &1875409220644603860
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4055790223504996370}
-  - component: {fileID: 8033034078652405491}
-  m_Layer: 0
-  m_Name: WeaponManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4055790223504996370
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1875409220644603860}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 2417535978260025957}
-  m_Father: {fileID: 3137287986617449566}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8033034078652405491
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1875409220644603860}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c09eaf9391143384c9a65b71fa71a65c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bulletPrefab: {fileID: 6760042265540064826, guid: e4992159c28c2e24ba7b726d9457aee1, type: 3}
-  firePoint: {fileID: 2417535978260025957}
-  bulletSpeed: 15
-  bulletLifetime: 3
-  currentAmmo: 30
-  maxAmmo: 30
-  reloadTime: 1.5
-  isReloading: 0
 --- !u!1 &5191148959976724351
 GameObject:
   m_ObjectHideFlags: 0
@@ -481,7 +429,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!1 &8533174853653454694
+--- !u!1 &8720198401923117333
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -489,26 +437,26 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2417535978260025957}
-  m_Layer: 0
-  m_Name: GameObject
+  - component: {fileID: 8993827512999552491}
+  m_Layer: 3
+  m_Name: FirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2417535978260025957
+--- !u!4 &8993827512999552491
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8533174853653454694}
+  m_GameObject: {fileID: 8720198401923117333}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.191, y: 0, z: 0}
+  m_LocalPosition: {x: 0.191, y: 0.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4055790223504996370}
+  m_Father: {fileID: 3137287986617449566}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
