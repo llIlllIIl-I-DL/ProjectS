@@ -10,6 +10,8 @@ public class ObjectConveyor : BaseObject
     // 밀리는 방향으로 이동속도가 증가하지 않는 문제가 발생
     // PlayerMovement.cs에서 점프를 처리하는 부분을 수정해야 할 듯
 
+    // 텍스쳐 스크롤링 코드로 구현해놓았지만 쉐이더 테스트하면서 쉐이더로 구현해서 관련 부분 주석처리
+
     #region Variables
 
     [Header("컨베이어 벨트 설정")]
@@ -20,7 +22,7 @@ public class ObjectConveyor : BaseObject
 
     [Header("시각 효과")]
     [SerializeField] private SpriteRenderer beltRenderer;
-    [SerializeField] private float textureScrollSpeed;
+    // [SerializeField] private float textureScrollSpeed; // 1로 설정하면 방향 <- -1로 설정하면 방향 ->
     [SerializeField] private Material scrollingMaterial;
 
     [Header("물리 설정")]
@@ -57,18 +59,18 @@ public class ObjectConveyor : BaseObject
     {
         if (isActive)
         {
-            // 텍스처 스크롤링
-            if (instanceMaterial != null)
-            {
-                // offset을 무한대로 증가시키고 모듈로 연산 사용하지 않음
-                // 이렇게 하면 텍스처가 계속 스크롤됨
-                offset += textureScrollSpeed * Time.deltaTime;
+            // // 텍스처 스크롤링
+            // if (instanceMaterial != null)
+            // {
+            //     // offset을 무한대로 증가시키고 모듈로 연산 사용하지 않음
+            //     // 이렇게 하면 텍스처가 계속 스크롤됨
+            //     offset += textureScrollSpeed * Time.deltaTime;
 
-                // 오프셋이 너무 커지는 것을 방지 (최적화 목적)
-                if (offset > 1000f) offset -= 1000f;
+            //     // 오프셋이 너무 커지는 것을 방지 (최적화 목적)
+            //     if (offset > 1000f) offset -= 1000f;
 
-                instanceMaterial.SetTextureOffset("_MainTex", new Vector2(offset, 0));
-            }
+            //     instanceMaterial.SetTextureOffset("_MainTex", new Vector2(offset, 0));
+            // }
 
             // 물리 기반 아닌 경우 직접 이동
             if (!usePhysics)
