@@ -16,9 +16,15 @@ public class Item : MonoBehaviour
     [SerializeField] private float collectCooldown = 0.5f; // 아이템 생성 후 수집 가능까지의 쿨다운
     private bool isCollectable = true;
 
+    [Header("특성 슬롯")]
+    [SerializeField] public InvenSlotUI invenSlotUI;
+
+    Player player;
+
     private void Awake()
     {
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        player = FindObjectOfType<Player>();
 
         // 아이템 생성 직후 잠시 수집 불가능 상태로 설정
         StartCoroutine(EnableCollection());
@@ -177,8 +183,8 @@ public class Item : MonoBehaviour
 
             if (added && itemData.itemType == ItemType.UtilityPoint)
             {
-                PlayerUI.Instance.AddUtilityPoint(itemData.utilityPointForOneWay);
-                Debug.Log($"특성 포인트 획득 {itemData.utilityPointForOneWay}");
+                PlayerUI.Instance.AddUtilityPoint(itemData.utilityPointForNow);
+                CreatSlotSystem.Instance.RefreshAllOwnPoints();
             }
 
                 return added;

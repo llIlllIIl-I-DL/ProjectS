@@ -5,68 +5,83 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
-public class InvenSlotUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class InvenSlotUI : MonoBehaviour
 {
-    public GameObject invenPopWindow;
-
-    [SerializeField] private Image itemIcon;
-
-    [Header("팝업 창 부분 UI")]
+    [Header("슬롯 정보")]
     [SerializeField] private TextMeshProUGUI itemName;
-    [SerializeField] private TextMeshProUGUI itemDescription;
+    [SerializeField] public Image itemIcon;
+    [SerializeField] private TextMeshProUGUI itemNeedPoint;
+    [SerializeField] private TextMeshProUGUI itemOwnPoint;
+    //[SerializeField] private TextMeshProUGUI itemDescription;
 
-    [SerializeField] private Image iconInPopUp;
+    /*
+    [Header("특성 해금")]
+    [SerializeField] private Button unLockButton;
+    [SerializeField] private TextMeshProUGUI pointForUnLock;
+    */
 
-    private ItemData invenItemData;
+    private ItemData utilityItemData;
+    private Player player; //player의 특성 포인트 현황을 받아오기 위함 
 
     private int slotIndex = 0;
 
-
-
-    public void OnPointerEnter(PointerEventData eventData)
+    public void Start()
     {
-        invenPopWindow.SetActive(true);
+        //unLockButton.onClick.AddListener(() => UnLockUtilitySlot());
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    public void SetItem(ItemData item, Player player)
     {
-        invenPopWindow.SetActive(false);
-    }
+        utilityItemData = item;
+        this.player = player;
 
-
-
-    public void AddItem(ItemData invenItemData)
-    {
-        CreatSlotSystem.Instance.slotList[slotIndex].SetItem(invenItemData);
-        slotIndex++;
-    }
-
-
-    public void SetItem(ItemData item)
-    {
-        invenItemData = item;
         RefreshUI();
     }
 
 
     public void RefreshUI()
     {
-        if (invenItemData !=null)
+        if (utilityItemData != null)
         {
-            itemName.text = invenItemData.ItemName;
-            itemDescription.text = invenItemData.ItemDescription;
+            itemName.text = utilityItemData.ItemName;
 
-            itemIcon.sprite = invenItemData.Icon;
-            iconInPopUp.sprite = invenItemData.Icon;
+            //itemDescription.text = utilityItemData.ItemDescription;
+
+            itemOwnPoint.text = player.utilityPoint.ToString(); //Player를 받아와야 함
+            itemNeedPoint.text = utilityItemData.utilityPointForUnLock.ToString();
+
+            if (player.utilityPoint >= utilityItemData.utilityPointForUnLock)
+            {
+                itemIcon.sprite = utilityItemData.Icon;
+            }
+
+            else
+            {
+                itemIcon.sprite = utilityItemData.UnLockedIcon;
+            }
+        }
+    }
+
+    public void UpdateOwnPoint() //각 슬롯 내부에 있는 플레이어의 특성 포인트 현황을 업데이트 해주는 함수
+    {
+        itemOwnPoint.text = player.utilityPoint.ToString();
+
+        if (player.utilityPoint >= utilityItemData.utilityPointForUnLock)
+        {
+            itemIcon.sprite = utilityItemData.Icon;
         }
 
         else
         {
-            itemName.text = "";
-            itemDescription.text = "";
-
-            itemIcon.sprite = null;
-            iconInPopUp.sprite = null;
+            itemIcon.sprite = utilityItemData.UnLockedIcon;
         }
+
+
+        if (player.utilityPoint >= utilityItemData.utilityPointForUnLock)
+        {
+            int maxPoint = utilityItemData.utilityPointForUnLock;
+            itemOwnPoint.text = maxPoint.ToString();
+        }
+
     }
 }
