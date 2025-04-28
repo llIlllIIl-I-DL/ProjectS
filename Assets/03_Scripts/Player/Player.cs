@@ -13,8 +13,18 @@ public class Player : MonoBehaviour
     private CollisionDetector collisionDetector;
     private PlayerStateManager stateManager;
     private PlayerAnimator playerAnimator;
+    private PlayerHP playerHP;
 
-    
+    public int utilityPoint;
+
+
+    [HideInInspector] public float CurrentMoveSpeed { get; private set; } //현재 이동 속도
+    [HideInInspector] public float CurrentJumpForce { get; private set; } //점프 높이
+    [HideInInspector] public float CurrentMaxHP { get; private set; } //점프 높이
+
+    [HideInInspector] public int CurrentUtilityPoint { get; private set; } //특성 포인트 보유 현황
+
+
 
     [HideInInspector]
     public ItemData CurrentattributeTypeData;
@@ -23,6 +33,8 @@ public class Player : MonoBehaviour
     {
         // 필요한 컴포넌트 추가
         EnsureComponents();
+
+        utilityPoint = 0;
     }
 
     private void OnEnable()
@@ -138,5 +150,46 @@ public class Player : MonoBehaviour
         playerAnimator = GetComponent<PlayerAnimator>();
         if (playerAnimator == null)
             playerAnimator = gameObject.AddComponent<PlayerAnimator>();
+
+        playerHP = GetComponent<PlayerHP>();
+        if (playerHP == null)
+            playerHP = gameObject.AddComponent<PlayerHP>();
+    }
+
+
+
+
+    // 플레이어 변동 스탯 관리
+    public void UpdateCurrentPlayerHP()
+    {
+        float maxHP = playerHP.MaxHP;
+        CurrentMaxHP = maxHP;
+
+        Debug.Log($"{CurrentMaxHP}");
+    }
+
+    //CurrentMoveSpeed += 플레이어 스탯에 변동을 줄 수 있는 모든 요소
+    public void UpdateCurrentPlayerMoveSpeed(float changedSpeed)
+    {
+        float moveSpeed = settings.moveSpeed += changedSpeed;
+        CurrentMoveSpeed = moveSpeed;
+    }
+
+    public void UpdateCurrentPlayerJumpForce(float changedJumpForce)
+    {
+        /*
+        currentXVelocity = Mathf.Sign(currentXVelocity) * settings.moveSpeed * 1.5f;
+        */
+
+        CurrentJumpForce = changedJumpForce;
+        
+    }
+
+    public void UpdateCurrentInventory()
+    {
+        // I키를 눌렀을 때 나타나는 모든 정보를 여기에 취합. 특성 포인트라든지, 획득한 복장이라든지...
+
+        int nowUtilityPoint = utilityPoint;
+        CurrentUtilityPoint = nowUtilityPoint;
     }
 }
