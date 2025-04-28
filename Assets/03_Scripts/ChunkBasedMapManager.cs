@@ -28,6 +28,13 @@ public class ChunkBasedMapManager : MonoBehaviour
     public bool loadModulesFromJson = true; // true면 JSON에서 모듈 로드, false면 씬에 이미 배치된 모듈 사용
     public string jsonFileFormat = "Chunk_{0}_{1}"; // JSON 파일 이름 형식
     
+    [Header("청크 제한 설정")]
+    public int minChunkX = -1000; // 최소 청크 X 좌표
+    public int maxChunkX = 1000;  // 최대 청크 X 좌표
+    public int minChunkY = -1000; // 최소 청크 Y 좌표
+    public int maxChunkY = 1000;  // 최대 청크 Y 좌표
+    public bool limitChunkRange = true; // 청크 범위 제한 활성화
+    
     // 현재 로드된 청크 관리
     private HashSet<Vector2Int> loadedChunks = new HashSet<Vector2Int>();
     private HashSet<Vector2Int> chunksBeingLoaded = new HashSet<Vector2Int>();
@@ -89,7 +96,57 @@ public class ChunkBasedMapManager : MonoBehaviour
     {
         int x = Mathf.FloorToInt(position.x / chunkSize);
         int y = Mathf.FloorToInt(position.y / chunkSize);
-        return new Vector2Int(x, y);
+        Vector2Int chunkId = new Vector2Int(x, y);
+        
+        // 범위 제한 적용
+        if (limitChunkRange)
+        {
+            chunkId.x = Mathf.Clamp(chunkId.x, minChunkX, maxChunkX);
+            chunkId.y = Mathf.Clamp(chunkId.y, minChunkY, maxChunkY);
+        }
+        
+        return chunkId;
+    }
+    
+    /// <summary>
+    /// 청크 ID가 유효한지 검사
+    /// </summary>
+    private bool IsValidChunkId(Vector2Int chunkId)
+    {
+        // 비정상적인 값 체크 (int.MinValue나 int.MaxValue에 가까운 값)
+        if (chunkId.x == int.MinValue || chunkId.x == int.MaxValue || 
+            chunkId.y == int.MinValue || chunkId.y == int.MaxValue)
+        {
+            return false;
+        }
+        
+        // 범위 제한이 활성화된 경우, 지정된 범위 내에 있는지 확인
+        if (limitChunkRange)
+        {
+            return chunkId.x >= minChunkX && chunkId.x <= maxChunkX && 
+                   chunkId.y >= minChunkY && chunkId.y <= maxChunkY;
+        }
+        
+        return true;
+    }
+    
+    /// <summary>
+    /// 청크 씬이 빌드 설정에 포함되어 있는지 확인
+    /// </summary>
+    private bool IsSceneInBuildSettings(string sceneName)
+    {
+        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+        {
+            string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
+            string sceneNameFromPath = Path.GetFileNameWithoutExtension(scenePath);
+            
+            if (sceneNameFromPath == sceneName)
+            {
+                return true;
+            }
+        }
+        
+        return false;
     }
     
     /// <summary>
@@ -115,6 +172,12 @@ public class ChunkBasedMapManager : MonoBehaviour
             for (int dy = -loadRadius; dy <= loadRadius; dy++)
             {
                 Vector2Int chunkToCheck = new Vector2Int(currentPlayerChunk.x + dx, currentPlayerChunk.y + dy);
+                
+                // 청크 ID 유효성 검사 추가
+                if (!IsValidChunkId(chunkToCheck))
+                {
+                    continue;
+                }
                 
                 // 맨해튼 거리로 필터링 (원형 영역)
                 if (GetChunkDistance(currentPlayerChunk, chunkToCheck) <= loadRadius)
@@ -162,8 +225,24 @@ public class ChunkBasedMapManager : MonoBehaviour
     /// </summary>
     private IEnumerator LoadChunk(Vector2Int chunkId)
     {
+        // 유효하지 않은 청크 ID 필터링
+        if (!IsValidChunkId(chunkId))
+        {
+            Debug.LogWarning($"유효하지 않은 청크 ID: {chunkId}, 로드 건너뜀");
+            chunksBeingLoaded.Remove(chunkId);
+            yield break;
+        }
+        
         string chunkName = string.Format(sceneNameFormat, chunkId.x, chunkId.y);
         Debug.Log($"청크 로드 시작: {chunkName}");
+        
+        // 빌드 설정에 씬이 포함되어 있는지 확인
+        if (!IsSceneInBuildSettings(chunkName))
+        {
+            Debug.LogWarning($"씬이 빌드 설정에 없음: {chunkName}, 로드 건너뜀");
+            chunksBeingLoaded.Remove(chunkId);
+            yield break;
+        }
         
         // 씬 로드 시도
         AsyncOperation asyncLoad = null;
