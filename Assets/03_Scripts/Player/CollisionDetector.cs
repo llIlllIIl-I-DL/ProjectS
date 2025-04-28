@@ -12,6 +12,8 @@ public class CollisionDetector : MonoBehaviour
     private BoxCollider2D boxCollider;
     private int facingDirection = 1;
     private int wallDirection = 0; // 0: 벽 없음, 1: 오른쪽 벽, -1: 왼쪽 벽
+    private Animator animator; // 애니메이터 참조 추가
+    private int prevWallDirection = 0; // 이전 벽 방향 저장
 
     public bool IsGrounded { get; private set; }
     public bool IsTouchingWall { get; private set; }
@@ -22,10 +24,17 @@ public class CollisionDetector : MonoBehaviour
     public event Action<bool> OnGroundedChanged;
     public event Action<bool> OnWallTouchChanged;
     public event Action<bool> OnLadderTouchChanged;
+    public event Action<int> OnWallDirectionChanged; // 벽 방향 변경 이벤트 추가
 
     private void Awake()
     {
         boxCollider = GetComponent<BoxCollider2D>();
+        // 애니메이터 찾기
+        animator = GetComponentInChildren<Animator>();
+        if (animator == null)
+        {
+            animator = GetComponent<Animator>();
+        }
     }
 
     private void Update()
@@ -33,6 +42,7 @@ public class CollisionDetector : MonoBehaviour
         bool wasGrounded = IsGrounded;
         bool wasTouchingWall = IsTouchingWall;
         bool wasOnLadder = IsOnLadder;
+        prevWallDirection = wallDirection; // 이전 벽 방향 저장
 
         IsGrounded = CheckIsGrounded();
         CheckWallContact(); // 벽 접촉 확인과 방향 설정
@@ -48,12 +58,107 @@ public class CollisionDetector : MonoBehaviour
         {
             OnWallTouchChanged?.Invoke(IsTouchingWall);
             Debug.Log($"벽 접촉 상태 변경: {IsTouchingWall}, 벽 방향: {wallDirection}");
+            
+            // 벽에서 떨어질 때 애니메이션 파라미터 초기화
+            if (!IsTouchingWall && animator != null)
+            {
+                SetWallAnimationParams(0);
+            }
+        }
+
+        // 벽 방향이 변경되었을 때 이벤트 발생 및 애니메이션 파라미터 설정
+        if (prevWallDirection != wallDirection)
+        {
+            OnWallDirectionChanged?.Invoke(wallDirection);
+            
+            // 애니메이션 파라미터 설정
+            if (animator != null)
+            {
+                SetWallAnimationParams(wallDirection);
+            }
         }
 
         if (wasOnLadder != IsOnLadder)
         {
             OnLadderTouchChanged?.Invoke(IsOnLadder);
         }
+    }
+    
+    // 벽 애니메이션 파라미터 설정 메서드
+    private void SetWallAnimationParams(int wallDir)
+    {
+        Debug.Log($"벽 애니메이션 파라미터 설정 시작: 벽 방향={wallDir}");
+        
+        // IsWallSliding 파라미터 설정
+        if (HasParameter("IsWallSliding"))
+        {
+            animator.SetBool("IsWallSliding", wallDir != 0);
+            Debug.Log($"IsWallSliding 파라미터 설정: {wallDir != 0}");
+        }
+        
+        // WallDirection 파라미터 설정
+        if (HasParameter("WallDirection"))
+        {
+            animator.SetInteger("WallDirection", wallDir);
+            Debug.Log($"WallDirection 파라미터 설정: {wallDir}");
+        }
+        
+        // 양쪽 애니메이션 파라미터 먼저 모두 false로 초기화
+        if (HasParameter("LeftWallSlide"))
+        {
+            animator.SetBool("LeftWallSlide", false);
+        }
+        
+        if (HasParameter("RightWallSlide"))
+        {
+            animator.SetBool("RightWallSlide", false);
+        }
+        
+        // 이제 현재 벽 방향에 맞는 파라미터만 true로 설정
+        if (wallDir < 0) // 왼쪽 벽
+        {
+            if (HasParameter("LeftWallSlide"))
+            {
+                animator.SetBool("LeftWallSlide", true);
+                Debug.Log("오른쪽 벽 감지: LeftWallSlide = true");
+            }
+        }
+        else if (wallDir > 0) // 오른쪽 벽
+        {
+            if (HasParameter("RightWallSlide"))
+            {
+                animator.SetBool("RightWallSlide", true);
+                Debug.Log("왼쪽 벽 감지: RightWallSlide = true");
+            }
+        }
+        
+        // 모든 파라미터 값 로그 출력
+        if (HasParameter("LeftWallSlide"))
+        {
+            bool isLeft = animator.GetBool("LeftWallSlide");
+            Debug.Log($"최종 LeftWallSlide 값: {isLeft}");
+        }
+        
+        if (HasParameter("RightWallSlide"))
+        {
+            bool isRight = animator.GetBool("RightWallSlide");
+            Debug.Log($"최종 RightWallSlide 값: {isRight}");
+        }
+    }
+    
+    // 애니메이션 파라미터 존재 여부 확인
+    private bool HasParameter(string paramName)
+    {
+        if (animator == null) return false;
+        
+        foreach (AnimatorControllerParameter param in animator.parameters)
+        {
+            if (param.name == paramName)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void SetFacingDirection(int direction)
@@ -133,9 +238,12 @@ public class CollisionDetector : MonoBehaviour
         bool leftWall = hitLeftTop.collider != null || hitLeftMiddle.collider != null || hitLeftBottom.collider != null;
         
         // 벽 방향 설정
-        if (rightWall) wallDirection = 1;      // 오른쪽 벽
-        else if (leftWall) wallDirection = -1; // 왼쪽 벽
-        else wallDirection = 0;                // 벽 없음
+        int newWallDirection = 0;
+        if (rightWall) newWallDirection = 1;      // 오른쪽 벽
+        else if (leftWall) newWallDirection = -1; // 왼쪽 벽
+        
+        // 벽 방향 업데이트
+        wallDirection = newWallDirection;
         
         // 벽 접촉 상태 업데이트
         IsTouchingWall = rightWall || leftWall;

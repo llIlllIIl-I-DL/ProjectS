@@ -617,4 +617,26 @@ public class PlayerStateManager : MonoBehaviour
             ExitClimbingState(false);
         }
     }
+
+    // 벽을 바라보도록 캐릭터의 방향을 변경
+    public void FlipCharacterToFaceWall(int wallDirection)
+    {
+        if (wallDirection == 0) return; // 벽 방향이 없으면 무시
+        
+        int directionToFace = -wallDirection; // 벽 반대 방향을 바라봐야 함
+        
+        // 이미 바라보고 있는 방향이면 무시
+        if (movement.FacingDirection == directionToFace) return;
+        
+        // 캐릭터의 로컬 스케일 변경 (X축 뒤집기)
+        transform.localScale = new Vector3(directionToFace, 1, 1);
+        
+        // 이동 컴포넌트에 방향 변경 알림 (내부 facingDirection 값 갱신)
+        movement.SetFacingDirection(directionToFace);
+        
+        // 충돌 감지기에도 방향 변경 알림
+        collisionDetector.SetFacingDirection(directionToFace);
+        
+        Debug.Log($"벽({wallDirection})을 바라보도록 캐릭터 방향을 {directionToFace}로 변경");
+    }
 }

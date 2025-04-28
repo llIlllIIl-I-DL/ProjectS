@@ -350,4 +350,15 @@ public class PlayerMovement : MonoBehaviour
         // 최소값 보장
         return Mathf.Max(currentSpeed, 5f);
     }
+
+    // 직접 캐릭터 방향을 설정하는 메서드
+    public void SetFacingDirection(int direction)
+    {
+        if (facingDirection != direction)
+        {
+            facingDirection = direction;
+            OnDirectionChanged?.Invoke(facingDirection);
+            Debug.Log($"PlayerMovement: 캐릭터 방향이 {facingDirection}로 변경되었습니다.");
+        }
+    }
 }
