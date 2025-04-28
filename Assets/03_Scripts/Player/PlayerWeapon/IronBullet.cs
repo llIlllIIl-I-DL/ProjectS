@@ -36,6 +36,7 @@ public class IronBullet : Bullet
         // 충돌 후 오버차지 상태라면 일정 시간 후 파괴
         if (hasCollided && isOvercharged)
         {
+            
             destroyTimer += Time.deltaTime;
             
             // 잔존 시간이 지나면 파괴
