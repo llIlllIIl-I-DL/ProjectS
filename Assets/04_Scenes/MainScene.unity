@@ -544,6 +544,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 545602709}
     m_Modifications:
     - target: {fileID: 5979861897027304007, guid: 79226f63885ffee458baf2945d069e21, type: 3}
+      propertyPath: fireRate
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5979861897027304007, guid: 79226f63885ffee458baf2945d069e21, type: 3}
       propertyPath: firePoint
       value: 
       objectReference: {fileID: 1668047892}
@@ -1430,6 +1434,10 @@ PrefabInstance:
     - target: {fileID: 3356648167279430091, guid: 10134879ea3c7fe419bbab5db19b26f0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3628932739470537783, guid: 10134879ea3c7fe419bbab5db19b26f0, type: 3}
+      propertyPath: baseSceneName
+      value: MainScene
       objectReference: {fileID: 0}
     - target: {fileID: 3628932739470537783, guid: 10134879ea3c7fe419bbab5db19b26f0, type: 3}
       propertyPath: playerTransform
