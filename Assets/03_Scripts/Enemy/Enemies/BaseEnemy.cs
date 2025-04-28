@@ -163,20 +163,7 @@ public abstract class BaseEnemy : DestructibleEntity
     #endregion
     
     #region Utility Functions
-    
-    /// <summary>
-    /// 피격 효과
-    /// </summary>
-    protected override IEnumerator FlashEffect()
-    {
-        if (spriteRenderer == null) yield break;
-        
-        Color originalColor = spriteRenderer.color;
-        spriteRenderer.color = Color.red;
-        yield return new WaitForSeconds(0.1f);
-        spriteRenderer.color = originalColor;
-    }
-    
+
     /// <summary>
     /// 플레이어 감지
     /// </summary>
@@ -404,5 +391,11 @@ public abstract class BaseEnemy : DestructibleEntity
         // 콜라이더 비활성화
         GetComponent<Collider2D>().enabled = false;
         Debug.Log($"{gameObject.name} Detroy가 아니라 Die로 호출 됨");
+    }
+
+    // 이동 속도 Getter
+    public float GetMoveSpeed()
+    {
+        return moveSpeed;
     }
 }

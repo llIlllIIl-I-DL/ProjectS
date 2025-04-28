@@ -38,6 +38,7 @@ public abstract class DestructibleEntity : MonoBehaviour, IDestructible
         currentHealth -= damage;
         
         // 피격 효과
+        StopCoroutine("FlashEffect");
         StartCoroutine(FlashEffect());
         
         // 파괴 체크

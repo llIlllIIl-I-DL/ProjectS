@@ -104,7 +104,7 @@ MonoBehaviour:
   possibleDrops: []
   dropChance: 0.3
   moveSpeed: 10
-  attackPower: 10
+  attackPower: 1
   attackRange: 7
   detectionRange: 7
   contactDamage: 1
@@ -151,7 +151,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2.048, y: 2.048}
+    oldSize: {x: 1.1377778, y: 1.1377778}
     newSize: {x: 10.24, y: 10.24}
     adaptiveTilingThreshold: 0.5
     drawMode: 0

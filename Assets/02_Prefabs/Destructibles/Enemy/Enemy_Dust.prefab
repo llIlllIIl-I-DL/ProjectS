@@ -58,7 +58,7 @@ MonoBehaviour:
   detectionRange: 10
   contactDamage: 1
   dealsDamageOnContact: 1
-  patrolDistance: 1
+  patrolDistance: 3
   patrolWaitTime: 2
 --- !u!50 &4174171962346470661
 Rigidbody2D:
@@ -86,7 +86,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &2569704663752254736
 BoxCollider2D:
   m_ObjectHideFlags: 0
