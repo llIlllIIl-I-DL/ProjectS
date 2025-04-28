@@ -218,7 +218,14 @@ public class ObjectLazer : BaseObject
                 GameObject impact = Instantiate(impactEffect, hit.point, Quaternion.identity);
                 Destroy(impact, 0.2f);
             }
-            
+
+            ILaserInteractable laserInteractable = hit.collider.GetComponent<ILaserInteractable>();
+            if (laserInteractable != null)
+            {
+                // 레이저와 상호작용하는 오브젝트 처리
+                laserInteractable.OnLaserHit(hit.point, direction);
+            }
+
             // 반사경 체크
             ObjectMirror mirror = hit.collider.GetComponent<ObjectMirror>();
             if (mirror != null && reflectionCount < maxReflections)
@@ -226,17 +233,17 @@ public class ObjectLazer : BaseObject
                 // 반사 방향 계산
                 Vector2 reflectedDir = mirror.ReflectLaser(direction);
                 
-                // 디버깅: 법선 및 반사 벡터 시각화
+                // 디버그 시각화
                 Debug.DrawRay(hit.point, hit.normal, Color.blue, 0.5f);
                 Debug.DrawRay(hit.point, reflectedDir * 5, Color.green, 0.5f);
                 
-                // 다음 반사점 시작 위치 (약간 오프셋)
+                // 다음 레이저 선분의 시작점
                 Vector2 nextStartPos = hit.point + reflectedDir * 0.05f;
                 
                 // 다음 레이저 선분의 시작점
                 laserLine.SetPosition(pointIndex++, nextStartPos);
                 
-                // 다음 반사 레이저 계산 (재귀)
+                // 다음 반사 레이저 계산
                 CastLaserRecursive(nextStartPos, reflectedDir, reflectionCount + 1, ref pointIndex);
             }
             else
@@ -246,7 +253,7 @@ public class ObjectLazer : BaseObject
                 if (damageable != null)
                 {
                     // 데미지 처리 로직
-                    // damageable.TakeDamage(laserDamage);
+                    // 데미지는 없어도 되겠지??
                 }
             }
         }
