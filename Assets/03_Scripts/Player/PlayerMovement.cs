@@ -22,6 +22,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float slopeCheckDistance = 0.5f;
     [SerializeField] private LayerMask groundLayer;
     
+    private PlayerStateManager stateManager;
+    
     public int FacingDirection => facingDirection;
     public Vector2 Velocity => rb.velocity;
     
@@ -35,6 +37,7 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        stateManager = GetComponent<PlayerStateManager>();
         
         // 마찰력 자료 확인
         if (noFriction == null || fullFriction == null)
@@ -43,10 +46,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
     
-    private void Update()
-    {
-        // 제트팩 관련 코드 제거
-    }
     
     private void FixedUpdate()
     {
@@ -66,6 +65,8 @@ public class PlayerMovement : MonoBehaviour
 
     public void Move(Vector2 moveDirection, bool sprint = false)
     {
+        // 앉기 상태일 때 스프린트 불가
+        bool isCrouching = stateManager != null && stateManager.IsCrouching;
         // 방향 변경
         if (moveDirection.x != 0)
         {
@@ -85,9 +86,9 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        // 목표 속도 (스프린트 상태 반영)
+        // 목표 속도 (스프린트 상태 반영, 단 앉기 상태에서는 스프린트 불가)
         float currentMoveSpeed = settings.moveSpeed;
-        if (sprint || isSprinting)
+        if ((sprint || isSprinting) && !isCrouching)
         {
             currentMoveSpeed += settings.sprintMultiplier;
         }
@@ -310,6 +311,12 @@ public class PlayerMovement : MonoBehaviour
 
     public void SetSprinting(bool sprinting)
     {
+        // 앉기 상태일 때 스프린트 불가
+        if (stateManager != null && stateManager.IsCrouching && sprinting)
+        {
+            isSprinting = false;
+            return;
+        }
         isSprinting = sprinting;
     }
 
