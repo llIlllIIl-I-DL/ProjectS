@@ -49,6 +49,7 @@ MonoBehaviour:
   gameOverWindow: {fileID: 6371846572626685058, guid: 34613739cf51adf4baf0cbd3a6853f01, type: 3}
   gameOverWindowParents: {fileID: 7556120981888034525}
   fadeOut: {fileID: 2937340609696970186, guid: d5f00ec4ee42d654aab33ff9b9d90956, type: 3}
+  utilityItemList: {fileID: 11400000, guid: c166cd561c5e68b42b3e75e9e584a5d0, type: 2}
   allUIPages:
   - {fileID: 0}
   - {fileID: 0}
@@ -67,3 +68,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bossWarningUI: {fileID: 301466265314762394, guid: 0ca8cc33bfd65cd48ab584f93b02a2fe, type: 3}
   bossWarningUIParents: {fileID: 7556120981888034525}
+  Btn: []
+  isApproved: 0
