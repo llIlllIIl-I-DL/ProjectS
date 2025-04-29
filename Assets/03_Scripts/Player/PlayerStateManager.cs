@@ -359,6 +359,7 @@ public class PlayerStateManager : MonoBehaviour
         movement.Jump(settings.jumpForce);
         ChangeState(PlayerStateType.Jumping);
         lastJumpTime = 0;
+        lastGroundedTime = 0;
     }
 
     private void HandleJumpRelease()
