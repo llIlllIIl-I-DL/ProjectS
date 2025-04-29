@@ -1389,6 +1389,18 @@ PrefabInstance:
       propertyPath: utilityPoint
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2921409417795693344, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: m_LinearDrag
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2921409417795693344, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2921409417795693344, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3137287986617449566, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
       propertyPath: m_LocalPosition.x
       value: 10
@@ -1428,6 +1440,30 @@ PrefabInstance:
     - target: {fileID: 3137287986617449566, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3643135106655314618, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4995387987602289083, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: maxSlopeAngle
+      value: 55
+      objectReference: {fileID: 0}
+    - target: {fileID: 4995387987602289083, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: slopeCheckDistance
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7599131818407334981, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: maxHP
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 7599131818407334981, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: currentHP
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 8571206959293451295, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1506,11 +1542,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3628932739470537783, guid: 10134879ea3c7fe419bbab5db19b26f0, type: 3}
       propertyPath: chunkSize
-      value: 50
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 3628932739470537783, guid: 10134879ea3c7fe419bbab5db19b26f0, type: 3}
       propertyPath: loadDistance
-      value: 50
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 3628932739470537783, guid: 10134879ea3c7fe419bbab5db19b26f0, type: 3}
       propertyPath: baseSceneName
@@ -1518,7 +1554,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3628932739470537783, guid: 10134879ea3c7fe419bbab5db19b26f0, type: 3}
       propertyPath: unloadDistance
-      value: 100
+      value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 3628932739470537783, guid: 10134879ea3c7fe419bbab5db19b26f0, type: 3}
       propertyPath: playerTransform
