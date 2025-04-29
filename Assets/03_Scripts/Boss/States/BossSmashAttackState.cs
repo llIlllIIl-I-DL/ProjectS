@@ -32,31 +32,39 @@ public class BossSmashAttackState : IEnemyState
         hasAttacked = false;
         BossStateMachine.StartCoroutine(SmashAttackCoroutine());
 
-        // 휘두르기 애니메이션 트리거
         if (animator != null)
         {
-            animator.SetTrigger("Slash");
+            animator.SetBool("IsSlashing", true); // 슬래시 애니메이션 활성화
+            animator.SetBool("IsKicking", false); // 혹시 킥이 켜져 있으면 끔
         }
     }
 
     public void Exit()
     {
         Debug.Log("Boss SmashAttack 상태 종료");
+        if (animator != null)
+        {
+            animator.SetBool("IsSlashing", false); // 슬래시 끝나면 비활성화
+            animator.SetBool("IsKicking", false);  // 킥도 혹시 모르니 비활성화
+        }
     }
 
     public void FixedUpdate() { }
     public void Update() { }
 
-    // ▶ 킥 공격 - 충돌 시 넉백 처리
     public void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
+            if (hasAttacked) return;
+
             Debug.Log("플레이어와 충돌 - 킥 공격 실행");
+            hasAttacked = true;
 
             if (animator != null)
             {
-                animator.SetTrigger("Kick"); // 킥 애니메이션 트리거
+                animator.SetBool("IsKicking", true);  // 킥 애니메이션 활성화
+                animator.SetBool("IsSlashing", false); // 슬래시 비활성화
             }
 
             var damageable = other.GetComponent<IDamageable>();
@@ -75,7 +83,6 @@ public class BossSmashAttackState : IEnemyState
                 Debug.Log("킥 넉백 적용");
             }
 
-            // 이펙트 (킥 이펙트가 있다면)
             if (BossStateMachine.kickEffectPrefab != null)
             {
                 GameObject effect = Object.Instantiate(
@@ -83,19 +90,18 @@ public class BossSmashAttackState : IEnemyState
                     other.transform.position,
                     Quaternion.identity
                 );
-                Object.Destroy(effect, 1f); // 일정 시간 후 제거
+                Object.Destroy(effect, 1f);
             }
         }
     }
 
-    // ▶ 휘두르기 공격 처리
     private IEnumerator SmashAttackCoroutine()
     {
         yield return new WaitForSeconds(smashDelay);
 
         if (!hasAttacked && player != null)
         {
-            PerformSlashAttack(); // 휘두르기 실행
+            PerformSlashAttack();
             hasAttacked = true;
         }
 
@@ -108,25 +114,12 @@ public class BossSmashAttackState : IEnemyState
         float distance = Vector2.Distance(boss.position, player.position);
         if (distance <= smashRange)
         {
-            if (animator != null)
-                animator.SetTrigger("Slash"); // 휘두르기 트리거 (한 번 더 가능)
+            Debug.Log("휘두르기 적중 - 데미지: " + smashDamage);
 
             var damageable = player.GetComponent<IDamageable>();
             if (damageable != null)
             {
                 damageable.TakeDamage(smashDamage);
-                Debug.Log("휘두르기 적중 - 데미지: " + smashDamage);
-            }
-
-            // 이펙트 (휘두르기 이펙트가 있다면)
-            if (BossStateMachine.slashEffectPrefab != null)
-            {
-                GameObject effect = Object.Instantiate(
-                    BossStateMachine.slashEffectPrefab,
-                    player.position,
-                    Quaternion.identity
-                );
-                Object.Destroy(effect, 1f); // 일정 시간 후 제거
             }
         }
         else
