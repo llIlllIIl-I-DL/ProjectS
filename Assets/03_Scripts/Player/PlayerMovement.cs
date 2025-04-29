@@ -4,6 +4,8 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private PlayerSettings settings;
+    //싱글톤 선언
+    public static PlayerMovement Instance { get; private set; }
 
     private Rigidbody2D rb;
     private int facingDirection = 1;
@@ -276,6 +278,31 @@ public class PlayerMovement : MonoBehaviour
 
     public void WallSlide(float slideSpeed, bool fastSlide = false)
     {
+        // 플레이어가 바라보는 방향으로 레이캐스트를 발사하여 벽 감지
+        Vector2 raycastDirection = new Vector2(facingDirection, 0);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, raycastDirection, 0.7f, groundLayer);
+        
+        // 디버그용 레이 시각화
+        Debug.DrawRay(transform.position, raycastDirection * 0.7f, Color.blue);
+        
+        // 벽이 감지되지 않았거나, 플레이어가 바라보는 방향과 벽의 방향이 일치하지 않으면 리턴
+        if (!hit.collider)
+        {
+            // 벽이 감지되지 않음
+            Debug.Log("벽이 감지되지 않아 벽 슬라이딩을 수행하지 않습니다.");
+            return;
+        }
+        
+        // 플레이어의 방향과 벽의 법선 벡터를 비교하여 방향 일치 확인
+        float dotProduct = Vector2.Dot(raycastDirection, hit.normal);
+        
+        // 플레이어가 바라보는 방향과 벽의 방향이 반대일 때 (닷 프로덕트가 음수일 때) 벽 슬라이딩 수행
+        if (dotProduct >= 0)
+        {
+            Debug.Log("플레이어의 방향과 벽의 방향이 일치하지 않아 벽 슬라이딩을 수행하지 않습니다.");
+            return;
+        }
+        
         // 벽 슬라이딩 디버그 로그 추가
         Debug.Log($"벽 슬라이딩 실행 중: 속도={slideSpeed}, 빠른 슬라이딩={fastSlide}");
         
