@@ -4,26 +4,30 @@ using System.Collections;
 /// <summary>
 /// 반사경 오브젝트 - 레이저 반사 및 회전 기능
 /// </summary>
-public class ObjectMirror : BaseObject
+public class ObjectMirror : BaseObject, IDamageable
 {
     #region Variables
 
     [Header("반사경 설정")]
-    [SerializeField] private float rotationStep = 45f;   // 회전 단위 (각도)
-    [SerializeField] private float initialAngle = 0f;    // 초기 각도
+    [SerializeField] private float rotationStep;   // 회전 단위 (각도)
+    [SerializeField] private float initialAngle;    // 초기 각도
     [SerializeField] private bool canBeAttacked = true;  // 공격으로도 회전 가능한지
     
     [Header("시각 효과")]
     [SerializeField] private SpriteRenderer mirrorRenderer;
     [SerializeField] private GameObject reflectEffect;   // 반사 효과 프리팹
-    [SerializeField] private float effectDuration = 0.2f; // 효과 지속 시간
+    [SerializeField] private float effectDuration; // 효과 지속 시간
     
     [Header("디버깅")]
     [SerializeField] private bool showDebugRays = true; // 디버그 레이 표시 여부
-    [SerializeField] private float debugRayLength = 2f;  // 디버그 레이 길이
+    [SerializeField] private float debugRayLength;  // 디버그 레이 길이
 
     // 법선 벡터 캐싱
     private Vector2 cachedNormal;
+    
+    [Header("반사 설정")]
+    [SerializeField] private bool useFixedDirection = true;
+    [SerializeField] private float fixedReflectionOffset;
 
     #endregion
 
@@ -67,9 +71,55 @@ public class ObjectMirror : BaseObject
         if (!canBeAttacked) return;
         
         RotateMirror();
-        
         // 시각 효과
         StartCoroutine(FlashEffect());
+    }
+
+    private Coroutine flashCoroutine; // 현재 실행 중인 코루틴 참조 저장
+
+    /// <summary>
+    /// 반사경 깜박임 효과 - 피격 효과
+    /// </summary>
+    private IEnumerator FlashEffect()
+    {
+        // 이미 참조가 없는지 확인
+        if (mirrorRenderer == null)
+        {
+            mirrorRenderer = GetComponent<SpriteRenderer>();
+            if (mirrorRenderer == null)
+            {
+                yield break;
+            }
+        }
+        
+        // 원래 색상 저장
+        Color originalColor = mirrorRenderer.color;
+        mirrorRenderer.color = Color.gray;
+        yield return new WaitForSeconds(0.1f);
+        mirrorRenderer.color = originalColor;
+        flashCoroutine = null;
+    }
+
+    public void TakeDamage(float damage)
+    {   
+        // 공격 처리
+        if (!canBeAttacked) 
+        {
+            Debug.Log("반사경을 공격할 수 없음");
+            return;
+        }
+        RotateMirror();
+        // 이미 실행 중인 코루틴 관리
+        if (flashCoroutine != null)
+        {
+            StopCoroutine(flashCoroutine);
+            flashCoroutine = null;
+            if (mirrorRenderer != null)
+            {
+                mirrorRenderer.color = Color.white; // 기본 색상으로 강제 리셋
+            }
+        }
+        flashCoroutine = StartCoroutine(FlashEffect());
     }
     
     #endregion
@@ -167,7 +217,42 @@ public class ObjectMirror : BaseObject
     /// </summary>
     public Vector2 ReflectLaser(Vector2 incomingDirection)
     {
-        return ReflectLaser(incomingDirection, transform.position);
+        Vector2 reflectedDirection;
+        
+        if (useFixedDirection)
+        {
+            // 반사경의 회전에 따른 고정된 반사 방향 계산
+            float mirrorAngle = transform.eulerAngles.z;
+            float reflectionAngle = (mirrorAngle + fixedReflectionOffset) * Mathf.Deg2Rad;
+            reflectedDirection = new Vector2(
+                Mathf.Cos(reflectionAngle),
+                Mathf.Sin(reflectionAngle)
+            ).normalized;
+        }
+        else
+        {
+            // 미러 표면의 법선 벡터 계산 (항상 mirrorAngle + 90도)
+            float mirrorAngle = transform.eulerAngles.z * Mathf.Deg2Rad;
+            Vector2 normal = new Vector2(
+                Mathf.Cos(mirrorAngle + Mathf.PI/2),
+                Mathf.Sin(mirrorAngle + Mathf.PI/2)
+            ).normalized;
+            
+            // 물리적 정확한 반사 계산
+            reflectedDirection = Vector2.Reflect(incomingDirection, normal);
+        }
+        
+        // 디버깅 표시
+        if (showDebugRays)
+        {
+            Debug.DrawRay(transform.position, incomingDirection * debugRayLength, Color.yellow, 1f);
+            Debug.DrawRay(transform.position, reflectedDirection * debugRayLength, Color.green, 1f);
+        }
+        
+        // 이펙트 생성 (중앙에)
+        ShowReflectionEffect(transform.position);
+        
+        return reflectedDirection;
     }
     
     /// <summary>
@@ -186,20 +271,6 @@ public class ObjectMirror : BaseObject
 
     #region Visual Effects
     
-    /// <summary>
-    /// 반사경 깜박임 효과
-    /// </summary>
-    private IEnumerator FlashEffect()
-    {
-        if (mirrorRenderer != null)
-        {
-            Color originalColor = mirrorRenderer.color;
-            mirrorRenderer.color = Color.white;
-            yield return new WaitForSeconds(0.1f);
-            mirrorRenderer.color = originalColor;
-        }
-    }
-    
     #endregion
 
     #region Editor
@@ -207,18 +278,23 @@ public class ObjectMirror : BaseObject
     #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        // 에디터에서 법선 벡터 방향 표시
+        // 중앙 히트 지점 표시 (빨강)
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, 0.2f);
+        
+        // 현재 회전 기준 반사 방향 표시 (파랑)
+        float angle = (transform.eulerAngles.z + fixedReflectionOffset) * Mathf.Deg2Rad;
+        Vector3 reflectionDir = new Vector3(
+            Mathf.Cos(angle),
+            Mathf.Sin(angle),
+            0
+        ).normalized;
+        
         Gizmos.color = Color.blue;
+        Gizmos.DrawRay(transform.position, reflectionDir * 2f);
         
-        float angle = transform.eulerAngles.z;
-        float angleInRadians = (angle + 90f) * Mathf.Deg2Rad;
-        Vector2 normal = new Vector2(Mathf.Cos(angleInRadians), Mathf.Sin(angleInRadians)).normalized;
-        
-        Gizmos.DrawRay(transform.position, normal * debugRayLength);
-        
-        // 반사경 외곽선
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireCube(transform.position, new Vector3(1f, 1f, 0.1f));
+        // 방향 텍스트 표시 (선택사항)
+        UnityEditor.Handles.Label(transform.position + reflectionDir * 2.2f, "반사 방향");
     }
     #endif
     

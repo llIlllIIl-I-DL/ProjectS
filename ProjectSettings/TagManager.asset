@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - InfoUI
   - Cog
+  - Mirror
   layers:
   - Default
   - TransparentFX
