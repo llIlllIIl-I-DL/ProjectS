@@ -1,86 +1,192 @@
 using UnityEngine;
 
+/// <summary>
+/// 벽 슬라이딩 상태를 처리하는 클래스
+/// 플레이어가 벽에 붙어 미끄러지는 동작을 관리
+/// </summary>
 public class PlayerWallSlidingState : IPlayerState
 {
-    private PlayerStateManager stateManager;
+    #region 변수
+
+    private readonly PlayerStateManager stateManager;
     private float wallSlideStartTime;
+    private int wallDirection; // 벽의 방향: -1(왼쪽), 1(오른쪽)
+    
+    private PlayerMovement movement;
+    private CollisionDetector collisionDetector;
+    private PlayerInputHandler inputHandler;
+
+    #endregion
+
+    #region 초기화
 
     public PlayerWallSlidingState(PlayerStateManager stateManager)
     {
         this.stateManager = stateManager;
     }
 
+    #endregion
+
+    #region 상태 메서드
+
+    /// <summary>
+    /// 벽 슬라이딩 상태 진입 시 호출
+    /// </summary>
     public void Enter()
     {
+        // 필요한 컴포넌트 캐싱
+        movement = stateManager.GetMovement();
+        collisionDetector = stateManager.GetCollisionDetector();
+        inputHandler = stateManager.GetInputHandler();
+        
         // 벽 슬라이딩 상태 설정
         stateManager.SetWallSliding(true);
         wallSlideStartTime = Time.time;
-        Debug.Log("벽 슬라이딩 상태 시작 - 시간: " + wallSlideStartTime);
+        
+        // 벽 방향 감지
+        wallDirection = collisionDetector.WallDirection;
+        
+        Debug.Log($"벽 슬라이딩 상태 시작 - 벽 방향: {wallDirection}");
     }
 
+    /// <summary>
+    /// 벽 슬라이딩 중 입력 처리
+    /// </summary>
     public void HandleInput()
     {
-        var inputHandler = stateManager.GetInputHandler();
-
-        // 점프 입력은 PlayerStateManager에서 HandleJumpInput으로 처리
-
-        // 벽에서 반대 방향으로 입력하면 벽에서 떨어짐 (선택적)
-        var facingDirection = stateManager.GetMovement().FacingDirection;
-        if ((facingDirection > 0 && inputHandler.IsLeftPressed) ||
-            (facingDirection < 0 && inputHandler.IsRightPressed))
+        // 벽에서 반대 방향으로 입력하면 벽에서 떨어짐
+        if (ShouldDetachFromWall())
         {
-            Debug.Log($"벽에서 반대 방향 입력 감지: FacingDirection={facingDirection}, LeftPressed={inputHandler.IsLeftPressed}, RightPressed={inputHandler.IsRightPressed}");
-            // 벽에서 떨어지도록 처리할 수 있음
-            // 여기서는 그냥 자연스럽게 떨어지도록 둠
+            ExitToFallingState();
         }
     }
 
+    /// <summary>
+    /// 벽 슬라이딩 중 매 프레임 업데이트
+    /// </summary>
     public void Update()
     {
-        var collisionDetector = stateManager.GetCollisionDetector();
-        
-        Debug.Log($"벽 슬라이딩 상태 Update - IsGrounded: {collisionDetector.IsGrounded}, IsTouchingWall: {collisionDetector.IsTouchingWall}");
-
-        // 땅에 닿으면 Idle 또는 Running 상태로 전환
-        if (collisionDetector.IsGrounded)
+        // 상태가 변경되었는지 확인 (지상에 착지 또는 벽에서 떨어짐)
+        if (CheckStateTransitions())
         {
-            var inputHandler = stateManager.GetInputHandler();
-            Debug.Log("벽 슬라이딩 중 땅에 닿아 상태 전환");
-            stateManager.ChangeState(inputHandler.IsMoving() ?
-                                    PlayerStateType.Running :
-                                    PlayerStateType.Idle);
-            return;
-        }
-
-        // 벽에서 떨어지면 Falling 상태로 전환
-        if (!collisionDetector.IsTouchingWall)
-        {
-            Debug.Log("벽에서 떨어져 Falling 상태로 전환");
-            stateManager.ChangeState(PlayerStateType.Falling);
             return;
         }
     }
 
+    /// <summary>
+    /// 벽 슬라이딩 중 물리 업데이트 (고정 타임스텝)
+    /// </summary>
     public void FixedUpdate()
     {
-        // 벽 슬라이딩 처리
-        var inputHandler = stateManager.GetInputHandler();
-        var movement = stateManager.GetMovement();
-        var velocity = movement.Velocity;
-
-        // 디버그 정보 출력
-        Debug.Log($"벽 슬라이딩 FixedUpdate - 현재 속도: {velocity.x}, {velocity.y}, 아래키: {inputHandler.IsDownPressed}");
-
-        // 아래 방향키를 누르고 있으면 빠르게 슬라이딩
-        bool fastSlide = inputHandler.IsDownPressed;
-        movement.WallSlide(stateManager.GetSettings().wallSlideSpeed, fastSlide);
+        ApplyWallSlide();
     }
 
+    /// <summary>
+    /// 벽 슬라이딩 상태 종료 시 호출
+    /// </summary>
     public void Exit()
     {
         // 벽 슬라이딩 상태 종료
         stateManager.SetWallSliding(false);
-        float duration = Time.time - wallSlideStartTime;
-        Debug.Log($"벽 슬라이딩 상태 종료 - 지속 시간: {duration:F2}초");
+        Debug.Log("벽 슬라이딩 상태 종료");
     }
+
+    #endregion
+
+    #region 유틸리티 메서드
+
+    /// <summary>
+    /// 플레이어가 벽에서 떨어져야 하는지 확인
+    /// </summary>
+    private bool ShouldDetachFromWall()
+    {
+        // 벽 방향과 반대로 입력이 들어오면 벽에서 떨어짐
+        bool isDetachInput = (wallDirection < 0 && inputHandler.IsRightPressed) ||
+                             (wallDirection > 0 && inputHandler.IsLeftPressed);
+                             
+        return isDetachInput;
+    }
+
+    /// <summary>
+    /// 상태 전환 여부 확인 (지상 착지 또는 벽에서 떨어짐)
+    /// </summary>
+    private bool CheckStateTransitions()
+    {
+        // 땅에 닿으면 Idle 또는 Running 상태로 전환
+        if (collisionDetector.IsGrounded)
+        {
+            TransitionToGroundState();
+            return true;
+        }
+
+        // 벽에서 떨어지거나 플레이어 방향이 벽 방향과 일치하지 않으면 Falling 상태로 전환
+        if (!IsWallSlideValid())
+        {
+            ExitToFallingState();
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 벽 슬라이딩이 유효한지 확인
+    /// </summary>
+    private bool IsWallSlideValid()
+    {
+        // 벽에 닿아있는지 확인
+        bool isTouchingWall = collisionDetector.IsTouchingWall;
+        
+        // 벽 방향이 설정되어 있는지 확인 (CollisionDetector에서 이미 플레이어 방향과 일치할 때만 wallDirection을 설정함)
+        bool isWallDirectionValid = collisionDetector.WallDirection != 0;
+        
+        // 플레이어 방향과 벽 방향이 일치하는지 확인 (중복 체크지만 안전을 위해 유지)
+        bool isPlayerFacingWall = movement.FacingDirection == wallDirection;
+        
+        // 모든 조건을 충족해야 유효한 벽 슬라이딩으로 간주
+        bool isValid = isTouchingWall && isWallDirectionValid && isPlayerFacingWall;
+        
+        if (!isValid)
+        {
+            Debug.Log($"벽 슬라이딩 무효 - 벽 접촉: {isTouchingWall}, 벽 방향 유효: {isWallDirectionValid}, 플레이어가 벽 바라봄: {isPlayerFacingWall}");
+        }
+        
+        return isValid;
+    }
+
+    /// <summary>
+    /// 지상 상태로 전환
+    /// </summary>
+    private void TransitionToGroundState()
+    {
+        // 이동 중이면 Running, 아니면 Idle
+        var targetState = inputHandler.IsMoving() ? 
+                         PlayerStateType.Running : 
+                         PlayerStateType.Idle;
+                         
+        stateManager.ChangeState(targetState);
+    }
+
+    /// <summary>
+    /// 낙하 상태로 전환
+    /// </summary>
+    private void ExitToFallingState()
+    {
+        stateManager.ChangeState(PlayerStateType.Falling);
+    }
+
+    /// <summary>
+    /// 벽 슬라이딩 물리 적용
+    /// </summary>
+    private void ApplyWallSlide()
+    {
+        // 아래 방향키를 누르고 있으면 빠르게 슬라이딩
+        bool fastSlide = inputHandler.IsDownPressed;
+        
+        // 벽 슬라이딩 물리 적용
+        float slideSpeed = stateManager.GetSettings().wallSlideSpeed;
+        movement.WallSlide(slideSpeed, fastSlide);
+    }
+
+    #endregion
 }
