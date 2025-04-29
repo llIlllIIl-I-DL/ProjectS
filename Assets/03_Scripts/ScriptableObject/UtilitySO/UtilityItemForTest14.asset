@@ -12,15 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1de8bda6a1396294abeb76d9d2ba17cb, type: 3}
   m_Name: UtilityItemForTest14
   m_EditorClassIdentifier: 
-  itemName: "\uAC04\uBC1C\uC758 \uCC28"
+  itemName: "\uC0BC\uC704\uC77C\uCCB4"
   itemIcon: {fileID: 21300000, guid: ed6a37202d33dc045895046ba08ebc1b, type: 3}
   unLockedItemIcon: {fileID: 21300000, guid: 5a69f7eee36b73e41a171230965e9abd, type: 3}
   itemType: 3
   itemUsageType: 1
   itemAttributeType: 0
-  description: 
+  description: "\uBAA8\uB4E0 \uC2A4\uD0EF \uC18C\uB7C9\uC0C1\uC2B9."
   id: 1014
-  effectValue: 0
+  effectValue: 3
   isConsumable: 1
   isStackable: 1
   maxStackAmount: 10
@@ -30,4 +30,5 @@ MonoBehaviour:
   damage: 0
   attackSpeed: 0
   utilityPointForNow: 0
+  attributeType: 1
   utilityPointForUnLock: 7

@@ -18,9 +18,10 @@ MonoBehaviour:
   itemType: 3
   itemUsageType: 1
   itemAttributeType: 0
-  description: 
+  description: "\uACF5\uACA9 \uC18D\uB3C4 \uC99D\uAC00,\uC774\uB3D9 \uC18D\uB3C4
+    \uC99D\uAC00, \uCCB4\uB825 \uAC10\uC18C."
   id: 1009
-  effectValue: 0
+  effectValue: 3
   isConsumable: 1
   isStackable: 1
   maxStackAmount: 10
@@ -30,4 +31,5 @@ MonoBehaviour:
   damage: 0
   attackSpeed: 0
   utilityPointForNow: 0
+  attributeType: 1
   utilityPointForUnLock: 3

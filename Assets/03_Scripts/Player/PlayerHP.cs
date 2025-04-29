@@ -56,8 +56,11 @@ public class PlayerHP : MonoBehaviour, IDamageable
     {
         if (amount <= 0) return; // 0 이하의 값은 무시
         float previousMaxHP = maxHP; // 이전 최대 HP 저장
-        maxHP += amount; 
-        float actualIncrease = maxHP - previousMaxHP; // 최대 HP 증가량
+
+        float changedMaxHP = maxHP * (amount / maxHP);
+        float actualIncrease = previousMaxHP - changedMaxHP; // 최대 HP 증가량
+
+        maxHP = previousMaxHP + changedMaxHP;
 
         // 현재 HP도 최대 HP를 초과하지 않도록 조정
 
@@ -65,8 +68,6 @@ public class PlayerHP : MonoBehaviour, IDamageable
         currentHP = Mathf.Clamp(currentHP + actualIncrease, MIN_HP, maxHP);
 
         Debug.Log($"최대 HP가 {maxHP - previousMaxHP}만큼 증가했습니다. 새로운 최대 HP: {maxHP}");
-
-        player.UpdateCurrentPlayerHP();
     }
 
     // 체력 초기화 (부활 시 사용)

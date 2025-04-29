@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System; // WeaponManager.OnAmmoChanged 구독을 위해 추가
 
 public class PlayerUI : MonoBehaviour
 {
@@ -26,16 +27,23 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] private Image healthBarImage;
     [SerializeField] private Image healLight;
 
-    [SerializeField] private int healHP;
+    [SerializeField] private TextMeshProUGUI hpText;
 
     [Header("HP 바 깨짐")]
-    [SerializeField] public GameObject Basic;
-    [SerializeField] public GameObject Hurt;
-    [SerializeField] public GameObject VeryHurt;
-    [SerializeField] public GameObject killme;
+    [SerializeField] private GameObject Basic;
+    [SerializeField] private GameObject Hurt;
+    [SerializeField] private GameObject VeryHurt;
+    [SerializeField] private GameObject killme;
 
-    public float shakeTime;
-    public float shakeRange;
+    private float shakeTime;
+    private float shakeRange;
+
+    [Header("Ammo 바 업데이트")]
+    [SerializeField] public Scrollbar ammoBar;
+    [SerializeField] public Image ammoBarImage;
+    [SerializeField] public Image ammoBarLight;
+    
+
 
     [Header("플레이어 속성 아이콘 업데이트")]
     [SerializeField] public ItemData attributeType;
@@ -46,11 +54,9 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] public TextMeshProUGUI utilityPointText;
 
 
-    public Player player;
-    static PlayerHP playerHP;
-    public TypeItemSlotList typeItemSlotList;
-
-    static int currentTypeIndex = 0;
+    private Player player;
+    private PlayerHP playerHP;
+    private TypeItemSlotList typeItemSlotList;
 
     public Dictionary<ItemData, Sprite> TypeItemDic = new Dictionary<ItemData, Sprite>();
 
@@ -61,6 +67,19 @@ public class PlayerUI : MonoBehaviour
 
         float maxHP = playerHP.MaxHP;
         float currentHP = playerHP.CurrentHP;
+
+        int ammo = WeaponManager.Instance.currentAmmo;
+        int maxAmmo = WeaponManager.Instance.maxAmmo;
+
+        
+
+        // 탄약 변경 이벤트 구독
+        if (WeaponManager.Instance != null)
+        {
+            WeaponManager.Instance.OnAmmoChanged += UpdateAmmoUI;
+        }
+        // 초기 Ammo UI 업데이트
+        UpdateAmmoUI(ammo, maxAmmo);
 
         Vector3 realPosition = healthBar.transform.position;
         Debug.Log($"{realPosition}");
@@ -73,6 +92,7 @@ public class PlayerUI : MonoBehaviour
             InventoryManager.Instance.OnWeaponAttributeChanged += UpdateWeaponAttributeUI;
         }
 
+        UpdatePlayerHPInUItext();
         // 초기 무기 속성 설정
         UpdateWeaponAttributeUI(InventoryManager.Instance.EquippedWeaponAttribute);
     }
@@ -80,6 +100,11 @@ public class PlayerUI : MonoBehaviour
     public void Voscuro(Vector3 realPosition, float maxHP, float currentHP)
     {
         HealHP();
+    }
+
+    public void UpdatePlayerHPInUItext()
+    {
+        hpText.text = playerHP.CurrentHP.ToString();
     }
 
     public void SetHealthBar(float maxHP, float currentHP) //여기 언젠가 리팩토리 필요...
@@ -136,8 +161,8 @@ public class PlayerUI : MonoBehaviour
         while (elapsed < shakeTime)
         {
             elapsed += Time.deltaTime;
-            float x = Random.value * shakeRange - (shakeRange / 2);
-            float y = Random.value * shakeRange - (shakeRange / 2);
+            float x = UnityEngine.Random.value * shakeRange - (shakeRange / 2);
+            float y = UnityEngine.Random.value * shakeRange - (shakeRange / 2);
 
             healthBar.transform.position = new Vector3(originalPosition.x + x, originalPosition.y + y, originalPosition.z);
             yield return null;
@@ -277,5 +302,13 @@ public class PlayerUI : MonoBehaviour
     {
         player.utilityPoint += utilityPointForOneWay;
         utilityPointText.text = player.utilityPoint.ToString();
+    }
+
+    // 탄약 UI를 업데이트하는 메서드
+    private void UpdateAmmoUI(int ammo, int maxAmmo)
+    {
+        float ratio = (float)ammo / maxAmmo;
+        ammoBar.value = ratio;
+        ammoBarImage.fillAmount = ratio;
     }
 }
