@@ -9,8 +9,6 @@ public class InvenInfoController : MonoBehaviour
 {
     public static InvenInfoController Instance { get; private set; }
 
-    static PlayerHP playerHP;
-
     private void Awake()
     {
         if (Instance == null)
@@ -33,11 +31,20 @@ public class InvenInfoController : MonoBehaviour
     [Header("현재 장착 중인 특성")]
     [SerializeField] private List<Image> currentEquippedUtility;
 
+    private UtilityChangedStatController utilityChangedStatController;
+
+
+    public float maxAmmo;
+
+    public float bulletDamage;
+    public float bulletSpeed;
+
+
+
     public void Start()
     {
-        playerHP = FindObjectOfType<PlayerHP>();
-
-        //slotInteractBtn.onClick.AddListener(() => slotInteract());
+        utilityChangedStatController = GetComponent<UtilityChangedStatController>();
+        //bulletDamage = 0;
     }
 
     public void slotInteract(string ItemDescription, string ItemName, Sprite ItemIcon, float effectValue, AttributeType attributeType, int id)
@@ -49,7 +56,7 @@ public class InvenInfoController : MonoBehaviour
         utilityEquipBtn.onClick.AddListener(() => UtilityEquipped(ItemIcon, effectValue, attributeType, id));
     }
 
-    public void UtilityEquipped(Sprite ItemIcon, float effectValue, AttributeType attributeType, int id)
+    public void UtilityEquipped(Sprite ItemIcon, float effectValue, AttributeType attributeType, int id) //장착 시 실행 함수
     {
         //플레이어 쪽의 현재 장착 중인 특성 아이콘 업데이트
         for (int i = 0; i < currentEquippedUtility.Count; i++)
@@ -61,90 +68,93 @@ public class InvenInfoController : MonoBehaviour
                 currentEquippedUtility[i].color = temp;
 
                 currentEquippedUtility[i].sprite = ItemIcon;
+
+
+                switch (id)
+                {
+                    case 1001:
+
+                        utilityChangedStatController.MaxHPUP(effectValue);
+                        break;
+
+
+                    case 1002:
+
+                        maxAmmo = WeaponManager.Instance.maxAmmo;
+                        utilityChangedStatController.MaxMPUP(effectValue, maxAmmo);
+
+                        break;
+
+                    case 1003:
+
+                        utilityChangedStatController.ATKUP(effectValue, bulletDamage);
+                        break;
+
+                    case 1004:
+
+                        utilityChangedStatController.ATKSUP(effectValue, bulletSpeed);
+
+                        break;
+
+                    case 1005:
+
+                        Debug.Log("저는 1005번입니다");
+                        break;
+
+                    case 1006:
+
+                        Debug.Log("저는 1006번입니다");
+                        break;
+
+                    case 1007:
+
+                        Debug.Log("저는 1007번입니다");
+                        break;
+
+                    case 1008:
+
+                        Debug.Log("저는 1008번입니다");
+                        break;
+
+                    case 1009:
+
+                        Debug.Log("저는 1009번입니다");
+                        break;
+
+                    case 1010:
+
+                        Debug.Log("저는 1010번입니다");
+                        break;
+
+                    case 1011:
+
+                        Debug.Log("저는 1011번입니다");
+                        break;
+
+                    case 1012:
+
+                        Debug.Log("저는 1012번입니다");
+                        break;
+
+                    case 1013:
+
+                        Debug.Log("저는 1013번입니다");
+                        break;
+
+                    case 1014:
+
+                        Debug.Log("저는 1014번입니다");
+                        break;
+
+                    case 1015:
+
+                        Debug.Log("저는 1015번입니다");
+                        break;
+
+                }
+
+                return;
             }
-
-            switch (id)
-            {
-                case 1001:
-
-                    playerHP.IncreaseMaxHP(effectValue);
-                    PlayerUI.Instance.UpdatePlayerHPInUItext();
-                    break;
-
-
-                case 1002:
-
-                    Debug.Log("저는 1002번입니다");
-                    break;
-
-                case 1003:
-
-                    Debug.Log("저는 1003번입니다");
-                    break;
-
-                case 1004:
-
-                    Debug.Log("저는 1004번입니다");
-                    break;
-
-                case 1005:
-
-                    Debug.Log("저는 1005번입니다");
-                    break;
-
-                case 1006:
-
-                    Debug.Log("저는 1006번입니다");
-                    break;
-
-                case 1007:
-
-                    Debug.Log("저는 1007번입니다");
-                    break;
-
-                case 1008:
-
-                    Debug.Log("저는 1008번입니다");
-                    break;
-
-                case 1009:
-
-                    Debug.Log("저는 1009번입니다");
-                    break;
-
-                case 1010:
-
-                    Debug.Log("저는 1010번입니다");
-                    break;
-
-                case 1011:
-
-                    Debug.Log("저는 1011번입니다");
-                    break;
-
-                case 1012:
-
-                    Debug.Log("저는 1012번입니다");
-                    break;
-
-                case 1013:
-
-                    Debug.Log("저는 1013번입니다");
-                    break;
-
-                case 1014:
-
-                    Debug.Log("저는 1014번입니다");
-                    break;
-
-                case 1015:
-
-                    Debug.Log("저는 1015번입니다");
-                    break;
-
-            }
-
-            return;
         }
     }
 }

@@ -68,8 +68,6 @@ public class PlayerHP : MonoBehaviour, IDamageable
         currentHP = Mathf.Clamp(currentHP + actualIncrease, MIN_HP, maxHP);
 
         Debug.Log($"최대 HP가 {maxHP - previousMaxHP}만큼 증가했습니다. 새로운 최대 HP: {maxHP}");
-
-        player.UpdateCurrentPlayerHP(maxHP);
     }
 
     // 체력 초기화 (부활 시 사용)

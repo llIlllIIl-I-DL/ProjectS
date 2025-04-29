@@ -105,7 +105,6 @@ public class PlayerUI : MonoBehaviour
     public void UpdatePlayerHPInUItext()
     {
         hpText.text = playerHP.CurrentHP.ToString();
-        //hpText.text = player.CurrentMaxHP.ToString();
     }
 
     public void SetHealthBar(float maxHP, float currentHP) //여기 언젠가 리팩토리 필요...
