@@ -26,16 +26,16 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] private Image healthBarImage;
     [SerializeField] private Image healLight;
 
-    [SerializeField] private int healHP;
+    [SerializeField] private TextMeshProUGUI hpText;
 
     [Header("HP 바 깨짐")]
-    [SerializeField] public GameObject Basic;
-    [SerializeField] public GameObject Hurt;
-    [SerializeField] public GameObject VeryHurt;
-    [SerializeField] public GameObject killme;
+    [SerializeField] private GameObject Basic;
+    [SerializeField] private GameObject Hurt;
+    [SerializeField] private GameObject VeryHurt;
+    [SerializeField] private GameObject killme;
 
-    public float shakeTime;
-    public float shakeRange;
+    private float shakeTime;
+    private float shakeRange;
 
     [Header("플레이어 속성 아이콘 업데이트")]
     [SerializeField] public ItemData attributeType;
@@ -46,11 +46,9 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] public TextMeshProUGUI utilityPointText;
 
 
-    public Player player;
-    static PlayerHP playerHP;
-    public TypeItemSlotList typeItemSlotList;
-
-    static int currentTypeIndex = 0;
+    private Player player;
+    private PlayerHP playerHP;
+    private TypeItemSlotList typeItemSlotList;
 
     public Dictionary<ItemData, Sprite> TypeItemDic = new Dictionary<ItemData, Sprite>();
 
@@ -73,6 +71,7 @@ public class PlayerUI : MonoBehaviour
             InventoryManager.Instance.OnWeaponAttributeChanged += UpdateWeaponAttributeUI;
         }
 
+        UpdatePlayerHPInUItext();
         // 초기 무기 속성 설정
         UpdateWeaponAttributeUI(InventoryManager.Instance.EquippedWeaponAttribute);
     }
@@ -80,6 +79,12 @@ public class PlayerUI : MonoBehaviour
     public void Voscuro(Vector3 realPosition, float maxHP, float currentHP)
     {
         HealHP();
+    }
+
+    public void UpdatePlayerHPInUItext()
+    {
+        hpText.text = playerHP.CurrentHP.ToString();
+        //hpText.text = player.CurrentMaxHP.ToString();
     }
 
     public void SetHealthBar(float maxHP, float currentHP) //여기 언젠가 리팩토리 필요...

@@ -160,12 +160,12 @@ public class Player : MonoBehaviour
 
 
     // 플레이어 변동 스탯 관리
-    public void UpdateCurrentPlayerHP()
+    public void UpdateCurrentPlayerHP(float playerMaxHP)
     {
-        float maxHP = playerHP.MaxHP;
-        CurrentMaxHP = maxHP;
+        CurrentMaxHP = playerMaxHP;
 
         Debug.Log($"{CurrentMaxHP}");
+        PlayerUI.Instance.UpdatePlayerHPInUItext();
     }
 
     //CurrentMoveSpeed += 플레이어 스탯에 변동을 줄 수 있는 모든 요소
@@ -182,7 +182,6 @@ public class Player : MonoBehaviour
         */
 
         CurrentJumpForce = changedJumpForce;
-        
     }
 
     public void UpdateCurrentInventory()
@@ -191,5 +190,7 @@ public class Player : MonoBehaviour
 
         int nowUtilityPoint = utilityPoint;
         CurrentUtilityPoint = nowUtilityPoint;
+
+        Debug.Log($"{CurrentUtilityPoint}");
     }
 }

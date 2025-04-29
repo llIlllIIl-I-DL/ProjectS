@@ -29,6 +29,23 @@ public enum PartsType
     Arms,
     Legs
 }
+public enum ElementType
+{
+    Normal,
+    Rust,
+    Iron,
+    Poison,
+    Water,
+    Flame,
+    Ice
+}
+
+public enum AttributeType
+{
+    MaxHPUP,
+    MPUP,
+}
+
 
 [CreateAssetMenu(fileName = "New Item", menuName = "ScriptableObjects/Item")]
 public class ItemData : ScriptableObject
@@ -78,18 +95,10 @@ public class ItemData : ScriptableObject
     [Tooltip("아이템 타입이 UtilityPoint일 경우에만 사용")]
     public int utilityPointForNow;
 
+    [Header("특성 종류")]
+    public AttributeType attributeType;
+
     [Header("특성 해금 포인트")]
     [Tooltip("아이템 타입이 UtilityItem일 경우에만 사용")]
     public int utilityPointForUnLock;
-}
-
-public enum ElementType
-{
-    Normal,
-    Rust,
-    Iron,
-    Poison,
-    Water,
-    Flame,
-    Ice
 }

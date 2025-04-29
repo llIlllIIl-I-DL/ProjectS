@@ -20,7 +20,7 @@ MonoBehaviour:
   itemAttributeType: 0
   description: "\uCCB4\uB825 \uC99D\uAC00."
   id: 1001
-  effectValue: 0
+  effectValue: 5
   isConsumable: 1
   isStackable: 1
   maxStackAmount: 10
