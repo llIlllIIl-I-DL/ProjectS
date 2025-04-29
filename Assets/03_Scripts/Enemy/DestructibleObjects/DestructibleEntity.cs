@@ -19,6 +19,7 @@ public abstract class DestructibleEntity : MonoBehaviour, IDestructible
     
     protected bool isDestroyed = false;
     protected SpriteRenderer spriteRenderer;
+    protected Coroutine flashCoroutine; // 코루틴 참조를 저장할 변수 추가
     
     #endregion
 
@@ -28,17 +29,43 @@ public abstract class DestructibleEntity : MonoBehaviour, IDestructible
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
     
-    // <summary>
-    // 피격 처리 - 외부에서 호출
-    // </summary>
+    /// <summary>
+    /// 피격 시 깜박임 효과 - 개선된 버전
+    /// </summary>
+    protected virtual IEnumerator FlashEffect()
+    {
+        if (spriteRenderer == null) yield break;
+        
+        Color originalColor = spriteRenderer.color;
+        spriteRenderer.color = Color.red;
+        yield return new WaitForSeconds(0.1f);
+        spriteRenderer.color = originalColor;
+        
+        // 코루틴 참조 초기화
+        flashCoroutine = null;
+    }
+
+    /// <summary>
+    /// 피격 처리 - 외부에서 호출
+    /// </summary>
     public virtual void TakeDamage(float damage)
     {
         if (isDestroyed) return;
         
         currentHealth -= damage;
         
-        // 피격 효과
-        StartCoroutine(FlashEffect());
+        // 피격 효과 관리 개선
+        if (flashCoroutine != null)
+        {
+            StopCoroutine(flashCoroutine);
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = Color.white; // 기본 색상으로 리셋
+            }
+        }
+        
+        // 새 코루틴 시작 및 참조 저장
+        flashCoroutine = StartCoroutine(FlashEffect());
         
         // 파괴 체크
         if (currentHealth <= 0)
@@ -83,17 +110,4 @@ public abstract class DestructibleEntity : MonoBehaviour, IDestructible
     // </summary>
     // 하위 클래스에서 구현
     public abstract void PlayDestructionEffect();
-    
-    // <summary>
-    // 피격 시 깜박임 효과
-    // </summary>
-    protected virtual IEnumerator FlashEffect()
-    {
-        if (spriteRenderer == null) yield break;
-        
-        Color originalColor = spriteRenderer.color;
-        spriteRenderer.color = Color.red;
-        yield return new WaitForSeconds(0.1f);
-        spriteRenderer.color = originalColor;
-    }
 }

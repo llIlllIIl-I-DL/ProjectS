@@ -63,6 +63,17 @@ public abstract class Bullet : MonoBehaviour
             Debug.Log("플레이어 또는 플레이어 자식과 충돌하여 무시됨");
             return;
         }
+
+        // 반사경 확인
+        if (other.CompareTag("Mirror"))
+        {
+            ObjectMirror mirror = other.GetComponent<ObjectMirror>();
+            if (mirror != null)
+            {
+                mirror.TakeDamage(damage);  
+                Destroy(gameObject);
+            }
+        }
         
         // 적 레이어 확인
         if (other.CompareTag("Enemy"))

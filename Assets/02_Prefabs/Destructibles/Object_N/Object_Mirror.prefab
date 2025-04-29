@@ -10,11 +10,11 @@ GameObject:
   m_Component:
   - component: {fileID: 5956262987438611228}
   - component: {fileID: 6298741086636373869}
+  - component: {fileID: 3657802295346505035}
   - component: {fileID: 8939102112077249444}
-  - component: {fileID: 7692665620956864949}
   m_Layer: 11
   m_Name: Object_Mirror
-  m_TagString: Untagged
+  m_TagString: Mirror
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 5c2525aa50c94445ca2bb5d0f763c99e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: cb125e285782d41c197e2d6d057adc64, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -86,31 +86,8 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &8939102112077249444
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1336672521626704782}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 730331104a6574bfa81c11cf15cdadfe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isInteractable: 1
-  interactionRange: 2
-  objectId: Object
-  interactSound: {fileID: 0}
-  interactSoundVolume: 1
-  rotationStep: 45
-  initialAngle: 50
-  canBeAttacked: 1
-  mirrorRenderer: {fileID: 0}
-  reflectEffect: {fileID: 0}
-  effectDuration: 0.2
---- !u!61 &7692665620956864949
-BoxCollider2D:
+--- !u!60 &3657802295346505035
+PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -138,7 +115,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -151,6 +128,110 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 0.85333335, y: 0.85333335}
-  m_EdgeRadius: 0
+  m_Points:
+    m_Paths:
+    - - {x: 0.22, y: -0.32}
+      - {x: 0.22, y: -0.3216667}
+      - {x: 0.22583334, y: -0.3216667}
+      - {x: 0.30333334, y: -0.32083336}
+      - {x: 0.31, y: -0.32}
+      - {x: 0.31416667, y: -0.3175}
+      - {x: 0.32916668, y: -0.29500002}
+      - {x: 0.34166667, y: -0.27}
+      - {x: 0.34166667, y: -0.2591667}
+      - {x: 0.32750002, y: -0.23083334}
+      - {x: 0.2825, y: -0.14583334}
+      - {x: 0.285, y: -0.13666667}
+      - {x: 0.26666668, y: -0.115}
+      - {x: 0.25, y: -0.083333336}
+      - {x: 0.22916667, y: -0.043333333}
+      - {x: 0.22583334, y: -0.028333334}
+      - {x: 0.205, y: 0.005}
+      - {x: 0.2025, y: 0.02}
+      - {x: 0.18416667, y: 0.041666668}
+      - {x: 0.16833334, y: 0.07333334}
+      - {x: 0.15416667, y: 0.1025}
+      - {x: 0.1525, y: 0.11333334}
+      - {x: 0.14, y: 0.13000001}
+      - {x: 0.12583333, y: 0.155}
+      - {x: 0.112500004, y: 0.18083334}
+      - {x: 0.100833334, y: 0.20583335}
+      - {x: 0.086666666, y: 0.23166667}
+      - {x: 0.045, y: 0.31}
+      - {x: 0.041666668, y: 0.31416667}
+      - {x: 0.02, y: 0.32500002}
+      - {x: 0.0025, y: 0.34833333}
+      - {x: 0, y: 0.34916666}
+      - {x: -0.005, y: 0.34916666}
+      - {x: -0.021666666, y: 0.32666668}
+      - {x: -0.025833335, y: 0.32500002}
+      - {x: -0.045833334, y: 0.315}
+      - {x: -0.04916667, y: 0.31166667}
+      - {x: -0.085, y: 0.24666667}
+      - {x: -0.094166666, y: 0.22583334}
+      - {x: -0.105000004, y: 0.20666668}
+      - {x: -0.10583334, y: 0.19916667}
+      - {x: -0.13833334, y: 0.1375}
+      - {x: -0.15916666, y: 0.105000004}
+      - {x: -0.15916666, y: 0.09583334}
+      - {x: -0.185, y: 0.043333333}
+      - {x: -0.2025, y: 0.019166667}
+      - {x: -0.20166667, y: 0.009166667}
+      - {x: -0.22083333, y: -0.024166668}
+      - {x: -0.22666667, y: -0.0275}
+      - {x: -0.22583334, y: -0.032500003}
+      - {x: -0.23166667, y: -0.046666667}
+      - {x: -0.23083334, y: -0.04916667}
+      - {x: -0.26000002, y: -0.105000004}
+      - {x: -0.26666668, y: -0.115}
+      - {x: -0.27083334, y: -0.125}
+      - {x: -0.28166667, y: -0.13916667}
+      - {x: -0.2875, y: -0.1575}
+      - {x: -0.30916667, y: -0.20333333}
+      - {x: -0.31083333, y: -0.205}
+      - {x: -0.33916667, y: -0.2616667}
+      - {x: -0.33916667, y: -0.26666668}
+      - {x: -0.32916668, y: -0.29000002}
+      - {x: -0.31333333, y: -0.31583333}
+      - {x: -0.3075, y: -0.32083336}
+      - {x: -0.23166667, y: -0.32083336}
+      - {x: -0.23166667, y: -0.32250002}
+      - {x: -0.21333334, y: -0.3216667}
+      - {x: -0.21333334, y: -0.32083336}
+      - {x: -0.10583334, y: -0.32083336}
+      - {x: -0.0675, y: -0.3216667}
+      - {x: -0.04, y: -0.3216667}
+      - {x: -0.010833333, y: -0.32083336}
+      - {x: -0.00083333335, y: -0.32500002}
+      - {x: 0.0058333334, y: -0.32500002}
+      - {x: 0.011666667, y: -0.32083336}
+      - {x: 0.07333334, y: -0.32083336}
+      - {x: 0.07416667, y: -0.32}
+  m_UseDelaunayMesh: 0
+--- !u!114 &8939102112077249444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1336672521626704782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 730331104a6574bfa81c11cf15cdadfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isInteractable: 1
+  interactionRange: 0.5
+  objectId: Object
+  interactSound: {fileID: 0}
+  interactSoundVolume: 1
+  rotationStep: 45
+  initialAngle: 0
+  canBeAttacked: 0
+  mirrorRenderer: {fileID: 0}
+  reflectEffect: {fileID: 0}
+  effectDuration: 0.2
+  showDebugRays: 1
+  debugRayLength: 2
+  useFixedDirection: 1
+  fixedReflectionOffset: 90

@@ -9,26 +9,36 @@ public class InvenSlotUI : MonoBehaviour
 {
     [Header("슬롯 정보")]
     [SerializeField] private TextMeshProUGUI itemName;
-    [SerializeField] public Image itemIcon;
+    [SerializeField] private Image itemIcon;
     [SerializeField] private TextMeshProUGUI itemNeedPoint;
     [SerializeField] private TextMeshProUGUI itemOwnPoint;
-    //[SerializeField] private TextMeshProUGUI itemDescription;
-
-    /*
-    [Header("특성 해금")]
-    [SerializeField] private Button unLockButton;
-    [SerializeField] private TextMeshProUGUI pointForUnLock;
-    */
+    [SerializeField] private Button slotInteractBtn;
 
     private ItemData utilityItemData;
     private Player player; //player의 특성 포인트 현황을 받아오기 위함 
 
     private int slotIndex = 0;
 
-    public void Start()
+    private void Start()
     {
-        //unLockButton.onClick.AddListener(() => UnLockUtilitySlot());
+        player = FindObjectOfType<Player>();
+
+
+        slotInteractBtn.onClick.AddListener(() => slotInteract());
+
     }
+
+    public void slotInteract()
+    {
+        if (utilityItemData.utilityPointForUnLock <= player.CurrentUtilityPoint)
+        {
+            Debug.Log("눌렀습니다!");
+            InvenInfoController.Instance.slotInteract
+            (utilityItemData.ItemDescription, utilityItemData.ItemName, utilityItemData.Icon,
+            utilityItemData.effectValue, utilityItemData.attributeType, utilityItemData.id);
+        }
+    }
+
 
     public void SetItem(ItemData item, Player player)
     {
@@ -44,11 +54,9 @@ public class InvenSlotUI : MonoBehaviour
         if (utilityItemData != null)
         {
             itemName.text = utilityItemData.ItemName;
-
-            //itemDescription.text = utilityItemData.ItemDescription;
-
             itemOwnPoint.text = player.utilityPoint.ToString(); //Player를 받아와야 함
             itemNeedPoint.text = utilityItemData.utilityPointForUnLock.ToString();
+
 
             if (player.utilityPoint >= utilityItemData.utilityPointForUnLock)
             {
@@ -82,6 +90,5 @@ public class InvenSlotUI : MonoBehaviour
             int maxPoint = utilityItemData.utilityPointForUnLock;
             itemOwnPoint.text = maxPoint.ToString();
         }
-
     }
 }

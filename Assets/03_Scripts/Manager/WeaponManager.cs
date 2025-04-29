@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System; // Action 사용을 위해 추가
 
 public class WeaponManager : Singleton<WeaponManager>
 {
@@ -45,6 +46,9 @@ public class WeaponManager : Singleton<WeaponManager>
     private Coroutine effectCoroutine; // 이펙트 코루틴 참조 저장
 
     private PlayerMovement playerMovement;
+
+    // 탄약 변경 시 호출되는 이벤트 선언
+    public event Action<int, int> OnAmmoChanged;
 
     private void Start()
     {
@@ -278,7 +282,7 @@ public class WeaponManager : Singleton<WeaponManager>
             // 압력 방출 사운드 재생
             if (audioSource != null && pressureReleaseSound != null && currentPressure > 0.3f)
             {
-                audioSource.pitch = Random.Range(0.8f, 1.2f);
+                audioSource.pitch = UnityEngine.Random.Range(0.8f, 1.2f);
                 audioSource.PlayOneShot(pressureReleaseSound, Mathf.Min(1.0f, currentPressure));
             }
 
@@ -381,7 +385,8 @@ public class WeaponManager : Singleton<WeaponManager>
 
         // 탄약 감소
         currentAmmo--;
-
+        // 탄약 변경 이벤트 호출
+        OnAmmoChanged?.Invoke(currentAmmo, maxAmmo);
         // 탄약 소진 시 재장전
         if (currentAmmo <= 0)
         {
@@ -515,7 +520,8 @@ public class WeaponManager : Singleton<WeaponManager>
 
         // 탄약 감소
         currentAmmo--;
-
+        // 탄약 변경 이벤트 호출
+        OnAmmoChanged?.Invoke(currentAmmo, maxAmmo);
         // 탄약 소진 시 재장전
         if (currentAmmo <= 0)
         {
@@ -555,6 +561,8 @@ public class WeaponManager : Singleton<WeaponManager>
         currentAmmo = maxAmmo;
         isReloading = false;
         Debug.Log("재장전 완료!");
+        // 탄약 변경 이벤트 호출
+        OnAmmoChanged?.Invoke(currentAmmo, maxAmmo);
     }
 
     // 현재 사용 중인 총알 속성 설정

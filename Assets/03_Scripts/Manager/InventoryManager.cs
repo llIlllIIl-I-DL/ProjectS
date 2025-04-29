@@ -283,11 +283,14 @@ public class InventoryManager : MonoBehaviour
             if (weaponAttribute != null && weaponAttribute.itemType == ItemType.WeaponAttribute)
             {
                 bulletType = weaponAttribute.elementType;
+
+                InvenInfoController.Instance.bulletDamage = weaponAttribute.damage;
+                InvenInfoController.Instance.bulletSpeed = weaponAttribute.attackSpeed;
             }
             
             // WeaponManager에 총알 타입 설정
             WeaponManager.Instance.SetBulletType(bulletType);
-            
+
             Debug.Log($"무기 총알 타입이 {bulletType}으로 변경되었습니다.");
         }
     }

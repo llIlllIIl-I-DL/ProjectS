@@ -35,28 +35,17 @@ public class CreatSlotSystem : MonoBehaviour
             Destroy(gameObject);
         }
 
+        player = FindObjectOfType<Player>();
 
+        InitInventoryUI();
         InitUtilityItemDataList();
     }
 
 
     public void Start()
     {
-        //UnLockUtilitySlot();
- 
-
-        InitInventoryUI();
         RefreshSlotUI();
     }
-
-    public void UnLockUtilitySlot() //각각의 특성 해금까지의 필요 포인트 도달 시 아이콘 활성화. 기본은 어둡게 깔려있음
-    {
-        foreach (var slot in slotList)
-        {
-            slot.itemIcon.color = Color.black;
-        }
-    }
-
 
     public void RefreshSlotUI()
     {
@@ -107,5 +96,7 @@ public class CreatSlotSystem : MonoBehaviour
         {
             slot.UpdateOwnPoint();
         }
+
+        player.UpdateCurrentInventory();
     }
 }

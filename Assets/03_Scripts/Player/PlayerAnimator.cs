@@ -153,7 +153,7 @@ public class PlayerAnimator : MonoBehaviour
         isPaused = true;
     }
 
-    // 애니메이션 재개 - 록맨 스타일
+    // 애니메이션 재개 \
     private void ResumeAnimation()
     {
         if (animator == null || !isPaused) return;

@@ -15,6 +15,8 @@ public class MapSplitterWindow : EditorWindow
     private bool createScenes = true;
     private bool splitJson = true;
     private bool regenerateSceneModules = true;
+    private int surroundingChunkRange = 3; // 주변 청크 생성 범위
+    private bool createSurroundingChunks = true; // 주변 청크 생성 옵션
     
     // 씬 템플릿 설정
     private SceneAsset sceneTemplate;
@@ -27,6 +29,9 @@ public class MapSplitterWindow : EditorWindow
     private int totalModulesCount = 0;
     private int totalChunksCount = 0;
     private Dictionary<Vector2Int, List<RoomData.PlacedModuleData>> chunkMap;
+    
+    // 청크 생성 범위 제한
+    private const int MAX_CHUNK_RANGE = 1000; // 최대 청크 범위 (±1000)
     
     // 접기/펼치기 상태
     private bool showSettings = true;
@@ -71,6 +76,16 @@ public class MapSplitterWindow : EditorWindow
             splitJson = EditorGUILayout.Toggle("JSON 분할", splitJson);
             createScenes = EditorGUILayout.Toggle("씬 생성", createScenes);
             regenerateSceneModules = EditorGUILayout.Toggle("SceneModules 다시 생성", regenerateSceneModules);
+            
+            // 주변 청크 생성 옵션 추가
+            createSurroundingChunks = EditorGUILayout.Toggle("주변 청크 생성", createSurroundingChunks);
+            if (createSurroundingChunks)
+            {
+                EditorGUI.indentLevel++;
+                surroundingChunkRange = EditorGUILayout.IntSlider("주변 청크 범위", surroundingChunkRange, 1, 5);
+                EditorGUI.indentLevel--;
+            }
+            
             EditorGUI.indentLevel--;
         }
         
@@ -234,6 +249,62 @@ public class MapSplitterWindow : EditorWindow
         {
             int processedChunks = 0;
             
+            // 주변 청크를 포함한 전체 청크 목록 생성
+            Dictionary<Vector2Int, List<RoomData.PlacedModuleData>> allChunks = new Dictionary<Vector2Int, List<RoomData.PlacedModuleData>>(chunkMap);
+            
+            // 주변 청크 생성 옵션이 활성화된 경우
+            if (createScenes && createSurroundingChunks)
+            {
+                // 기존 청크의 ID들을 복사
+                HashSet<Vector2Int> existingChunkIds = new HashSet<Vector2Int>(chunkMap.Keys);
+                
+                // 원본 청크 주변으로 빈 청크 추가
+                foreach (var chunkId in existingChunkIds)
+                {
+                    // 청크 ID 유효성 검사
+                    if (!IsValidChunkId(chunkId))
+                    {
+                        Debug.LogWarning($"유효하지 않은 청크 ID 건너뜀: {chunkId}");
+                        continue;
+                    }
+                    
+                    for (int x = -surroundingChunkRange; x <= surroundingChunkRange; x++)
+                    {
+                        for (int y = -surroundingChunkRange; y <= surroundingChunkRange; y++)
+                        {
+                            // 비정상적인 청크 ID가 생성되지 않도록 검사
+                            if (chunkId.x + x < -MAX_CHUNK_RANGE || chunkId.x + x > MAX_CHUNK_RANGE ||
+                                chunkId.y + y < -MAX_CHUNK_RANGE || chunkId.y + y > MAX_CHUNK_RANGE)
+                            {
+                                continue;
+                            }
+                            
+                            Vector2Int newChunkId = new Vector2Int(chunkId.x + x, chunkId.y + y);
+                            
+                            // 청크 ID 유효성 재검사
+                            if (!IsValidChunkId(newChunkId))
+                            {
+                                continue;
+                            }
+                            
+                            // 아직 존재하지 않는 청크인 경우 빈 모듈 리스트로 추가
+                            if (!allChunks.ContainsKey(newChunkId))
+                            {
+                                allChunks[newChunkId] = new List<RoomData.PlacedModuleData>();
+                                
+                                // 전체 범위 업데이트
+                                minChunk.x = Mathf.Min(minChunk.x, newChunkId.x);
+                                minChunk.y = Mathf.Min(minChunk.y, newChunkId.y);
+                                maxChunk.x = Mathf.Max(maxChunk.x, newChunkId.x);
+                                maxChunk.y = Mathf.Max(maxChunk.y, newChunkId.y);
+                            }
+                        }
+                    }
+                }
+                
+                Debug.Log($"주변 청크 추가됨: 원본 {chunkMap.Count}개 + 주변 {allChunks.Count - chunkMap.Count}개 = 총 {allChunks.Count}개 청크");
+            }
+            
             // 청크별 JSON 생성
             if (splitJson)
             {
@@ -244,6 +315,7 @@ public class MapSplitterWindow : EditorWindow
                     AssetDatabase.CreateFolder(Path.Combine(parts.Take(parts.Length - 1).ToArray()), parts.Last());
                 }
                 
+                // JSON은 모듈이 있는 원본 청크만 생성
                 foreach (var chunk in chunkMap)
                 {
                     float progress = (float)processedChunks / totalChunksCount;
@@ -266,9 +338,11 @@ public class MapSplitterWindow : EditorWindow
                     AssetDatabase.CreateFolder(Path.Combine(parts.Take(parts.Length - 1).ToArray()), parts.Last());
                 }
                 
-                foreach (var chunk in chunkMap)
+                // 모든 청크(원본 + 주변)에 대해 씬 생성
+                int totalAllChunks = allChunks.Count;
+                foreach (var chunk in allChunks)
                 {
-                    float progress = (float)processedChunks / totalChunksCount;
+                    float progress = (float)processedChunks / totalAllChunks;
                     EditorUtility.DisplayProgressBar("맵 분할 중", $"청크 씬 생성 중: {chunk.Key}", progress);
                     
                     // 청크별 씬 생성
@@ -281,12 +355,12 @@ public class MapSplitterWindow : EditorWindow
             if (regenerateSceneModules)
             {
                 EditorUtility.DisplayProgressBar("맵 분할 중", "SceneModuleData 생성 중...", 0.9f);
-                CreateSceneModuleData();
+                CreateSceneModuleData(allChunks);
             }
             
             AssetDatabase.Refresh();
             EditorUtility.DisplayProgressBar("맵 분할 중", "완료", 1.0f);
-            EditorUtility.DisplayDialog("완료", $"{totalChunksCount}개 청크 생성 완료!", "확인");
+            EditorUtility.DisplayDialog("완료", $"{allChunks.Count}개 청크 생성 완료!", "확인");
         }
         catch (Exception e)
         {
@@ -368,7 +442,7 @@ public class MapSplitterWindow : EditorWindow
         Debug.Log($"청크 씬 생성됨: {scenePath}");
     }
     
-    private void CreateSceneModuleData()
+    private void CreateSceneModuleData(Dictionary<Vector2Int, List<RoomData.PlacedModuleData>> allChunks)
     {
         // SceneModuleData는 MapManager의 일부이므로 먼저 찾아야 함
         MapManager mapManager = null;
@@ -400,7 +474,7 @@ public class MapSplitterWindow : EditorWindow
         Dictionary<string, List<string>> chunkGuids = new Dictionary<string, List<string>>();
         
         // 각 청크에 포함된 모듈 GUID 수집
-        foreach (var chunk in chunkMap)
+        foreach (var chunk in allChunks)
         {
             string chunkKey = $"Chunk_{chunk.Key.x}_{chunk.Key.y}";
             List<string> guids = new List<string>();
@@ -431,5 +505,27 @@ public class MapSplitterWindow : EditorWindow
         // 씬 저장
         EditorSceneManager.SaveOpenScenes();
         Debug.Log($"SceneModuleData 생성 완료: {mapManager.sceneModules.Count}개 씬");
+    }
+
+    /// <summary>
+    /// 청크 ID가 유효한지 검사
+    /// </summary>
+    private bool IsValidChunkId(Vector2Int chunkId)
+    {
+        // int.MinValue나 int.MaxValue에 가까운 비정상적인 값 체크
+        if (chunkId.x < -MAX_CHUNK_RANGE || chunkId.x > MAX_CHUNK_RANGE || 
+            chunkId.y < -MAX_CHUNK_RANGE || chunkId.y > MAX_CHUNK_RANGE)
+        {
+            return false;
+        }
+        
+        // 오버플로우 방지를 위한 추가 검사
+        if (chunkId.x == int.MinValue || chunkId.x == int.MaxValue || 
+            chunkId.y == int.MinValue || chunkId.y == int.MaxValue)
+        {
+            return false;
+        }
+        
+        return true;
     }
 } 

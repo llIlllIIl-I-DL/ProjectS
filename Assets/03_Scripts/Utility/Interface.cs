@@ -33,3 +33,8 @@ public interface IInteractable
 {
     void Interact(GameObject interactor);
 }
+
+public interface ILaserInteractable
+{
+    void OnLaserHit(Vector2 hitpoint, Vector2 direction); 
+}
