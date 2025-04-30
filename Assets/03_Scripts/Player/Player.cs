@@ -160,9 +160,9 @@ public class Player : MonoBehaviour
 
 
     // 플레이어 변동 스탯 관리
-    public void UpdateCurrentPlayerHP(float playerMaxHP)
+    public void UpdateCurrentPlayerHP(float playercurrentHP)
     {
-        CurrentMaxHP = playerMaxHP;
+        CurrentMaxHP = playercurrentHP;
 
         Debug.Log($"{CurrentMaxHP}");
         PlayerUI.Instance.UpdatePlayerHPInUItext();

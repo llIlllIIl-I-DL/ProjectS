@@ -34,29 +34,35 @@ public class InvenInfoController : MonoBehaviour
     private UtilityChangedStatController utilityChangedStatController;
 
 
-    public float maxAmmo;
+    [HideInInspector] public float maxAmmo;
 
-    public float bulletDamage;
-    public float bulletSpeed;
+    [HideInInspector] public float bulletDamage;
+    [HideInInspector] public float bulletSpeed;
+
+    //private bool isAableToDecrease = false;
+
+    Player player;
 
 
 
     public void Start()
     {
+        player = FindObjectOfType<Player>();
         utilityChangedStatController = GetComponent<UtilityChangedStatController>();
-        //bulletDamage = 0;
     }
 
-    public void slotInteract(string ItemDescription, string ItemName, Sprite ItemIcon, float effectValue, AttributeType attributeType, int id)
+    public void slotInteract(string ItemDescription, string ItemName, Sprite ItemIcon, float effectValue, AttributeType attributeType, int id, int utilityPointForUnLock)
     {
         descriptionTitle.text = ItemName;
         itemDescription.text = ItemDescription;
 
         utilityEquipBtn.onClick.RemoveAllListeners();
-        utilityEquipBtn.onClick.AddListener(() => UtilityEquipped(ItemIcon, effectValue, attributeType, id));
+        utilityEquipBtn.onClick.AddListener(() => UtilityEquipped(ItemIcon, effectValue, attributeType, id, utilityPointForUnLock));
+
+
     }
 
-    public void UtilityEquipped(Sprite ItemIcon, float effectValue, AttributeType attributeType, int id) //장착 시 실행 함수
+    public void UtilityEquipped(Sprite ItemIcon, float effectValue, AttributeType attributeType, int id, int utilityPointForUnLock) //장착 시 실행 함수
     {
         //플레이어 쪽의 현재 장착 중인 특성 아이콘 업데이트
         for (int i = 0; i < currentEquippedUtility.Count; i++)
@@ -69,6 +75,12 @@ public class InvenInfoController : MonoBehaviour
 
                 currentEquippedUtility[i].sprite = ItemIcon;
 
+                player.utilityPoint -= utilityPointForUnLock;
+                PlayerUI.Instance.utilityPointText.text = player.utilityPoint.ToString();
+                player.UpdateCurrentInventory();
+
+
+                utilityRemoveBtn.onClick.AddListener(() => UtilityRemoved(ItemIcon, effectValue, attributeType, id));
 
                 switch (id)
                 {
@@ -155,6 +167,16 @@ public class InvenInfoController : MonoBehaviour
 
                 return;
             }
+        }
+    }
+
+    public void UtilityRemoved(Sprite ItemIcon, float effectValue, AttributeType attributeType, int id)
+    {
+        switch (id)
+        {
+            case 1001:
+                utilityChangedStatController.RemovedMaxHPUP();
+                break;
         }
     }
 }

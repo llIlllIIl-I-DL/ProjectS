@@ -6,6 +6,21 @@ using UnityEngine;
 
 public class UtilityChangedStatController : MonoBehaviour
 {
+    private static UtilityChangedStatController instance;
+    public static UtilityChangedStatController Instance => instance;
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     public Player player;
     public PlayerHP playerHP;
@@ -19,6 +34,9 @@ public class UtilityChangedStatController : MonoBehaviour
     }
 
 
+    public float changedMaxHP;
+    public float actualIncrease;
+
 
 
     //해제는 어떻게 구현하면 좋을까...>>변화 값 지역 변수로 저장 후 해제 시 원본 값에서 변수값 제외하기!!
@@ -28,8 +46,22 @@ public class UtilityChangedStatController : MonoBehaviour
         playerHP.IncreaseMaxHP(effectValue);
         PlayerUI.Instance.UpdatePlayerHPInUItext();
 
-        player.UpdateCurrentPlayerHP(playerHP.MaxHP); //데이터 저장
+        player.UpdateCurrentPlayerHP(playerHP.CurrentHP); //데이터 저장
     }
+
+    public void RemovedMaxHPUP()
+    {
+        playerHP.DecreaseMaxHP(changedMaxHP, actualIncrease);
+
+        PlayerUI.Instance.UpdatePlayerHPInUItext();
+
+        player.UpdateCurrentPlayerHP(playerHP.CurrentHP); //데이터 저장
+
+    }
+
+
+
+
 
     public void MaxMPUP(float effectValue, float maxAmmo) //1002
     {
@@ -55,6 +87,11 @@ public class UtilityChangedStatController : MonoBehaviour
         //player.UpdateCurrentPlayerMP(maxMP); //데이터 저장용
     }
 
+
+
+
+
+
     public void ATKUP(float effectValue, float bulletDamage) //1003
     {
         float nowDamage = bulletDamage;
@@ -71,7 +108,7 @@ public class UtilityChangedStatController : MonoBehaviour
         //player.UpdateCurrentPlayerATK(bullet.damage); //데이터 저장용
     }
 
-    public void ATKSUP(float effectValue, float bulletSpeed) //1004
+    public void ATKSUP(float effectValue, float bulletSpeed) //1004 이거 weaponManager에 있는 speed로 바꿔야돼!!
     {
         float nowATKSpeed = bulletSpeed;
 
