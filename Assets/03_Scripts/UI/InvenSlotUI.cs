@@ -33,9 +33,7 @@ public class InvenSlotUI : MonoBehaviour
         if (utilityItemData.utilityPointForUnLock <= player.CurrentUtilityPoint)
         {
             Debug.Log("눌렀습니다!");
-            InvenInfoController.Instance.slotInteract
-            (utilityItemData.ItemDescription, utilityItemData.ItemName, utilityItemData.Icon,
-            utilityItemData.effectValue, utilityItemData.attributeType, utilityItemData.id, utilityItemData.utilityPointForUnLock);
+            InvenInfoController.Instance.slotInteract(utilityItemData);
         }
     }
 

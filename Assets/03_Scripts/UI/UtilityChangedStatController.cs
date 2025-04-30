@@ -27,19 +27,33 @@ public class UtilityChangedStatController : MonoBehaviour
 
     [SerializeField] Bullet bullet;
 
+    public List<ItemData> currentUtilityList = new List<ItemData>();//플레이어가 장착한 특성의 리스트
+    //UI 갱신은 이 리스트를 통해서....
+
+
     private void Start()
     {
         player = FindObjectOfType<Player>();
         playerHP = FindObjectOfType<PlayerHP>();
     }
 
-
     public float changedMaxHP;
     public float actualIncrease;
 
 
-
     //해제는 어떻게 구현하면 좋을까...>>변화 값 지역 변수로 저장 후 해제 시 원본 값에서 변수값 제외하기!!
+
+    public void EquippedUtility(ItemData itemData)
+    {
+        currentUtilityList.Add(itemData);
+    }
+
+    public void RemovedUtility(int id)
+    {
+        ItemData itemData = currentUtilityList.Find(utility => utility.id == id);
+
+        currentUtilityList.Remove(itemData);
+    }
 
     public void MaxHPUP(float effectValue) //1001
     {

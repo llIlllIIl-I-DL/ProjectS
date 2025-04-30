@@ -28,8 +28,10 @@ public class InvenInfoController : MonoBehaviour
     [SerializeField] private Button utilityEquipBtn;
     [SerializeField] private Button utilityRemoveBtn;
 
+
     [Header("현재 장착 중인 특성")]
-    [SerializeField] private List<Image> currentEquippedUtility;
+    [SerializeField] private List<Image> currentEquippedUtility; 
+
 
     private UtilityChangedStatController utilityChangedStatController;
 
@@ -38,8 +40,6 @@ public class InvenInfoController : MonoBehaviour
 
     [HideInInspector] public float bulletDamage;
     [HideInInspector] public float bulletSpeed;
-
-    //private bool isAableToDecrease = false;
 
     Player player;
 
@@ -51,20 +51,21 @@ public class InvenInfoController : MonoBehaviour
         utilityChangedStatController = GetComponent<UtilityChangedStatController>();
     }
 
-    public void slotInteract(string ItemDescription, string ItemName, Sprite ItemIcon, float effectValue, AttributeType attributeType, int id, int utilityPointForUnLock)
+    public void slotInteract(ItemData itemData)
     {
-        descriptionTitle.text = ItemName;
-        itemDescription.text = ItemDescription;
+        descriptionTitle.text = itemData.ItemName;
+        itemDescription.text = itemData.ItemDescription;
 
         utilityEquipBtn.onClick.RemoveAllListeners();
-        utilityEquipBtn.onClick.AddListener(() => UtilityEquipped(ItemIcon, effectValue, attributeType, id, utilityPointForUnLock));
+        utilityEquipBtn.onClick.AddListener(() => UtilityEquipped(itemData));
 
 
     }
 
-    public void UtilityEquipped(Sprite ItemIcon, float effectValue, AttributeType attributeType, int id, int utilityPointForUnLock) //장착 시 실행 함수
+    public void UtilityEquipped(ItemData itemData) //장착 시 실행 함수
     {
         //플레이어 쪽의 현재 장착 중인 특성 아이콘 업데이트
+
         for (int i = 0; i < currentEquippedUtility.Count; i++)
         {
             if (currentEquippedUtility[i].sprite == null)
@@ -73,38 +74,40 @@ public class InvenInfoController : MonoBehaviour
                 temp.a = 1f;
                 currentEquippedUtility[i].color = temp;
 
-                currentEquippedUtility[i].sprite = ItemIcon;
+                currentEquippedUtility[i].sprite = itemData.Icon;
 
-                player.utilityPoint -= utilityPointForUnLock;
+                player.utilityPoint -= itemData.utilityPointForUnLock;
                 PlayerUI.Instance.utilityPointText.text = player.utilityPoint.ToString();
                 player.UpdateCurrentInventory();
 
 
-                utilityRemoveBtn.onClick.AddListener(() => UtilityRemoved(ItemIcon, effectValue, attributeType, id));
+                utilityRemoveBtn.onClick.AddListener(() => UtilityRemoved(itemData.Icon, itemData.effectValue, itemData.attributeType, itemData.id));
 
-                switch (id)
+                utilityChangedStatController.EquippedUtility(itemData);
+
+                switch (itemData.id)
                 {
                     case 1001:
 
-                        utilityChangedStatController.MaxHPUP(effectValue);
+                        utilityChangedStatController.MaxHPUP(itemData.effectValue);
                         break;
 
 
                     case 1002:
 
                         maxAmmo = WeaponManager.Instance.maxAmmo;
-                        utilityChangedStatController.MaxMPUP(effectValue, maxAmmo);
+                        utilityChangedStatController.MaxMPUP(itemData.effectValue, maxAmmo);
 
                         break;
 
                     case 1003:
 
-                        utilityChangedStatController.ATKUP(effectValue, bulletDamage);
+                        utilityChangedStatController.ATKUP(itemData.effectValue, bulletDamage);
                         break;
 
                     case 1004:
 
-                        utilityChangedStatController.ATKSUP(effectValue, bulletSpeed);
+                        utilityChangedStatController.ATKSUP(itemData.effectValue, bulletSpeed);
 
                         break;
 
@@ -172,11 +175,27 @@ public class InvenInfoController : MonoBehaviour
 
     public void UtilityRemoved(Sprite ItemIcon, float effectValue, AttributeType attributeType, int id)
     {
-        switch (id)
+        //선택한 슬롯의 특성 아이콘이 remove되어야 하며 장착 된 특성 슬롯 중간에 빈칸이 생기면 남은 이미지들은 빈칸 없이 재배치 됨!
+        
+        for (int i = 0; i < currentEquippedUtility.Count; i++)
         {
-            case 1001:
-                utilityChangedStatController.RemovedMaxHPUP();
-                break;
+            if (currentEquippedUtility[i].sprite != null)
+            {
+                
+                Color temp = currentEquippedUtility[i].color;
+                temp.a = 0f;
+                currentEquippedUtility[i].color = temp;
+
+                utilityChangedStatController.RemovedUtility(id);
+        
+
+                switch (id)
+                {
+                    case 1001:
+                        utilityChangedStatController.RemovedMaxHPUP();
+                        break;
+                }
+            }
         }
     }
 }
