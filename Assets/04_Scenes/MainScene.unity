@@ -844,6 +844,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 645074951903564137, guid: 9bab26b6324cbcb4890ab662b9a2af0d, type: 3}
+      propertyPath: m_BiasY
+      value: -0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 645074951903564137, guid: 9bab26b6324cbcb4890ab662b9a2af0d, type: 3}
       propertyPath: m_ScreenY
       value: 0.65
       objectReference: {fileID: 0}
@@ -852,8 +856,16 @@ PrefabInstance:
       value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 645074951903564137, guid: 9bab26b6324cbcb4890ab662b9a2af0d, type: 3}
+      propertyPath: m_SoftZoneWidth
+      value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 645074951903564137, guid: 9bab26b6324cbcb4890ab662b9a2af0d, type: 3}
       propertyPath: m_DeadZoneHeight
       value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 645074951903564137, guid: 9bab26b6324cbcb4890ab662b9a2af0d, type: 3}
+      propertyPath: m_SoftZoneHeight
+      value: 0.58
       objectReference: {fileID: 0}
     - target: {fileID: 645074951903564137, guid: 9bab26b6324cbcb4890ab662b9a2af0d, type: 3}
       propertyPath: m_LookaheadSmoothing
