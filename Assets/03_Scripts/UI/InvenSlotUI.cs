@@ -28,15 +28,11 @@ public class InvenSlotUI : MonoBehaviour
 
     }
 
-    public void slotInteract()
+    public void slotInteract() //포인트 모자랄 때 슬롯 비활성화해주는 메서드도 만들어야 함, 한번 unlock했던 슬롯은 계속 활성화되게!
     {
-        if (utilityItemData.utilityPointForUnLock <= player.CurrentUtilityPoint)
-        {
+
             Debug.Log("눌렀습니다!");
-            InvenInfoController.Instance.slotInteract
-            (utilityItemData.ItemDescription, utilityItemData.ItemName, utilityItemData.Icon,
-            utilityItemData.effectValue, utilityItemData.attributeType, utilityItemData.id);
-        }
+            InvenInfoController.Instance.SlotInteract(utilityItemData); //특성 슬롯 눌렀을 시 실행되는 함수.
     }
 
 

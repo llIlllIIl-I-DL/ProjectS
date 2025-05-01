@@ -29,8 +29,8 @@ MonoBehaviour:
   jumpBufferTime: 0.1
   doubleJumpForceMultiplier: 0.8
   canDoubleJump: 0
-  dashSpeed: 6
-  dashDuration: 0.2
+  dashSpeed: 8
+  dashDuration: 0.3
   dashCooldown: 0.8
   wallSlideSpeed: 1.5
   wallSlideAcceleration: 5

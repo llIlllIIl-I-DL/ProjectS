@@ -4291,7 +4291,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC124\uBA85 \uC124\uBA85"
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e57dba4986f585a44a2a724235e41ceb, type: 2}
   m_sharedMaterial: {fileID: 8998966611788895184, guid: e57dba4986f585a44a2a724235e41ceb, type: 2}
@@ -5599,7 +5599,9 @@ MonoBehaviour:
   - {fileID: 1995145091251862759}
   - {fileID: 2680566255104113744}
   - {fileID: 3899814947860808607}
+  maxAmmo: 0
   bulletDamage: 0
+  bulletSpeed: 0
 --- !u!114 &6088920734943119367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5612,7 +5614,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b21c92fcb7379aa499a827e63fca70ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  playerHP: {fileID: 0}
   bullet: {fileID: 8529992230163698548, guid: e4992159c28c2e24ba7b726d9457aee1, type: 3}
+  currentUtilityList: []
+  changedMaxHP: 0
+  actualIncrease: 0
 --- !u!1 &3113945353657093581
 GameObject:
   m_ObjectHideFlags: 0
@@ -6880,7 +6887,7 @@ MonoBehaviour:
   typeName: {fileID: 1893027840929886486}
   typeIcon: {fileID: 8087937150057085035}
   slotBackground: {fileID: 3921032060081057120}
-  attributeTypeData: {fileID: 0}
+  attributeTypeData: {fileID: 11400000, guid: 33f30d3fb4330074780e94934cdd8542, type: 2}
   slotElementType: 2
 --- !u!1 &3675026358356682383
 GameObject:
@@ -9831,7 +9838,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1642423815136021122
 RectTransform:
   m_ObjectHideFlags: 0
@@ -16309,10 +16316,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uB098\uB294 \uD578\uB4E4\uC774 \uB3CC\uC544\uAC04 8\uD1A4 \uD2B8\uB7ED
-    \uB0B4 \uC778\uC0DD\uC740 \uC5B8\uC81C\uB098 \uC090\uB531\uC120 \uC138\uC0C1\uC774\uB780
-    \uD559\uAD50\uC5D0 \uC785\uD559 \uC804 \uB098\uB294 \uAFC8\uC774\uB77C\uB294
-    \uBCF4\uBB3C \uCC3E\uC544 \uC720\uB791\uD558\uB294 \uD574\uC801\uC120"
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e57dba4986f585a44a2a724235e41ceb, type: 2}
   m_sharedMaterial: {fileID: 8998966611788895184, guid: e57dba4986f585a44a2a724235e41ceb, type: 2}

@@ -171,14 +171,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7285975119b3e4fa3beea7a41f5ac9c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 200
-  currentHealth: 200
+  maxHealth: 20
+  currentHealth: 20
   possibleDrops: []
   dropChance: 0.3
   moveSpeed: 3
   attackPower: 10
-  attackRange: 3
-  detectionRange: 5
+  attackRange: 4
+  detectionRange: 7
   contactDamage: 1
   dealsDamageOnContact: 1
   patrolDistance: 5
@@ -188,7 +188,7 @@ MonoBehaviour:
   chargePower: 10
   chargeDistance: 5
   chargeSpeed: 5
-  chargeCooldown: 3
+  chargeCooldown: 5
   slamPower: 5
   slamJumpPower: 0
   slamDistance: 3

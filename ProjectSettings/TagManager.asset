@@ -10,6 +10,9 @@ TagManager:
   - Cog
   - Mirror
   - Destructible
+  - Platform
+  - Ground
+  - Ladder
   layers:
   - Default
   - TransparentFX
