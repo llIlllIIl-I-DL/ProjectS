@@ -70,26 +70,27 @@ public class UtilityChangedStatController : MonoBehaviour
         }
     }
 
-    public void RemovedUtility(int id)
+    public void RemovedUtility(int id) //현재 선택한 슬롯에 할당 된 특성SO의 id값을 갖고온다!
     {
-        int removeIndex = currentUtilityList.FindIndex(u => u.id == id);
-        if (removeIndex < 0) return;
+        int removeIndex = currentUtilityList.FindIndex(u => u.id == id); //FindIndex = 특정 값에 일치하는 아이템의 인덱스 리턴
+        if (removeIndex < 0) return; //못 찾았을 경우 실행x
 
         // 데이터 제거
-        currentUtilityList.RemoveAt(removeIndex);
+        currentUtilityList.RemoveAt(removeIndex); //해제했기 때문에 currentUtilityList에서 제거!
 
         // UI 업데이트
-        for (int i = 0; i < invenInfoController.currentEquippedUtility.Count; i++)
+        for (int i = 0; i < invenInfoController.currentEquippedUtility.Count; i++) //4번 반복
         {
-            Image slot = invenInfoController.currentEquippedUtility[i];
-            if (i < currentUtilityList.Count)
+            Image slot = invenInfoController.currentEquippedUtility[i]; //0번 슬롯 UI(Image) 부터 시작
+
+            if (i < currentUtilityList.Count) //현재 장착 중인 특성 갯수를 계산
             {
-                slot.sprite = currentUtilityList[i].Icon;
+                slot.sprite = currentUtilityList[i].Icon; //첫번째 슬롯부터 Icon이미지가 쌓이도록 재배치
                 var color = slot.color;
                 color.a = 1f;
                 slot.color = color;
             }
-            else
+            else //i > currentUtilityList.Count = 이 앞으로는 빈칸이다!
             {
                 slot.sprite = null;
                 var color = slot.color;

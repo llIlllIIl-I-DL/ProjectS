@@ -54,14 +54,10 @@ public class EnemyDust : BaseEnemy
     /// <summary>
     /// 데미지 처리
     /// </summary>
-    public override void TakeDamage(float damage)
-    {
-        base.TakeDamage(damage);
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
-    }
+    // public override void TakeDamage(float damage)
+    // {
+    //     base.TakeDamage(damage);
+    // }
     #endregion
 
     #region Core Methods
