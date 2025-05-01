@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6200365022326256820}
   m_Layer: 0
   m_Name: Object_Wall
-  m_TagString: Untagged
+  m_TagString: Destructible
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.16, y: -1.34, z: -0.16201721}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.4315, y: 0.4119, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -143,11 +143,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4b5aaccc2eae4494a7cfe150b864418, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 10
-  currentHealth: 10
+  maxHealth: 5
+  currentHealth: 5
   possibleDrops: []
   dropChance: 0.3
-  destroyEffectPrefab: {fileID: 0}
+  destroyEffectPrefab: {fileID: 6518603070700440181, guid: 594fe06cd962e40f290d96a83d21fae6, type: 3}
   dustEffectPrefab: {fileID: 0}
   destroySound: {fileID: 0}
   hitSound: {fileID: 0}

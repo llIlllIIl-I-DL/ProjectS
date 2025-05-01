@@ -74,6 +74,17 @@ public abstract class Bullet : MonoBehaviour
                 Destroy(gameObject);
             }
         }
+
+        // 파괴 가능한 오브젝트 확인
+        if (other.CompareTag("Destructible"))
+        {
+            DestructibleObject destructible = other.GetComponent<DestructibleObject>();
+            if (destructible != null)
+            {
+                destructible.TakeDamage(damage);
+                Destroy(gameObject);
+            }
+        }
         
         // 적 레이어 확인
         if (other.CompareTag("Enemy"))
