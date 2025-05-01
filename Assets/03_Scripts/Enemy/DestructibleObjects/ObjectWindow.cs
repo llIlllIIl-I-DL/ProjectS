@@ -31,6 +31,7 @@ public class ObjectWindow : DestructibleObject
     public override void TakeDamage(float damage)
     {
         base.TakeDamage(damage);
+        Debug.Log("유리창이 피해를 입었습니다.");
     }
     
     public override void PlayDestructionEffect()

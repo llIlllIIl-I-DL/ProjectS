@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4410121900498740424}
   m_Layer: 0
   m_Name: Object_Window
-  m_TagString: Untagged
+  m_TagString: Destructible
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -143,8 +143,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 204456bec52a54ed494e704f261f90b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 2
-  currentHealth: 2
+  maxHealth: 5
+  currentHealth: 5
   possibleDrops: []
   dropChance: 0.3
   destroyEffectPrefab: {fileID: 9002412034580591336, guid: f1cc85886470c4439807cdfe8684bee1, type: 3}

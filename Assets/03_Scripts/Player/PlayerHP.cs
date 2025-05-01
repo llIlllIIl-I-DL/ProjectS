@@ -38,6 +38,7 @@ public class PlayerHP : MonoBehaviour, IDamageable
         {
             PlayerUI.Instance.SetHealthBar(maxHP, currentHP);
             playerStateManager.ChangeState(PlayerStateType.Hit);
+            PlayerUI.Instance.UpdatePlayerHPInUItext();
         }
 
         if (currentHP <= 0)
@@ -65,10 +66,21 @@ public class PlayerHP : MonoBehaviour, IDamageable
         // 현재 HP도 최대 HP를 초과하지 않도록 조정
 
         float previousCurrentHP = currentHP;
-        currentHP = Mathf.Clamp(currentHP + actualIncrease, MIN_HP, maxHP);
+        currentHP = currentHP + changedMaxHP;
+
+        UtilityChangedStatController.Instance.changedMaxHP = changedMaxHP;
+        UtilityChangedStatController.Instance.actualIncrease = actualIncrease;
+
 
         Debug.Log($"최대 HP가 {maxHP - previousMaxHP}만큼 증가했습니다. 새로운 최대 HP: {maxHP}");
     }
+
+    public void DecreaseMaxHP(float changedMaxHP, float actualIncrease)
+    {
+        maxHP -= changedMaxHP;
+        currentHP = currentHP - changedMaxHP;
+    }
+
 
     // 체력 초기화 (부활 시 사용)
     public void ResetHealth()

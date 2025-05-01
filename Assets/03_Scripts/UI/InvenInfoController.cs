@@ -28,133 +28,165 @@ public class InvenInfoController : MonoBehaviour
     [SerializeField] private Button utilityEquipBtn;
     [SerializeField] private Button utilityRemoveBtn;
 
-    [Header("현재 장착 중인 특성")]
-    [SerializeField] private List<Image> currentEquippedUtility;
+
+    [Header("현재 장착 중인 특성 이미지")]
+    [SerializeField] public List<Image> currentEquippedUtility;
+
 
     private UtilityChangedStatController utilityChangedStatController;
+    private ItemData selectedItem; //선택한 슬롯에 담겨있는 특성 SO
 
+    [HideInInspector] public float maxAmmo;
 
-    public float maxAmmo;
-
-    public float bulletDamage;
-    public float bulletSpeed;
-
-
+    [HideInInspector] public float bulletDamage;
+    [HideInInspector] public float bulletSpeed;
 
     public void Start()
     {
         utilityChangedStatController = GetComponent<UtilityChangedStatController>();
-        //bulletDamage = 0;
     }
 
-    public void slotInteract(string ItemDescription, string ItemName, Sprite ItemIcon, float effectValue, AttributeType attributeType, int id)
+    public void SlotInteract(ItemData itemData)
     {
-        descriptionTitle.text = ItemName;
-        itemDescription.text = ItemDescription;
+        utilityEquipBtn.onClick.RemoveAllListeners(); //장착 버튼 리스너 초기화
+        utilityRemoveBtn.onClick.RemoveAllListeners(); //해제 버튼 리스너 초기화
 
-        utilityEquipBtn.onClick.RemoveAllListeners();
-        utilityEquipBtn.onClick.AddListener(() => UtilityEquipped(ItemIcon, effectValue, attributeType, id));
+        descriptionTitle.text = itemData.ItemName;
+        itemDescription.text = itemData.ItemDescription;
+
+        selectedItem = itemData; //선택한 슬롯 데이터를 selectedItem변수에 할당
+
+
+        utilityEquipBtn.onClick.AddListener(() => UtilityEquipped(itemData));
+
+        utilityRemoveBtn.onClick.AddListener(UtilityRemoved); //버튼들 리스너 등록
+
+
     }
 
-    public void UtilityEquipped(Sprite ItemIcon, float effectValue, AttributeType attributeType, int id) //장착 시 실행 함수
+    public void UtilityEquipped(ItemData itemData) //장착 시 실행 함수
     {
-        //플레이어 쪽의 현재 장착 중인 특성 아이콘 업데이트
-        for (int i = 0; i < currentEquippedUtility.Count; i++)
+        utilityChangedStatController.EquippedUtility(itemData); //특성 장착시 UI 업데이트
+
+        switch (itemData.id) //선택한 슬롯 내의 특성 데이터 속 id값을 받아옴
         {
-            if (currentEquippedUtility[i].sprite == null)
-            {
-                Color temp = currentEquippedUtility[i].color;
-                temp.a = 1f;
-                currentEquippedUtility[i].color = temp;
+            case 1001:
 
-                currentEquippedUtility[i].sprite = ItemIcon;
+                utilityChangedStatController.MaxHPUP(itemData.effectValue);
+                break;
 
 
-                switch (id)
-                {
-                    case 1001:
+            case 1002:
 
-                        utilityChangedStatController.MaxHPUP(effectValue);
-                        break;
+                maxAmmo = WeaponManager.Instance.maxAmmo;
+                utilityChangedStatController.MaxMPUP(itemData.effectValue, maxAmmo);
 
+                break;
 
-                    case 1002:
+            case 1003:
 
-                        maxAmmo = WeaponManager.Instance.maxAmmo;
-                        utilityChangedStatController.MaxMPUP(effectValue, maxAmmo);
+                utilityChangedStatController.ATKUP(itemData.effectValue, bulletDamage);
+                break;
 
-                        break;
+            case 1004:
 
-                    case 1003:
+                utilityChangedStatController.ATKSUP(itemData.effectValue, bulletSpeed);
 
-                        utilityChangedStatController.ATKUP(effectValue, bulletDamage);
-                        break;
+                break;
 
-                    case 1004:
+            case 1005:
 
-                        utilityChangedStatController.ATKSUP(effectValue, bulletSpeed);
+                Debug.Log("저는 1005번입니다");
+                break;
 
-                        break;
+            case 1006:
 
-                    case 1005:
+                Debug.Log("저는 1006번입니다");
+                break;
 
-                        Debug.Log("저는 1005번입니다");
-                        break;
+            case 1007:
 
-                    case 1006:
+                Debug.Log("저는 1007번입니다");
+                break;
 
-                        Debug.Log("저는 1006번입니다");
-                        break;
+            case 1008:
 
-                    case 1007:
+                Debug.Log("저는 1008번입니다");
+                break;
 
-                        Debug.Log("저는 1007번입니다");
-                        break;
+            case 1009:
 
-                    case 1008:
+                Debug.Log("저는 1009번입니다");
+                break;
 
-                        Debug.Log("저는 1008번입니다");
-                        break;
+            case 1010:
 
-                    case 1009:
+                Debug.Log("저는 1010번입니다");
+                break;
 
-                        Debug.Log("저는 1009번입니다");
-                        break;
+            case 1011:
 
-                    case 1010:
+                Debug.Log("저는 1011번입니다");
+                break;
 
-                        Debug.Log("저는 1010번입니다");
-                        break;
+            case 1012:
 
-                    case 1011:
+                Debug.Log("저는 1012번입니다");
+                break;
 
-                        Debug.Log("저는 1011번입니다");
-                        break;
+            case 1013:
 
-                    case 1012:
+                Debug.Log("저는 1013번입니다");
+                break;
 
-                        Debug.Log("저는 1012번입니다");
-                        break;
+            case 1014:
 
-                    case 1013:
+                Debug.Log("저는 1014번입니다");
+                break;
 
-                        Debug.Log("저는 1013번입니다");
-                        break;
+            case 1015:
 
-                    case 1014:
+                Debug.Log("저는 1015번입니다");
+                break;
 
-                        Debug.Log("저는 1014번입니다");
-                        break;
-
-                    case 1015:
-
-                        Debug.Log("저는 1015번입니다");
-                        break;
-
-                }
-
-                return;
-            }
         }
+
+        return;
+
+
+    }
+
+    public void UtilityRemoved() //특성 해제
+    {
+        if (selectedItem == null) return;
+
+        utilityChangedStatController.RemovedUtility(selectedItem.id); //특성 장착시 UI 업데이트
+
+
+        switch (selectedItem.id)
+        {
+            case 1001:
+                utilityChangedStatController.RemovedMaxHPUP();
+                break;
+
+            case 1002:
+                utilityChangedStatController.RemovedMaxMPUP();
+                break;
+
+            case 1003:
+                utilityChangedStatController.RemovedATKUP();
+                break;
+
+            case 1004:
+                utilityChangedStatController.RemovedATKSUP();
+                break;
+
+        }
+
+        utilityRemoveBtn.onClick.RemoveAllListeners();
+        selectedItem = null;
+
+        //해제 버튼 비활성화
+        //utilityRemoveBtn.interactable = false;
     }
 }
