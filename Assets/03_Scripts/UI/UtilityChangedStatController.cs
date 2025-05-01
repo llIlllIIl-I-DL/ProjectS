@@ -46,7 +46,7 @@ public class UtilityChangedStatController : MonoBehaviour
     public float changedMaxHP;
     public float actualIncrease;
 
-    public void EquippedUtility(ItemData itemData)
+    public void EquippedUtility(ItemData itemData) //UI 업데이트
     {
         currentUtilityList.Add(itemData);
 
@@ -63,7 +63,7 @@ public class UtilityChangedStatController : MonoBehaviour
                 player.utilityPoint -= itemData.utilityPointForUnLock;
                 PlayerUI.Instance.utilityPointText.text = player.utilityPoint.ToString();
 
-                player.UpdateCurrentInventory();
+                player.UpdateCurrentInventory(); //현재는 플레이어 포인트 현황만 업데이트 중
             }
         }
     }
@@ -76,43 +76,25 @@ public class UtilityChangedStatController : MonoBehaviour
         // 데이터 제거
         currentUtilityList.RemoveAt(removeIndex);
 
-        // UI 재구성
+        // UI 업데이트
         for (int i = 0; i < invenInfoController.currentEquippedUtility.Count; i++)
         {
             Image slot = invenInfoController.currentEquippedUtility[i];
             if (i < currentUtilityList.Count)
             {
                 slot.sprite = currentUtilityList[i].Icon;
-                var c = slot.color; c.a = 1f; slot.color = c;
+                var color = slot.color;
+                color.a = 1f;
+                slot.color = color;
             }
             else
             {
                 slot.sprite = null;
-                var c = slot.color; c.a = 0f; slot.color = c;
+                var color = slot.color;
+                color.a = 0f;
+                slot.color = color;
             }
         }
-
-        /*
-        int removeIndex = currentUtilityList.FindIndex(u => u.id == id);
-
-        if (removeIndex < 0)
-        {
-            Debug.LogWarning($"삭제하려는 유틸리티(id={id})가 리스트에 없음");
-            return;
-        }
-
-        //데이터 리스트에서 해당 아이템을 제거
-        currentUtilityList.RemoveAt(removeIndex);
-
-
-        Image slot = invenInfoController.currentEquippedUtility[removeIndex];
-
-
-        slot.sprite = null;
-        var c = slot.color;
-        c.a = 1f;
-        slot.color = c;
-        */
     }
 
 

@@ -34,50 +34,41 @@ public class InvenInfoController : MonoBehaviour
 
 
     private UtilityChangedStatController utilityChangedStatController;
-    private ItemData selectedItem;
-
+    private ItemData selectedItem; //선택한 슬롯에 담겨있는 특성 SO
 
     [HideInInspector] public float maxAmmo;
 
     [HideInInspector] public float bulletDamage;
     [HideInInspector] public float bulletSpeed;
 
-    Player player;
-
-
-
     public void Start()
     {
-        player = FindObjectOfType<Player>();
         utilityChangedStatController = GetComponent<UtilityChangedStatController>();
     }
 
-    public void slotInteract(ItemData itemData)
+    public void SlotInteract(ItemData itemData)
     {
-        utilityEquipBtn.onClick.RemoveAllListeners();
-        utilityRemoveBtn.onClick.RemoveAllListeners();
+        utilityEquipBtn.onClick.RemoveAllListeners(); //장착 버튼 리스너 초기화
+        utilityRemoveBtn.onClick.RemoveAllListeners(); //해제 버튼 리스너 초기화
 
-        // (2) UI에 아이템 정보 세팅
         descriptionTitle.text = itemData.ItemName;
         itemDescription.text = itemData.ItemDescription;
 
-        // (3) selectedItem 갱신
-        selectedItem = itemData;
+        selectedItem = itemData; //선택한 슬롯 데이터를 selectedItem변수에 할당
 
-        // (4) 장착 버튼 리스너 등록
+
         utilityEquipBtn.onClick.AddListener(() => UtilityEquipped(itemData));
 
-        // (5) 제거 버튼 리스너 등록 (한 번만!)
-        utilityRemoveBtn.onClick.AddListener(UtilityRemoved);
+        utilityRemoveBtn.onClick.AddListener(UtilityRemoved); //버튼들 리스너 등록
 
 
     }
 
     public void UtilityEquipped(ItemData itemData) //장착 시 실행 함수
     {
-        utilityChangedStatController.EquippedUtility(itemData);
+        utilityChangedStatController.EquippedUtility(itemData); //특성 장착시 UI 업데이트
 
-        switch (itemData.id)
+        switch (itemData.id) //선택한 슬롯 내의 특성 데이터 속 id값을 받아옴
         {
             case 1001:
 
@@ -165,12 +156,12 @@ public class InvenInfoController : MonoBehaviour
 
     }
 
-    public void UtilityRemoved()
+    public void UtilityRemoved() //특성 해제
     {
         if (selectedItem == null) return;
 
-        // 1) 데이터/UI 실제 해제
-        utilityChangedStatController.RemovedUtility(selectedItem.id);
+        utilityChangedStatController.RemovedUtility(selectedItem.id); //특성 장착시 UI 업데이트
+
 
         switch (selectedItem.id)
         {
@@ -195,7 +186,7 @@ public class InvenInfoController : MonoBehaviour
         utilityRemoveBtn.onClick.RemoveAllListeners();
         selectedItem = null;
 
-        // (옵션) 제거 버튼 비활성화
-        utilityRemoveBtn.interactable = false;
+        //해제 버튼 비활성화
+        //utilityRemoveBtn.interactable = false;
     }
 }

@@ -33,7 +33,7 @@ public class InvenSlotUI : MonoBehaviour
         if (utilityItemData.utilityPointForUnLock <= player.CurrentUtilityPoint)
         {
             Debug.Log("눌렀습니다!");
-            InvenInfoController.Instance.slotInteract(utilityItemData);
+            InvenInfoController.Instance.SlotInteract(utilityItemData); //특성 슬롯 눌렀을 시 실행되는 함수.
         }
     }
 
