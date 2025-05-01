@@ -152,6 +152,8 @@ public class CostumeSetUI : MonoBehaviour
             
             // 인벤토리에 모든 파츠가 있는지 확인
             Dictionary<int, bool> partsStatus = costumeManager.GetPartsCollectionStatus(costumeSetData.costumeId);
+            
+            // 초기값을 true로 설정하고, 부족한 파츠가 있을 때만 false로 설정
             hasAllParts = true;
             
             Debug.Log($"파츠 상태 확인 - 총 {costumeSetData.requiredParts.Count}개 파츠 필요");
@@ -162,29 +164,30 @@ public class CostumeSetUI : MonoBehaviour
                 if (part != null)
                 {
                     bool hasPart = partsStatus.ContainsKey(part.id) && partsStatus[part.id];
-                    Debug.Log($"파츠 '{part.ItemName}' 보유 여부: {hasPart}");
+                    Debug.Log($"파츠 '{part.ItemName}' 보유 여부: {hasPart}, ID: {part.id}");
                     
                     if (!hasPart)
                     {
                         hasAllParts = false;
+                        break; // 하나라도 없으면 반복문 종료
                     }
                 }
             }
             
-            Debug.Log($"모든 파츠 보유 여부: {hasAllParts}");
+            // 해금 상태 강제 재확인
+            if (hasAllParts && !isUnlocked)
+            {
+                Debug.Log("모든 파츠를 가지고 있지만 해금되지 않은 상태입니다. CostumeManager에 해금 요청");
+                costumeManager.CheckCostumeUnlocks(costumeSetData.costumeId);
+                // 상태 다시 확인
+                isUnlocked = costumeSetData.isUnlocked;
+            }
+            
+            Debug.Log($"최종 확인 - 모든 파츠 보유 여부: {hasAllParts}, 해금 상태: {isUnlocked}");
         }
         else
         {
             Debug.LogWarning("costumeManager가 null입니다.");
-        }
-
-        // 게임 상태는 무시하고 항상 활성화 가능하도록 설정
-        // bool isGamePlaying = true; // 사용하지 않는 변수 제거
-        
-        if (gameManager != null) 
-        {
-            // 로그 출력만 하고 조건에는 영향을 주지 않음
-            Debug.Log($"게임 상태: {gameManager.CurrentState}, 실제 플레이 중은 아니지만 버튼은 활성화합니다.");
         }
 
         // 버튼 텍스트 설정
@@ -206,7 +209,6 @@ public class CostumeSetUI : MonoBehaviour
         if (unlockButton != null)
         {
             // 세트가 해금되어 있고, 활성화 상태가 아니며, 모든 파츠가 인벤토리에 있으면 버튼 활성화
-            // gameState 조건 제거
             unlockButton.interactable = isUnlocked && !isActive && hasAllParts;
             
             Debug.Log($"버튼 활성화 상태: {unlockButton.interactable}");
