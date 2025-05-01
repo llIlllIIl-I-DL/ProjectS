@@ -9,9 +9,6 @@ TagManager:
   - InfoUI
   - Cog
   - Mirror
-  - Ground
-  - Platform
-  - Ladder
   layers:
   - Default
   - TransparentFX
