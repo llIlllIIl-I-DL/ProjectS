@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UtilityChangedStatController : MonoBehaviour
 {
@@ -27,6 +29,9 @@ public class UtilityChangedStatController : MonoBehaviour
 
     [SerializeField] Bullet bullet;
 
+    private InvenInfoController invenInfoController;
+
+    [Header("장착 중인 특성 아이템 데이터")]
     public List<ItemData> currentUtilityList = new List<ItemData>();//플레이어가 장착한 특성의 리스트
     //UI 갱신은 이 리스트를 통해서....
 
@@ -35,25 +40,81 @@ public class UtilityChangedStatController : MonoBehaviour
     {
         player = FindObjectOfType<Player>();
         playerHP = FindObjectOfType<PlayerHP>();
+        invenInfoController = GetComponent<InvenInfoController>();
     }
 
     public float changedMaxHP;
     public float actualIncrease;
 
-
-    //해제는 어떻게 구현하면 좋을까...>>변화 값 지역 변수로 저장 후 해제 시 원본 값에서 변수값 제외하기!!
-
     public void EquippedUtility(ItemData itemData)
     {
         currentUtilityList.Add(itemData);
+
+
+        for (int i = 0; i < currentUtilityList.Count; i++)
+        {
+            if (invenInfoController.currentEquippedUtility[i].sprite == null)
+            {
+                Color temp = invenInfoController.currentEquippedUtility[i].color;
+                temp.a = 1f;
+                invenInfoController.currentEquippedUtility[i].color = temp;
+                invenInfoController.currentEquippedUtility[i].sprite = itemData.Icon;
+
+                player.utilityPoint -= itemData.utilityPointForUnLock;
+                PlayerUI.Instance.utilityPointText.text = player.utilityPoint.ToString();
+
+                player.UpdateCurrentInventory();
+            }
+        }
     }
 
     public void RemovedUtility(int id)
     {
-        ItemData itemData = currentUtilityList.Find(utility => utility.id == id);
+        int removeIndex = currentUtilityList.FindIndex(u => u.id == id);
+        if (removeIndex < 0) return;
 
-        currentUtilityList.Remove(itemData);
+        // 데이터 제거
+        currentUtilityList.RemoveAt(removeIndex);
+
+        // UI 재구성
+        for (int i = 0; i < invenInfoController.currentEquippedUtility.Count; i++)
+        {
+            Image slot = invenInfoController.currentEquippedUtility[i];
+            if (i < currentUtilityList.Count)
+            {
+                slot.sprite = currentUtilityList[i].Icon;
+                var c = slot.color; c.a = 1f; slot.color = c;
+            }
+            else
+            {
+                slot.sprite = null;
+                var c = slot.color; c.a = 0f; slot.color = c;
+            }
+        }
+
+        /*
+        int removeIndex = currentUtilityList.FindIndex(u => u.id == id);
+
+        if (removeIndex < 0)
+        {
+            Debug.LogWarning($"삭제하려는 유틸리티(id={id})가 리스트에 없음");
+            return;
+        }
+
+        //데이터 리스트에서 해당 아이템을 제거
+        currentUtilityList.RemoveAt(removeIndex);
+
+
+        Image slot = invenInfoController.currentEquippedUtility[removeIndex];
+
+
+        slot.sprite = null;
+        var c = slot.color;
+        c.a = 1f;
+        slot.color = c;
+        */
     }
+
 
     public void MaxHPUP(float effectValue) //1001
     {
@@ -72,7 +133,6 @@ public class UtilityChangedStatController : MonoBehaviour
         player.UpdateCurrentPlayerHP(playerHP.CurrentHP); //데이터 저장
 
     }
-
 
 
 
@@ -101,7 +161,10 @@ public class UtilityChangedStatController : MonoBehaviour
         //player.UpdateCurrentPlayerMP(maxMP); //데이터 저장용
     }
 
-
+    public void RemovedMaxMPUP()
+    {
+        Debug.Log("끼얏호~! 1002");
+    }
 
 
 
@@ -122,6 +185,15 @@ public class UtilityChangedStatController : MonoBehaviour
         //player.UpdateCurrentPlayerATK(bullet.damage); //데이터 저장용
     }
 
+    public void RemovedATKUP()
+    {
+        Debug.Log("끼얏호~! 1003");
+    }
+
+
+
+
+
     public void ATKSUP(float effectValue, float bulletSpeed) //1004 이거 weaponManager에 있는 speed로 바꿔야돼!!
     {
         float nowATKSpeed = bulletSpeed;
@@ -135,5 +207,9 @@ public class UtilityChangedStatController : MonoBehaviour
 
         Debug.Log($"최대 HP가 {bullet.bulletSpeed - nowATKSpeed}만큼 증가했습니다. 새로운 최대 HP: {bullet.bulletSpeed}");
 
+    }
+    public void RemovedATKSUP()
+    {
+        Debug.Log("끼얏호~! 1004");
     }
 }

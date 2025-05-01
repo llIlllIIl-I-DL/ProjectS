@@ -29,11 +29,12 @@ public class InvenInfoController : MonoBehaviour
     [SerializeField] private Button utilityRemoveBtn;
 
 
-    [Header("현재 장착 중인 특성")]
-    [SerializeField] private List<Image> currentEquippedUtility; 
+    [Header("현재 장착 중인 특성 이미지")]
+    [SerializeField] public List<Image> currentEquippedUtility;
 
 
     private UtilityChangedStatController utilityChangedStatController;
+    private ItemData selectedItem;
 
 
     [HideInInspector] public float maxAmmo;
@@ -53,149 +54,148 @@ public class InvenInfoController : MonoBehaviour
 
     public void slotInteract(ItemData itemData)
     {
+        utilityEquipBtn.onClick.RemoveAllListeners();
+        utilityRemoveBtn.onClick.RemoveAllListeners();
+
+        // (2) UI에 아이템 정보 세팅
         descriptionTitle.text = itemData.ItemName;
         itemDescription.text = itemData.ItemDescription;
 
-        utilityEquipBtn.onClick.RemoveAllListeners();
+        // (3) selectedItem 갱신
+        selectedItem = itemData;
+
+        // (4) 장착 버튼 리스너 등록
         utilityEquipBtn.onClick.AddListener(() => UtilityEquipped(itemData));
+
+        // (5) 제거 버튼 리스너 등록 (한 번만!)
+        utilityRemoveBtn.onClick.AddListener(UtilityRemoved);
 
 
     }
 
     public void UtilityEquipped(ItemData itemData) //장착 시 실행 함수
     {
-        //플레이어 쪽의 현재 장착 중인 특성 아이콘 업데이트
+        utilityChangedStatController.EquippedUtility(itemData);
 
-        for (int i = 0; i < currentEquippedUtility.Count; i++)
+        switch (itemData.id)
         {
-            if (currentEquippedUtility[i].sprite == null)
-            {
-                Color temp = currentEquippedUtility[i].color;
-                temp.a = 1f;
-                currentEquippedUtility[i].color = temp;
+            case 1001:
 
-                currentEquippedUtility[i].sprite = itemData.Icon;
-
-                player.utilityPoint -= itemData.utilityPointForUnLock;
-                PlayerUI.Instance.utilityPointText.text = player.utilityPoint.ToString();
-                player.UpdateCurrentInventory();
+                utilityChangedStatController.MaxHPUP(itemData.effectValue);
+                break;
 
 
-                utilityRemoveBtn.onClick.AddListener(() => UtilityRemoved(itemData.Icon, itemData.effectValue, itemData.attributeType, itemData.id));
+            case 1002:
 
-                utilityChangedStatController.EquippedUtility(itemData);
+                maxAmmo = WeaponManager.Instance.maxAmmo;
+                utilityChangedStatController.MaxMPUP(itemData.effectValue, maxAmmo);
 
-                switch (itemData.id)
-                {
-                    case 1001:
+                break;
 
-                        utilityChangedStatController.MaxHPUP(itemData.effectValue);
-                        break;
+            case 1003:
 
+                utilityChangedStatController.ATKUP(itemData.effectValue, bulletDamage);
+                break;
 
-                    case 1002:
+            case 1004:
 
-                        maxAmmo = WeaponManager.Instance.maxAmmo;
-                        utilityChangedStatController.MaxMPUP(itemData.effectValue, maxAmmo);
+                utilityChangedStatController.ATKSUP(itemData.effectValue, bulletSpeed);
 
-                        break;
+                break;
 
-                    case 1003:
+            case 1005:
 
-                        utilityChangedStatController.ATKUP(itemData.effectValue, bulletDamage);
-                        break;
+                Debug.Log("저는 1005번입니다");
+                break;
 
-                    case 1004:
+            case 1006:
 
-                        utilityChangedStatController.ATKSUP(itemData.effectValue, bulletSpeed);
+                Debug.Log("저는 1006번입니다");
+                break;
 
-                        break;
+            case 1007:
 
-                    case 1005:
+                Debug.Log("저는 1007번입니다");
+                break;
 
-                        Debug.Log("저는 1005번입니다");
-                        break;
+            case 1008:
 
-                    case 1006:
+                Debug.Log("저는 1008번입니다");
+                break;
 
-                        Debug.Log("저는 1006번입니다");
-                        break;
+            case 1009:
 
-                    case 1007:
+                Debug.Log("저는 1009번입니다");
+                break;
 
-                        Debug.Log("저는 1007번입니다");
-                        break;
+            case 1010:
 
-                    case 1008:
+                Debug.Log("저는 1010번입니다");
+                break;
 
-                        Debug.Log("저는 1008번입니다");
-                        break;
+            case 1011:
 
-                    case 1009:
+                Debug.Log("저는 1011번입니다");
+                break;
 
-                        Debug.Log("저는 1009번입니다");
-                        break;
+            case 1012:
 
-                    case 1010:
+                Debug.Log("저는 1012번입니다");
+                break;
 
-                        Debug.Log("저는 1010번입니다");
-                        break;
+            case 1013:
 
-                    case 1011:
+                Debug.Log("저는 1013번입니다");
+                break;
 
-                        Debug.Log("저는 1011번입니다");
-                        break;
+            case 1014:
 
-                    case 1012:
+                Debug.Log("저는 1014번입니다");
+                break;
 
-                        Debug.Log("저는 1012번입니다");
-                        break;
+            case 1015:
 
-                    case 1013:
+                Debug.Log("저는 1015번입니다");
+                break;
 
-                        Debug.Log("저는 1013번입니다");
-                        break;
-
-                    case 1014:
-
-                        Debug.Log("저는 1014번입니다");
-                        break;
-
-                    case 1015:
-
-                        Debug.Log("저는 1015번입니다");
-                        break;
-
-                }
-
-                return;
-            }
         }
+
+        return;
+
+
     }
 
-    public void UtilityRemoved(Sprite ItemIcon, float effectValue, AttributeType attributeType, int id)
+    public void UtilityRemoved()
     {
-        //선택한 슬롯의 특성 아이콘이 remove되어야 하며 장착 된 특성 슬롯 중간에 빈칸이 생기면 남은 이미지들은 빈칸 없이 재배치 됨!
-        
-        for (int i = 0; i < currentEquippedUtility.Count; i++)
+        if (selectedItem == null) return;
+
+        // 1) 데이터/UI 실제 해제
+        utilityChangedStatController.RemovedUtility(selectedItem.id);
+
+        switch (selectedItem.id)
         {
-            if (currentEquippedUtility[i].sprite != null)
-            {
-                
-                Color temp = currentEquippedUtility[i].color;
-                temp.a = 0f;
-                currentEquippedUtility[i].color = temp;
+            case 1001:
+                utilityChangedStatController.RemovedMaxHPUP();
+                break;
 
-                utilityChangedStatController.RemovedUtility(id);
-        
+            case 1002:
+                utilityChangedStatController.RemovedMaxMPUP();
+                break;
 
-                switch (id)
-                {
-                    case 1001:
-                        utilityChangedStatController.RemovedMaxHPUP();
-                        break;
-                }
-            }
+            case 1003:
+                utilityChangedStatController.RemovedATKUP();
+                break;
+
+            case 1004:
+                utilityChangedStatController.RemovedATKSUP();
+                break;
+
         }
+
+        utilityRemoveBtn.onClick.RemoveAllListeners();
+        selectedItem = null;
+
+        // (옵션) 제거 버튼 비활성화
+        utilityRemoveBtn.interactable = false;
     }
 }
