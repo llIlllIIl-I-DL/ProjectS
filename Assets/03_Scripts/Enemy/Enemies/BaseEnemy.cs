@@ -151,14 +151,14 @@ public abstract class BaseEnemy : DestructibleEntity
     /// <summary>
     /// 사망 처리
     /// </summary>
-    protected override void Destroy()
-    {
-        if (isDestroyed) return; // 이미 파괴된 경우 무시
+    // protected override void Destroy()
+    // {
+    //     if (isDestroyed) return; // 이미 파괴된 경우 무시
         
-        isDestroyed = true;
-        StopMoving(); // 이동 정지
-        PlayDestructionEffect(); // 파괴 효과 재생
-    }
+    //     isDestroyed = true;
+    //     StopMoving(); // 이동 정지
+    //     PlayDestructionEffect(); // 파괴 효과 재생
+    // }
     
     #endregion
     
