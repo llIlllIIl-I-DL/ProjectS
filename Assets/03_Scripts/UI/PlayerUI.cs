@@ -226,8 +226,6 @@ public class PlayerUI : MonoBehaviour
 
     public void MovetoLeftType()
     {
-        if (typeItemSlotList == null) return;
-        
         // 인벤토리에서 사용 가능한 무기 속성 목록 가져오기
         List<ItemData> availableTypes = null;
         if (InventoryManager.Instance != null)
@@ -263,8 +261,6 @@ public class PlayerUI : MonoBehaviour
 
     public void MovetoRightType()
     {
-        if (typeItemSlotList == null) return;
-        
         // 인벤토리에서 사용 가능한 무기 속성 목록 가져오기
         List<ItemData> availableTypes = null;
         if (InventoryManager.Instance != null)

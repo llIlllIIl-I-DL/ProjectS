@@ -126,7 +126,7 @@ public class CostumeManager : MonoBehaviour
     }
 
     // 특정 복장 세트의 해금 상태 검사
-    private void CheckCostumeUnlocks(string costumeSetId)
+    public void CheckCostumeUnlocks(string costumeSetId)
     {
         if (string.IsNullOrEmpty(costumeSetId))
         {
@@ -350,11 +350,19 @@ public class CostumeManager : MonoBehaviour
 
         Dictionary<int, bool> result = new Dictionary<int, bool>();
 
+        Debug.Log($"GetPartsCollectionStatus: '{costumeSet.costumeName}' 세트의 파츠 상태 확인 시작 (현재 수집된 파츠: {collectedPartIds.Count}개)");
+        
         foreach (ItemData part in costumeSet.requiredParts)
         {
             if (part != null)
             {
-                result[part.id] = collectedPartIds.Contains(part.id);
+                bool isCollected = collectedPartIds.Contains(part.id);
+                result[part.id] = isCollected;
+                Debug.Log($"파츠 '{part.ItemName}' (ID: {part.id}) 수집 상태: {isCollected}");
+            }
+            else
+            {
+                Debug.LogWarning($"null인 파츠가 '{costumeSet.costumeName}' 세트에 포함되어 있습니다.");
             }
         }
 
