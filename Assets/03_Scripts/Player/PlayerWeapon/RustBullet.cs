@@ -1,10 +1,12 @@
 using UnityEngine;
 
-// 녹 총알
+// 녹(산성) 총알
 public class RustBullet : Bullet
 {
-    [SerializeField] private float armorReductionPercent = 20f; // 방어력 감소 퍼센트
-    [SerializeField] private float effectDuration = 5f; // 효과 지속시간
+    [SerializeField] private float rustDebuffDuration = 5f;     // 디버프 지속 시간
+    [SerializeField] private float speedReductionPercent = 30f; // 속도 감소 비율 (%)
+    [SerializeField] private float damageOverTimeAmount = 2f;   // 시간당 추가 데미지
+    [SerializeField] private GameObject acidEffectPrefab;       // 산성 효과 VFX 프리팹
 
     protected override void Start()
     {
@@ -14,8 +16,28 @@ public class RustBullet : Bullet
 
     protected override void ApplySpecialEffect(BaseEnemy enemy)
     {
-        // 적의 방어력을 일시적으로 감소시킴 (구현 필요)
-        Debug.Log($"적 {enemy.name}의 방어력이 {armorReductionPercent}% 감소됨, 지속시간: {effectDuration}초");
-        // 여기서 실제 적용 로직 구현 필요
+        // 디버프가 이미 적용되어 있는지 확인
+        DebuffManager existingDebuff = enemy.GetComponent<DebuffManager>();
+
+        if (existingDebuff != null)
+        {
+            // 이미 디버프가 있다면 지속시간 리셋
+            existingDebuff.RefreshDuration(rustDebuffDuration);
+        }
+        else
+        {
+            // 디버프 효과 추가
+            DebuffManager debuff = enemy.gameObject.AddComponent<DebuffManager>();
+            debuff.Initialize(rustDebuffDuration, speedReductionPercent, damageOverTimeAmount);
+
+            // VFX 효과 표시 (있다면)
+            if (acidEffectPrefab != null)
+            {
+                GameObject effect = Instantiate(acidEffectPrefab, enemy.transform);
+                effect.transform.localPosition = Vector3.zero;
+                // VFX는 디버프와 함께 자동 소멸
+                Destroy(effect, rustDebuffDuration);
+            }
+        }
     }
-} 
+}

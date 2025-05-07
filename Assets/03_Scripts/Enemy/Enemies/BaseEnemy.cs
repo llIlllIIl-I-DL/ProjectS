@@ -338,7 +338,22 @@ public abstract class BaseEnemy : DestructibleEntity
         float distance = Vector2.Distance(transform.position, playerTransform.position);
         return distance <= attackRange;
     }
-    
+
+    /// <summary>
+    /// 에너미 상태이상 여부 확인
+    /// 
+    public float GetAttackPower() => attackPower;
+    public float SetMoveSpeed() => moveSpeed;
+    public void SetMoveSpeed(float speed)
+    {
+        moveSpeed = speed;
+    }
+    public void GetMoveSpeed(float moveSpeed)
+    {
+        this.moveSpeed = moveSpeed;
+    }
+
+
     #endregion
 
     #region DestructibleEntity Implementation
