@@ -7,11 +7,30 @@ public class RustBullet : Bullet
     [SerializeField] private float speedReductionPercent = 30f; // 속도 감소 비율 (%)
     [SerializeField] private float damageOverTimeAmount = 2f;   // 시간당 추가 데미지
     [SerializeField] private GameObject acidEffectPrefab;       // 산성 효과 VFX 프리팹
+    [SerializeField] private float floatSpeed = 2f;      // 위로 떠오르는 속도
+    [SerializeField] private float swayAmount = 0.5f;    // 좌우 흔들림 폭
+    [SerializeField] private float swaySpeed = 2f;       // 흔들림 속도
+
+    private Vector3 startPosition;
+    private float elapsedTime = 0f;
+
 
     protected override void Start()
     {
         bulletType = ElementType.Rust;
         base.Start();
+        startPosition = transform.position;
+    }
+    protected override void Update()
+    {
+        base.Update();
+        elapsedTime += Time.deltaTime;
+        // 위로 떠오르기
+        float upward = floatSpeed * elapsedTime;
+        // 좌우로 흔들리기
+        float sway = Mathf.Sin(elapsedTime * swaySpeed) * swayAmount;
+        // 새로운 위치 계산
+        transform.position = startPosition + new Vector3(upward, sway, 0);
     }
 
     protected override void ApplySpecialEffect(BaseEnemy enemy)
