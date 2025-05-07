@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 
-public class UIManager : Singleton<UIManager>
+public class UIManager : Singleton<UIManager> //조금 리팩토링 필요!!
 {
     [Header("GameOver Window")]
     public float fadeSpeed = 1.5f;
@@ -22,18 +22,20 @@ public class UIManager : Singleton<UIManager>
     InputUI inputUI;
     Player player;
 
-    GameObject _gameOverWindow;
-    CanvasGroup _fadeOut;
+    GameObject _gameOverWindow; //
+    CanvasGroup _fadeOut; //
+
+    //보통 Manager에 들어가는 기능 = (UIManager라 했을 때) UI를 가지고 찾고 전달하고...show add remove 등등
 
     private void Start()
     {
         inputUI = FindObjectOfType<InputUI>();
         player = FindObjectOfType<Player>();
 
-        utilityItemList.GetUtility(player);
+        utilityItemList.GetUtility(player); //플레이어의 특성 15개 아이템 데이터를 담아두는 리스트
     }
 
-    public void CloseAllPage()
+    public void CloseAllPage() //모든 UI 창은 뒤로가기 버튼 뿐만 아니라 ESC를 눌렀을 때에도 false가 됨
     {
         foreach (GameObject uiPage in allUIPages)
         {
@@ -100,7 +102,7 @@ public class UIManager : Singleton<UIManager>
         }
     }
 
-    public void ToStartMenu(GameObject _gameOverWindow)
+    public void ToStartMenu(GameObject _gameOverWindow) //스타트 씬으로 이동!!
     {
         SceneManager.LoadScene("TempStartScene", LoadSceneMode.Single);
 

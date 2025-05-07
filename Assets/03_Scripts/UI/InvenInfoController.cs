@@ -21,6 +21,9 @@ public class InvenInfoController : MonoBehaviour
         }
     }
 
+    [Header("특성 해금 버튼")]
+    [SerializeField] private Button utilityUnLockBtn;
+
     [Header("아이템 설명과 장착/해제 버튼")]
     [SerializeField] private TextMeshProUGUI descriptionTitle;
     [SerializeField] private TextMeshProUGUI itemDescription;
@@ -32,9 +35,7 @@ public class InvenInfoController : MonoBehaviour
     [Header("현재 장착 중인 특성 이미지")]
     [SerializeField] public List<Image> currentEquippedUtility;
 
-
     private UtilityChangedStatController utilityChangedStatController;
-    private ItemData selectedItem; //선택한 슬롯에 담겨있는 특성 SO
     private Player player;
 
     [HideInInspector] public float maxAmmo;
@@ -48,30 +49,63 @@ public class InvenInfoController : MonoBehaviour
         utilityChangedStatController = GetComponent<UtilityChangedStatController>();
     }
 
-    public void SlotInteract(ItemData itemData)
+    public void UnLockedUtility(ItemData utilityItemData) //특성 해금
     {
+        utilityUnLockBtn.onClick.RemoveAllListeners();
+
+        descriptionTitle.text = utilityItemData.ItemName;
+        itemDescription.text = utilityItemData.ItemDescription;
+
+        utilityUnLockBtn.gameObject.SetActive(true);
+
+        utilityEquipBtn.gameObject.SetActive(false);
+        utilityRemoveBtn.gameObject.SetActive(false);
+
+        if (player.CurrentUtilityPoint >= utilityItemData.utilityPointForUnLock)
+        {
+            utilityUnLockBtn.onClick.AddListener(() => SlotInteract(utilityItemData));
+        }
+    }
+
+
+    public void SlotInteract(ItemData itemData) //해금 후 특성 슬롯 상호작용
+    {
+        if (!player.UnLockedUtility.Contains(itemData.id))
+        {
+            player.utilityPoint -= itemData.utilityPointForUnLock;
+            PlayerUI.Instance.utilityPointText.text = player.utilityPoint.ToString();
+
+            CreatSlotSystem.Instance.RefreshAllOwnPoints();
+
+            player.UpdateCurrentInventory(); //현재는 플레이어 포인트 현황만 업데이트 중
+            player.UpdateCurrentUnLockedUtility(itemData);
+        }
+
+        utilityUnLockBtn.gameObject.SetActive(false);
+
+        utilityEquipBtn.gameObject.SetActive(true);
+        utilityRemoveBtn.gameObject.SetActive(true);
+
+
         utilityEquipBtn.onClick.RemoveAllListeners(); //장착 버튼 리스너 초기화
         utilityRemoveBtn.onClick.RemoveAllListeners(); //해제 버튼 리스너 초기화
 
         descriptionTitle.text = itemData.ItemName;
         itemDescription.text = itemData.ItemDescription;
 
-        selectedItem = itemData; //선택한 슬롯 데이터를 selectedItem변수에 할당
-
-
         utilityEquipBtn.onClick.AddListener(() => UtilityEquipped(itemData));
-
-        utilityRemoveBtn.onClick.AddListener(UtilityRemoved); //버튼들 리스너 등록
+        utilityRemoveBtn.onClick.AddListener(() => UtilityRemoved(itemData));
 
 
     }
 
     public void UtilityEquipped(ItemData itemData) //장착 시 실행 함수
     {
-        utilityChangedStatController.EquippedUtility(itemData); //특성 장착시 UI 업데이트
-
-        if (player.CurrentUtilityPoint >= itemData.utilityPointForUnLock)
+        if (!utilityChangedStatController.currentUtilityList.Contains(itemData)) //특성 개당 하나씩만 추가할 수 있도록 만듦
         {
+            utilityChangedStatController.EquippedUtility(itemData); //특성 장착시 UI 업데이트
+
+
             switch (itemData.id) //선택한 슬롯 내의 특성 데이터 속 id값을 받아옴
             {
                 case 1001:
@@ -156,19 +190,18 @@ public class InvenInfoController : MonoBehaviour
             }
 
             return;
-
-
         }
     }
 
-    public void UtilityRemoved() //특성 해제
+
+    public void UtilityRemoved(ItemData itemdata) //특성 해제
     {
-        if (selectedItem == null) return;
+        if (itemdata == null) return;
 
-        utilityChangedStatController.RemovedUtility(selectedItem.id); //특성 장착시 UI 업데이트
+        utilityChangedStatController.RemovedUtility(itemdata.id); //특성 장착시 UI 업데이트
 
 
-        switch (selectedItem.id)
+        switch (itemdata.id)
         {
             case 1001:
                 utilityChangedStatController.RemovedMaxHPUP();
@@ -188,8 +221,8 @@ public class InvenInfoController : MonoBehaviour
 
         }
 
-        utilityRemoveBtn.onClick.RemoveAllListeners();
-        selectedItem = null;
+        //utilityRemoveBtn.onClick.RemoveAllListeners();
+        //selectedItem = null;
 
         //해제 버튼 비활성화
         //utilityRemoveBtn.interactable = false;

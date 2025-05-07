@@ -7,7 +7,7 @@ public class WeaponManager : Singleton<WeaponManager>
 {
     [Header("총알 설정")]
     [SerializeField] private Transform firePoint;           // 총알이 발사되는 위치
-    [SerializeField] private float bulletSpeed = 15f;
+    [SerializeField] private float bulletSpeed = 15f; //읽기전용
     [SerializeField] private float bulletLifetime = 3f;
     [SerializeField] private Vector3 normalBulletScale = new Vector3(0.5f, 0.5f, 0.5f);  // 일반 총알 크기
     [SerializeField] private float fireRate = 0.3f;         // 발사 속도 (초)

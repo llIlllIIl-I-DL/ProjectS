@@ -48,24 +48,16 @@ public class UtilityChangedStatController : MonoBehaviour
 
     public void EquippedUtility(ItemData itemData) //UI 업데이트
     {
-        if (player.CurrentUtilityPoint >= itemData.utilityPointForUnLock)
+        currentUtilityList.Add(itemData);
+
+        for (int i = 0; i < currentUtilityList.Count; i++)
         {
-            currentUtilityList.Add(itemData);
-
-            for (int i = 0; i < currentUtilityList.Count; i++)
+            if (invenInfoController.currentEquippedUtility[i].sprite == null)
             {
-                if (invenInfoController.currentEquippedUtility[i].sprite == null)
-                {
-                    Color temp = invenInfoController.currentEquippedUtility[i].color;
-                    temp.a = 1f;
-                    invenInfoController.currentEquippedUtility[i].color = temp;
-                    invenInfoController.currentEquippedUtility[i].sprite = itemData.Icon;
-
-                    player.utilityPoint -= itemData.utilityPointForUnLock;
-                    PlayerUI.Instance.utilityPointText.text = player.utilityPoint.ToString();
-
-                    player.UpdateCurrentInventory(); //현재는 플레이어 포인트 현황만 업데이트 중
-                }
+                Color temp = invenInfoController.currentEquippedUtility[i].color;
+                temp.a = 1f;
+                invenInfoController.currentEquippedUtility[i].color = temp;
+                invenInfoController.currentEquippedUtility[i].sprite = itemData.Icon;
             }
         }
     }

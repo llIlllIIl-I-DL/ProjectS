@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -6,6 +8,9 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private PlayerSettings settings;
     [SerializeField] private bool hasWingsuit = false; // 윙슈트 장착 여부
+
+    [SerializeField] public List<int> UnLockedUtility; //player가 현재까지 해금한 특성 리스트(해금 할 때마다 계속해서 쌓이기만 함)
+    //초기화 기능 필요!
 
     // 필수 컴포넌트들
     private PlayerInputHandler inputHandler;
@@ -192,5 +197,11 @@ public class Player : MonoBehaviour
         CurrentUtilityPoint = nowUtilityPoint;
 
         Debug.Log($"{CurrentUtilityPoint}");
+    }
+
+    public void UpdateCurrentUnLockedUtility(ItemData utilityItemData)
+    {
+        UnLockedUtility.Add(utilityItemData.id);
+        Debug.Log("해금된 특성 리스트에 추가되었습니다.");
     }
 }
