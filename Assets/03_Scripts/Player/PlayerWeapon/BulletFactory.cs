@@ -52,10 +52,32 @@ public class BulletFactory : MonoBehaviour
             Bullet bulletComponent = bulletObject.GetComponent<Bullet>();
             if (bulletComponent != null)
             {
-                bulletComponent.isOvercharged = isOvercharged;
+                bulletComponent.IsOvercharged = isOvercharged;
             }
         }
 
         return bulletObject;
+    }
+    public GameObject GetBulletPrefab(ElementType type)
+    {
+        switch (type)
+        {
+            case ElementType.Normal:
+                return normalBulletPrefab;
+            case ElementType.Rust:
+                return rustBulletPrefab;
+            case ElementType.Iron:
+                return ironBulletPrefab;
+            case ElementType.Poison:
+                return poisonBulletPrefab;
+            case ElementType.Water:
+                return waterBulletPrefab;
+            case ElementType.Flame:
+                return flameBulletPrefab;
+            case ElementType.Ice:
+                return iceBulletPrefab;
+            default:
+                return normalBulletPrefab;
+        }
     }
 } 

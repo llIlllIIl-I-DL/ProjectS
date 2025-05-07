@@ -15,14 +15,14 @@ public class IronBullet : Bullet
 
     protected override void Start()
     {
-        bulletType = ElementType.Iron;
-        damage *= extraDamageMultiplier; // 더 높은 기본 데미지
+        BulletType = ElementType.Iron;
+        Damage *= extraDamageMultiplier; // 더 높은 기본 데미지
         
         // 오버차지 상태라면 크기 증가
-        if (isOvercharged)
+        if (IsOvercharged)
         {
             transform.localScale *= overchargedScale;
-            damage *= 1.5f; // 오버차지 상태에서 추가 데미지
+            Damage *= 1.5f; // 오버차지 상태에서 추가 데미지
         }
         
         base.Start();
@@ -34,7 +34,7 @@ public class IronBullet : Bullet
         base.Update();
         
         // 충돌 후 오버차지 상태라면 일정 시간 후 파괴
-        if (hasCollided && isOvercharged)
+        if (hasCollided && IsOvercharged)
         {
             
             destroyTimer += Time.deltaTime;
@@ -66,7 +66,7 @@ public class IronBullet : Bullet
 
             if (enemy != null)
             {
-                enemy.TakeDamage(damage);
+                enemy.TakeDamage(Damage);
                 hasHitEnemy = true;
 
                 // 각 타입별 특수 효과 적용
@@ -77,11 +77,11 @@ public class IronBullet : Bullet
                 if (enemyRb != null)
                 {
                     Vector2 knockbackDirection = (other.transform.position - transform.position).normalized;
-                    enemyRb.AddForce(knockbackDirection * knockbackForce, ForceMode2D.Impulse);
+                    enemyRb.AddForce(knockbackDirection * KnockbackForce, ForceMode2D.Impulse);
                 }
                 
                 // 과열 공격이 적중했을 경우 플레이어에게 데미지
-                if (isOvercharged)
+                if (IsOvercharged)
                 {
                     // 플레이어 찾기
                     GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -102,7 +102,7 @@ public class IronBullet : Bullet
                 hasCollided = true;
                 
                 // 오버차지 상태가 아니면 즉시 파괴, 오버차지 상태라면 잠시 유지 후 파괴
-                if (!isOvercharged)
+                if (!IsOvercharged)
                 {
                     Debug.Log("적과 충돌하여 철 총알 즉시 제거됨");
                     Destroy(gameObject);
@@ -124,7 +124,7 @@ public class IronBullet : Bullet
             hasCollided = true;
             
             // 오버차지 상태가 아니면 즉시 파괴, 오버차지 상태라면 잠시 유지 후 파괴
-            if (!isOvercharged)
+            if (!IsOvercharged)
             {
                 Debug.Log("벽과 충돌하여 철 총알 즉시 제거됨: " + other.gameObject.name);
                 Destroy(gameObject);
@@ -175,7 +175,7 @@ public class IronBullet : Bullet
         // 철 총알은 기본 데미지가 더 높음 (이미 데미지에 적용됨)
         
         // 오버차징 상태에서는 추가 효과 (필요시 구현)
-        if (isOvercharged)
+        if (IsOvercharged)
         {
            
         }

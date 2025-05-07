@@ -160,9 +160,9 @@ public class UtilityChangedStatController : MonoBehaviour
 
         float changedMaxHP = nowDamage * (effectValue / 100);
 
-        bullet.damage = previousMaxMP + changedMaxHP;
+        WeaponManager.Instance.SetBulletDamage(previousMaxMP + changedMaxHP);
 
-        Debug.Log($"최대 HP가 {bullet.damage - nowDamage}만큼 증가했습니다. 새로운 최대 HP: {bullet.damage}");
+        Debug.Log($"공격력이 {previousMaxMP + changedMaxHP - nowDamage}만큼 증가했습니다. 새로운 공격력: {previousMaxMP + changedMaxHP}");
 
         //player.UpdateCurrentPlayerATK(bullet.damage); //데이터 저장용
     }
@@ -185,9 +185,9 @@ public class UtilityChangedStatController : MonoBehaviour
 
         float changedATKSpeed = nowATKSpeed * (effectValue / 100);
 
-        bullet.bulletSpeed = previouATKsSpeed + changedATKSpeed;
+        WeaponManager.Instance.SetBulletSpeed(previouATKsSpeed + changedATKSpeed);
 
-        Debug.Log($"최대 HP가 {bullet.bulletSpeed - nowATKSpeed}만큼 증가했습니다. 새로운 최대 HP: {bullet.bulletSpeed}");
+        Debug.Log($"총알 속도가 {previouATKsSpeed + changedATKSpeed - nowATKSpeed}만큼 증가했습니다. 새로운 총알 속도: {previouATKsSpeed + changedATKSpeed}");
 
     }
     public void RemovedATKSUP()

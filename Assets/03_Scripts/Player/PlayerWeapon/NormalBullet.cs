@@ -5,7 +5,7 @@ public class NormalBullet : Bullet
 {
     protected override void Start()
     {
-        bulletType = ElementType.Normal;
+        BulletType = ElementType.Normal;
         base.Start();
     }
 

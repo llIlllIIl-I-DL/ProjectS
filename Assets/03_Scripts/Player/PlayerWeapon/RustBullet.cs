@@ -17,7 +17,7 @@ public class RustBullet : Bullet
 
     protected override void Start()
     {
-        bulletType = ElementType.Rust;
+        BulletType = ElementType.Rust;
         base.Start();
         startPosition = transform.position;
     }
@@ -25,12 +25,10 @@ public class RustBullet : Bullet
     {
         base.Update();
         elapsedTime += Time.deltaTime;
-        // 위로 떠오르기
-        float upward = floatSpeed * elapsedTime;
         // 좌우로 흔들리기
         float sway = Mathf.Sin(elapsedTime * swaySpeed) * swayAmount;
-        // 새로운 위치 계산
-        transform.position = startPosition + new Vector3(upward, sway, 0);
+        // 현재 위치에서 y값만 흔들리게
+        transform.position += new Vector3(0, sway * Time.deltaTime, 0);
     }
 
     protected override void ApplySpecialEffect(BaseEnemy enemy)

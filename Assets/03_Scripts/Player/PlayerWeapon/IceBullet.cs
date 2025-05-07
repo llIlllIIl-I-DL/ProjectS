@@ -8,7 +8,7 @@ public class IceBullet : Bullet
 
     protected override void Start()
     {
-        bulletType = ElementType.Ice;
+        BulletType = ElementType.Ice;
         base.Start();
     }
 

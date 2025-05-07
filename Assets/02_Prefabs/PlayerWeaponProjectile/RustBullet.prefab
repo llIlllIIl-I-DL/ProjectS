@@ -207,7 +207,7 @@ MonoBehaviour:
   damage: 3
   knockbackForce: 0
   bulletType: 1
-  isOvercharged: 0
+  isOvercharged: 1
   rustDebuffDuration: 5
   speedReductionPercent: 30
   damageOverTimeAmount: 2
