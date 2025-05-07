@@ -4,45 +4,57 @@ using UnityEngine;
 
 public class BossDieState : IEnemyState
 {
-    BossStateMachine BossStateMachine;
-
-    public Transform player;  // 플레이어 Transform 연결 필요
-    private Transform boss;   // 이 스크립트가 붙은 오브젝트가 보스라고 가정
-    private Rigidbody2D rb;
-
+    private BossStateMachine BossStateMachine;
+    private Transform boss;
     private Animator animator;
+    private Rigidbody2D rb;
 
     public BossDieState(BossStateMachine stateMachine)
     {
         BossStateMachine = stateMachine;
         boss = BossStateMachine.transform;
-        player = BossStateMachine.playerTransform;
-        rb = stateMachine.GetComponent<Rigidbody2D>();
         animator = stateMachine.GetComponent<Animator>();
+        rb = stateMachine.GetComponent<Rigidbody2D>();
     }
 
     public void Enter()
     {
-        Debug.Log("BossDie");
+        Debug.Log("Boss 사망 상태 진입");
+        
+        // 물리 효과 비활성화
+        if (rb != null)
+        {
+            rb.velocity = Vector2.zero;
+            rb.isKinematic = true;
+        }
+
+        // 사망 애니메이션 재생
+        if (animator != null)
+        {
+            animator.SetTrigger("Die");
+        }
+
+        // 보스 오브젝트 비활성화 (또는 파괴)
+        BossStateMachine.gameObject.SetActive(false);
     }
 
     public void Exit()
     {
-
-    }
-
-    public void FixedUpdate()
-    {
-
-    }
-
-    public void OnTriggerEnter2D(Collider2D other)
-    {
-
+        Debug.Log("Boss 사망 상태 종료");
     }
 
     public void Update()
     {
+        // 사망 상태에서는 아무것도 하지 않음
+    }
 
+    public void FixedUpdate()
+    {
+        // 사망 상태에서는 아무것도 하지 않음
+    }
+
+    public void OnTriggerEnter2D(Collider2D other)
+    {
+        // 사망 상태에서는 충돌 무시
     }
 }

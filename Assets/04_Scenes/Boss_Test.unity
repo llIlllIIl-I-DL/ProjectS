@@ -242,7 +242,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 980502325}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2711c451f641b7145a1f0392064b30c2, type: 3}
+  m_Script: {fileID: 11500000, guid: a79568b698b7abe4abdff8c03c2f615b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 0}
@@ -251,6 +251,7 @@ MonoBehaviour:
   slashEffectPrefab: {fileID: 0}
   kickEffectPrefab: {fileID: 0}
   chaseRange: 5
+  KickCooldown: 20
 --- !u!61 &980502332
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -447,8 +448,8 @@ Transform:
   m_GameObject: {fileID: 1505539894}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.0358, y: -4.6259, z: 0}
-  m_LocalScale: {x: 19.807009, y: 1.1416999, z: 1.4843}
+  m_LocalPosition: {x: 3.0958, y: -4.6259, z: 0}
+  m_LocalScale: {x: 78.26423, y: 1.1416999, z: 1.4843}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -504,6 +505,14 @@ PrefabInstance:
     - target: {fileID: 3137287986617449566, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7599131818407334981, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: maxHP
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 7599131818407334981, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: currentHP
+      value: 1000
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

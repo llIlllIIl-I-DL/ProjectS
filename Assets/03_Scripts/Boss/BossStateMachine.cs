@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,8 +23,12 @@ public class BossStateMachine : MonoBehaviour
     public GameObject kickEffectPrefab;
     public float chaseRange = 5f;
 
+    [SerializeField] public int maxHP = 100;
+    [SerializeField] private int currentHP;
+
     public float KickCooldown = 20f;
     private float lastKickTime = -Mathf.Infinity;
+
     public float LastKickTime => lastKickTime;
 
     public bool CanKick => Time.time - lastKickTime >= KickCooldown;
@@ -42,6 +45,11 @@ public class BossStateMachine : MonoBehaviour
         states.Add(BossState.Die, new BossDieState(this));
 
         ChangeState(BossState.Idle);
+    }
+
+    public void Awake()
+    {
+        currentHP = maxHP;
     }
 
     public void ChangeState(BossState state)
@@ -74,5 +82,10 @@ public class BossStateMachine : MonoBehaviour
     public void MarkKickUsed()
     {
         lastKickTime = Time.time;
+    }
+
+    public void OnTriggerEnter2D(Collider2D other)
+    {
+        currentState?.OnTriggerEnter2D(other);
     }
 }

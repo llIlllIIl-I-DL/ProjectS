@@ -5,19 +5,23 @@ public class BossProjectileAttackState : IEnemyState
 {
     BossStateMachine bossStateMachine;
 
-    private Transform boss;
-    private Transform player;
+    private Transform bossTransform;
+    private Transform playerTransform;
     private Animator animator;
+
+    [SerializeField] private float detectionRange = 10f; //플레이어를 감지하는 거리
+    [SerializeField] private float attackRange = 5f; //근접 공격 거리
 
     private bool canUseChargedAttack = true;
     private float chargedAttackCooldown = 20f;
     private bool isAttacking = false; // 중복 공격 방지용
+    private bool isCoroutineRunning = false; // 코루틴 중복 실행 방지용
 
     public BossProjectileAttackState(BossStateMachine stateMachine)
     {
         bossStateMachine = stateMachine;
-        boss = stateMachine.transform;
-        player = stateMachine.playerTransform;
+        bossTransform = stateMachine.transform;
+        playerTransform = stateMachine.playerTransform;
         animator = stateMachine.GetComponent<Animator>();
     }
 
@@ -25,10 +29,12 @@ public class BossProjectileAttackState : IEnemyState
     {
         Debug.Log("Boss 원거리 공격 상태 진입");
 
-        if (isAttacking)
+        // 코루틴이 실행 중이면 Enter를 종료
+        if (isCoroutineRunning)
             return;
 
-        isAttacking = true;
+        // 코루틴이 실행 중이 아니면 시작
+        isCoroutineRunning = true;
 
         bool tryChargeAttack = Random.value <= 0.4f;
 
@@ -45,12 +51,32 @@ public class BossProjectileAttackState : IEnemyState
     public void Exit()
     {
         Debug.Log("BossProjectileAttackState 상태 종료");
+        isCoroutineRunning = false; // 상태 종료 시 코루틴 실행 상태 리셋
         isAttacking = false;
     }
 
     public void FixedUpdate() { }
     public void Update() { }
-    public void OnTriggerEnter2D(Collider2D other) { }
+
+    public void OnTriggerEnter2D(Collider2D other)
+    {
+        Debug.Log($"{other.name} {other.tag} @@@");
+
+        if (other.CompareTag("Player"))
+        {
+            Debug.Log($"{bossStateMachine.CanKick} @@@");
+            if (bossStateMachine.CanKick)
+            {
+                Debug.Log("Kick 공격 진입!@@@");
+                bossStateMachine.ChangeState(BossState.KickAttack);
+            }
+            else
+            {
+                float remain = bossStateMachine.KickCooldown - (Time.time - bossStateMachine.LastKickTime);
+                Debug.Log($"Kick 쿨다운 중... 남은 시간: {remain:F1}초@@@");
+            }
+        }
+    }
 
     private IEnumerator FireNormalProjectileCoroutine()
     {
@@ -60,7 +86,7 @@ public class BossProjectileAttackState : IEnemyState
 
         while (timer < attackDuration)
         {
-            if (player != null)
+            if (playerTransform != null)
             {
                 animator?.SetTrigger("FireProjectile");
                 FireProjectile(false);
@@ -73,6 +99,7 @@ public class BossProjectileAttackState : IEnemyState
         animator?.ResetTrigger("FireProjectile");
 
         bossStateMachine.ChangeState(BossState.Idle);
+        isCoroutineRunning = false; // 코루틴 종료 후 중복 실행 방지
     }
 
     private IEnumerator FireChargedProjectileCoroutine()
@@ -82,13 +109,15 @@ public class BossProjectileAttackState : IEnemyState
 
         yield return new WaitForSeconds(2f);
 
-        if (player != null)
+        if (playerTransform != null)
         {
             FireProjectile(true);
         }
 
         bossStateMachine.StartCoroutine(StartChargedAttackCooldown());
         bossStateMachine.ChangeState(BossState.Idle);
+
+        isCoroutineRunning = false; // 코루틴 종료 후 중복 실행 방지
     }
 
     private void FireProjectile(bool isCharged)
@@ -105,7 +134,7 @@ public class BossProjectileAttackState : IEnemyState
             Quaternion.identity
         );
 
-        Vector2 direction = (player.position - bossStateMachine.firePoint.position).normalized;
+        Vector2 direction = (playerTransform.position - bossStateMachine.firePoint.position).normalized;
         Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
 
         if (rb != null)

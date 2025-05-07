@@ -27,15 +27,15 @@ public class BossKickAttackState : IEnemyState
     {
         if (animator != null)
         {
-        Debug.Log("Boss Kick 상태 진입###");
+        Debug.Log("Boss Kick 상태 진입@@@@");
         animator.SetBool("IsKicking", true);
-        }
         BossStateMachine.StartCoroutine(KickAttackCoroutine());
+        }
     }
 
     public void Exit()// 상태에서 나갈 때
     {
-        Debug.Log("Boss Kick 상태 종료###");
+        Debug.Log("Boss Kick 상태 종료@@@@");
         animator.SetBool("IsKicking", false);
     }
 
@@ -54,7 +54,7 @@ public class BossKickAttackState : IEnemyState
 
     }
 
-    private IEnumerator KickAttackCoroutine()
+    private IEnumerator KickAttackCoroutine()//상태 진입은 되는데 코루틴 실행이 안 됨 왜인지는 모르겠음
     {
         yield return new WaitForSeconds(attackDelay);
 
@@ -64,7 +64,7 @@ public class BossKickAttackState : IEnemyState
             if (damageable != null)
             {
                 damageable.TakeDamage(kickDamage);
-                Debug.Log("Kick 데미지: " + kickDamage);
+                Debug.Log("Kick 데미지: " + kickDamage + "@@@");
             }
 
             if (kickEffectPrefab != null)
