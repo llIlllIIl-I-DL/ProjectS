@@ -70,14 +70,14 @@ public abstract class DestructibleEntity : MonoBehaviour, IDestructible
         // 파괴 체크
         if (currentHealth <= 0)
         {
-            Destroy();
+            DestroyEntity();
         }
     }
     
     // <summary>
     // 파괴 처리
     // </summary>
-    protected virtual void Destroy()
+    protected virtual void DestroyEntity()
     {
         isDestroyed = true;
         PlayDestructionEffect();
