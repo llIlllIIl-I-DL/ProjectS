@@ -93,7 +93,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3993583324721861071}
-  - component: {fileID: 6407862367436263255}
+  - component: {fileID: -172964644735229929}
   - component: {fileID: 7793101244677922675}
   - component: {fileID: -3802576868962594738}
   m_Layer: 14
@@ -119,7 +119,7 @@ Transform:
   - {fileID: 3706757852589720071}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!50 &6407862367436263255
+--- !u!50 &-172964644735229929
 Rigidbody2D:
   serializedVersion: 4
   m_ObjectHideFlags: 0
@@ -134,7 +134,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 0.07
+  m_GravityScale: 0.01
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -175,7 +175,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -203,7 +203,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f8837e90a0fa624c9a669d04fd28f50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletSpeed: 6
+  bulletSpeed: 3
   damage: 3
   knockbackForce: 0
   bulletType: 1
@@ -212,6 +212,5 @@ MonoBehaviour:
   speedReductionPercent: 30
   damageOverTimeAmount: 2
   acidEffectPrefab: {fileID: 0}
-  floatSpeed: 2
-  swayAmount: 0.5
-  swaySpeed: 2
+  swayAmount: 1.5
+  swaySpeed: 4
