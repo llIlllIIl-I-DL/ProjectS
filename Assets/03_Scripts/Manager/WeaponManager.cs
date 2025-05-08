@@ -7,10 +7,11 @@ public class WeaponManager : Singleton<WeaponManager>
 {
     [Header("총알 설정")]
     [SerializeField] private Transform firePoint;           // 총알이 발사되는 위치
-    [SerializeField] private float bulletSpeed = 15f;
-    [SerializeField] private float bulletLifetime = 3f;
-    [SerializeField] private Vector3 normalBulletScale = new Vector3(0.5f, 0.5f, 0.5f);  // 일반 총알 크기
-    [SerializeField] private float fireRate = 0.3f;         // 발사 속도 (초)
+    [SerializeField] private float bulletSpeed;
+    [SerializeField] private float bulletLifetime;
+    [SerializeField] private float bulletDamage;
+    [SerializeField] private Vector3 normalBulletScale;  // 일반 총알 크기
+    [SerializeField] private float fireRate;         // 발사 속도 (초)
 
     [Header("무기 상태")]
     public int currentAmmo = 30;
@@ -36,6 +37,10 @@ public class WeaponManager : Singleton<WeaponManager>
     [Header("불릿 팩토리 설정")]
     [SerializeField] private BulletFactory bulletFactory;    // 불릿 팩토리 참조
     [SerializeField] private ElementType currentBulletType = ElementType.Normal; // 현재 총알 속성
+
+    // 유틸리티 효과 설정
+    private float atkUpPercent = 0f;
+    private float speedUpPercent = 0f;
 
     // 차징 상태 관리
     private bool isCharging = false;
@@ -337,11 +342,13 @@ public class WeaponManager : Singleton<WeaponManager>
 
     public void FireNormalBullet()
     {
+        Debug.Log("FireNormalBullet");
         // 재장전 중이거나 탄약 없으면 발사 불가
         if (isReloading || currentAmmo <= 0)
         {
             if (currentAmmo <= 0 && !isReloading)
             {
+                Debug.Log("탄약 없음");
                 StartCoroutine(Reload());
             }
             return;
@@ -350,6 +357,7 @@ public class WeaponManager : Singleton<WeaponManager>
         // 발사 쿨다운 체크
         if (Time.time < nextFireTime)
         {
+            Debug.Log("아직 발사할 수 없음");
             return; // 아직 발사할 수 없음
         }
 
@@ -357,7 +365,18 @@ public class WeaponManager : Singleton<WeaponManager>
         nextFireTime = Time.time + fireRate;
 
         Vector2 direction = GetAimDirection();
+        if (currentBulletType == ElementType.Rust) 
+        {
+            // 현재 방향의 각도 구하기
+            float baseAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            // -45~+45도 랜덤값 더하기
+            float randomAngle = baseAngle + UnityEngine.Random.Range(-45f, 45f);
+            // 새로운 방향 벡터로 변환
+            float rad = randomAngle * Mathf.Deg2Rad;
+            direction = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)).normalized;
+        }
         Vector3 spawnPosition = firePoint.position + new Vector3(direction.x * 0.2f, 0, 0);
+        Debug.Log("spawnPosition: " + spawnPosition);
 
         // BulletFactory를 사용하여 총알 생성
         GameObject bullet = bulletFactory.CreateBullet(currentBulletType, spawnPosition, Quaternion.identity);
@@ -396,6 +415,7 @@ public class WeaponManager : Singleton<WeaponManager>
 
     private void FireSteamPressureBullet()
     {
+        Debug.Log("FireSteamPressureBullet");
         // 재장전 중이거나 탄약 없으면 발사 불가
         if (isReloading || currentAmmo <= 0)
         {
@@ -460,6 +480,16 @@ public class WeaponManager : Singleton<WeaponManager>
         }
 
         Vector2 direction = GetAimDirection();
+        if (currentBulletType == ElementType.Rust) 
+        {
+            // 현재 방향의 각도 구하기
+            float baseAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            // -45~+45도 랜덤값 더하기
+            float randomAngle = baseAngle + UnityEngine.Random.Range(-65f, 65f);
+            // 새로운 방향 벡터로 변환
+            float rad = randomAngle * Mathf.Deg2Rad;
+            direction = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)).normalized;
+        }
         Vector3 spawnPosition = firePoint.position + new Vector3(direction.x * 0.2f, 0, 0);
 
         // BulletFactory를 사용하여 총알 생성 (오버차지 여부 전달)
@@ -482,6 +512,11 @@ public class WeaponManager : Singleton<WeaponManager>
         if (bulletRb != null)
         {
             bulletRb.velocity = direction * finalBulletSpeed;
+        }
+        var bulletScript = bullet.GetComponent<Bullet>();
+        if (bulletScript != null)
+        {
+            bulletScript.Damage = bulletDamage;
         }
 
         // 총알 회전 설정
@@ -569,8 +604,24 @@ public class WeaponManager : Singleton<WeaponManager>
     public void SetBulletType(ElementType type)
     {
         currentBulletType = type;
-        Debug.Log($"무기 속성이 {type}으로 변경되었습니다.");
+
+        GameObject bulletPrefab = bulletFactory.GetBulletPrefab(type);
+        var bullet = bulletPrefab.GetComponent<Bullet>();
+        if (bullet != null)
+        {
+            bulletSpeed = bullet.BulletSpeed * (1f + speedUpPercent);
+            bulletDamage = bullet.Damage * (1f + atkUpPercent);
+        }
     }
+    // 외부에서 값 변경 가능
+
+    public void SetSpeedUpPercent(float percent) => speedUpPercent = percent;
+    public void SetAtkUpPercent(float percent) => atkUpPercent = percent;
+    public void SetBulletSpeed(float speed) => bulletSpeed = speed;
+    public void SetFireRate(float rate) => fireRate = rate;
+    public void SetBulletDamage(float damage) => bulletDamage = damage;
+    public void SetBulletLifetime(float lifetime) => bulletLifetime = lifetime;
+    public void SetNormalBulletScale(Vector3 scale) => normalBulletScale = scale;
 
     // 총알 속성 가져오기
     public ElementType GetBulletType()

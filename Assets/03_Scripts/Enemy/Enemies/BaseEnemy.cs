@@ -357,7 +357,19 @@ public abstract class BaseEnemy : DestructibleEntity
         float distance = Vector2.Distance(transform.position, playerTransform.position);
         return distance <= attackRange;
     }
-    
+
+    /// <summary>
+    /// 에너미 상태이상 여부 확인
+    /// 
+    public float GetAttackPower() => attackPower;
+    public float SetMoveSpeed() => moveSpeed;
+    public void SetMoveSpeed(float speed)
+    {
+        moveSpeed = speed;
+    }
+
+
+
     #endregion
 
     #region Effects
@@ -418,6 +430,8 @@ public abstract class BaseEnemy : DestructibleEntity
     {
         Invoke("ReturnToPool", 1f);
         // 죽음 애니메이션, 효과음 등
+        // 상태이상 초기화
+        DebuffManager.Instance.RemoveAllDebuffs(this);
         isDestroyed = true;
         PlayDestructionEffect();
         DropItem();

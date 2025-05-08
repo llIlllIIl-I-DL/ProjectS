@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
+using System.Linq;
 
 public class InvenSlotUI : MonoBehaviour
 {
@@ -17,8 +18,6 @@ public class InvenSlotUI : MonoBehaviour
     private ItemData utilityItemData;
     private Player player; //player의 특성 포인트 현황을 받아오기 위함 
 
-    private int slotIndex = 0;
-
     private void Start()
     {
         player = FindObjectOfType<Player>();
@@ -30,9 +29,16 @@ public class InvenSlotUI : MonoBehaviour
 
     public void slotInteract() //포인트 모자랄 때 슬롯 비활성화해주는 메서드도 만들어야 함, 한번 unlock했던 슬롯은 계속 활성화되게!
     {
-
+        if (player.UnLockedUtility.Contains(utilityItemData.id))
+        {
             Debug.Log("눌렀습니다!");
             InvenInfoController.Instance.SlotInteract(utilityItemData); //특성 슬롯 눌렀을 시 실행되는 함수.
+
+            return; //함수 종료시키는 거 깜빡하면 안돼!
+        }
+
+        Debug.Log("플레이어가 해금한 특성이 아님닙다");
+        InvenInfoController.Instance.UnLockedUtility(utilityItemData);
     }
 
 
@@ -66,11 +72,12 @@ public class InvenSlotUI : MonoBehaviour
         }
     }
 
-    public void UpdateOwnPoint() //각 슬롯 내부에 있는 플레이어의 특성 포인트 현황을 업데이트 해주는 함수
+    public void UpdateOwnPoint( ) //각 슬롯 내부에 있는 플레이어의 특성 포인트 현황을 업데이트 해주는 함수
     {
         itemOwnPoint.text = player.utilityPoint.ToString();
 
-        if (player.utilityPoint >= utilityItemData.utilityPointForUnLock)
+
+        if (player.utilityPoint >= utilityItemData.utilityPointForUnLock) //|| player.UnLockedUtility.Contains(itemData.id)//)
         {
             itemIcon.sprite = utilityItemData.Icon;
         }

@@ -48,24 +48,16 @@ public class UtilityChangedStatController : MonoBehaviour
 
     public void EquippedUtility(ItemData itemData) //UI 업데이트
     {
-        if (player.CurrentUtilityPoint >= itemData.utilityPointForUnLock)
+        currentUtilityList.Add(itemData);
+
+        for (int i = 0; i < currentUtilityList.Count; i++)
         {
-            currentUtilityList.Add(itemData);
-
-            for (int i = 0; i < currentUtilityList.Count; i++)
+            if (invenInfoController.currentEquippedUtility[i].sprite == null)
             {
-                if (invenInfoController.currentEquippedUtility[i].sprite == null)
-                {
-                    Color temp = invenInfoController.currentEquippedUtility[i].color;
-                    temp.a = 1f;
-                    invenInfoController.currentEquippedUtility[i].color = temp;
-                    invenInfoController.currentEquippedUtility[i].sprite = itemData.Icon;
-
-                    player.utilityPoint -= itemData.utilityPointForUnLock;
-                    PlayerUI.Instance.utilityPointText.text = player.utilityPoint.ToString();
-
-                    player.UpdateCurrentInventory(); //현재는 플레이어 포인트 현황만 업데이트 중
-                }
+                Color temp = invenInfoController.currentEquippedUtility[i].color;
+                temp.a = 1f;
+                invenInfoController.currentEquippedUtility[i].color = temp;
+                invenInfoController.currentEquippedUtility[i].sprite = itemData.Icon;
             }
         }
     }
@@ -100,6 +92,15 @@ public class UtilityChangedStatController : MonoBehaviour
         }
     }
 
+    /*
+    public void ClearUtilityIcon(int id)
+    {
+        slot.sprite = null;
+        var color = slot.color;
+        color.a = 0f;
+        slot.color = color;
+    }
+    */
 
     public void MaxHPUP(float effectValue) //1001
     {
@@ -163,9 +164,9 @@ public class UtilityChangedStatController : MonoBehaviour
 
         float changedMaxHP = nowDamage * (effectValue / 100);
 
-        bullet.damage = previousMaxMP + changedMaxHP;
+        WeaponManager.Instance.SetBulletDamage(previousMaxMP + changedMaxHP);
 
-        Debug.Log($"최대 HP가 {bullet.damage - nowDamage}만큼 증가했습니다. 새로운 최대 HP: {bullet.damage}");
+        Debug.Log($"공격력이 {previousMaxMP + changedMaxHP - nowDamage}만큼 증가했습니다. 새로운 공격력: {previousMaxMP + changedMaxHP}");
 
         //player.UpdateCurrentPlayerATK(bullet.damage); //데이터 저장용
     }
@@ -188,9 +189,9 @@ public class UtilityChangedStatController : MonoBehaviour
 
         float changedATKSpeed = nowATKSpeed * (effectValue / 100);
 
-        bullet.bulletSpeed = previouATKsSpeed + changedATKSpeed;
+        WeaponManager.Instance.SetBulletSpeed(previouATKsSpeed + changedATKSpeed);
 
-        Debug.Log($"최대 HP가 {bullet.bulletSpeed - nowATKSpeed}만큼 증가했습니다. 새로운 최대 HP: {bullet.bulletSpeed}");
+        Debug.Log($"총알 속도가 {previouATKsSpeed + changedATKSpeed - nowATKSpeed}만큼 증가했습니다. 새로운 총알 속도: {previouATKsSpeed + changedATKSpeed}");
 
     }
     public void RemovedATKSUP()
