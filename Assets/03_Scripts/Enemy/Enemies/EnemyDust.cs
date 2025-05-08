@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Enemy.States;
 
@@ -9,7 +8,7 @@ using Enemy.States;
 public class EnemyDust : BaseEnemy
 {
     #region Variables
-    
+
     [Header("순찰 설정")]
     [SerializeField] private float patrolDistance; // 순찰 거리
     [SerializeField] private float patrolWaitTime; // 방향 전환 시 대기 시간
@@ -19,11 +18,11 @@ public class EnemyDust : BaseEnemy
 
     // 순찰 시작점
     private Vector2 startPosition;
-    
+
     #endregion
 
     #region Unity Lifecycle Methods
-    
+
     /// <summary>
     /// 컴포넌트 초기화 및 시작 위치 저장
     /// </summary>
@@ -61,7 +60,7 @@ public class EnemyDust : BaseEnemy
     #endregion
 
     #region Core Methods
-    
+
     /// <summary>
     /// 적 초기화 및 상태 설정
     /// </summary>
@@ -102,11 +101,30 @@ public class EnemyDust : BaseEnemy
         // 단순 패트롤 적은 충돌 데미지만 주므로 여기선 구현 불필요
         // 실제 충돌 데미지는 BaseEnemy의 OnCollisionEnter2D에서 처리됨
     }
-    
+
+    /// <summary>
+    /// 넉백 처리
+    /// </summary>
+    public override void ApplyKnockback(Vector2 direction, float force)
+    {
+        base.ApplyKnockback(direction, 2f);
+        StartCoroutine(KnockbackCoroutine(0.5f));
+    }
+
+    /// <summary>
+    /// 넉백 후 이동 재게 코루틴
+    /// </summary>
+    private IEnumerator KnockbackCoroutine(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        stateMachine.ChangeState(patrolState);
+        Debug.Log($"{gameObject.name}이(가) 넉백 후 이동을 재개합니다.");
+    }
+
     #endregion
 
     #region Player Detection
-    
+
     /// <summary>
     /// 플레이어 감지 시 호출됨 (반응 없음)
     /// </summary>
@@ -122,11 +140,11 @@ public class EnemyDust : BaseEnemy
     {
         // 단순 패트롤 적은 플레이어를 놓치는 것에 반응하지 않음
     }
-    
+
     #endregion
 
     #region State Switch Methods
-    
+
     /// <summary>
     /// 순찰 상태로 전환
     /// </summary>
@@ -134,10 +152,10 @@ public class EnemyDust : BaseEnemy
     {
         stateMachine.ChangeState(patrolState);
     }
-    
+
     /// <summary>
     /// 대기 상태로 전환
     /// </summary>
-    
+
     #endregion
 }

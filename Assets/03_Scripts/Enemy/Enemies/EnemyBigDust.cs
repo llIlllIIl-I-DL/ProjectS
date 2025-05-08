@@ -204,6 +204,32 @@ public class EnemyBigDust : BaseEnemy
         }
     }
 
+    /// <summary>
+    /// 넉백 처리
+    /// </summary>
+    public override void ApplyKnockback(Vector2 direction, float force)
+    {
+        base.ApplyKnockback(direction, 1f);
+        StartCoroutine(KnockbackCoroutine(0.5f));
+    }
+
+    /// <summary>
+    /// 넉백 후 이동 재개 코루틴
+    /// </summary>
+    private IEnumerator KnockbackCoroutine(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (playerDetected)
+        {
+            stateMachine.ChangeState(chaseState);
+        }
+        else
+        {
+            stateMachine.ChangeState(patrolState);
+        }
+        Debug.Log($"{gameObject.name}이(가) 넉백 후 이동을 재개합니다.");
+    }
+
     #endregion
 
     #region Player Detection

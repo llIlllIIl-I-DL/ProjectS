@@ -110,4 +110,6 @@ public abstract class DestructibleEntity : MonoBehaviour, IDestructible
     // </summary>
     // 하위 클래스에서 구현
     public abstract void PlayDestructionEffect();
+
+    public abstract void PlayHitEffect(Vector2 hitpoint = default);
 }
