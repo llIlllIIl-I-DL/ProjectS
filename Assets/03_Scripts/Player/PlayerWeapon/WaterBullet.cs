@@ -8,7 +8,7 @@ public class WaterBullet : Bullet
 
     protected override void Start()
     {
-        bulletType = ElementType.Water;
+        BulletType = ElementType.Water;
         base.Start();
     }
 

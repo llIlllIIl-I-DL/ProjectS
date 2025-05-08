@@ -7,10 +7,11 @@ public class WeaponManager : Singleton<WeaponManager>
 {
     [Header("총알 설정")]
     [SerializeField] private Transform firePoint;           // 총알이 발사되는 위치
-    [SerializeField] private float bulletSpeed = 15f; //읽기전용
-    [SerializeField] private float bulletLifetime = 3f;
-    [SerializeField] private Vector3 normalBulletScale = new Vector3(0.5f, 0.5f, 0.5f);  // 일반 총알 크기
-    [SerializeField] private float fireRate = 0.3f;         // 발사 속도 (초)
+    [SerializeField] private float bulletSpeed;
+    [SerializeField] private float bulletLifetime;
+    [SerializeField] private float bulletDamage;
+    [SerializeField] private Vector3 normalBulletScale;  // 일반 총알 크기
+    [SerializeField] private float fireRate;         // 발사 속도 (초)
 
     [Header("무기 상태")]
     public int currentAmmo = 30;
@@ -36,6 +37,10 @@ public class WeaponManager : Singleton<WeaponManager>
     [Header("불릿 팩토리 설정")]
     [SerializeField] private BulletFactory bulletFactory;    // 불릿 팩토리 참조
     [SerializeField] private ElementType currentBulletType = ElementType.Normal; // 현재 총알 속성
+
+    // 유틸리티 효과 설정
+    private float atkUpPercent = 0f;
+    private float speedUpPercent = 0f;
 
     // 차징 상태 관리
     private bool isCharging = false;
@@ -483,6 +488,11 @@ public class WeaponManager : Singleton<WeaponManager>
         {
             bulletRb.velocity = direction * finalBulletSpeed;
         }
+        var bulletScript = bullet.GetComponent<Bullet>();
+        if (bulletScript != null)
+        {
+            bulletScript.Damage = bulletDamage;
+        }
 
         // 총알 회전 설정
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -569,8 +579,24 @@ public class WeaponManager : Singleton<WeaponManager>
     public void SetBulletType(ElementType type)
     {
         currentBulletType = type;
-        Debug.Log($"무기 속성이 {type}으로 변경되었습니다.");
+
+        GameObject bulletPrefab = bulletFactory.GetBulletPrefab(type);
+        var bullet = bulletPrefab.GetComponent<Bullet>();
+        if (bullet != null)
+        {
+            bulletSpeed = bullet.BulletSpeed * (1f + speedUpPercent);
+            bulletDamage = bullet.Damage * (1f + atkUpPercent);
+        }
     }
+    // 외부에서 값 변경 가능
+
+    public void SetSpeedUpPercent(float percent) => speedUpPercent = percent;
+    public void SetAtkUpPercent(float percent) => atkUpPercent = percent;
+    public void SetBulletSpeed(float speed) => bulletSpeed = speed;
+    public void SetFireRate(float rate) => fireRate = rate;
+    public void SetBulletDamage(float damage) => bulletDamage = damage;
+    public void SetBulletLifetime(float lifetime) => bulletLifetime = lifetime;
+    public void SetNormalBulletScale(Vector3 scale) => normalBulletScale = scale;
 
     // 총알 속성 가져오기
     public ElementType GetBulletType()
