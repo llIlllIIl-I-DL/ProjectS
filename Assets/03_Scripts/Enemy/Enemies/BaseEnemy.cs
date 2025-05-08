@@ -348,10 +348,7 @@ public abstract class BaseEnemy : DestructibleEntity
     {
         moveSpeed = speed;
     }
-    public void GetMoveSpeed(float moveSpeed)
-    {
-        this.moveSpeed = moveSpeed;
-    }
+
 
 
     #endregion
@@ -400,6 +397,8 @@ public abstract class BaseEnemy : DestructibleEntity
     {
         Invoke("ReturnToPool", 1f);
         // 죽음 애니메이션, 효과음 등
+        // 상태이상 초기화
+        DebuffManager.Instance.RemoveAllDebuffs(this);
         isDestroyed = true;
         PlayDestructionEffect();
         DropItem();
