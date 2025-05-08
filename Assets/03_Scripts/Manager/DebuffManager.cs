@@ -1,106 +1,200 @@
+using System.Collections.Generic;
 using UnityEngine;
 
+// 디버프 타입 열거형
+public enum DebuffType
+{
+    None,
+    Rust,       // 산성/부식
+    Freeze,     // 빙결
+    Burn,       // 화상
+    Poison,     // 독
+    // 추가 디버프 타입
+}
+
+// 디버프 데이터를 담는 구조체
+[System.Serializable]
+public struct DebuffData
+{
+    public DebuffType type;
+    public float duration;
+    public float intensity;  // 디버프 효과의 강도 (%, 0.0-1.0)
+    public float tickDamage; // 초당 데미지
+    public GameObject visualEffectPrefab;
+    public Color tintColor;  // 적용될 색상
+    public AudioClip effectSound;
+}
+
+// 디버프 매니저
 public class DebuffManager : MonoBehaviour
 {
-    private BaseEnemy targetEnemy;
-    private float duration;
-    private float speedReductionFactor;
-    private float damagePerSecond;
-    private float originalSpeed;
-    private float originalAttackPower;
-    private float currentSpeed;
-    private float currentAttackPower;
-    private float timer;
+    private static DebuffManager _instance;
+    public static DebuffManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                GameObject go = new GameObject("DebuffManager");
+                _instance = go.AddComponent<DebuffManager>();
+                DontDestroyOnLoad(go);
+            }
+            return _instance;
+        }
+    }
+
+    [Header("Default Debuff Settings")]
+    [SerializeField] private List<DebuffData> defaultDebuffs = new List<DebuffData>();
+
+    // 디버프 타입별 데이터 캐시
+    private Dictionary<DebuffType, DebuffData> debuffDataCache = new Dictionary<DebuffType, DebuffData>();
 
     private void Awake()
     {
-        targetEnemy = GetComponent<BaseEnemy>();
-    }
-
-    public void Initialize(float debuffDuration, float speedReductionPercent, float dotDamage)
-    {
-        duration = debuffDuration;
-        speedReductionFactor = speedReductionPercent / 100f;
-        damagePerSecond = dotDamage;
-        timer = 0f;
-
-        // 원래 속도 저장 및 감소된 속도 적용
-        originalSpeed = targetEnemy.SetMoveSpeed();
-        currentSpeed = originalSpeed * (1f - speedReductionFactor);
-
-        // 디버프 시각적 표시 (예: 색상 변경)
-        ApplyVisualEffect(true);
-    }
-
-    public void RefreshDuration(float newDuration)
-    {
-        duration = newDuration;
-        timer = 0f;
-    }
-
-    private void Update()
-    {
-        if (targetEnemy == null)
+        if (_instance != null && _instance != this)
         {
-            Destroy(this);
+            Destroy(gameObject);
             return;
         }
 
-        // 타이머 업데이트
-        timer += Time.deltaTime;
+        _instance = this;
+        DontDestroyOnLoad(gameObject);
 
-        // 지속 데미지 적용
-        if (timer >= 1.0f)
-        {
-            targetEnemy.TakeDamage(damagePerSecond);
-            timer -= 1.0f; // 1초마다 데미지
-        }
+        // 기본 디버프 데이터 캐싱
+        CacheDefaultDebuffs();
+    }
 
-        // 디버프 지속시간 체크
-        duration -= Time.deltaTime;
-        if (duration <= 0)
+    private void CacheDefaultDebuffs()
+    {
+        foreach (DebuffData data in defaultDebuffs)
         {
-            RemoveDebuff();
+            debuffDataCache[data.type] = data;
         }
     }
 
-    private void RemoveDebuff()
+    // 디버프 적용 메서드
+    public void ApplyDebuff(BaseEnemy enemy, DebuffType type, float duration = -1, float intensity = -1, float tickDamage = -1)
     {
-        // 원래 속도로 복구
-        if (targetEnemy != null)
+        if (enemy == null) return;
+
+        // 디버프 데이터 가져오기
+        if (!debuffDataCache.TryGetValue(type, out DebuffData data))
         {
-            targetEnemy.SetMoveSpeed(originalSpeed);
-            ApplyVisualEffect(false);
+            Debug.LogWarning($"Debuff type {type} not found in cache.");
+            return;
         }
 
-        Destroy(this);
+        // 사용자가 지정한 값이 있으면 오버라이드
+        float finalDuration = duration > 0 ? duration : data.duration;
+        float finalIntensity = intensity > 0 ? intensity : data.intensity;
+        float finalTickDamage = tickDamage > 0 ? tickDamage : data.tickDamage;
+
+        // 해당 적에게 디버프 컴포넌트 찾기
+        DebuffEffect existingDebuff = GetDebuffComponent(enemy, type);
+
+        if (existingDebuff != null)
+        {
+            // 이미 디버프가 있다면 갱신
+            existingDebuff.RefreshDebuff(finalDuration, finalIntensity, finalTickDamage);
+        }
+        else
+        {
+            // 새로운 디버프 적용
+            CreateDebuffEffect(enemy, type, data, finalDuration, finalIntensity, finalTickDamage);
+        }
     }
 
-    private void ApplyVisualEffect(bool apply)
+    // 특정 타입의 디버프 컴포넌트 가져오기
+    private DebuffEffect GetDebuffComponent(BaseEnemy enemy, DebuffType type)
     {
-        // 디버프 시각적 효과 (예: 색상 변경)
-        SpriteRenderer renderer = targetEnemy.GetComponentInChildren<SpriteRenderer>();
-        if (renderer != null)
+        DebuffEffect[] debuffs = enemy.GetComponents<DebuffEffect>();
+        foreach (DebuffEffect debuff in debuffs)
         {
-            if (apply)
+            if (debuff.DebuffType == type)
             {
-                renderer.color = new Color(0.7f, 1.0f, 0.7f); // 녹색빛 산성 효과
+                return debuff;
             }
-            else
+        }
+        return null;
+    }
+
+    // 새 디버프 효과 생성
+    private void CreateDebuffEffect(BaseEnemy enemy, DebuffType type, DebuffData data, float duration, float intensity, float tickDamage)
+    {
+        switch (type)
+        {
+            case DebuffType.Rust:
+                RustEffect rustEffect = enemy.gameObject.AddComponent<RustEffect>();
+                rustEffect.Initialize(type, duration, intensity, tickDamage, data);
+                break;
+/*
+            case DebuffType.Freeze:
+                FreezeEffect freezeEffect = enemy.gameObject.AddComponent<FreezeEffect>();
+                freezeEffect.Initialize(type, duration, intensity, tickDamage, data);
+                break;
+
+            case DebuffType.Burn:
+                BurnEffect burnEffect = enemy.gameObject.AddComponent<BurnEffect>();
+                burnEffect.Initialize(type, duration, intensity, tickDamage, data);
+                break;
+
+            // 추가 디버프 타입 처리...
+
+            default:
+                GenericDebuffEffect genericEffect = enemy.gameObject.AddComponent<GenericDebuffEffect>();
+                genericEffect.Initialize(type, duration, intensity, tickDamage, data);
+                break;*/
+        }
+
+        // 시각 효과 생성
+        CreateVisualEffect(enemy, data);
+    }
+
+    // 시각 효과 생성
+    private void CreateVisualEffect(BaseEnemy enemy, DebuffData data)
+    {
+        if (data.visualEffectPrefab != null)
+        {
+            GameObject effect = Instantiate(data.visualEffectPrefab, enemy.transform);
+            effect.transform.localPosition = Vector3.zero;
+
+            // 효과 자동 제거는 DebuffEffect에서 처리
+        }
+
+        // 사운드 효과 재생
+        if (data.effectSound != null)
+        {
+            AudioSource audio = enemy.GetComponent<AudioSource>();
+            if (audio == null)
             {
-                renderer.color = Color.white; // 원래 색상으로 복구
+                audio = enemy.gameObject.AddComponent<AudioSource>();
             }
+
+            audio.PlayOneShot(data.effectSound);
         }
     }
 
-    private void OnDestroy()
+    // 디버프 제거
+    public void RemoveDebuff(BaseEnemy enemy, DebuffType type)
     {
-        // 컴포넌트가 제거될 때 원래 상태로 복구
-        if (targetEnemy != null)
+        if (enemy == null) return;
+
+        DebuffEffect debuff = GetDebuffComponent(enemy, type);
+        if (debuff != null)
         {
-            targetEnemy.SetMoveSpeed(originalSpeed);
-            ApplyVisualEffect(false);
+            debuff.RemoveDebuff();
+        }
+    }
+
+    // 모든 디버프 제거
+    public void RemoveAllDebuffs(BaseEnemy enemy)
+    {
+        if (enemy == null) return;
+
+        DebuffEffect[] debuffs = enemy.GetComponents<DebuffEffect>();
+        foreach (DebuffEffect debuff in debuffs)
+        {
+            debuff.RemoveDebuff();
         }
     }
 }
-

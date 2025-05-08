@@ -1,11 +1,14 @@
 using UnityEditor;
 using UnityEngine;
+using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Collections;
 
 public class InputUI : MonoBehaviour
 {
     public GameObject currentPage = null;
+
 
     [Header("UI 창")]
     [SerializeField] public GameObject pauseMenu;

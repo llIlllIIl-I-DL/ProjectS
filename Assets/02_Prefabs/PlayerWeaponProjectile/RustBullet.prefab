@@ -52,7 +52,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: b16eaff5488dfc84a8f09f4148d77730, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 81b7b61ab51cdf54abcf96c3527c3131, type: 3}
-  m_Color: {r: 0.38679248, g: 0.38679248, b: 0.38679248, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.64705884}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -94,8 +94,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3993583324721861071}
   - component: {fileID: -172964644735229929}
-  - component: {fileID: 7793101244677922675}
   - component: {fileID: -3802576868962594738}
+  - component: {fileID: 4741245070497508289}
   m_Layer: 14
   m_Name: RustBullet
   m_TagString: Untagged
@@ -146,8 +146,31 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!61 &7793101244677922675
-BoxCollider2D:
+--- !u!114 &-3802576868962594738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6760042265540064826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f8837e90a0fa624c9a669d04fd28f50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletSpeed: 2
+  damage: 1
+  knockbackForce: 0
+  bulletType: 1
+  isOvercharged: 1
+  rustDebuffDuration: 3
+  speedReductionPercent: 0.2
+  damageOverTimeAmount: 2
+  acidEffectPrefab: {fileID: 5382799822232062830, guid: 3c409995c8cd87848a292c959de13b0f, type: 3}
+  swayAmount: 1.5
+  swaySpeed: 4
+--- !u!58 &4741245070497508289
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -179,38 +202,5 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
---- !u!114 &-3802576868962594738
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6760042265540064826}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f8837e90a0fa624c9a669d04fd28f50, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bulletSpeed: 3
-  damage: 3
-  knockbackForce: 0
-  bulletType: 1
-  isOvercharged: 1
-  rustDebuffDuration: 5
-  speedReductionPercent: 30
-  damageOverTimeAmount: 2
-  acidEffectPrefab: {fileID: 0}
-  swayAmount: 1.5
-  swaySpeed: 4
+  m_Radius: 0.5

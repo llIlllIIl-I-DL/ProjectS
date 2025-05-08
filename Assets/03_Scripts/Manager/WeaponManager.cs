@@ -342,11 +342,13 @@ public class WeaponManager : Singleton<WeaponManager>
 
     public void FireNormalBullet()
     {
+        Debug.Log("FireNormalBullet");
         // 재장전 중이거나 탄약 없으면 발사 불가
         if (isReloading || currentAmmo <= 0)
         {
             if (currentAmmo <= 0 && !isReloading)
             {
+                Debug.Log("탄약 없음");
                 StartCoroutine(Reload());
             }
             return;
@@ -355,6 +357,7 @@ public class WeaponManager : Singleton<WeaponManager>
         // 발사 쿨다운 체크
         if (Time.time < nextFireTime)
         {
+            Debug.Log("아직 발사할 수 없음");
             return; // 아직 발사할 수 없음
         }
 
@@ -362,7 +365,18 @@ public class WeaponManager : Singleton<WeaponManager>
         nextFireTime = Time.time + fireRate;
 
         Vector2 direction = GetAimDirection();
+        if (currentBulletType == ElementType.Rust) 
+        {
+            // 현재 방향의 각도 구하기
+            float baseAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            // -45~+45도 랜덤값 더하기
+            float randomAngle = baseAngle + UnityEngine.Random.Range(-45f, 45f);
+            // 새로운 방향 벡터로 변환
+            float rad = randomAngle * Mathf.Deg2Rad;
+            direction = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)).normalized;
+        }
         Vector3 spawnPosition = firePoint.position + new Vector3(direction.x * 0.2f, 0, 0);
+        Debug.Log("spawnPosition: " + spawnPosition);
 
         // BulletFactory를 사용하여 총알 생성
         GameObject bullet = bulletFactory.CreateBullet(currentBulletType, spawnPosition, Quaternion.identity);
@@ -401,6 +415,7 @@ public class WeaponManager : Singleton<WeaponManager>
 
     private void FireSteamPressureBullet()
     {
+        Debug.Log("FireSteamPressureBullet");
         // 재장전 중이거나 탄약 없으면 발사 불가
         if (isReloading || currentAmmo <= 0)
         {
@@ -465,6 +480,16 @@ public class WeaponManager : Singleton<WeaponManager>
         }
 
         Vector2 direction = GetAimDirection();
+        if (currentBulletType == ElementType.Rust) 
+        {
+            // 현재 방향의 각도 구하기
+            float baseAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            // -45~+45도 랜덤값 더하기
+            float randomAngle = baseAngle + UnityEngine.Random.Range(-65f, 65f);
+            // 새로운 방향 벡터로 변환
+            float rad = randomAngle * Mathf.Deg2Rad;
+            direction = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)).normalized;
+        }
         Vector3 spawnPosition = firePoint.position + new Vector3(direction.x * 0.2f, 0, 0);
 
         // BulletFactory를 사용하여 총알 생성 (오버차지 여부 전달)
