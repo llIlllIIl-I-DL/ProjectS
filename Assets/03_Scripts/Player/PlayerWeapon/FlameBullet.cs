@@ -8,7 +8,7 @@ public class FlameBullet : Bullet
 
     protected override void Start()
     {
-        bulletType = ElementType.Flame;
+        BulletType = ElementType.Flame;
         base.Start();
     }
 

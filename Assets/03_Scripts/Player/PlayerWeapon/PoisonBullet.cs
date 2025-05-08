@@ -8,7 +8,7 @@ public class PoisonBullet : Bullet
 
     protected override void Start()
     {
-        bulletType = ElementType.Poison;
+        BulletType = ElementType.Poison;
         base.Start();
     }
 

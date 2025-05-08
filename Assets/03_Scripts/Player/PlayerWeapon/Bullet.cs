@@ -3,13 +3,39 @@ using UnityEngine;
 // 총알 추상 클래스
 public abstract class Bullet : MonoBehaviour
 {
-    public float bulletSpeed = 4f;
-    public float damage = 10f;
-    public float knockbackForce = 5f;
-    public ElementType bulletType = ElementType.Normal;
+    [SerializeField] private float bulletSpeed = 4f;
+    [SerializeField] private float damage = 10f;
+    [SerializeField] private float knockbackForce = 5f;
+    [SerializeField] private ElementType bulletType = ElementType.Normal;
     
     [Header("오버차지 설정")]
-    public bool isOvercharged = false;  // 과열 상태 여부
+    [SerializeField] private bool isOvercharged = false;  // 과열 상태 여부
+
+    public float BulletSpeed
+    {
+        get => bulletSpeed;
+        set => bulletSpeed = value;
+    }
+    public float Damage
+    {
+        get => damage;
+        set => damage = value;
+    }
+    public float KnockbackForce
+    {
+        get => knockbackForce;
+        set => knockbackForce = value;
+    }
+    public ElementType BulletType
+    {
+        get => bulletType;
+        set => bulletType = value;
+    }
+    public bool IsOvercharged
+    {
+        get => isOvercharged;
+        set => isOvercharged = value;
+    }
     
     protected bool hasHitEnemy = false;
     protected GameObject playerObject; // 플레이어 게임오브젝트 참조
@@ -19,33 +45,32 @@ public abstract class Bullet : MonoBehaviour
 
     protected virtual void Start()
     {
-        // 플레이어 찾기
         playerObject = GameObject.FindGameObjectWithTag("Player");
-        
-        if (playerObject != null)
+        var bulletCollider = GetComponent<Collider2D>();
+        if (playerObject != null && bulletCollider != null)
         {
-            // 플레이어와 총알 콜라이더 간의 충돌 무시
-            Physics2D.IgnoreCollision(GetComponent<Collider2D>(), playerObject.GetComponent<Collider2D>(), true);
-            
-            // 플레이어의 모든 자식 콜라이더와도 충돌 무시
+            var playerCollider = playerObject.GetComponent<Collider2D>();
+            if (playerCollider != null)
+                Physics2D.IgnoreCollision(bulletCollider, playerCollider, true);
+
             Collider2D[] playerChildColliders = playerObject.GetComponentsInChildren<Collider2D>();
             foreach (Collider2D childCollider in playerChildColliders)
             {
-                Physics2D.IgnoreCollision(GetComponent<Collider2D>(), childCollider, true);
+                if (childCollider != null)
+                    Physics2D.IgnoreCollision(bulletCollider, childCollider, true);
             }
-            
-            // 레이어 기반 충돌 무시 설정
+
             int bulletLayer = gameObject.layer;
             int playerLayer = playerObject.layer;
-            
-            // 플레이어 레이어와 총알 레이어 간 충돌 무시
             Physics2D.IgnoreLayerCollision(bulletLayer, playerLayer, true);
-            
+
+#if UNITY_EDITOR
             Debug.Log($"레이어 충돌 무시 설정 - 총알 레이어: {LayerMask.LayerToName(bulletLayer)}, 플레이어 레이어: {LayerMask.LayerToName(playerLayer)}");
+#endif
         }
-        
-        // 디버그를 위한 로그 추가
+#if UNITY_EDITOR
         Debug.Log("총알 생성됨: " + transform.position + ", 레이어: " + LayerMask.LayerToName(gameObject.layer));
+#endif
     }
     
     // 업데이트 가상 메서드 추가
