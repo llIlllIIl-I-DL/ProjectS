@@ -300,6 +300,11 @@ public class PlayerUI : MonoBehaviour
         utilityPointText.text = player.utilityPoint.ToString();
     }
 
+    public void TempAddUtilityPoint()
+    {
+        utilityPointText.text = player.utilityPoint.ToString();
+    }
+
     // 탄약 UI를 업데이트하는 메서드
     private void UpdateAmmoUI(int ammo, int maxAmmo)
     {

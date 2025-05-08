@@ -24,6 +24,15 @@ public class InvenInfoController : MonoBehaviour
     [Header("특성 해금 버튼")]
     [SerializeField] private Button utilityUnLockBtn;
 
+    [Header("특성 초기화")]
+    [SerializeField] private Button utilityResetBtn;
+
+    [SerializeField] private Transform isRealUtilityResetPopUpTransform;
+    [SerializeField] private GameObject isRealUtilityResetPopUp;
+
+    [SerializeField] private Button utilityResetYesBtn;
+    [SerializeField] private Button utilityResetNoBtn;
+
     [Header("아이템 설명과 장착/해제 버튼")]
     [SerializeField] private TextMeshProUGUI descriptionTitle;
     [SerializeField] private TextMeshProUGUI itemDescription;
@@ -37,17 +46,51 @@ public class InvenInfoController : MonoBehaviour
 
     private UtilityChangedStatController utilityChangedStatController;
     private Player player;
+    private int revertUtilityPoint;
 
     [HideInInspector] public float maxAmmo;
 
     [HideInInspector] public float bulletDamage;
     [HideInInspector] public float bulletSpeed;
+    
 
     public void Start()
     {
         player = FindObjectOfType<Player>();
         utilityChangedStatController = GetComponent<UtilityChangedStatController>();
+
+        utilityResetBtn.onClick.AddListener(() => IsRealResetUtility());
+
+        utilityResetYesBtn.onClick.AddListener(() => ResetUtility());
+        utilityResetNoBtn.onClick.AddListener(() => isRealUtilityResetPopUp.SetActive(false));
     }
+
+    public void IsRealResetUtility()
+    {
+        if (player.UnLockedUtility.Count > 0)
+        {
+            isRealUtilityResetPopUp.SetActive(true);
+        }
+    }
+
+    public void ResetUtility()
+    {
+        player.UnLockedUtility.Clear();
+
+        player.utilityPoint += revertUtilityPoint;
+
+        player.UpdateCurrentInventory();
+
+        CreatSlotSystem.Instance.RefreshAllOwnPoints();
+        PlayerUI.Instance.TempAddUtilityPoint();
+
+        utilityChangedStatController.currentUtilityList.Clear();
+
+        isRealUtilityResetPopUp.SetActive(false);
+
+        revertUtilityPoint = 0;
+    }
+
 
     public void UnLockedUtility(ItemData utilityItemData) //특성 해금
     {
@@ -73,6 +116,8 @@ public class InvenInfoController : MonoBehaviour
         if (!player.UnLockedUtility.Contains(itemData.id))
         {
             player.utilityPoint -= itemData.utilityPointForUnLock;
+            revertUtilityPoint += itemData.utilityPointForUnLock;
+
             PlayerUI.Instance.utilityPointText.text = player.utilityPoint.ToString();
 
             CreatSlotSystem.Instance.RefreshAllOwnPoints();
@@ -193,7 +238,6 @@ public class InvenInfoController : MonoBehaviour
         }
     }
 
-
     public void UtilityRemoved(ItemData itemdata) //특성 해제
     {
         if (itemdata == null) return;
@@ -220,11 +264,5 @@ public class InvenInfoController : MonoBehaviour
                 break;
 
         }
-
-        //utilityRemoveBtn.onClick.RemoveAllListeners();
-        //selectedItem = null;
-
-        //해제 버튼 비활성화
-        //utilityRemoveBtn.interactable = false;
     }
 }
