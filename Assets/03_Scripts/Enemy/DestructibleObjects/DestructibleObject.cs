@@ -10,8 +10,9 @@ public class DestructibleObject : DestructibleEntity
 {
     #region Variables
 
-    [Header("파괴 이펙트")]
+    [Header("파괴 설정")]
     [SerializeField] protected GameObject destroyEffectPrefab; // 파괴 이펙트 프리팹
+    [SerializeField] protected GameObject hitEffectPrefab; // 피격 이펙트 프리팹
     [SerializeField] protected GameObject dustEffectPrefab; // 먼지 이펙트 프리팹(선택 사항)
 
     // 사운드 관련 변수들은 추후에 AudioManager에서 관리하게 될 수도 있어 선택사항으로 붙여 놓았음
@@ -72,6 +73,15 @@ public class DestructibleObject : DestructibleEntity
         if (enableDestructionForce)
         {
             ApplyDestructionForce();
+        }
+    }
+
+    public override void PlayHitEffect(Vector2 hitpoint = default)
+    {
+        // 피격 이펙트 생성
+        if (hitEffectPrefab != null)
+        {
+            Instantiate(hitEffectPrefab, transform.position, Quaternion.identity);
         }
     }
     

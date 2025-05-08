@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -19,6 +16,11 @@ public abstract class BaseEnemy : DestructibleEntity
     [Header("충돌 데미지")]
     [SerializeField] protected float contactDamage = 1f; // 충돌 데미지 값
     [SerializeField] protected bool dealsDamageOnContact = true; // 충돌 데미지 적용 여부
+
+    [Header("이펙트 설정")]
+
+    [SerializeField] protected GameObject destructionEffect; // 파괴 효과
+    [SerializeField] protected GameObject hitEffect; // 피격 효과
 
     // Enemy 고유 상태 관련
     protected bool isStunned = false; // 기절 여부
@@ -159,6 +161,7 @@ public abstract class BaseEnemy : DestructibleEntity
     //     StopMoving(); // 이동 정지
     //     PlayDestructionEffect(); // 파괴 효과 재생
     // }
+    // BaseEnemy 클래스에서 구현으로 일단 주석처리
     
     #endregion
     
@@ -253,7 +256,23 @@ public abstract class BaseEnemy : DestructibleEntity
     {
         rb.velocity = Vector2.zero; // 속도 초기화
     }
-    
+
+    /// <summary>
+    /// 넉백 적용
+    /// </summary>
+    public virtual void ApplyKnockback(Vector2 direction, float force)
+    {
+        if (rb == null) return; // Rigidbody2D가 없으면 무시
+        StopMoving(); // 이동 정지
+        if (stateMachine != null)
+            stateMachine.ChangeState(null); // 상태 머신 초기화
+        rb.AddForce(direction.normalized * force, ForceMode2D.Impulse); // 넉백 힘 적용
+        // 다시 스테이트 머신으로 돌아가야 함
+        // 이부분은 자식클래스에서 오버라이드해서 타야할 상태머신에 맞게 변경
+
+        Debug.Log($"{gameObject.name}이(가) 넉백을 받았습니다. 방향: {direction}, 힘: {force}");
+    }
+
     #endregion
 
     #region State Switch Methods
@@ -341,18 +360,32 @@ public abstract class BaseEnemy : DestructibleEntity
     
     #endregion
 
-    #region DestructibleEntity Implementation
+    #region Effects
 
     /// <summary>
     /// 파괴 효과 재생
     /// </summary>
     public override void PlayDestructionEffect()
     {
-        // 애니메이션
-        // animator?.SetTrigger("Die");
-        
-        // 여기에 Enemy 전용 파괴 효과 추가
+        if (destructionEffect != null)
+        {
+            GameObject effect = Instantiate(destructionEffect, transform.position, Quaternion.identity);
+            Destroy(effect, 1f); // 1초 후에 효과 삭제
+        }
     }
+
+    public override void PlayHitEffect(Vector2 hitpoint = default)
+    {
+        if (hitpoint == default)
+            hitpoint = transform.position;
+        if (hitEffect != null)
+        {
+            GameObject effect = Instantiate(hitEffect, hitpoint, Quaternion.identity);
+            Destroy(effect, 1f); // 1초 후에 효과 삭제
+        }
+    }
+
+    
 
     #endregion
 
