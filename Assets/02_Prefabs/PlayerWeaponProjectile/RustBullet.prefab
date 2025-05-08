@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 4741245070497508289}
   m_Layer: 14
   m_Name: RustBullet
-  m_TagString: Untagged
+  m_TagString: PlayerAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 6305969457568904122}
   m_Layer: 14
   m_Name: IronBullet
-  m_TagString: Untagged
+  m_TagString: PlayerAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
