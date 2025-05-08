@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 using System; // WeaponManager.OnAmmoChanged 구독을 위해 추가
 
 public class PlayerUI : MonoBehaviour
@@ -20,6 +21,16 @@ public class PlayerUI : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    [Header("GameOver Window")]
+    public float fadeSpeed = 1.5f;
+
+    [SerializeField] public GameObject gameOverWindow;
+    [SerializeField] public Transform gameOverWindowParents;
+    [SerializeField] public CanvasGroup fadeOut;
+
+    GameObject _gameOverWindow;
+    CanvasGroup _fadeOut;
 
 
     [Header("HP 바")]
@@ -300,11 +311,60 @@ public class PlayerUI : MonoBehaviour
         utilityPointText.text = player.utilityPoint.ToString();
     }
 
+    public void TempAddUtilityPoint()
+    {
+        utilityPointText.text = player.utilityPoint.ToString();
+    }
+
     // 탄약 UI를 업데이트하는 메서드
     private void UpdateAmmoUI(int ammo, int maxAmmo)
     {
         float ratio = (float)ammo / maxAmmo;
         ammoBar.value = ratio;
         ammoBarImage.fillAmount = ratio;
+    }
+
+
+
+    public void ShowGameOverUI()
+    {
+        _fadeOut = Instantiate(fadeOut, gameOverWindowParents);
+        _fadeOut.alpha = 0;
+
+        StartCoroutine(FadeOut(_fadeOut));
+    }
+
+    IEnumerator FadeOut(CanvasGroup _fadeOut)
+    {
+        float alpha = _fadeOut.alpha;
+
+        yield return new WaitForSeconds(1);
+
+        while (alpha < 1f)
+        {
+            alpha += Time.deltaTime * fadeSpeed;
+
+            float temp = _fadeOut.alpha;
+            temp = alpha;
+            _fadeOut.alpha = temp;
+
+            yield return null;
+        }
+
+
+        if (gameOverWindow != null)
+        {
+            _gameOverWindow = Instantiate(gameOverWindow, gameOverWindowParents);
+
+            yield return new WaitForSeconds(3);
+
+            ToStartMenu(_gameOverWindow);
+        }
+    }
+    public void ToStartMenu(GameObject _gameOverWindow) //스타트 씬으로 이동!!
+    {
+        SceneManager.LoadScene("TempStartScene", LoadSceneMode.Single);
+
+        Debug.Log("스타트씬 이동!!");
     }
 }
