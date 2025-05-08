@@ -10476,6 +10476,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2daa0fec5340633459056cca03e6312b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fadeSpeed: 1.5
+  gameOverWindow: {fileID: 6371846572626685058, guid: 34613739cf51adf4baf0cbd3a6853f01, type: 3}
+  gameOverWindowParents: {fileID: 5834350049969042346, guid: 34613739cf51adf4baf0cbd3a6853f01, type: 3}
+  fadeOut: {fileID: 2937340609696970186, guid: d5f00ec4ee42d654aab33ff9b9d90956, type: 3}
   healthBar: {fileID: 4959195329951270868}
   healthBarImage: {fileID: 704897820366371018}
   healLight: {fileID: 54305724309254516}

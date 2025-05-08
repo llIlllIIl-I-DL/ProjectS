@@ -65,7 +65,7 @@ public class InvenInfoController : MonoBehaviour
         utilityResetNoBtn.onClick.AddListener(() => isRealUtilityResetPopUp.SetActive(false));
     }
 
-    public void IsRealResetUtility()
+    public void IsRealResetUtility() //초기화하시겠습니까?
     {
         if (player.UnLockedUtility.Count > 0)
         {
@@ -73,7 +73,7 @@ public class InvenInfoController : MonoBehaviour
         }
     }
 
-    public void ResetUtility()
+    public void ResetUtility() //특성 초기화
     {
         player.UnLockedUtility.Clear();
 
@@ -83,6 +83,10 @@ public class InvenInfoController : MonoBehaviour
 
         CreatSlotSystem.Instance.RefreshAllOwnPoints();
         PlayerUI.Instance.TempAddUtilityPoint();
+
+        currentEquippedUtility.Clear();
+
+        //utilityChangedStatController.ClearUtilityIcon();
 
         utilityChangedStatController.currentUtilityList.Clear();
 

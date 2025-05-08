@@ -3,27 +3,15 @@ using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-
 
 public class UIManager : Singleton<UIManager> //조금 리팩토링 필요!!
 {
-    [Header("GameOver Window")]
-    public float fadeSpeed = 1.5f;
-
-    [SerializeField] public GameObject gameOverWindow;
-    [SerializeField] public Transform gameOverWindowParents;
-    [SerializeField] public CanvasGroup fadeOut;
-
     [SerializeField] public UtilityItemList utilityItemList;
 
     public List<GameObject> allUIPages = new List<GameObject>();
 
     InputUI inputUI;
     Player player;
-
-    GameObject _gameOverWindow; //
-    CanvasGroup _fadeOut; //
 
     //보통 Manager에 들어가는 기능 = (UIManager라 했을 때) UI를 가지고 찾고 전달하고...show add remove 등등
 
@@ -63,49 +51,5 @@ public class UIManager : Singleton<UIManager> //조금 리팩토링 필요!!
             inputUI.currentPage.SetActive(!isActive);
             Time.timeScale = isActive ? 1 : 0;
         }
-    }
-
-
-    public void ShowGameOverUI()
-    {
-        _fadeOut = Instantiate(fadeOut, gameOverWindowParents);
-        _fadeOut.alpha = 0;
-
-        StartCoroutine(FadeOut(_fadeOut));
-    }
-
-    IEnumerator FadeOut(CanvasGroup _fadeOut)
-    {
-        float alpha = _fadeOut.alpha;
-
-        yield return new WaitForSeconds(1);
-
-        while (alpha < 1f)
-        {
-            alpha += Time.deltaTime * fadeSpeed;
-
-            float temp = _fadeOut.alpha;
-            temp = alpha;
-            _fadeOut.alpha = temp;
-
-            yield return null;
-        }
-
-
-        if (gameOverWindow != null)
-        {
-            _gameOverWindow = Instantiate(gameOverWindow, gameOverWindowParents);
-
-            yield return new WaitForSeconds(3);
-
-            ToStartMenu(_gameOverWindow);
-        }
-    }
-
-    public void ToStartMenu(GameObject _gameOverWindow) //스타트 씬으로 이동!!
-    {
-        SceneManager.LoadScene("TempStartScene", LoadSceneMode.Single);
-
-        Debug.Log("스타트씬 이동!!");
     }
 }

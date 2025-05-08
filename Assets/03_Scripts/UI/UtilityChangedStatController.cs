@@ -92,6 +92,15 @@ public class UtilityChangedStatController : MonoBehaviour
         }
     }
 
+    /*
+    public void ClearUtilityIcon(int id)
+    {
+        slot.sprite = null;
+        var color = slot.color;
+        color.a = 0f;
+        slot.color = color;
+    }
+    */
 
     public void MaxHPUP(float effectValue) //1001
     {
