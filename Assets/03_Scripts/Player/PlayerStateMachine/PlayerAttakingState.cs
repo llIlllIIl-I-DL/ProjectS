@@ -21,7 +21,7 @@ public class PlayerAttackingState : PlayerStateBase
         lastAimDirection = new Vector2(player.GetMovement().FacingDirection, 0).normalized;
 
         // 총알 발사
-        FireWeapon();
+        //FireWeapon();
 
         Debug.Log("공격 상태 시작: 총 발사");
     }
