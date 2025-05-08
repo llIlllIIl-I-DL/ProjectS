@@ -31,11 +31,11 @@ public class BossDieState : IEnemyState
         // 사망 애니메이션 재생
         if (animator != null)
         {
-            animator.SetTrigger("Die");
+            animator.SetTrigger("setDie");
         }
 
         // 보스 오브젝트 비활성화 (또는 파괴)
-        BossStateMachine.gameObject.SetActive(false);
+        //BossStateMachine.gameObject.SetActive(false);
     }
 
     public void Exit()

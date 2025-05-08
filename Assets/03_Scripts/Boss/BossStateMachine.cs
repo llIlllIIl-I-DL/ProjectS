@@ -16,24 +16,26 @@ public class BossStateMachine : MonoBehaviour
     public IEnemyState currentState;
     private Dictionary<BossState, IEnemyState> states = new Dictionary<BossState, IEnemyState>();
 
+    public BossHealth bossHealth; // 체력 컴포넌트 참조
+
     public Transform playerTransform;
     public GameObject projectilePrefab;
     public Transform firePoint;
-    public GameObject slashEffectPrefab;
-    public GameObject kickEffectPrefab;
     public float chaseRange = 5f;
-
-    [SerializeField] public int maxHP = 100;
-    [SerializeField] private int currentHP;
 
     public float KickCooldown = 20f;
     private float lastKickTime = -Mathf.Infinity;
 
     public float LastKickTime => lastKickTime;
-
     public bool CanKick => Time.time - lastKickTime >= KickCooldown;
 
-    public void Start()
+    private void Awake()
+    {
+        bossHealth = GetComponent<BossHealth>();
+        bossHealth.OnBossDied += HandleBossDeath;
+    }
+
+    private void Start()
     {
         playerTransform = GameObject.FindWithTag("Player")?.transform;
 
@@ -47,19 +49,9 @@ public class BossStateMachine : MonoBehaviour
         ChangeState(BossState.Idle);
     }
 
-    public void Awake()
-    {
-        currentHP = maxHP;
-    }
-
     public void ChangeState(BossState state)
     {
-        if (!states.ContainsKey(state))
-        {
-            Debug.LogError($"State {state} not found in StateMachine.");
-            return;
-        }
-
+        if (!states.ContainsKey(state)) return;
         if (currentState == states[state]) return;
 
         currentState?.Exit();
@@ -67,16 +59,33 @@ public class BossStateMachine : MonoBehaviour
         currentState?.Enter();
     }
 
-
-    public void Update() => currentState?.Update();
-    public void FixedUpdate() => currentState?.FixedUpdate();
-
-    private void OnDrawGizmosSelected()
+    private void HandleBossDeath()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, 10f);
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, 5f);
+        if (!(currentState is BossDieState))
+        {
+            ChangeState(BossState.Die);
+        }
+    }
+
+    private void Update()
+    {
+        currentState?.Update();
+    }
+
+    private void FixedUpdate()
+    {
+        currentState?.FixedUpdate();
+    }
+
+    public void OnTriggerEnter2D(Collider2D other)
+    {
+        currentState?.OnTriggerEnter2D(other);
+
+        if (other.CompareTag("PlayerAttack"))
+        {
+            int damage = 20; // 또는 other.GetComponent<Attack>().damage;
+            bossHealth.TakeDamage(damage);
+        }
     }
 
     public void MarkKickUsed()
@@ -84,8 +93,11 @@ public class BossStateMachine : MonoBehaviour
         lastKickTime = Time.time;
     }
 
-    public void OnTriggerEnter2D(Collider2D other)
+    private void OnDrawGizmosSelected()
     {
-        currentState?.OnTriggerEnter2D(other);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, 10f);
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, 5f);
     }
 }

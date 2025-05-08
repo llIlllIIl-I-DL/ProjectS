@@ -96,12 +96,6 @@ public class BossSlashAttackState : IEnemyState
                 damageable.TakeDamage(slashDamage);
                 Debug.Log("Slash 데미지: " + slashDamage + "@@@@");
             }
-
-            if (BossStateMachine.slashEffectPrefab != null)
-            {
-                GameObject effect = Object.Instantiate(BossStateMachine.slashEffectPrefab, playerTransform.position, Quaternion.identity);
-                Object.Destroy(effect, 1f);
-            }
         }
 
         yield return new WaitForSeconds(returnToIdleDelay);

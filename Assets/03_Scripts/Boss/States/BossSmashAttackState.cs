@@ -82,16 +82,6 @@ public class BossSmashAttackState : IEnemyState
                 rb.AddForce(dir * knockbackForce, ForceMode2D.Impulse);
                 Debug.Log("킥 넉백 적용");
             }
-
-            if (BossStateMachine.kickEffectPrefab != null)
-            {
-                GameObject effect = Object.Instantiate(
-                    BossStateMachine.kickEffectPrefab,
-                    other.transform.position,
-                    Quaternion.identity
-                );
-                Object.Destroy(effect, 1f);
-            }
         }
     }
 

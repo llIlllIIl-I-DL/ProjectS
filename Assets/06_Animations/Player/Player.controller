@@ -982,7 +982,7 @@ AnimatorStateMachine:
   m_ChildStates:
   - serializedVersion: 1
     m_State: {fileID: -5755027986052723802}
-    m_Position: {x: 320, y: 120, z: 0}
+    m_Position: {x: -40, y: 70, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -784757969460253508}
     m_Position: {x: 690, y: 380, z: 0}
@@ -1003,19 +1003,19 @@ AnimatorStateMachine:
     m_Position: {x: 470, y: 500, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 4034913245025905389}
-    m_Position: {x: 100, y: 230, z: 0}
+    m_Position: {x: -260, y: 180, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 4906927650926604761}
-    m_Position: {x: 100, y: 320, z: 0}
+    m_Position: {x: -160, y: 310, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 6848390019451389415}
-    m_Position: {x: 360, y: 240, z: 0}
+    m_Position: {x: 0, y: 190, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 8193872638968681387}
-    m_Position: {x: 360, y: 320, z: 0}
+    m_Position: {x: 150, y: 290, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 6073337978743109298}
-    m_Position: {x: 270, y: 630, z: 0}
+    m_Position: {x: 250, y: 640, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 1980831988766795664}
     m_Position: {x: 180, y: 380, z: 0}
@@ -1030,7 +1030,7 @@ AnimatorStateMachine:
     m_Position: {x: -140, y: 570, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -4292347709326554854}
-    m_Position: {x: 270, y: 500, z: 0}
+    m_Position: {x: 1050, y: 520, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions:
   - {fileID: 1911796879980252437}
@@ -1045,8 +1045,8 @@ AnimatorStateMachine:
   m_EntryTransitions: []
   m_StateMachineTransitions: {}
   m_StateMachineBehaviours: []
-  m_AnyStatePosition: {x: 420, y: 380, z: 0}
-  m_EntryPosition: {x: 50, y: 120, z: 0}
+  m_AnyStatePosition: {x: 1200, y: 290, z: 0}
+  m_EntryPosition: {x: -310, y: 70, z: 0}
   m_ExitPosition: {x: 670, y: 120, z: 0}
   m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}
   m_DefaultState: {fileID: -5755027986052723802}
