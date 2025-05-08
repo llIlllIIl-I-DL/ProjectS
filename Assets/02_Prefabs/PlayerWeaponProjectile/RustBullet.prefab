@@ -158,15 +158,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f8837e90a0fa624c9a669d04fd28f50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletSpeed: 3
-  damage: 3
+  bulletSpeed: 2
+  damage: 1
   knockbackForce: 0
   bulletType: 1
   isOvercharged: 1
-  rustDebuffDuration: 5
-  speedReductionPercent: 30
+  rustDebuffDuration: 3
+  speedReductionPercent: 0.2
   damageOverTimeAmount: 2
-  acidEffectPrefab: {fileID: 0}
+  acidEffectPrefab: {fileID: 5382799822232062830, guid: 3c409995c8cd87848a292c959de13b0f, type: 3}
   swayAmount: 1.5
   swaySpeed: 4
 --- !u!58 &4741245070497508289
