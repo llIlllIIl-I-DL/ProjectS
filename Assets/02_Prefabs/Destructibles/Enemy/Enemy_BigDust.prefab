@@ -177,10 +177,12 @@ MonoBehaviour:
   dropChance: 0.3
   moveSpeed: 3
   attackPower: 10
-  attackRange: 4
+  attackRange: 2.5
   detectionRange: 7
   contactDamage: 1
   dealsDamageOnContact: 1
+  destructionEffect: {fileID: 0}
+  hitEffect: {fileID: 4570405473215393228, guid: 0b8595a57512f4d41a3ed4373b374989, type: 3}
   patrolDistance: 5
   patrolWaitTime: 3
   chaseSpeed: 1
