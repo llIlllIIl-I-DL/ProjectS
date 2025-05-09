@@ -134,15 +134,15 @@ public class UtilityChangedStatController : MonoBehaviour
         float changedMaxMP = maxAmmo * (effectValue / 100);
         float actualIncrease = previousMaxMP - changedMaxMP; // 최대 HP 증가량
 
-        WeaponManager.Instance.maxAmmo = Mathf.CeilToInt(previousMaxMP + changedMaxMP);
+        WeaponManager.Instance.AmmoManager.SetMaxAmmo(Mathf.CeilToInt(previousMaxMP + changedMaxMP));
 
 
         // 현재 HP도 최대 HP를 초과하지 않도록 조정
 
-        float previousCurrentMP = WeaponManager.Instance.currentAmmo;
-        WeaponManager.Instance.currentAmmo = Mathf.CeilToInt(Mathf.Clamp(WeaponManager.Instance.currentAmmo + actualIncrease, 0, WeaponManager.Instance.maxAmmo));
+        float previousCurrentMP = WeaponManager.Instance.AmmoManager.CurrentAmmo;
+        WeaponManager.Instance.AmmoManager.CurrentAmmo = Mathf.CeilToInt(Mathf.Clamp(WeaponManager.Instance.AmmoManager.CurrentAmmo + actualIncrease, 0, WeaponManager.Instance.AmmoManager.MaxAmmo));
 
-        Debug.Log($"최대 HP가 {WeaponManager.Instance.maxAmmo - previousMaxMP}만큼 증가했습니다. 새로운 최대 HP: {WeaponManager.Instance.maxAmmo}");
+        Debug.Log($"최대 HP가 {WeaponManager.Instance.AmmoManager.MaxAmmo - previousMaxMP}만큼 증가했습니다. 새로운 최대 HP: {WeaponManager.Instance.AmmoManager.MaxAmmo}");
 
         //player.UpdateCurrentPlayerMP(maxMP); //데이터 저장용
     }
@@ -157,16 +157,17 @@ public class UtilityChangedStatController : MonoBehaviour
 
     public void ATKUP(float effectValue, float bulletDamage) //1003
     {
-        float nowDamage = bulletDamage;
+        WeaponManager.Instance.SetAtkUpPercent(effectValue / 100f);
 
-        if (effectValue <= 0) return; // 0 이하의 값은 무시
-        float previousMaxMP = nowDamage; // 이전 최대 MP 저장
-
-        float changedMaxHP = nowDamage * (effectValue / 100);
-
-        WeaponManager.Instance.SetBulletDamage(previousMaxMP + changedMaxHP);
-
-        Debug.Log($"공격력이 {previousMaxMP + changedMaxHP - nowDamage}만큼 증가했습니다. 새로운 공격력: {previousMaxMP + changedMaxHP}");
+        // 현재 무기 속성의 기본 데미지로부터 다시 계산
+        var type = WeaponManager.Instance.GetBulletType();
+        var bulletPrefab = WeaponManager.Instance.BulletFactory.GetBulletPrefab(type);
+        var bullet = bulletPrefab.GetComponent<Bullet>();
+        if (bullet != null)
+        {
+            float newDamage = bullet.Damage * (1f + WeaponManager.Instance.AtkUpPercent);
+            WeaponManager.Instance.SetBulletDamage(newDamage);
+        }
 
         //player.UpdateCurrentPlayerATK(bullet.damage); //데이터 저장용
     }
