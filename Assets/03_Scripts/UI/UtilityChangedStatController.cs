@@ -134,15 +134,15 @@ public class UtilityChangedStatController : MonoBehaviour
         float changedMaxMP = maxAmmo * (effectValue / 100);
         float actualIncrease = previousMaxMP - changedMaxMP; // 최대 HP 증가량
 
-        WeaponManager.Instance.AmmoManager.SetMaxAmmo(Mathf.CeilToInt(previousMaxMP + changedMaxMP));
+        WeaponManager.Instance.maxAmmo = Mathf.CeilToInt(previousMaxMP + changedMaxMP);
 
 
         // 현재 HP도 최대 HP를 초과하지 않도록 조정
 
-        float previousCurrentMP = WeaponManager.Instance.AmmoManager.CurrentAmmo;
-        WeaponManager.Instance.AmmoManager.CurrentAmmo = Mathf.CeilToInt(Mathf.Clamp(WeaponManager.Instance.AmmoManager.CurrentAmmo + actualIncrease, 0, WeaponManager.Instance.AmmoManager.MaxAmmo));
+        float previousCurrentMP = WeaponManager.Instance.currentAmmo;
+        WeaponManager.Instance.currentAmmo = Mathf.CeilToInt(Mathf.Clamp(WeaponManager.Instance.currentAmmo + actualIncrease, 0, WeaponManager.Instance.maxAmmo));
 
-        Debug.Log($"최대 HP가 {WeaponManager.Instance.AmmoManager.MaxAmmo - previousMaxMP}만큼 증가했습니다. 새로운 최대 HP: {WeaponManager.Instance.AmmoManager.MaxAmmo}");
+        Debug.Log($"최대 HP가 {WeaponManager.Instance.maxAmmo - previousMaxMP}만큼 증가했습니다. 새로운 최대 HP: {WeaponManager.Instance.maxAmmo}");
 
         //player.UpdateCurrentPlayerMP(maxMP); //데이터 저장용
     }
@@ -155,21 +155,15 @@ public class UtilityChangedStatController : MonoBehaviour
 
 
 
-    public void ATKUP(float effectValue, float bulletDamage) //1003
+    public void ATKUP(float effectValue) //1003
     {
-        WeaponManager.Instance.SetAtkUpPercent(effectValue / 100f);
+        if (effectValue <= 0) return;
 
-        // 현재 무기 속성의 기본 데미지로부터 다시 계산
-        var type = WeaponManager.Instance.GetBulletType();
-        var bulletPrefab = WeaponManager.Instance.BulletFactory.GetBulletPrefab(type);
-        var bullet = bulletPrefab.GetComponent<Bullet>();
-        if (bullet != null)
-        {
-            float newDamage = bullet.Damage * (1f + WeaponManager.Instance.AtkUpPercent);
-            WeaponManager.Instance.SetBulletDamage(newDamage);
-        }
+        float percent = effectValue / 100f; //퍼센트 값 계산
 
-        //player.UpdateCurrentPlayerATK(bullet.damage); //데이터 저장용
+        WeaponManager.Instance.SetAtkUpPercent(percent); //weaponManager에 전달!!
+
+        Debug.Log($"버프 적용: {effectValue}% 공격력 (현재 총알 속성: {WeaponManager.Instance.GetBulletType()})");
     }
 
     public void RemovedATKUP()

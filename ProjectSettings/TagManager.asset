@@ -13,6 +13,8 @@ TagManager:
   - Platform
   - Ground
   - Ladder
+  - Boss
+  - PlayerAttack
   layers:
   - Default
   - TransparentFX

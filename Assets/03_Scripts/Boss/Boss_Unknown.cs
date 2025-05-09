@@ -2,17 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Boss_Unknown : MonoBehaviour
+public class Boss_Unknown : BaseEnemy
 {
-    // Start is called before the first frame update
-    void Start()
+    public override void PerformAttack()
     {
-        
+        throw new System.NotImplementedException();
     }
 
-    // Update is called once per frame
-    void Update()
+    protected override void HandleMovement()
     {
-        
+        throw new System.NotImplementedException();
+    }
+
+    protected override void InitializeEnemy()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected override void UpdateAI()
+    {
+        throw new System.NotImplementedException();
     }
 }
