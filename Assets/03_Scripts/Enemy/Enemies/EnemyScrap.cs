@@ -2,7 +2,7 @@ using UnityEngine;
 using Enemy.States;
 
 /// <summary>
-/// 간단한 순찰 적 (Met/굼바 스타일)
+/// 날아다니는 기본 적 클래스
 /// </summary>
 public class EnemyScrap : BaseEnemy
 {
@@ -25,6 +25,9 @@ public class EnemyScrap : BaseEnemy
     // 부유 효과를 위한 변수
     private float timeCounter = 0f;
     private float originalY;
+    private bool isReturningToHeight = false;
+    private float targetY;
+    private float heightReturnSpeed = 1.5f;
 
     // 상태들
     private FlyingPatrolState flyingPatrolState;
@@ -67,8 +70,17 @@ public class EnemyScrap : BaseEnemy
     {
         if (isDestroyed || isStunned) return;
     
-        // 부유 효과 적용 (위아래 움직임)
-        ApplyHoverEffect();
+        // 높이 복귀 처리
+        if (isReturningToHeight)
+        {
+            HandleHeightReturn();
+            // 높이 복귀 중일 때는 부유 효과 적용하지 않음
+        }
+        // 부유 효과는 복귀 중이 아니고, 추격 또는 공격 상태가 아닐 때만 적용
+        else if (currentState != flyingChaseState && currentState != attackState)
+        {
+            ApplyHoverEffect();
+        }
 
         // 플레이어 감지
         DetectPlayer();
@@ -93,7 +105,6 @@ public class EnemyScrap : BaseEnemy
         base.Start(); // 부모의 Start 호출
         InitializeEnemy(); // 이 메서드 호출이 Start에서 이루어져야 함
     }
-    
     #endregion
 
     #region Core Methods
@@ -131,17 +142,28 @@ public class EnemyScrap : BaseEnemy
     }
 
     /// <summary>
-    /// 총알 발사 속성 초기화
+    /// 공격 로직은 상태에서 처리
     /// </summary>
     public override void PerformAttack()
     {
+        // 플레이어가 있고 공격 범위 내에 있는지 확인
+        if (playerTransform != null && IsInAttackRange())
+        {
+            // 플레이어에게 데미지 주기
+            IDamageable playerDamageable = playerTransform.GetComponent<IDamageable>();
+            if (playerDamageable != null)
+            {
+                playerDamageable.TakeDamage(attackPower);
+                Debug.Log($"{gameObject.name}이(가) 플레이어에게 {attackPower} 데미지를 입혔습니다.");
 
+                // 공격 이펙트 등 추가 요소 구현 가능
+            }
+        }
     }
     
     #endregion
 
     #region Player Detection
-    
     /// <summary>
     /// 플레이어 감지 시 호출됨
     /// </summary>
@@ -171,7 +193,6 @@ public class EnemyScrap : BaseEnemy
     {
         stateMachine.ChangeState(attackState);
     }
-    
     /// <summary>
     /// 순찰 상태로 전환
     /// </summary>
@@ -195,6 +216,33 @@ public class EnemyScrap : BaseEnemy
     #region Flying Mechanics
     
     /// <summary>
+    /// 지정된 높이로 자연스럽게 복귀
+    /// </summary>
+    private void HandleHeightReturn()
+    {
+        Vector3 currentPos = transform.position;
+        float newY = Mathf.MoveTowards(currentPos.y, targetY, heightReturnSpeed * Time.deltaTime);
+        transform.position = new Vector3(currentPos.x, newY, currentPos.z);
+
+        // 목표 높이에 충분히 가까워지면 완료로 표시
+        if (Mathf.Abs(newY - targetY) < 0.05f)
+        {
+            isReturningToHeight = false;
+            originalY = targetY; // 원래 높이 업데이트
+            timeCounter = 0f; // 부유 효과 타이머 리셋
+        }
+    }
+
+    /// <summary>
+    /// 지정된 높이로 돌아가기 시작
+    /// </summary>
+    public void ReturnToHeight(float height)
+    {
+        targetY = height;
+        isReturningToHeight = true;
+    }
+
+    /// <summary>
     /// 부유 효과 적용 (상하로 부드럽게 움직임)
     /// </summary>
     private void ApplyHoverEffect()
@@ -203,14 +251,21 @@ public class EnemyScrap : BaseEnemy
         
         timeCounter += Time.deltaTime;
         float hoverOffset = Mathf.Sin(timeCounter * hoverFrequency) * hoverAmplitude;
-        
-        // 현재 x 위치는 그대로 유지하고 y만 변경
-        // transform.position이 아닌 localPosition 사용 고려
+
         Vector3 currentPos = transform.position;
         float newY = originalY + hoverOffset;
         
         transform.position = new Vector3(currentPos.x, newY, currentPos.z);
     }
     
+    /// <summary>
+    /// 현재 Y 위치를 원래 Y 위치로 설정
+    /// </summary>
+    public void SetCurrentPositionAsOriginalY()
+    {
+        originalY = transform.position.y;
+        timeCounter = 0f; // 부유 효과 타이머 리셋
+    }
+
     #endregion
 }
