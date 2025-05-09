@@ -210,8 +210,14 @@ public class WeaponManager : Singleton<WeaponManager>
             float baseAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             float randomAngle = baseAngle + UnityEngine.Random.Range(-65f, 65f);
             float rad = randomAngle * Mathf.Deg2Rad;
-            direction = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)).normalized;
+            if (isCharged)
+            {
+                // 차징샷인 경우 발사 방향 기존방향과 동일
+                direction = new Vector2(direction.x, direction.y);
+            }
+            else direction = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)).normalized;
         }
+        
 
         Vector3 spawnPosition = firePoint.position + new Vector3(direction.x * 0.2f, 0, 0);
         Debug.Log("spawnPosition: " + spawnPosition);
