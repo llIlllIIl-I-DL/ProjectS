@@ -79,8 +79,8 @@ public class PlayerUI : MonoBehaviour
         float maxHP = playerHP.MaxHP;
         float currentHP = playerHP.CurrentHP;
 
-        int ammo = WeaponManager.Instance.currentAmmo;
-        int maxAmmo = WeaponManager.Instance.maxAmmo;
+        int ammo = WeaponManager.Instance.AmmoManager.CurrentAmmo;
+        int maxAmmo = WeaponManager.Instance.AmmoManager.MaxAmmo;
 
         
 

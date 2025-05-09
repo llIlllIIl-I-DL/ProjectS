@@ -6,6 +6,8 @@ public abstract class Bullet : MonoBehaviour
     [SerializeField] private float bulletSpeed = 4f;
     [SerializeField] private float damage = 10f;
     [SerializeField] private float knockbackForce = 5f;
+    [SerializeField] private int ammo = 30;
+
     [SerializeField] private ElementType bulletType = ElementType.Normal;
     
     [Header("오버차지 설정")]
@@ -36,7 +38,12 @@ public abstract class Bullet : MonoBehaviour
         get => isOvercharged;
         set => isOvercharged = value;
     }
-    
+    public int Ammo
+    {
+        get => ammo;
+        set => ammo = value;
+    }
+
     protected bool hasHitEnemy = false;
     protected GameObject playerObject; // 플레이어 게임오브젝트 참조
 
@@ -110,7 +117,17 @@ public abstract class Bullet : MonoBehaviour
                 Destroy(gameObject);
             }
         }
-        
+
+        if (other.CompareTag("Boss"))
+        {
+            BossHealth boss = other.GetComponent<BossHealth>();
+            if (boss != null)
+            {
+                boss.TakeDamage(damage);
+                Destroy(gameObject);
+            }
+        }
+
         // 적 레이어 확인
         if (other.CompareTag("Enemy"))
         {

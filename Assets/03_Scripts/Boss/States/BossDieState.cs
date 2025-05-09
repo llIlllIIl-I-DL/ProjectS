@@ -34,6 +34,8 @@ public class BossDieState : IEnemyState
             animator.SetTrigger("setDie");
         }
 
+        animator.enabled = false;
+
         // 보스 오브젝트 비활성화 (또는 파괴)
         //BossStateMachine.gameObject.SetActive(false);
     }
@@ -45,16 +47,16 @@ public class BossDieState : IEnemyState
 
     public void Update()
     {
-        // 사망 상태에서는 아무것도 하지 않음
+
     }
 
     public void FixedUpdate()
     {
-        // 사망 상태에서는 아무것도 하지 않음
+
     }
 
     public void OnTriggerEnter2D(Collider2D other)
     {
-        // 사망 상태에서는 충돌 무시
+
     }
 }
