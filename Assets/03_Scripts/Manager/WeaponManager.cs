@@ -376,7 +376,9 @@ public class WeaponManager : Singleton<WeaponManager>
 
     // 외부에서 값 변경 가능
     public void SetSpeedUpPercent(float percent) => speedUpPercent = percent;
+    public float SpeedUpPercent => speedUpPercent;
     public void SetAtkUpPercent(float percent) => atkUpPercent = percent;
+    public float AtkUpPercent => atkUpPercent;
     public void SetBulletSpeed(float speed) => bulletSpeed = speed;
     public void SetFireRate(float rate) => fireRate = rate;
     public void SetBulletDamage(float damage) => bulletDamage = damage;
@@ -388,6 +390,9 @@ public class WeaponManager : Singleton<WeaponManager>
     public AmmoManager AmmoManager => ammoManager;
     public ChargeManager ChargeManager => chargeManager;
     public EffectManager EffectManager => effectManager;
+    public BulletFactory BulletFactory => bulletFactory;
+
+
 
 
     // 총알 속성 가져오기
