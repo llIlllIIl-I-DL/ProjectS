@@ -110,7 +110,17 @@ public abstract class Bullet : MonoBehaviour
                 Destroy(gameObject);
             }
         }
-        
+
+        if (other.CompareTag("Boss"))
+        {
+            BossHealth boss = other.GetComponent<BossHealth>();
+            if (boss != null)
+            {
+                boss.TakeDamage(damage);
+                Destroy(gameObject);
+            }
+        }
+
         // 적 레이어 확인
         if (other.CompareTag("Enemy"))
         {
