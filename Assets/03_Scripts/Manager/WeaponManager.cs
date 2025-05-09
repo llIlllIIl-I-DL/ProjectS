@@ -39,7 +39,7 @@ public class WeaponManager : Singleton<WeaponManager>
     [SerializeField] private ElementType currentBulletType = ElementType.Normal; // 현재 총알 속성
 
     // 유틸리티 효과 설정
-    private float atkUpPercent = 0f;
+    private float atkUpPercent = 0f; //공격력 증가 퍼센트
     private float speedUpPercent = 0f;
 
     // 차징 상태 관리
@@ -605,18 +605,44 @@ public class WeaponManager : Singleton<WeaponManager>
     {
         currentBulletType = type;
 
+        /*
         GameObject bulletPrefab = bulletFactory.GetBulletPrefab(type);
         var bullet = bulletPrefab.GetComponent<Bullet>();
         if (bullet != null)
         {
             bulletSpeed = bullet.BulletSpeed * (1f + speedUpPercent);
-            bulletDamage = bullet.Damage * (1f + atkUpPercent);
+            bulletDamage = bulletDamage * (1f + atkUpPercent);
+        }
+        */
+
+        RecalculateCurrentBulletDamage();
+    }
+
+  
+    public void SetAtkUpPercent(float percent) 
+    {
+        atkUpPercent = percent; //atkUpPercent에 방금 계산했던 퍼센트 값 할당
+        RecalculateCurrentBulletDamage(); //계산!
+    }
+    
+
+    // 현재 총알 타입의 기본 데미지에 퍼센트를 적용해 bulletDamage 재설정
+    private void RecalculateCurrentBulletDamage()
+    {
+        var prefab = bulletFactory.GetBulletPrefab(currentBulletType);
+        var bulletComp = prefab.GetComponent<Bullet>();
+        if (bulletComp != null)
+        {
+            // bulletComp.Damage = 에디터에 설정된 “기본 데미지”
+            bulletDamage = bulletComp.Damage * (1f + atkUpPercent);
         }
     }
+
     // 외부에서 값 변경 가능
 
     public void SetSpeedUpPercent(float percent) => speedUpPercent = percent;
-    public void SetAtkUpPercent(float percent) => atkUpPercent = percent;
+
+    //public void SetAtkUpPercent(float percent) => atkUpPercent = percent;
     public void SetBulletSpeed(float speed) => bulletSpeed = speed;
     public void SetFireRate(float rate) => fireRate = rate;
     public void SetBulletDamage(float damage) => bulletDamage = damage;

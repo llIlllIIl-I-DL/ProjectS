@@ -155,20 +155,15 @@ public class UtilityChangedStatController : MonoBehaviour
 
 
 
-    public void ATKUP(float effectValue, float bulletDamage) //1003
+    public void ATKUP(float effectValue) //1003
     {
-        float nowDamage = bulletDamage;
+        if (effectValue <= 0) return;
 
-        if (effectValue <= 0) return; // 0 이하의 값은 무시
-        float previousMaxMP = nowDamage; // 이전 최대 MP 저장
+        float percent = effectValue / 100f; //퍼센트 값 계산
 
-        float changedMaxHP = nowDamage * (effectValue / 100);
+        WeaponManager.Instance.SetAtkUpPercent(percent); //weaponManager에 전달!!
 
-        WeaponManager.Instance.SetBulletDamage(previousMaxMP + changedMaxHP);
-
-        Debug.Log($"공격력이 {previousMaxMP + changedMaxHP - nowDamage}만큼 증가했습니다. 새로운 공격력: {previousMaxMP + changedMaxHP}");
-
-        //player.UpdateCurrentPlayerATK(bullet.damage); //데이터 저장용
+        Debug.Log($"버프 적용: {effectValue}% 공격력 (현재 총알 속성: {WeaponManager.Instance.GetBulletType()})");
     }
 
     public void RemovedATKUP()
