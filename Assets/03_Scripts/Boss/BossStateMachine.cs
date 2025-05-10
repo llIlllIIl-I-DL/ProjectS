@@ -55,9 +55,13 @@ public class BossStateMachine : MonoBehaviour
 
     public void ChangeState(BossState state)
     {
-        if (isDead) return; // 사망 시 상태 전이 차단
+        // 이미 죽은 상태면 상태 전이 차단
+        if (isDead && state != BossState.Die) return;
+
         if (!states.ContainsKey(state)) return;
         if (currentState == states[state]) return;
+
+        Debug.Log($"[BossStateMachine] 상태 전이: {currentState} → {state}!!!");
 
         currentState?.Exit();
         currentState = states[state];
@@ -80,6 +84,7 @@ public class BossStateMachine : MonoBehaviour
 
     private void Update()
     {
+        if (isDead) return;
         currentState?.Update();
     }
 
@@ -105,5 +110,17 @@ public class BossStateMachine : MonoBehaviour
         animator.enabled = false;
         // 기타 처리: 피격 무시, 오브젝트 제거 등
     }
+    public void SetDead()
+    {
+        if (isDead) return;
 
+        isDead = true;
+        Debug.Log("[BossStateMachine] 보스가 사망했습니다.!!!!");
+
+        currentState?.Exit(); // 현재 상태 종료
+        ChangeState(BossState.Die); // 반드시 Die 상태로 전이
+
+        // 사망 애니메이션 트리거
+        animator?.SetTrigger("setDead"); // 또는 "setDie"
+    }
 }

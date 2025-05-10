@@ -11,6 +11,7 @@ public class BossMoveState : IEnemyState
     private float moveSpeed = 3f;
     private float detectionRange = 10f;
     private float attackRange = 5f;
+    private bool isDead;
 
     public BossMoveState(BossStateMachine stateMachine)
     {
@@ -93,5 +94,10 @@ public class BossMoveState : IEnemyState
                 Debug.Log($"Kick 쿨다운 중... 남은 시간: {remain:F1}초");
             }
         }
+    }
+    public void SetDead()
+    {
+        isDead = true;
+        Debug.Log("[BossStateMachine] 보스 사망 처리됨 - 상태 업데이트 정지");
     }
 }

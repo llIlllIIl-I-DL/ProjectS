@@ -16,6 +16,17 @@ public class BossHealth : MonoBehaviour, IDamageable
     {
         currentHP = maxHP;
         animator = GetComponent<Animator>(); // Animator 연결
+
+        // 보스가 죽었을 때 상태머신에 알림
+        OnBossDied += () =>
+        {
+            BossStateMachine stateMachine = GetComponent<BossStateMachine>();
+            if (stateMachine != null)
+            {
+                stateMachine.SetDead(); // 보스가 죽음 처리
+            }
+        };
+
     }
 
     public void OnTriggerEnter2D(Collider2D other)
