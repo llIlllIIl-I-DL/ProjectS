@@ -155,10 +155,15 @@ public class DebuffManager : MonoBehaviour
     {
         if (data.visualEffectPrefab != null)
         {
-            GameObject effect = Instantiate(data.visualEffectPrefab, enemy.transform);
-            effect.transform.localPosition = Vector3.zero;
-
-            // 효과 자동 제거는 DebuffEffect에서 처리
+            // 풀링 매니저 사용
+            GameObject effect = ObjectPoolingManager.Instance.GetDebuffEffect(data.type, enemy.transform);
+            
+            // 이펙트 참조를 DebuffEffect에 전달
+            DebuffEffect debuffEffect = GetDebuffComponent(enemy, data.type);
+            if (debuffEffect != null)
+            {
+                debuffEffect.SetVisualEffect(effect);
+            }
         }
 
         // 사운드 효과 재생

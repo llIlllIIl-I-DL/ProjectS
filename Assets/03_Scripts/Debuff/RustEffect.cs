@@ -14,6 +14,18 @@ public class RustEffect : DebuffEffect
 
         // 시각적 효과 적용 (색상 변경 등)
         ApplyVisualEffect(true);
+        
+        // 필요하다면 visualEffect 관련 추가 설정
+        if (visualEffect != null)
+        {
+            // 예: 파티클 색상 변경 등
+            ParticleSystem ps = visualEffect.GetComponent<ParticleSystem>();
+            if (ps != null)
+            {
+                var main = ps.main;
+                main.startColor = new Color(0.7f, 1.0f, 0.7f);
+            }
+        }
     }
 
     protected override void ApplyTickEffect()

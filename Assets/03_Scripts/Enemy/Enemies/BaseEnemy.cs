@@ -10,6 +10,7 @@ public abstract class BaseEnemy : DestructibleEntity
     [Header("기본 스탯")]
     [SerializeField] protected float moveSpeed; // 이동 속도
     [SerializeField] protected float attackPower; // 공격력
+    [SerializeField] protected float defence; // 방어력
     [SerializeField] protected float attackRange; // 공격 범위
     [SerializeField] protected float detectionRange; // 감지 범위
     
@@ -366,6 +367,7 @@ public abstract class BaseEnemy : DestructibleEntity
     /// 에너미 상태이상 여부 확인
     /// 
     public float GetAttackPower() => attackPower;
+    public float GetDefence() => defence;
     public float SetMoveSpeed() => moveSpeed;
     public void SetMoveSpeed(float speed)
     {

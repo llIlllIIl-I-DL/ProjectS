@@ -85,7 +85,12 @@ public abstract class Bullet : MonoBehaviour
     {
         // 파생 클래스에서 오버라이드 가능
     }
-
+    // 총알 상태 초기화 (풀에서 가져올 때 호출)
+    public void ResetBullet()
+    {
+        // 필요한 초기화 작업
+        // 예: 충돌 카운터 리셋, 효과 초기화 등
+    }
     protected virtual void OnTriggerEnter2D(Collider2D other)
     {
         // 플레이어와의 충돌은 무시
