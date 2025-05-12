@@ -242,8 +242,6 @@ public class UtilityChangedStatController : MonoBehaviour
 
 
 
-
-
     public void RDUP(float effectValue)
     {
 
@@ -251,7 +249,7 @@ public class UtilityChangedStatController : MonoBehaviour
 
         float percent = effectValue / 100f; //퍼센트 값 계산
 
-        //playerSettings.너 변수명이 무엇이냐... += percent;
+        player.UpdateCurrentSprintTime(percent);
     }
 
     public void RemovedRDUP()
@@ -297,7 +295,7 @@ public class UtilityChangedStatController : MonoBehaviour
 
 
 
-    public void WeighPower()
+    public void WeighPower(float effectValue)
     {
 
     }
@@ -309,7 +307,7 @@ public class UtilityChangedStatController : MonoBehaviour
 
 
 
-    public void WeighHealth()
+    public void WeighHealth(float effectValue)
     {
 
     }
@@ -320,12 +318,50 @@ public class UtilityChangedStatController : MonoBehaviour
 
 
 
-    public void BestDefenceIsAttack()
+    public void BestDefenceIsAttack(float effectValue)
     {
 
     }
     public void RemovedBestDefenceIsAttack()
     {
-        Debug.Log("Remove 1011");
+        Debug.Log("Remove 1012");
     }
+
+
+
+
+    public void SpeedRacer(float effectValue)
+    {
+
+    }
+    public void RemovedSpeedRacer()
+    {
+        Debug.Log("Remove 1013");
+    }
+
+
+
+
+    public void Trinity(float effectValue)
+    {
+
+    }
+    public void RemovedTrinity()
+    {
+        Debug.Log("Remove 1014");
+    }
+
+
+
+
+
+    public void InvincibleWhenSprint(float effectValue)
+    {
+
+    }
+    public void RemovedInvincibleWhenSprint()
+    {
+        Debug.Log("Remove 1015");
+    }
+
 }

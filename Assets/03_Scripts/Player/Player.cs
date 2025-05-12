@@ -186,7 +186,12 @@ public class Player : MonoBehaviour
         CurrentMoveSpeed = moveSpeed;
     }
 
+
     public void UpdateCurrentPlayerRunSpeed(float changedSpeed)
+    {
+        float moveSpeed = settings.sprintMultiplier += changedSpeed;
+        CurrentRunSpeed = moveSpeed;
+    }
 
 
     public void UpdateCurrentSprintTime(float changedSprintTime)
@@ -195,11 +200,6 @@ public class Player : MonoBehaviour
         CurrentSprintTime = sprintTime;
     }
 
-    public void UpdateCurrentPlayerJumpForce(float changedJumpForce)
-    {
-        float moveSpeed = settings.sprintMultiplier += changedSpeed;
-        CurrentRunSpeed = moveSpeed; 
-    }
 
     public void UpdateCurrentInventory()
     {
@@ -207,9 +207,9 @@ public class Player : MonoBehaviour
 
         int nowUtilityPoint = utilityPoint;
         CurrentUtilityPoint = nowUtilityPoint;
-
-        Debug.Log($"{CurrentUtilityPoint}");
     }
+
+
 
     public void UpdateCurrentUnLockedUtility(ItemData utilityItemData)
     {
