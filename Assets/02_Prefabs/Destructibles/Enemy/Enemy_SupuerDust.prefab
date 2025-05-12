@@ -109,6 +109,8 @@ MonoBehaviour:
   detectionRange: 7
   contactDamage: 1
   dealsDamageOnContact: 1
+  destructionEffect: {fileID: 9174822137840911509, guid: e5623deedc49c4b7f88cd66604a12a00, type: 3}
+  hitEffect: {fileID: 4570405473215393228, guid: 0b8595a57512f4d41a3ed4373b374989, type: 3}
   firePoint: {fileID: 0}
   bulletPrefab: {fileID: 4363198470078929428, guid: 00c8892831c5e438faf6f7d95f95044a, type: 3}
   fireRate: 1.5
