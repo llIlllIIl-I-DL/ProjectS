@@ -786,7 +786,7 @@ Transform:
   m_GameObject: {fileID: 980502325}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.15, y: -1.95, z: 0.031704225}
+  m_LocalPosition: {x: -4.67, y: -1.95, z: 0.031704225}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -810,6 +810,7 @@ MonoBehaviour:
   projectilePrefab: {fileID: 8185762800821648384, guid: 5e2ab09353e4dd04684a03973d264cc3, type: 3}
   firePoint: {fileID: 2121112092}
   chaseRange: 5
+  isFastChasingAfterProjectile: 0
   KickCooldown: 20
 --- !u!61 &980502332
 BoxCollider2D:
@@ -896,7 +897,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHP: 10
-  currentHP: 10
+  currentHP: 1
   damage: 0
 --- !u!212 &980502335
 SpriteRenderer:
@@ -958,7 +959,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 980502325}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 55136ed437e1e4f4a9b3233e6b709450, type: 2}
   m_CullingMode: 0
@@ -1368,7 +1369,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3137287986617449566, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.5
+      value: -3.54
       objectReference: {fileID: 0}
     - target: {fileID: 3137287986617449566, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1406,6 +1407,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3643135106655314618, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4995387987602289083, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
       propertyPath: maxSlopeAngle
       value: 55
@@ -1416,11 +1421,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7599131818407334981, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
       propertyPath: maxHP
-      value: 100
+      value: 10000
       objectReference: {fileID: 0}
     - target: {fileID: 7599131818407334981, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
       propertyPath: currentHP
-      value: 100
+      value: 10000
       objectReference: {fileID: 0}
     - target: {fileID: 8571206959293451295, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
       propertyPath: m_SortingOrder

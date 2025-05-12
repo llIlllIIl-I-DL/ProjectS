@@ -11,9 +11,6 @@ public class BossKickAttackState : IEnemyState
     private float kickRange = 2f;
     private int kickDamage = 30;
     private float attackDelay = 0.3f;
-    private float returnToIdleDelay = 1.0f;
-
-    private GameObject kickEffectPrefab;
 
     public BossKickAttackState(BossStateMachine bossStateMachine)
     {
@@ -27,15 +24,15 @@ public class BossKickAttackState : IEnemyState
     {
         if (animator != null)
         {
-        Debug.Log("Boss Kick 상태 진입@@@@");
+        Debug.Log("Boss Kick 상태 진입####");
         animator.SetBool("IsKicking", true);
-        BossStateMachine.StartCoroutine(KickAttackCoroutine());
+        BossStateMachine.StartCoroutine(PerformKickAfterDelay());
         }
     }
 
     public void Exit()// 상태에서 나갈 때
     {
-        Debug.Log("Boss Kick 상태 종료@@@@");
+        Debug.Log("Boss Kick 상태 종료####");
         animator.SetBool("IsKicking", false);
     }
 
@@ -54,7 +51,8 @@ public class BossKickAttackState : IEnemyState
 
     }
 
-    private IEnumerator KickAttackCoroutine()//상태 진입은 되는데 코루틴 실행이 안 됨 왜인지는 모르겠음
+    // 공격 딜레이 후 데미지 판정만
+    private IEnumerator PerformKickAfterDelay()
     {
         yield return new WaitForSeconds(attackDelay);
 
@@ -64,18 +62,14 @@ public class BossKickAttackState : IEnemyState
             if (damageable != null)
             {
                 damageable.TakeDamage(kickDamage);
-                Debug.Log("Kick 데미지: " + kickDamage + "@@@");
-            }
-
-            if (kickEffectPrefab != null)
-            {
-                GameObject effect = Object.Instantiate(kickEffectPrefab, player.position, Quaternion.identity);
-                Object.Destroy(effect, 1f);
+                Debug.Log("Kick 데미지: " + kickDamage + "###");
             }
         }
+    }
 
-        yield return new WaitForSeconds(returnToIdleDelay);
-
+    // 이 메서드는 애니메이션 이벤트에서 호출됨
+    public void OnKickAnimationEnd()
+    {
         if (BossStateMachine != null && BossStateMachine.currentState is BossKickAttackState)
         {
             BossStateMachine.ChangeState(BossState.Idle);

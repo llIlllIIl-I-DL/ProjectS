@@ -24,6 +24,8 @@ public class BossStateMachine : MonoBehaviour
     public Transform firePoint;
     public float chaseRange = 5f;
 
+    public bool isFastChasingAfterProjectile = false;
+
     public float KickCooldown = 20f;
     private float lastKickTime = -Mathf.Infinity;
 
@@ -43,6 +45,7 @@ public class BossStateMachine : MonoBehaviour
     {
         playerTransform = GameObject.FindWithTag("Player")?.transform;
 
+        // 상태 추가
         states.Add(BossState.Idle, new BossIdleState(this));
         states.Add(BossState.Move, new BossMoveState(this));
         states.Add(BossState.ProjectileAttack, new BossProjectileAttackState(this));
@@ -93,11 +96,6 @@ public class BossStateMachine : MonoBehaviour
         currentState?.FixedUpdate();
     }
 
-    public void MarkKickUsed()
-    {
-        lastKickTime = Time.time;
-    }
-
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
@@ -105,11 +103,7 @@ public class BossStateMachine : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, 5f);
     }
-    public void OnDeathAnimationEnd()
-    {
-        animator.enabled = false;
-        // 기타 처리: 피격 무시, 오브젝트 제거 등
-    }
+
     public void SetDead()
     {
         if (isDead) return;
@@ -122,5 +116,18 @@ public class BossStateMachine : MonoBehaviour
 
         // 사망 애니메이션 트리거
         animator?.SetTrigger("setDead"); // 또는 "setDie"
+    }
+    public void OnDeathAnimationEnd()
+    {
+        animator.enabled = false;
+        // 기타 처리: 피격 무시, 오브젝트 제거 등
+    }
+
+    public void OnKickAnimationEnd()
+    {
+        if (currentState is BossKickAttackState)
+        {
+            ChangeState(BossState.Idle);
+        }
     }
 }
