@@ -65,11 +65,7 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
         playerInputs.Player.Enable();
         Debug.Log("PlayerInput이 활성화되었습니다.");
         
-        // 이벤트 구독 상태 확인
-        if (OnSprintActivated == null)
-        {
-            Debug.LogWarning("OnSprintActivated 이벤트에 구독된 리스너가 없습니다!");
-        }
+        // 이벤트 구독 상태 확인 - 디버깅용 로그 제거
     }
 
     private void OnDisable()

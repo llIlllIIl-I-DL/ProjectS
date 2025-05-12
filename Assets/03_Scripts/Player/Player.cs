@@ -41,11 +41,15 @@ public class Player : MonoBehaviour
         EnsureComponents();
 
         utilityPoint = 0;
+        
+        // 초기 스탯 설정
+        CurrentSprintTime = sprintDuration;
     }
 
     private void OnEnable()
     {
         // 이벤트 구독
+        inputHandler = GetComponent<PlayerInputHandler>();
         if (inputHandler != null)
         {
             inputHandler.OnSprintActivated += HandleSprint;
@@ -104,6 +108,7 @@ public class Player : MonoBehaviour
             
             // 일정 시간 후 스프린트 비활성화
             Invoke("DisableSprint", CurrentSprintTime);
+            Debug.Log($"스프린트 지속 시간: {CurrentSprintTime}");
         }
     }
 
