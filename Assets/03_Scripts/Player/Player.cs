@@ -103,7 +103,7 @@ public class Player : MonoBehaviour
             }
             
             // 일정 시간 후 스프린트 비활성화
-            Invoke("DisableSprint", sprintDuration);
+            Invoke("DisableSprint", CurrentSprintTime);
         }
     }
 
