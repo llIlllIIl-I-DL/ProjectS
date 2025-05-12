@@ -177,33 +177,33 @@ public class InvenInfoController : MonoBehaviour
 
                 case 1004:
 
-                    utilityChangedStatController.ATKSUP(itemData.effectValue, bulletSpeed);
+                    utilityChangedStatController.ATKSUP(itemData.effectValue);
 
                     break;
 
                 case 1005:
 
-                    Debug.Log("저는 1005번입니다");
+                    utilityChangedStatController.MSUP(itemData.effectValue);
                     break;
 
                 case 1006:
 
-                    Debug.Log("저는 1006번입니다");
+                    utilityChangedStatController.RSUP(itemData.effectValue);
                     break;
 
                 case 1007:
 
-                    Debug.Log("저는 1007번입니다");
+                    utilityChangedStatController.RDUP(itemData.effectValue);
                     break;
 
                 case 1008:
 
-                    Debug.Log("저는 1008번입니다");
+                    utilityChangedStatController.DDUP(itemData.effectValue);
                     break;
 
                 case 1009:
 
-                    Debug.Log("저는 1009번입니다");
+                    utilityChangedStatController.WeighSpeed(itemData.effectValue);
                     break;
 
                 case 1010:

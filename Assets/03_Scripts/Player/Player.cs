@@ -7,6 +7,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] private PlayerSettings settings;
+
     [SerializeField] private bool hasWingsuit = false; // 윙슈트 장착 여부
 
     [SerializeField] public List<int> UnLockedUtility; //player가 현재까지 해금한 특성 리스트(해금 할 때마다 계속해서 쌓이기만 함)
@@ -24,7 +25,7 @@ public class Player : MonoBehaviour
 
 
     [HideInInspector] public float CurrentMoveSpeed { get; private set; } //현재 이동 속도
-    [HideInInspector] public float CurrentJumpForce { get; private set; } //점프 높이
+    [HideInInspector] public float CurrentRunSpeed { get; private set; } //현재 이동 속도
     [HideInInspector] public float CurrentMaxHP { get; private set; } //점프 높이
 
     [HideInInspector] public int CurrentUtilityPoint { get; private set; } //특성 포인트 보유 현황
@@ -180,13 +181,10 @@ public class Player : MonoBehaviour
         CurrentMoveSpeed = moveSpeed;
     }
 
-    public void UpdateCurrentPlayerJumpForce(float changedJumpForce)
+    public void UpdateCurrentPlayerRunSpeed(float changedSpeed)
     {
-        /*
-        currentXVelocity = Mathf.Sign(currentXVelocity) * settings.moveSpeed * 1.5f;
-        */
-
-        CurrentJumpForce = changedJumpForce;
+        float moveSpeed = settings.sprintMultiplier += changedSpeed;
+        CurrentRunSpeed = moveSpeed; 
     }
 
     public void UpdateCurrentInventory()
