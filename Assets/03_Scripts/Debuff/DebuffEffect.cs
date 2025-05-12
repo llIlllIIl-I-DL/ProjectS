@@ -86,7 +86,9 @@ public abstract class DebuffEffect : MonoBehaviour
         // 시각 효과 제거
         if (visualEffect != null)
         {
-            Destroy(visualEffect);
+            // 풀링 매니저로 반환
+            ObjectPoolingManager.Instance.ReturnDebuffEffect(visualEffect, debuffType);
+            visualEffect = null;
         }
 
         // 컴포넌트 제거
@@ -100,5 +102,10 @@ public abstract class DebuffEffect : MonoBehaviour
         {
             RemoveEffect();
         }
+    }
+
+    public void SetVisualEffect(GameObject effect)
+    {
+        this.visualEffect = effect;
     }
 }

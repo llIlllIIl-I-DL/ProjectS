@@ -5,9 +5,9 @@ public class EffectManager : MonoBehaviour
 {
     [Header("스팀 압력 이펙트")]
     [SerializeField] private GameObject steamPressureEffectPrefab;
-    [SerializeField] private AudioClip pressureBuildSound;
-    [SerializeField] private AudioClip pressureReleaseSound;
-    [SerializeField] private AudioClip steamHissSound;
+    [SerializeField] private AudioClip pressureBuildSound;// 압력 증가 사운드
+    [SerializeField] private AudioClip pressureReleaseSound;// 압력 방출 사운드
+    [SerializeField] private AudioClip steamHissSound;// 스팀 소리
 
     private SteamPressureEffect pressureEffect;
     private AudioSource audioSource;

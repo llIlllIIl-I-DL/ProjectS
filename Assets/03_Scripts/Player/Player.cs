@@ -8,6 +8,7 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private PlayerSettings settings;
     [SerializeField] private bool hasWingsuit = false; // 윙슈트 장착 여부
+    [SerializeField] private float sprintDuration = 1.5f; // 스프린트 지속 시간
 
     [SerializeField] public List<int> UnLockedUtility; //player가 현재까지 해금한 특성 리스트(해금 할 때마다 계속해서 쌓이기만 함)
     //초기화 기능 필요!
@@ -25,8 +26,8 @@ public class Player : MonoBehaviour
 
     [HideInInspector] public float CurrentMoveSpeed { get; private set; } //현재 이동 속도
     [HideInInspector] public float CurrentJumpForce { get; private set; } //점프 높이
-    [HideInInspector] public float CurrentMaxHP { get; private set; } //점프 높이
-
+    [HideInInspector] public float CurrentMaxHP { get; private set; } //최대 HP
+    [HideInInspector] public float CurrentSprintTime { get; private set; } //스프린트 지속 시간
     [HideInInspector] public int CurrentUtilityPoint { get; private set; } //특성 포인트 보유 현황
 
 
@@ -102,7 +103,7 @@ public class Player : MonoBehaviour
             }
             
             // 일정 시간 후 스프린트 비활성화
-            Invoke("DisableSprint", 1.5f);
+            Invoke("DisableSprint", CurrentSprintTime);
         }
     }
 
@@ -178,6 +179,12 @@ public class Player : MonoBehaviour
     {
         float moveSpeed = settings.moveSpeed += changedSpeed;
         CurrentMoveSpeed = moveSpeed;
+    }
+
+    public void UpdateCurrentSprintTime(float changedSprintTime)
+    {
+        float sprintTime = sprintDuration += changedSprintTime;
+        CurrentSprintTime = sprintTime;
     }
 
     public void UpdateCurrentPlayerJumpForce(float changedJumpForce)
