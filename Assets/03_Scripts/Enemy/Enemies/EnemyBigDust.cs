@@ -92,7 +92,7 @@ public class EnemyBigDust : BaseEnemy
     /// <summary>
     /// 충돌 감지 처리
     /// </summary>
-    protected override void OnCollisionEnter2D(Collision2D collision)
+    protected override void OnCollisionStay2D(Collision2D collision)
     {
         // 상태별 충돌 처리 위임
         if (currentState == chargeAttackState)
@@ -105,7 +105,7 @@ public class EnemyBigDust : BaseEnemy
         }
 
         // 기본 충돌 처리 (데미지 등)
-        base.OnCollisionEnter2D(collision);
+        base.OnCollisionStay2D(collision);
     }
 
     /// <summary>
