@@ -367,16 +367,8 @@ public abstract class BaseEnemy : DestructibleEntity
     /// 에너미 상태이상 여부 확인
     /// 
     public float GetAttackPower() => attackPower;
-    public void SetAttackPower(float power)
-    {
-        attackPower = power;
-    }
     public float GetDefence() => defence;
-    public void SetDefence(float def)
-    {
-        defence = def;
-    }
-    public float GetMoveSpeed() => moveSpeed;
+    public float SetMoveSpeed() => moveSpeed;
     public void SetMoveSpeed(float speed)
     {
         moveSpeed = speed;
@@ -454,4 +446,25 @@ public abstract class BaseEnemy : DestructibleEntity
         Debug.Log($"{gameObject.name} Detroy가 아니라 Die로 호출 됨");
     }
 
+    // 이동 속도 Getter
+    public float GetMoveSpeed()
+    {
+        return moveSpeed;
+    }
+
+    /// <summary>
+    /// 방어력을 고려한 데미지 처리
+    /// </summary>
+    public override void TakeDamage(float damage)
+    {
+        if (isDestroyed) return;
+
+        // 방어력만큼 데미지 감소 (최소 1의 데미지는 보장)
+        float finalDamage = Mathf.Max(damage - defence, 1f);
+        
+        // 부모 클래스의 TakeDamage 호출하여 실제 데미지 적용
+        base.TakeDamage(finalDamage);
+        
+        Debug.Log($"{gameObject.name}이(가) {damage} 데미지를 받았고, 방어력 {defence}로 인해 {finalDamage} 데미지만큼만 피해를 입었습니다.");
+    }
 }

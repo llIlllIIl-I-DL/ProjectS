@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using Enemy.States;
 
@@ -7,7 +8,7 @@ using Enemy.States;
 public class EnemyScrap : BaseEnemy
 {
     #region Variables
-    
+
     [Header("비행 설정")]
     [SerializeField] private float hoverAmplitude = 0.5f; // 부유 진폭
     [SerializeField] private float hoverFrequency = 2f; // 부유 주파수
@@ -17,11 +18,11 @@ public class EnemyScrap : BaseEnemy
 
     [Header("공격 설정")]
     [SerializeField] private float attackSpeed; // 공격 속도
-    
+
     [Header("순찰 설정")]
     [SerializeField] private float patrolDistance; // 순찰 거리
     [SerializeField] private float patrolWaitTime; // 방향 전환 시 대기 시간
-    
+
     // 부유 효과를 위한 변수
     private float timeCounter = 0f;
     private float originalY;
@@ -45,11 +46,11 @@ public class EnemyScrap : BaseEnemy
     public IdleState GetIdleState() => idleState;
     public AttackState GetAttackState() => attackState;
     public FlyingChaseState GetChaseState() => flyingChaseState;
-    
+
     #endregion
 
     #region Unity Lifecycle Methods
-    
+
     /// <summary>
     /// 컴포넌트 초기화 및 시작 위치 저장
     /// </summary>
@@ -58,7 +59,7 @@ public class EnemyScrap : BaseEnemy
         base.Awake();
         startPosition = transform.position;
         originalY = transform.position.y;
-        
+
         // 날아다니는 적이므로 중력 영향 제거
         rb.gravityScale = 0f;
     }
@@ -69,7 +70,7 @@ public class EnemyScrap : BaseEnemy
     protected override void Update()
     {
         if (isDestroyed || isStunned) return;
-    
+
         // 높이 복귀 처리
         if (isReturningToHeight)
         {
@@ -84,7 +85,7 @@ public class EnemyScrap : BaseEnemy
 
         // 플레이어 감지
         DetectPlayer();
-    
+
         // 상태 머신 업데이트 (좌우 움직임)
         stateMachine.Update();
     }
@@ -95,11 +96,11 @@ public class EnemyScrap : BaseEnemy
     protected override void FixedUpdate()
     {
         if (isDestroyed || isStunned) return;
-    
+
         // 상태 머신의 물리 업데이트 호출
         stateMachine.FixedUpdate();
     }
-    
+
     protected override void Start()
     {
         base.Start(); // 부모의 Start 호출
@@ -108,7 +109,7 @@ public class EnemyScrap : BaseEnemy
     #endregion
 
     #region Core Methods
-    
+
     /// <summary>
     /// 적 초기화 및 상태 설정
     /// </summary>
@@ -118,10 +119,10 @@ public class EnemyScrap : BaseEnemy
         flyingChaseState = new FlyingChaseState(this, stateMachine, chaseSpeed);
         attackState = new AttackState(this, stateMachine, attackSpeed);
 
-        
+
         // 상태 머신 초기화
         stateMachine.ChangeState(flyingPatrolState);
-        
+
         // 나머지 초기화...
     }
 
@@ -160,7 +161,49 @@ public class EnemyScrap : BaseEnemy
             }
         }
     }
-    
+
+    /// <summary>
+    /// 넉백 처리
+    /// </summary>
+    public override void ApplyKnockback(Vector2 direction, float force)
+    {
+        // 현재 Y 위치 저장
+        float currentY = transform.position.y;
+        
+        // 넉백 적용 (X축만 적용)
+        Vector2 knockbackDirection = new Vector2(direction.x, 0).normalized;
+        base.ApplyKnockback(knockbackDirection, 2f);
+        
+        // Y 위치 복원
+        Vector3 position = transform.position;
+        position.y = currentY;
+        transform.position = position;
+        
+        // 현재 높이를 원래 높이로 설정
+        originalY = currentY;
+        
+        StartCoroutine(KnockbackCoroutine(0.5f));
+    }
+
+    /// <summary>
+    /// 넉백 후 이동 재개 코루틴
+    /// </summary>
+    private IEnumerator KnockbackCoroutine(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        
+        if (playerDetected)
+        {
+            // 추격 상태로 전환하기 전에 현재 높이를 유지
+            SetCurrentPositionAsOriginalY();
+            stateMachine.ChangeState(flyingChaseState);
+        }
+        else
+        {
+            stateMachine.ChangeState(flyingPatrolState);
+        }
+        Debug.Log($"{gameObject.name}이(가) 넉백 후 이동을 재개합니다.");
+    }
     #endregion
 
     #region Player Detection
@@ -172,6 +215,8 @@ public class EnemyScrap : BaseEnemy
         // 플레이어 감지 시 추격 상태로 전환
         if (currentState != flyingChaseState && currentState != attackState)
         {
+            // 추격 상태로 전환하기 전에 현재 높이를 유지
+            SetCurrentPositionAsOriginalY();
             stateMachine.ChangeState(flyingChaseState);
         }
     }
@@ -183,9 +228,9 @@ public class EnemyScrap : BaseEnemy
     {
         // 단순 패트롤 적은 플레이어를 놓치는 것에 반응하지 않음
     }
-    
-     #region State Switch Methods
-    
+
+    #region State Switch Methods
+
     /// <summary>
     /// 공격 상태로 전환
     /// </summary>
@@ -214,7 +259,7 @@ public class EnemyScrap : BaseEnemy
     #endregion
 
     #region Flying Mechanics
-    
+
     /// <summary>
     /// 지정된 높이로 자연스럽게 복귀
     /// </summary>
@@ -248,16 +293,16 @@ public class EnemyScrap : BaseEnemy
     private void ApplyHoverEffect()
     {
         if (isDestroyed || isStunned) return;
-        
+
         timeCounter += Time.deltaTime;
         float hoverOffset = Mathf.Sin(timeCounter * hoverFrequency) * hoverAmplitude;
 
         Vector3 currentPos = transform.position;
         float newY = originalY + hoverOffset;
-        
+
         transform.position = new Vector3(currentPos.x, newY, currentPos.z);
     }
-    
+
     /// <summary>
     /// 현재 Y 위치를 원래 Y 위치로 설정
     /// </summary>
