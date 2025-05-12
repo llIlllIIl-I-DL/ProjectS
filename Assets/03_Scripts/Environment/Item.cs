@@ -5,6 +5,7 @@ using UnityEngine;
 public class Item : MonoBehaviour
 {
     [SerializeField] private ItemData itemData;
+    public ItemData Itemdata => itemData;
     [SerializeField] private SpriteRenderer spriteRenderer;
 
     [Header("아이템 움직임")]

@@ -400,6 +400,21 @@ public class InventoryManager : MonoBehaviour
     {
         return allItems;
     }
+    // 아이템 ID 목록 반환 메서드 추가
+    public List<string> GetAllItemIDs()
+    {
+        return allItems.Select(item => item.id.ToString()).ToList();
+    }
+
+    // 특정 타입의 아이템 ID 목록 반환
+    public List<string> GetItemIDsByType(ItemType itemType)
+    {
+        return allItems
+            .Where(item => item.itemType == itemType)
+            .Select(item => item.id.ToString())
+            .ToList();
+    }
+
 
     // 복장 파츠 목록 반환
     public List<ItemData> GetCostumeParts()

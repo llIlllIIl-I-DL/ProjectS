@@ -360,6 +360,17 @@ public class ChunkBasedMapManager : MonoBehaviour
             yield break;
         }
         
+        // 인벤토리 매니저 참조
+        InventoryManager inventoryManager = InventoryManager.Instance;
+        if (inventoryManager == null)
+        {
+            Debug.LogWarning("InventoryManager를 찾을 수 없습니다.");
+            yield break;
+        }
+
+        // 플레이어가 가진 아이템 ID 목록 가져오기
+        List<string> ownedItemIDs = inventoryManager.GetAllItemIDs();
+
         // 모듈 인스턴스화
         int moduleCount = 0;
         int batchSize = 5; // 한 번에 처리할 모듈 수
@@ -368,6 +379,13 @@ public class ChunkBasedMapManager : MonoBehaviour
         {
             var moduleData = chunkData.placedModules[i];
             
+            // 코스튬 파츠 모듈인 경우 인벤토리 체크
+            if (moduleData.moduleType == "Costume" && ownedItemIDs.Contains(moduleData.itemID))
+            {
+                Debug.Log($"이미 소유한 코스튬 파츠 스킵: {moduleData.itemID}");
+                continue;
+            }
+
             // try-catch 블록 밖에서 인스턴스화 (하지만 예외는 개별적으로 포착)
             GameObject instance = null;
             try
@@ -455,10 +473,46 @@ public class ChunkBasedMapManager : MonoBehaviour
         roomBehavior.moduleData = moduleAsset;
         roomBehavior.instanceId = instanceId;
         
-        // 인스턴스 캐싱
-        instancedModules[instanceId] = instance;
+        // 인스턴스화된 룸 내의 아이템 체크 및 필터링
+        CheckAndFilterItems(instance);
         
+        // 인스턴스 캐싱 및 반환
+        instancedModules[instanceId] = instance;
         return instance;
+    }
+    
+    // 룸 내의 아이템 체크 및 필터링 메서드
+    private void CheckAndFilterItems(GameObject roomInstance)
+    {
+        // 인벤토리 매니저 참조
+        InventoryManager inventoryManager = InventoryManager.Instance;
+        if (inventoryManager == null) return;
+        
+        // 룸 내의 모든 아이템 프리팹 찾기
+        Item[] items = roomInstance.GetComponentsInChildren<Item>(true);
+        
+        foreach (Item item in items)
+        {
+            // Item 컴포넌트에 ItemData 참조가 있어야 함
+            ItemData itemData = item.Itemdata;
+            
+            if (itemData != null)
+            {
+                // 코스튬 파츠이고 이미 인벤토리에 있는지 확인
+                if (itemData.itemType == ItemType.CostumeParts)
+                {
+                    // 인벤토리에서 같은 ID의 아이템 찾기
+                    ItemData ownedItem = inventoryManager.GetItemById(itemData.id);
+                    
+                    if (ownedItem != null)
+                    {
+                        // 이미 소유한 아이템이면 비활성화
+                        Debug.Log($"이미 소유한 코스튬 아이템 비활성화: {itemData.ItemName}");
+                        item.gameObject.SetActive(false);
+                    }
+                }
+            }
+        }
     }
     
     /// <summary>
