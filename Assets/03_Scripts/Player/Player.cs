@@ -7,6 +7,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] private PlayerSettings settings;
+
     [SerializeField] private bool hasWingsuit = false; // 윙슈트 장착 여부
     [SerializeField] private float sprintDuration = 1.5f; // 스프린트 지속 시간
 
@@ -25,9 +26,13 @@ public class Player : MonoBehaviour
 
 
     [HideInInspector] public float CurrentMoveSpeed { get; private set; } //현재 이동 속도
-    [HideInInspector] public float CurrentJumpForce { get; private set; } //점프 높이
+
+    [HideInInspector] public float CurrentRunSpeed { get; private set; } //현재 이동 속도
+
     [HideInInspector] public float CurrentMaxHP { get; private set; } //최대 HP
+
     [HideInInspector] public float CurrentSprintTime { get; private set; } //스프린트 지속 시간
+
     [HideInInspector] public int CurrentUtilityPoint { get; private set; } //특성 포인트 보유 현황
 
 
@@ -186,20 +191,20 @@ public class Player : MonoBehaviour
         CurrentMoveSpeed = moveSpeed;
     }
 
+
+    public void UpdateCurrentPlayerRunSpeed(float changedSpeed)
+    {
+        float moveSpeed = settings.sprintMultiplier += changedSpeed;
+        CurrentRunSpeed = moveSpeed;
+    }
+
+
     public void UpdateCurrentSprintTime(float changedSprintTime)
     {
         float sprintTime = sprintDuration += changedSprintTime;
         CurrentSprintTime = sprintTime;
     }
 
-    public void UpdateCurrentPlayerJumpForce(float changedJumpForce)
-    {
-        /*
-        currentXVelocity = Mathf.Sign(currentXVelocity) * settings.moveSpeed * 1.5f;
-        */
-
-        CurrentJumpForce = changedJumpForce;
-    }
 
     public void UpdateCurrentInventory()
     {
@@ -207,9 +212,9 @@ public class Player : MonoBehaviour
 
         int nowUtilityPoint = utilityPoint;
         CurrentUtilityPoint = nowUtilityPoint;
-
-        Debug.Log($"{CurrentUtilityPoint}");
     }
+
+
 
     public void UpdateCurrentUnLockedUtility(ItemData utilityItemData)
     {
