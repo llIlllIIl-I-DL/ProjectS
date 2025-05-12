@@ -11,6 +11,8 @@ public class RustEffect : DebuffEffect
 
         // 속도 감소 적용 (intensity는 0.0-1.0 사이의 값, 감소율을 나타냄)
         targetEnemy.SetMoveSpeed(originalSpeed * (1f - intensity));
+        // 방어력 감소 적용
+        targetEnemy.SetDefence(targetEnemy.GetDefence() * (1f - intensity));
 
         // 시각적 효과 적용 (색상 변경 등)
         ApplyVisualEffect(true);
@@ -42,6 +44,9 @@ public class RustEffect : DebuffEffect
         {
             targetEnemy.SetMoveSpeed(originalSpeed);
             ApplyVisualEffect(false);
+            // 방어력 복구
+            targetEnemy.SetDefence(targetEnemy.GetDefence() / (1f - intensity));
+
         }
     }
 

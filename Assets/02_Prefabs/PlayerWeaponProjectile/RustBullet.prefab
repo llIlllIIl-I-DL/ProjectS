@@ -161,7 +161,7 @@ MonoBehaviour:
   bulletSpeed: 2
   damage: 1
   knockbackForce: 0
-  ammo: 30
+  ammo: 10
   bulletType: 1
   isOvercharged: 1
   rustDebuffDuration: 2

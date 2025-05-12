@@ -11,7 +11,6 @@ public class EffectManager : MonoBehaviour
 
     private SteamPressureEffect pressureEffect;
     private AudioSource audioSource;
-    private Coroutine effectCoroutine;
     private GameObject player;
 
     private void Awake()
@@ -63,16 +62,26 @@ public class EffectManager : MonoBehaviour
         }
     }
 
-    // 차징 압력 이펙트 업데이트
+    // 차징 압력 이펙트 업데이트 - 즉시 활성화
     public void UpdatePressureEffect(float pressure)
     {
         if (pressureEffect != null)
         {
-            if (!pressureEffect.gameObject.activeSelf)
+            // 압력이 0보다 크면 이펙트 활성화, 아니면 비활성화
+            bool shouldBeActive = pressure > 0f;
+            
+            if (shouldBeActive)
             {
-                pressureEffect.gameObject.SetActive(true);
+                if (!pressureEffect.gameObject.activeSelf)
+                {
+                    pressureEffect.gameObject.SetActive(true);
+                }
+                pressureEffect.SetPressure(pressure);
             }
-            pressureEffect.SetPressure(pressure);
+            else
+            {
+                pressureEffect.gameObject.SetActive(false);
+            }
         }
     }
 
@@ -94,62 +103,49 @@ public class EffectManager : MonoBehaviour
         }
     }
 
-    // 차징 중단 및 이펙트 종료
+    // 차징 중단 및 이펙트 종료 - 즉시 처리
     public void StopPressureEffect()
     {
-        // 이전 코루틴이 있다면 중지하고 새로운 코루틴 시작
-        if (effectCoroutine != null)
-        {
-            StopCoroutine(effectCoroutine);
-        }
-        effectCoroutine = StartCoroutine(ReleasePressureEffect());
-    }
-
-    // 압력 방출 효과를 처리하는 코루틴
-    private IEnumerator ReleasePressureEffect()
-    {
         if (pressureEffect != null && pressureEffect.gameObject.activeSelf)
         {
-            // 압력 게이지를 0으로 설정하고 방출 효과 준비
+            // 압력 게이지를 0으로 설정
             pressureEffect.SetPressure(0f);
-
-            // 증기 파티클 방출 효과를 직접 처리
-            StartCoroutine(BurstSteamParticles());
-
-            // 압력 방출 사운드를 재생하기 위해 약간의 지연
-            yield return new WaitForSeconds(0.1f);
-
-            // 압력 방출 애니메이션 완료를 위한 대기 시간
-            yield return new WaitForSeconds(1.5f);
-
-            // 이펙트 비활성화
+            
+            // 증기 파티클 방출 효과 즉시 처리
+            EmitBurstSteamParticles();
+            
+            // 압력 방출 사운드 재생
+            PlayPressureReleaseSound(pressureEffect.GetCurrentPressure());
+            
+            // 이펙트 즉시 비활성화
             pressureEffect.gameObject.SetActive(false);
         }
-
-        effectCoroutine = null;
     }
 
-    // 압력 방출 시 증기 폭발 효과
-    private IEnumerator BurstSteamParticles()
+    // 압력 방출 시 증기 폭발 효과 - 즉시 처리
+    private void EmitBurstSteamParticles()
     {
-        if (pressureEffect != null && pressureEffect.gameObject.activeSelf)
+        if (pressureEffect != null)
         {
-            int burstAmount = 20; // 기본 증기 파티클 수
+            int burstAmount = 5; // 기본 증기 파티클 수 (즉시 처리이므로 적게 설정)
             float currentPressure = pressureEffect.GetCurrentPressure();
             burstAmount = Mathf.RoundToInt(burstAmount * (1f + currentPressure));
 
-            // 압력 방출 사운드 재생
-            if (audioSource != null && pressureReleaseSound != null && currentPressure > 0.3f)
-            {
-                audioSource.pitch = UnityEngine.Random.Range(0.8f, 1.2f);
-                audioSource.PlayOneShot(pressureReleaseSound, Mathf.Min(1.0f, currentPressure));
-            }
-
+            // 한번에 모든 파티클 방출
             for (int i = 0; i < burstAmount; i++)
             {
                 pressureEffect.EmitSteamParticleExternal();
-                yield return new WaitForSeconds(0.03f);
             }
+        }
+    }
+
+    // 압력 방출 사운드 재생
+    private void PlayPressureReleaseSound(float pressure)
+    {
+        if (audioSource != null && pressureReleaseSound != null && pressure > 0.3f)
+        {
+            audioSource.pitch = UnityEngine.Random.Range(0.8f, 1.2f);
+            audioSource.PlayOneShot(pressureReleaseSound, Mathf.Min(1.0f, pressure));
         }
     }
 

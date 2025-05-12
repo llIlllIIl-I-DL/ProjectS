@@ -566,6 +566,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7739246131164750639, guid: ad110ef73bc534f2896e28960730b5ad, type: 3}
+      propertyPath: defence
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7739246131164750639, guid: ad110ef73bc534f2896e28960730b5ad, type: 3}
       propertyPath: maxHealth
       value: 200
       objectReference: {fileID: 0}
@@ -771,9 +775,25 @@ PrefabInstance:
     m_TransformParent: {fileID: 790421297}
     m_Modifications:
     - target: {fileID: 5979861897027304007, guid: 79226f63885ffee458baf2945d069e21, type: 3}
+      propertyPath: fireRate
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5979861897027304007, guid: 79226f63885ffee458baf2945d069e21, type: 3}
       propertyPath: firePoint
       value: 
       objectReference: {fileID: 1869363132}
+    - target: {fileID: 5979861897027304007, guid: 79226f63885ffee458baf2945d069e21, type: 3}
+      propertyPath: normalShotCooldown
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5979861897027304007, guid: 79226f63885ffee458baf2945d069e21, type: 3}
+      propertyPath: level0ChargeCooldown
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5990920311680459410, guid: 79226f63885ffee458baf2945d069e21, type: 3}
+      propertyPath: pressureBuildSound
+      value: 
+      objectReference: {fileID: 8300000, guid: c1e68ccf3abecfa4cb67be5f4ec9f098, type: 3}
     - target: {fileID: 6251991218227164234, guid: 79226f63885ffee458baf2945d069e21, type: 3}
       propertyPath: m_Name
       value: WeaponManager
@@ -1354,18 +1374,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poolInfos:
-  - type: 0
+  - type: 1
     prefab: {fileID: 6760042265540064826, guid: e4992159c28c2e24ba7b726d9457aee1, type: 3}
     initialSize: 0
-  - type: 0
+  - type: 3
     prefab: {fileID: 6760042265540064826, guid: 0ebe0aeb0356d1640b66bdd67deee51a, type: 3}
     initialSize: 0
-  - type: 0
+  - type: 2
     prefab: {fileID: 6760042265540064826, guid: ec3bab020d8f49443845a78a13895d8b, type: 3}
     initialSize: 0
-  - type: 1
+  - type: 0
     prefab: {fileID: 5382799822232062830, guid: 3c409995c8cd87848a292c959de13b0f, type: 3}
-    initialSize: 0
+    initialSize: 10
   debuffPrefabs:
   - debuffType: 1
     prefab: {fileID: 5382799822232062830, guid: 3c409995c8cd87848a292c959de13b0f, type: 3}

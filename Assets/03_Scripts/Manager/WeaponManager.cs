@@ -21,7 +21,11 @@ public class WeaponManager : Singleton<WeaponManager>
     [SerializeField] private Vector3 normalBulletScale = new Vector3(0.5f, 0.5f, 0.5f);
     [SerializeField] private Vector3 level1BulletScale = new Vector3(0.7f, 0.7f, 0.7f);
     [SerializeField] private Vector3 level2BulletScale = new Vector3(1.0f, 1.0f, 1.0f);
-    [SerializeField] private float fireRate = 0.2f;
+    
+    [Header("쿨다운 설정")]
+    [SerializeField] private float level0ChargeCooldown = 0.3f; // 차징 없는 차지샷 쿨다운
+    [SerializeField] private float level1ChargeCooldown = 0.3f; // 1단계 차지샷 쿨다운
+    [SerializeField] private float level2ChargeCooldown = 0.5f; // 2단계 차지샷 쿨다운
 
     [Header("유틸리티 효과")]
     private float atkUpPercent = 0f;
@@ -44,6 +48,16 @@ public class WeaponManager : Singleton<WeaponManager>
         if (chargeManager.IsCharging && !ammoManager.IsReloading && ammoManager.CurrentAmmo > 0)
         {
             chargeManager.UpdateCharging();
+        }
+        
+        // 쿨다운 디버깅
+        if (Time.time < nextFireTime)
+        {
+            float remainingCooldown = nextFireTime - Time.time;
+            if (remainingCooldown > 0.01f) // 작은 값은 무시
+            {
+                Debug.Log($"발사 쿨다운 중: {remainingCooldown:F2}초 남음");
+            }
         }
     }
 
@@ -118,28 +132,34 @@ public class WeaponManager : Singleton<WeaponManager>
     // 일반 총알 발사
     public void FireNormalBullet()
     {
-        Debug.Log("FireNormalBullet");
+        Debug.Log("FireNormalBullet 호출됨");
 
         // 재장전 중이거나 탄약 없으면 발사 불가
         if (ammoManager.IsReloading || ammoManager.CurrentAmmo <= 0)
         {
             if (ammoManager.CurrentAmmo <= 0 && !ammoManager.IsReloading)
             {
-                Debug.Log("탄약 없음");
+                Debug.Log("탄약 없음 - 재장전 시작");
                 ammoManager.StartReload();
+            }
+            else
+            {
+                Debug.Log("발사 불가: 재장전 중이거나 탄약 없음");
             }
             return;
         }
 
         // 발사 쿨다운 체크
-        if (Time.time < nextFireTime)
+        float currentCooldown = nextFireTime - Time.time;
+        if (currentCooldown > 0)
         {
-            Debug.Log("아직 발사할 수 없음");
+            Debug.Log($"아직 발사할 수 없음: 쿨다운 {currentCooldown:F2}초 남음");
             return;
         }
 
         // 다음 발사 시간 설정
-        nextFireTime = Time.time + fireRate;
+        nextFireTime = Time.time + level0ChargeCooldown;
+        Debug.Log($"일반 공격 발사: 쿨다운 {level0ChargeCooldown:F2}초 적용");
 
         // 총알 생성 및 발사
         FireBullet(false);
@@ -155,9 +175,27 @@ public class WeaponManager : Singleton<WeaponManager>
     public void StartCharging()
     {
         // 재장전 중이거나 탄약이 없으면 차징 불가
-        if (ammoManager.IsReloading || ammoManager.CurrentAmmo <= 0) return;
+        if (ammoManager.IsReloading || ammoManager.CurrentAmmo <= 0)
+        {
+            Debug.Log("차징 불가: 재장전 중이거나 탄약 없음");
+            return;
+        }
+        
+        // 현재 쿨다운 상태 확인
+        float currentCooldown = nextFireTime - Time.time;
+        if (currentCooldown > 0)
+        {
+            Debug.Log($"차징 시작 시 쿨다운 초기화: {currentCooldown:F2}초 남음");
+        }
+        
+        // 쿨다운 초기화 (연타 후 차징 가능하도록)
+        //nextFireTime = 0f;
 
+        // 차징 시작하고 압력 이펙트 즉시 활성화
         chargeManager.StartCharging();
+        effectManager.UpdatePressureEffect(0.01f); // 최소값으로 설정하여 즉시 활성화
+        
+        Debug.Log("차징 시작됨");
     }
 
     // 차징 중단 (발사)
@@ -166,6 +204,7 @@ public class WeaponManager : Singleton<WeaponManager>
         // 차징 중이 아니었으면 일반 공격으로 처리
         if (!chargeManager.IsCharging)
         {
+            Debug.Log("차징 중이 아님 - 일반 공격으로 처리");
             FireNormalBullet();
             return;
         }
@@ -175,13 +214,49 @@ public class WeaponManager : Singleton<WeaponManager>
         {
             if (ammoManager.CurrentAmmo <= 0 && !ammoManager.IsReloading)
             {
+                Debug.Log("탄약 없음 - 재장전 시작");
                 ammoManager.StartReload();
             }
+            // 차징 상태 초기화 및 이펙트 즉시 종료
+            Debug.Log("차징 취소: 재장전 중이거나 탄약 없음");
+            chargeManager.StopCharging();
+            effectManager.StopPressureEffect();
             return;
         }
 
-        // 발사 쿨다운은 차징샷은 무시하지만, 발사 후 다음 발사까지 쿨다운 설정
-        nextFireTime = Time.time + fireRate;
+        // 발사 쿨다운 체크 (차징샷도 쿨다운 적용)
+        float currentCooldown = nextFireTime - Time.time;
+        if (currentCooldown > 0)
+        {
+            Debug.Log($"아직 발사할 수 없음: 쿨다운 {currentCooldown:F2}초 남음");
+            // 차징 상태 초기화 및 이펙트 즉시 종료
+            chargeManager.StopCharging();
+            effectManager.StopPressureEffect();
+            return;
+        }
+
+        // 차징 레벨에 따라 다른 쿨다운 적용
+        float cooldown;
+        int chargeLevel = chargeManager.CurrentChargeLevel;
+        
+        if (chargeLevel == 2)
+        {
+            cooldown = level2ChargeCooldown;
+            Debug.Log($"레벨 2 차징샷 발사: 쿨다운 {cooldown:F2}초 적용");
+        }
+        else if (chargeLevel == 1)
+        {
+            cooldown = level1ChargeCooldown;
+            Debug.Log($"레벨 1 차징샷 발사: 쿨다운 {cooldown:F2}초 적용");
+        }
+        else
+        {
+            cooldown = level0ChargeCooldown;
+            Debug.Log($"레벨 0 차징샷 발사: 쿨다운 {cooldown:F2}초 적용");
+        }
+        
+        // 다음 발사 시간 설정
+        nextFireTime = Time.time + cooldown;
 
         // 차징 레벨에 따른 총알 발사
         FireBullet(true);
@@ -388,7 +463,6 @@ public class WeaponManager : Singleton<WeaponManager>
     public void SetAtkUpPercent(float percent) => atkUpPercent = percent;
     public float AtkUpPercent => atkUpPercent;
     public void SetBulletSpeed(float speed) => bulletSpeed = speed;
-    public void SetFireRate(float rate) => fireRate = rate;
     public void SetBulletDamage(float damage) => bulletDamage = damage;
     public void SetBulletLifetime(float lifetime) => bulletLifetime = lifetime;
     public void SetNormalBulletScale(Vector3 scale) => normalBulletScale = scale;
@@ -400,8 +474,18 @@ public class WeaponManager : Singleton<WeaponManager>
     public EffectManager EffectManager => effectManager;
     public BulletFactory BulletFactory => bulletFactory;
 
-
-
+    // 쿨다운 설정 메서드들
+    public void SetLevel0ChargeCooldown(float cooldown) => level0ChargeCooldown = Mathf.Max(0.05f, cooldown);
+    public void SetLevel1ChargeCooldown(float cooldown) => level1ChargeCooldown = Mathf.Max(0.1f, cooldown);
+    public void SetLevel2ChargeCooldown(float cooldown) => level2ChargeCooldown = Mathf.Max(0.2f, cooldown);
+    
+    // 모든 쿨다운을 한 번에 설정 (기존 SetFireRate 대체)
+    public void SetAllCooldowns(float multiplier)
+    {
+        level0ChargeCooldown = Mathf.Max(0.05f, level0ChargeCooldown * multiplier);
+        level1ChargeCooldown = Mathf.Max(0.1f, level1ChargeCooldown * multiplier);
+        level2ChargeCooldown = Mathf.Max(0.2f, level2ChargeCooldown * multiplier);
+    }
 
     // 총알 속성 가져오기
     public ElementType GetBulletType()
