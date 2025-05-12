@@ -177,7 +177,7 @@ public class UtilityChangedStatController : MonoBehaviour
 
     public void ATKSUP(float effectValue)
     {
-        if (effectValue <= 0) return;
+        //if (effectValue <= 0) return;
 
         float percent = effectValue / 100f; //퍼센트 값 계산
 
@@ -301,9 +301,13 @@ public class UtilityChangedStatController : MonoBehaviour
 
 
 
-    public void WeighPower(float effectValue)
+    public void WeighPower(float effectValue) //공증 공속감
     {
+        ATKUP(5f);
 
+
+
+        ATKSUP(-effectValue); //수정수정
     }
     public void RemovedWeighPower()
     {

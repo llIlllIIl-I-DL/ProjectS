@@ -128,10 +128,11 @@ public class InvenInfoController : MonoBehaviour
 
             PlayerUI.Instance.utilityPointText.text = player.utilityPoint.ToString();
 
-            CreatSlotSystem.Instance.RefreshAllOwnPoints();
-
             player.UpdateCurrentInventory(); //현재는 플레이어 포인트 현황만 업데이트 중
             player.UpdateCurrentUnLockedUtility(itemData);
+
+            CreatSlotSystem.Instance.RefreshAllOwnPoints();
+
         }
 
         utilityUnLockBtn.gameObject.SetActive(false);
