@@ -203,6 +203,10 @@ public class WeaponManager : Singleton<WeaponManager>
     private void FireBullet(bool isCharged)
     {
         Vector2 direction = GetAimDirection();
+        // 차징 레벨에 따른 총알 설정
+        Vector3 bulletScale;
+        bool isOvercharged = isCharged && chargeManager.CurrentChargeLevel == 2;
+        float finalBulletSpeed = bulletSpeed;
 
         // 러스트 속성 총알인 경우 랜덤 방향으로 살짝 틀어줌
         if (currentBulletType == ElementType.Rust)
@@ -210,17 +214,21 @@ public class WeaponManager : Singleton<WeaponManager>
             float baseAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             float randomAngle = baseAngle + UnityEngine.Random.Range(-65f, 65f);
             float rad = randomAngle * Mathf.Deg2Rad;
-            direction = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)).normalized;
+            if (isOvercharged)
+            {
+                // 오버차징인 경우 발사 방향 기존방향과 동일
+                direction = new Vector2(direction.x, direction.y);
+            }
+            else
+            {
+                direction = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)).normalized;
+            }
         }
+        
 
         Vector3 spawnPosition = firePoint.position + new Vector3(direction.x * 0.2f, 0, 0);
         Debug.Log("spawnPosition: " + spawnPosition);
-
-        // 차징 레벨에 따른 총알 설정
-        Vector3 bulletScale;
-        bool isOvercharged = false;
-        float finalBulletSpeed = bulletSpeed;
-
+        // 차징 레벨별 발사로직
         if (isCharged)
         {
             int chargeLevel = chargeManager.CurrentChargeLevel;

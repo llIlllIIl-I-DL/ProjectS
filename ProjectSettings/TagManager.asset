@@ -15,6 +15,7 @@ TagManager:
   - Ladder
   - Boss
   - PlayerAttack
+  - Wall
   layers:
   - Default
   - TransparentFX

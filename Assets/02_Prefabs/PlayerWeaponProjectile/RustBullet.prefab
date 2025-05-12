@@ -161,11 +161,12 @@ MonoBehaviour:
   bulletSpeed: 2
   damage: 1
   knockbackForce: 0
+  ammo: 30
   bulletType: 1
   isOvercharged: 1
-  rustDebuffDuration: 3
+  rustDebuffDuration: 2
   speedReductionPercent: 0.2
-  damageOverTimeAmount: 2
+  damageOverTimeAmount: 0
   acidEffectPrefab: {fileID: 5382799822232062830, guid: 3c409995c8cd87848a292c959de13b0f, type: 3}
   swayAmount: 1.5
   swaySpeed: 4
