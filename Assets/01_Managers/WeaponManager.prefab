@@ -1,5 +1,53 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &270197883557975162
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7395388996758239111}
+  - component: {fileID: 5990920311680459410}
+  m_Layer: 0
+  m_Name: EffectManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7395388996758239111
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 270197883557975162}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6559266257352440787}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5990920311680459410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 270197883557975162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75e845205d6065541848eada7cac550a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  steamPressureEffectPrefab: {fileID: 8055816082711127519, guid: 816f4a3c859f8f94984ec01a474455fa, type: 3}
+  pressureBuildSound: {fileID: 0}
+  pressureReleaseSound: {fileID: 0}
+  steamHissSound: {fileID: 0}
 --- !u!1 &1215494265166037107
 GameObject:
   m_ObjectHideFlags: 0
@@ -45,12 +93,105 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   normalBulletPrefab: {fileID: 6760042265540064826, guid: e4992159c28c2e24ba7b726d9457aee1, type: 3}
-  rustBulletPrefab: {fileID: 0}
+  rustBulletPrefab: {fileID: 6760042265540064826, guid: ec3bab020d8f49443845a78a13895d8b, type: 3}
   ironBulletPrefab: {fileID: 6760042265540064826, guid: 0ebe0aeb0356d1640b66bdd67deee51a, type: 3}
   poisonBulletPrefab: {fileID: 0}
   waterBulletPrefab: {fileID: 0}
   flameBulletPrefab: {fileID: 0}
   iceBulletPrefab: {fileID: 0}
+--- !u!1 &2975802066948719850
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6951684267907128060}
+  - component: {fileID: 6603184417805179892}
+  m_Layer: 0
+  m_Name: AmmoManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6951684267907128060
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2975802066948719850}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6559266257352440787}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6603184417805179892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2975802066948719850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12c55ca08854c2847aa3afce352ef611, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentAmmo: 30
+  maxAmmo: 30
+  reloadTime: 1.5
+--- !u!1 &6066506141383519615
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6018684241869060093}
+  - component: {fileID: 3117026063196520114}
+  m_Layer: 0
+  m_Name: ChargeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6018684241869060093
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6066506141383519615}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6559266257352440787}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3117026063196520114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6066506141383519615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62592635b578a0549a1fda3ffa87f67e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chargingLevel1Time: 1
+  chargingLevel2Time: 2.5
 --- !u!1 &6251991218227164234
 GameObject:
   m_ObjectHideFlags: 0
@@ -76,12 +217,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6251991218227164234}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -18, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3031228756718020601}
+  - {fileID: 6951684267907128060}
+  - {fileID: 7395388996758239111}
+  - {fileID: 6018684241869060093}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5979861897027304007
@@ -97,23 +241,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firePoint: {fileID: 0}
+  bulletFactory: {fileID: 2265406581366153293}
+  ammoManager: {fileID: 6603184417805179892}
+  chargeManager: {fileID: 3117026063196520114}
+  effectManager: {fileID: 5990920311680459410}
   bulletSpeed: 15
   bulletLifetime: 3
-  normalBulletScale: {x: 0.5, y: 0.5, z: 0.5}
-  fireRate: 0.3
-  currentAmmo: 30
+  bulletDamage: 1
+  ammo: 30
   maxAmmo: 30
-  reloadTime: 1.5
-  isReloading: 0
-  chargingLevel1Time: 1
-  chargingLevel2Time: 2.5
-  level1Damage: 15
-  level2Damage: 30
+  normalBulletScale: {x: 0.5, y: 0.5, z: 0.5}
   level1BulletScale: {x: 0.7, y: 0.7, z: 0.7}
   level2BulletScale: {x: 1, y: 1, z: 1}
-  steamPressureEffectPrefab: {fileID: 8055816082711127519, guid: 816f4a3c859f8f94984ec01a474455fa, type: 3}
-  pressureBuildSound: {fileID: 0}
-  pressureReleaseSound: {fileID: 0}
-  steamHissSound: {fileID: 0}
-  bulletFactory: {fileID: 0}
-  currentBulletType: 0
+  fireRate: 0.3

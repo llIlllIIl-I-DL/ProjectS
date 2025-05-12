@@ -10,12 +10,15 @@ public abstract class BaseEnemy : DestructibleEntity
     [Header("기본 스탯")]
     [SerializeField] protected float moveSpeed; // 이동 속도
     [SerializeField] protected float attackPower; // 공격력
+    [SerializeField] protected float defence; // 방어력
     [SerializeField] protected float attackRange; // 공격 범위
     [SerializeField] protected float detectionRange; // 감지 범위
     
     [Header("충돌 데미지")]
     [SerializeField] protected float contactDamage = 1f; // 충돌 데미지 값
     [SerializeField] protected bool dealsDamageOnContact = true; // 충돌 데미지 적용 여부
+    [SerializeField] protected float damageInterval = 1.5f; // 데미지 주기
+    private float lastDamageTime = -999f;
 
     [Header("이펙트 설정")]
 
@@ -95,13 +98,15 @@ public abstract class BaseEnemy : DestructibleEntity
     /// <summary>
     /// 충돌 처리
     /// </summary>
-    protected virtual void OnCollisionEnter2D(Collision2D collision)
+    protected virtual void OnCollisionStay2D(Collision2D collision)
     {
         if (!dealsDamageOnContact) return; // 충돌 데미지가 비활성화된 경우 무시
         
         // 플레이어와 충돌했는지 확인
         if (collision.gameObject.CompareTag("Player"))
         {
+            if (Time.time - lastDamageTime < damageInterval) return; // 데미지 주기 체크
+            lastDamageTime = Time.time;
             // 플레이어에게 데미지 주기
             IDamageable damageable = collision.gameObject.GetComponent<IDamageable>();
             if (damageable != null)
@@ -362,6 +367,7 @@ public abstract class BaseEnemy : DestructibleEntity
     /// 에너미 상태이상 여부 확인
     /// 
     public float GetAttackPower() => attackPower;
+    public float GetDefence() => defence;
     public float SetMoveSpeed() => moveSpeed;
     public void SetMoveSpeed(float speed)
     {
@@ -444,5 +450,21 @@ public abstract class BaseEnemy : DestructibleEntity
     public float GetMoveSpeed()
     {
         return moveSpeed;
+    }
+
+    /// <summary>
+    /// 방어력을 고려한 데미지 처리
+    /// </summary>
+    public override void TakeDamage(float damage)
+    {
+        if (isDestroyed) return;
+
+        // 방어력만큼 데미지 감소 (최소 1의 데미지는 보장)
+        float finalDamage = Mathf.Max(damage - defence, 1f);
+        
+        // 부모 클래스의 TakeDamage 호출하여 실제 데미지 적용
+        base.TakeDamage(finalDamage);
+        
+        Debug.Log($"{gameObject.name}이(가) {damage} 데미지를 받았고, 방어력 {defence}로 인해 {finalDamage} 데미지만큼만 피해를 입었습니다.");
     }
 }

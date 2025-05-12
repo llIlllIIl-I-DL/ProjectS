@@ -165,14 +165,14 @@ public class InvenInfoController : MonoBehaviour
 
                 case 1002:
 
-                    maxAmmo = WeaponManager.Instance.maxAmmo;
+                    maxAmmo = WeaponManager.Instance.AmmoManager.MaxAmmo;
                     utilityChangedStatController.MaxMPUP(itemData.effectValue, maxAmmo);
 
                     break;
 
                 case 1003:
 
-                    utilityChangedStatController.ATKUP(itemData.effectValue, bulletDamage);
+                    utilityChangedStatController.ATKUP(itemData.effectValue);
                     break;
 
                 case 1004:

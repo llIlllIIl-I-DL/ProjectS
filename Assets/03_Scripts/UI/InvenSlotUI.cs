@@ -72,12 +72,12 @@ public class InvenSlotUI : MonoBehaviour
         }
     }
 
-    public void UpdateOwnPoint( ) //각 슬롯 내부에 있는 플레이어의 특성 포인트 현황을 업데이트 해주는 함수
+    public void UpdateOwnPoint() //각 슬롯 내부에 있는 플레이어의 특성 포인트 현황을 업데이트 해주는 함수
     {
         itemOwnPoint.text = player.utilityPoint.ToString();
 
 
-        if (player.utilityPoint >= utilityItemData.utilityPointForUnLock) //|| player.UnLockedUtility.Contains(itemData.id)//)
+        if (player.utilityPoint >= utilityItemData.utilityPointForUnLock || player.UnLockedUtility.Contains(utilityItemData.id))
         {
             itemIcon.sprite = utilityItemData.Icon;
         }

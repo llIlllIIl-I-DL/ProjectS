@@ -48,17 +48,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 278aafc7ce7e54fb09239bdf1681ab1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 3
-  currentHealth: 3
+  maxHealth: 10
+  currentHealth: 10
   possibleDrops: []
   dropChance: 0.3
-  moveSpeed: 1
-  attackPower: 10
-  attackRange: 10
-  detectionRange: 10
-  contactDamage: 1
+  moveSpeed: 2
+  attackPower: 20
+  defence: 5
+  attackRange: 0
+  detectionRange: 0
+  contactDamage: 20
   dealsDamageOnContact: 1
-  destructionEffect: {fileID: 0}
+  destructionEffect: {fileID: 9174822137840911509, guid: e5623deedc49c4b7f88cd66604a12a00, type: 3}
   hitEffect: {fileID: 4570405473215393228, guid: 0b8595a57512f4d41a3ed4373b374989, type: 3}
   patrolDistance: 3
   patrolWaitTime: 2

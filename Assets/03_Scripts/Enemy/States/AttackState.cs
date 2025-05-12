@@ -11,8 +11,11 @@ namespace Enemy.States
         
         // 공격 관련 변수
         protected float attackCooldown; // 공격 간 쿨다운 시간
-        protected float attackTimer = 0; // 현재 쿨다운 타이머
+        protected float attackTimer = 1; // 현재 쿨다운 타이머
         protected bool canAttack = true; // 공격 가능 여부
+        
+        // 상태 전환 및 추격으로 돌아갈 때 쿨다운 유지를 위한 변수
+        private static float globalAttackTimer = 0; // 모든 공격 상태 간에 공유되는 타이머
         
         #endregion
         
@@ -39,8 +42,9 @@ namespace Enemy.States
         /// </summary>
         public override void Enter()
         {
-            attackTimer = 0;
-            canAttack = true;
+            // 이전 공격 타이머 값을 유지
+            attackTimer = globalAttackTimer;
+            canAttack = attackTimer >= attackCooldown;
         }
 
         /// <summary>
@@ -51,6 +55,8 @@ namespace Enemy.States
             // 플레이어가 공격 범위를 벗어났는지 확인
             if (!enemy.IsInAttackRange())
             {
+                // 공격 타이머 저장
+                globalAttackTimer = attackTimer;
                 enemy.SwitchToChaseState();
                 return;
             }
@@ -59,6 +65,8 @@ namespace Enemy.States
             if (!canAttack)
             {
                 attackTimer += Time.deltaTime;
+                globalAttackTimer = attackTimer; // 전역 타이머 업데이트
+                
                 if (attackTimer >= attackCooldown)
                 {
                     canAttack = true;
@@ -79,6 +87,7 @@ namespace Enemy.States
                 // 쿨다운 설정
                 canAttack = false;
                 attackTimer = 0;
+                globalAttackTimer = 0;
             }
         }
 
@@ -87,9 +96,6 @@ namespace Enemy.States
         /// </summary>
         protected virtual void PerformAttack()
         {
-            // 공격 애니메이션 실행 (나중에 구현)
-            // enemy.GetComponent<Animator>()?.SetTrigger("Attack");
-
             // 공격 로직 실행 - BaseEnemy의 PerformAttack 호출
             enemy.PerformAttack();
         }
@@ -99,7 +105,8 @@ namespace Enemy.States
         /// </summary>
         public override void Exit()
         {
-            // 추가 정리 작업 (필요시 구현)
+            // 공격 타이머 저장
+            globalAttackTimer = attackTimer;
         }
         
         #endregion
