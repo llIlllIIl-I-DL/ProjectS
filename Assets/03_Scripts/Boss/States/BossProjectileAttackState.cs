@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class BossProjectileAttackState : IEnemyState
 {
-    BossStateMachine bossStateMachine;
+    private BossStateMachine bossStateMachine;
 
     private Transform bossTransform;
     private Transform playerTransform;
@@ -17,6 +17,8 @@ public class BossProjectileAttackState : IEnemyState
     private bool isAttacking = false; // 중복 공격 방지용
     private bool isCoroutineRunning = false; // 코루틴 중복 실행 방지용
 
+    private int projectileAttackCount = 0; // 발사한 투사체 횟수 추적용
+
     public BossProjectileAttackState(BossStateMachine stateMachine)
     {
         bossStateMachine = stateMachine;
@@ -28,6 +30,10 @@ public class BossProjectileAttackState : IEnemyState
     public void Enter()
     {
         Debug.Log("Boss 원거리 공격 상태 진입");
+
+        // [추가] 이동 정지 (투사체 공격 중엔 이동 X)
+        var rb = bossStateMachine.GetComponent<Rigidbody2D>();
+        if (rb != null) rb.velocity = Vector2.zero;
 
         // 코루틴이 실행 중이면 Enter를 종료
         if (isCoroutineRunning)
@@ -55,7 +61,13 @@ public class BossProjectileAttackState : IEnemyState
         isAttacking = false;
     }
 
-    public void FixedUpdate() { }
+    public void FixedUpdate()
+    {
+        // [추가] 지속적으로 이동 차단 유지
+        var rb = bossStateMachine.GetComponent<Rigidbody2D>();
+        if (rb != null) rb.velocity = Vector2.zero;
+    }
+
     public void Update() { }
 
     public void OnTriggerEnter2D(Collider2D other)
@@ -90,17 +102,33 @@ public class BossProjectileAttackState : IEnemyState
             {
                 animator?.SetTrigger("FireProjectile");
                 FireProjectile(false);
+                projectileAttackCount++; // 투사체 발사 횟수 증가
             }
 
             yield return new WaitForSeconds(fireRate);
             timer += fireRate;
+
+            if (projectileAttackCount >= 3) // 투사체 3번 발사 후 추적 상태로 전환
+            {
+                // [수정] 빠른 추적 활성화 및 상태 변경
+                bossStateMachine.isFastChasingAfterProjectile = true;
+                bossStateMachine.ChangeState(BossState.Move);  // Move 상태로 전환
+                break; // 반복문 종료
+            }
         }
 
         animator?.ResetTrigger("FireProjectile");
 
-        bossStateMachine.ChangeState(BossState.Idle);
+        // 코루틴 종료 후 상태 전환
+        if (projectileAttackCount < 3)
+        {
+            bossStateMachine.isFastChasingAfterProjectile = true; // 빠른 추적 모드 활성화
+            Debug.Log("빠른 추적###");
+            bossStateMachine.ChangeState(BossState.Move); // Move 상태로 전환
+        }
         isCoroutineRunning = false; // 코루틴 종료 후 중복 실행 방지
     }
+
 
     private IEnumerator FireChargedProjectileCoroutine()
     {

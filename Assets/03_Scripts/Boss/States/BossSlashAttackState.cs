@@ -29,6 +29,7 @@ public class BossSlashAttackState : IEnemyState
     {
         Debug.Log("Boss Slash 상태 진입###");
         animator.SetBool("IsSlashing", true);
+        isAttackFinished = false;
     }
     public void Exit()// 상태에서 나갈 때
     {
@@ -40,27 +41,22 @@ public class BossSlashAttackState : IEnemyState
     {
         if (playerTransform == null || bossTransform == null) return;
 
-        float distance = Vector3.Distance(playerTransform.position, bossTransform.position); // 계속해서 거리 확인 하기.
+        float distance = Vector3.Distance(playerTransform.position, bossTransform.position);
 
-        Debug.Log($"{distance},{attackRange}");
-
-        if( distance< attackRange)
+        if (distance < attackRange && !isAttackFinished)
         {
             Debug.Log("근거리 공격");
-            SlashAttackCoroutine();
+            isAttackFinished = true;
+            BossStateMachine.StartCoroutine(SlashAttackCoroutine());
         }
-        else if( distance > attackRange && distance < detectionRange)
+        else if (distance > attackRange && distance < detectionRange)
         {
-            Debug.Log("원거리 공격###");
             BossStateMachine.ChangeState(BossState.ProjectileAttack);
         }
-        else
+        else if (distance >= detectionRange)
         {
-            Debug.Log("Idle 상태로###");
             BossStateMachine.ChangeState(BossState.Idle);
         }
-
-
     }
 
     public void FixedUpdate()// 물리 업데이트
