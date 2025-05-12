@@ -101,7 +101,7 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0
   m_GravityScale: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -126,7 +126,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8177935134fcc4c4aa421c7ada905a90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 1
   speed: 10
   lifetime: 5
   isPiercing: 0

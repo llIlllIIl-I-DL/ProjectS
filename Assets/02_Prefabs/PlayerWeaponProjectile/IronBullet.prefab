@@ -206,6 +206,7 @@ MonoBehaviour:
   bulletSpeed: 4
   damage: 3
   knockbackForce: 5
+  ammo: 20
   bulletType: 2
   isOvercharged: 1
   extraDamageMultiplier: 1.5

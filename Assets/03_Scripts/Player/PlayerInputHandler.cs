@@ -3,6 +3,7 @@ using Unity.VisualScripting;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 
 public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
@@ -214,23 +215,57 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
         {
             Debug.Log("공격 입력 감지 - 차징 시작");
             IsAttackPressed = true;
-            IsChargingAttack = true;
-            OnAttackInput?.Invoke();
-            OnChargeAttackStart?.Invoke();
             
-            // 차징 시작
-            WeaponManager.Instance.StartCharging();
+            // 이전에 차징 중이었다면 먼저 발사 처리
+            if (IsChargingAttack)
+            {
+                Debug.Log("이전 차징 중단 및 발사");
+                IsChargingAttack = false;
+                OnAttackRelease?.Invoke();
+                OnChargeAttackRelease?.Invoke();
+                WeaponManager.Instance.StopCharging();
+                
+                // 약간의 지연 후 새로운 차징 시작
+                StartCoroutine(StartNewChargingAfterDelay(0.05f));
+            }
+            else
+            {
+                // 일반적인 차징 시작
+                IsChargingAttack = true;
+                OnAttackInput?.Invoke();
+                OnChargeAttackStart?.Invoke();
+                WeaponManager.Instance.StartCharging();
+            }
         }
         else if (context.canceled)
         {
             Debug.Log("공격 입력 해제 - 발사");
             IsAttackPressed = false;
-            IsChargingAttack = false;
-            OnAttackRelease?.Invoke();
-            OnChargeAttackRelease?.Invoke();
             
-            // 차징 해제 및 발사
-            WeaponManager.Instance.StopCharging();
+            // 차징 중이었을 때만 발사 처리
+            if (IsChargingAttack)
+            {
+                IsChargingAttack = false;
+                OnAttackRelease?.Invoke();
+                OnChargeAttackRelease?.Invoke();
+                WeaponManager.Instance.StopCharging();
+            }
+        }
+    }
+
+    // 약간의 지연 후 새로운 차징 시작
+    private IEnumerator StartNewChargingAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        
+        // 여전히 공격 버튼이 눌려있는 경우에만 새로운 차징 시작
+        if (IsAttackPressed)
+        {
+            Debug.Log("새로운 차징 시작");
+            IsChargingAttack = true;
+            OnAttackInput?.Invoke();
+            OnChargeAttackStart?.Invoke();
+            WeaponManager.Instance.StartCharging();
         }
     }
 
