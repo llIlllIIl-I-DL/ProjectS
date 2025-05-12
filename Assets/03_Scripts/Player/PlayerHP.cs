@@ -6,6 +6,9 @@ public class PlayerHP : MonoBehaviour, IDamageable
 {
     [SerializeField] private float maxHP = 10;
     [SerializeField] private float currentHP;
+    [SerializeField] private float invincibleTime = 0.2f;
+
+    private float lastDamageTime = -999f;
 
     private readonly float MIN_HP = 0f;
     private readonly float MAX_HP = 100f;
@@ -30,11 +33,16 @@ public class PlayerHP : MonoBehaviour, IDamageable
 
     public void TakeDamage(float damage)
     {
+        if (Time.time - lastDamageTime < invincibleTime)
+            return;
+        lastDamageTime = Time.time;
+
         currentHP = Mathf.Clamp(currentHP - damage, MIN_HP, maxHP);
         Debug.Log($"플레이어가 {damage} 데미지를 입었습니다. 현재 HP: {currentHP}");
 
-        // 플레이어가 데미지를 입으면 Hit 상태로 변경
-        if (playerStateManager != null)
+
+            // 플레이어가 데미지를 입으면 Hit 상태로 변경
+            if (playerStateManager != null)
         {
             PlayerUI.Instance.SetHealthBar(maxHP, currentHP);
             playerStateManager.ChangeState(PlayerStateType.Hit);

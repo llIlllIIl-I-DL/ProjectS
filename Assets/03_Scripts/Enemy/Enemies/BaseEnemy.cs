@@ -16,6 +16,8 @@ public abstract class BaseEnemy : DestructibleEntity
     [Header("충돌 데미지")]
     [SerializeField] protected float contactDamage = 1f; // 충돌 데미지 값
     [SerializeField] protected bool dealsDamageOnContact = true; // 충돌 데미지 적용 여부
+    [SerializeField] protected float damageInterval = 1.5f; // 데미지 주기
+    private float lastDamageTime = -999f;
 
     [Header("이펙트 설정")]
 
@@ -95,13 +97,15 @@ public abstract class BaseEnemy : DestructibleEntity
     /// <summary>
     /// 충돌 처리
     /// </summary>
-    protected virtual void OnCollisionEnter2D(Collision2D collision)
+    protected virtual void OnCollisionStay2D(Collision2D collision)
     {
         if (!dealsDamageOnContact) return; // 충돌 데미지가 비활성화된 경우 무시
         
         // 플레이어와 충돌했는지 확인
         if (collision.gameObject.CompareTag("Player"))
         {
+            if (Time.time - lastDamageTime < damageInterval) return; // 데미지 주기 체크
+            lastDamageTime = Time.time;
             // 플레이어에게 데미지 주기
             IDamageable damageable = collision.gameObject.GetComponent<IDamageable>();
             if (damageable != null)

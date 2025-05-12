@@ -27,6 +27,11 @@ public class RustBullet : Bullet
         // 좌우로 흔들리기
         float sway = Mathf.Sin(elapsedTime * swaySpeed) * swayAmount;
         // 현재 위치에서 y값만 흔들리게
+        // 차지된 상태면 흔들리지 않음
+        if (IsOvercharged)
+        {
+            sway = 0f;
+        }
         transform.position += new Vector3(0, sway * Time.deltaTime, 0);
     }
 
