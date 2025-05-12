@@ -31,7 +31,7 @@ public class EnemyBullet : MonoBehaviour
                 Destroy(gameObject);
         }
         // 벽이나 장애물과 충돌
-        else if (((1 << other.gameObject.layer) & (LayerMask.GetMask("Ground", "Wall"))) != 0)
+        else if (((1 << other.gameObject.layer) & (LayerMask.GetMask("Ground", "Wall", "NoCollision"))) != 0)
         {
             Destroy(gameObject);
         }
