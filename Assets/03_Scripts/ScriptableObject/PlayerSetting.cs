@@ -5,7 +5,7 @@ public class PlayerSettings : ScriptableObject
 {
     [Header("이동 설정")]
     public float moveSpeed = 7f;
-    public float sprintMultiplier = 1.5f;
+    public float sprintMultiplier = 1.5f; //스프린트 속도
     public float doubleTapTime = 0.3f;
     public float acceleration = 60f;
     public float deceleration = 60f;

@@ -52,7 +52,7 @@ public class InvenInfoController : MonoBehaviour
 
     [HideInInspector] public float bulletDamage;
     [HideInInspector] public float bulletSpeed;
-    
+
 
     public void Start()
     {
@@ -84,9 +84,13 @@ public class InvenInfoController : MonoBehaviour
         CreatSlotSystem.Instance.RefreshAllOwnPoints();
         PlayerUI.Instance.TempAddUtilityPoint();
 
-        currentEquippedUtility.Clear();
-
-        //utilityChangedStatController.ClearUtilityIcon();
+        foreach (var icon in currentEquippedUtility)
+        {
+            icon.sprite = null;
+            var color = icon.color;
+            color.a = 0f;
+            icon.color = color;
+        }
 
         utilityChangedStatController.currentUtilityList.Clear();
 
@@ -124,10 +128,11 @@ public class InvenInfoController : MonoBehaviour
 
             PlayerUI.Instance.utilityPointText.text = player.utilityPoint.ToString();
 
-            CreatSlotSystem.Instance.RefreshAllOwnPoints();
-
             player.UpdateCurrentInventory(); //현재는 플레이어 포인트 현황만 업데이트 중
             player.UpdateCurrentUnLockedUtility(itemData);
+
+            CreatSlotSystem.Instance.RefreshAllOwnPoints();
+
         }
 
         utilityUnLockBtn.gameObject.SetActive(false);
@@ -177,63 +182,63 @@ public class InvenInfoController : MonoBehaviour
 
                 case 1004:
 
-                    utilityChangedStatController.ATKSUP(itemData.effectValue, bulletSpeed);
+                    utilityChangedStatController.ATKSUP(itemData.effectValue);
 
                     break;
 
                 case 1005:
 
-                    Debug.Log("저는 1005번입니다");
+                    utilityChangedStatController.MSUP(itemData.effectValue);
                     break;
 
                 case 1006:
 
-                    Debug.Log("저는 1006번입니다");
+                    utilityChangedStatController.RSUP(itemData.effectValue);
                     break;
 
                 case 1007:
 
-                    Debug.Log("저는 1007번입니다");
+                    utilityChangedStatController.RDUP(itemData.effectValue);
                     break;
 
                 case 1008:
 
-                    Debug.Log("저는 1008번입니다");
+                    utilityChangedStatController.DDUP(itemData.effectValue);
                     break;
 
                 case 1009:
 
-                    Debug.Log("저는 1009번입니다");
+                    utilityChangedStatController.WeighSpeed(itemData.effectValue);
                     break;
 
                 case 1010:
 
-                    Debug.Log("저는 1010번입니다");
+                    utilityChangedStatController.WeighPower(itemData.effectValue);
                     break;
 
                 case 1011:
 
-                    Debug.Log("저는 1011번입니다");
+                    utilityChangedStatController.WeighHealth(itemData.effectValue);
                     break;
 
                 case 1012:
 
-                    Debug.Log("저는 1012번입니다");
+                    utilityChangedStatController.BestDefenceIsAttack(itemData.effectValue);
                     break;
 
                 case 1013:
 
-                    Debug.Log("저는 1013번입니다");
+                    utilityChangedStatController.SpeedRacer(itemData.effectValue);
                     break;
 
                 case 1014:
 
-                    Debug.Log("저는 1014번입니다");
+                    utilityChangedStatController.Trinity(itemData.effectValue);
                     break;
 
                 case 1015:
 
-                    Debug.Log("저는 1015번입니다");
+                    utilityChangedStatController.InvincibleWhenSprint(itemData.effectValue);
                     break;
 
             }
@@ -246,7 +251,7 @@ public class InvenInfoController : MonoBehaviour
     {
         if (itemdata == null) return;
 
-        utilityChangedStatController.RemovedUtility(itemdata.id); //특성 장착시 UI 업데이트
+        utilityChangedStatController.RemovedUtility(itemdata.id); //특성 해제시 UI 업데이트
 
 
         switch (itemdata.id)
@@ -265,6 +270,50 @@ public class InvenInfoController : MonoBehaviour
 
             case 1004:
                 utilityChangedStatController.RemovedATKSUP();
+                break;
+
+            case 1005:
+                utilityChangedStatController.RemovedMSUP();
+                break;
+
+            case 1006:
+                utilityChangedStatController.RemovedRSUP();
+                break;
+
+            case 1007:
+                utilityChangedStatController.RemovedRDUP();
+                break;
+
+            case 1008:
+                utilityChangedStatController.RemovedDDUP();
+                break;
+
+            case 1009:
+                utilityChangedStatController.RemovedWeighSpeed();
+                break;
+
+            case 1010:
+                utilityChangedStatController.RemovedWeighPower();
+                break;
+
+            case 1011:
+                utilityChangedStatController.RemovedWeighHealth();
+                break;
+
+            case 1012:
+                utilityChangedStatController.RemovedBestDefenceIsAttack();
+                break;
+
+            case 1013:
+                utilityChangedStatController.RemovedSpeedRacer();
+                break;
+
+            case 1014:
+                utilityChangedStatController.RemovedTrinity();
+                break;
+
+            case 1015:
+                utilityChangedStatController.RemovedInvincibleWhenSprint();
                 break;
 
         }
