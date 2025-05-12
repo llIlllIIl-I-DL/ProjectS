@@ -2,10 +2,18 @@ using UnityEngine;
 
 public class EnemyBullet : MonoBehaviour
 {
-    public float damage = 10f;
+    private float damage; // private으로 변경
     public float speed = 10f;
     public float lifetime = 5f;
     public bool isPiercing = false;  // 관통 여부
+    
+    /// <summary>
+    /// 총알 데미지 설정
+    /// </summary>
+    public void SetDamage(float newDamage)
+    {
+        damage = newDamage;
+    }
     
     private void Start()
     {

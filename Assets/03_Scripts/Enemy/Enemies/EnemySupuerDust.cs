@@ -202,15 +202,18 @@ public class EnemySupuerDust : BaseEnemy
         
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, bulletRotation);
         
-        // 총알에 속도 적용
+        // 총알에 속도와 데미지 적용
         Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
-        if (bulletRb != null)
+        EnemyBullet enemyBullet = bullet.GetComponent<EnemyBullet>();
+        
+        if (bulletRb != null && enemyBullet != null)
         {
-            bulletRb.velocity = fireDirection * bulletSpeed; // 실제 플레이어 방향으로 발사
+            bulletRb.velocity = fireDirection * bulletSpeed;
+            enemyBullet.SetDamage(attackPower); // attackPower를 총알 데미지로 설정
         }
         else
         {
-            Debug.LogWarning("총알에 Rigidbody2D가 없습니다!");
+            Debug.LogWarning("총알에 필요한 컴포넌트가 없습니다!");
             return;
         }
         
@@ -219,7 +222,7 @@ public class EnemySupuerDust : BaseEnemy
         
         // 디버깅
         Debug.DrawRay(firePoint.position, fireDirection * 3f, Color.red, 0.5f);
-        Debug.Log($"총알 발사 방향: {fireDirection}, 각도: {angle}도");
+        Debug.Log($"총알 발사 방향: {fireDirection}, 각도: {angle}도, 데미지: {attackPower}");
     }
     
     #endregion
