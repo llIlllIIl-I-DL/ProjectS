@@ -29,7 +29,6 @@ public class UtilityChangedStatController : MonoBehaviour
     [SerializeField] public PlayerSettings playerSettings;
 
     public float changedMaxHP;
-    public float actualIncrease;
 
     [SerializeField] Bullet bullet;
 
@@ -104,7 +103,7 @@ public class UtilityChangedStatController : MonoBehaviour
 
     public void RemovedMaxHPUP()
     {
-        playerHP.DecreaseMaxHP(changedMaxHP, actualIncrease);
+        playerHP.DecreaseMaxHP(changedMaxHP);
 
         PlayerUI.Instance.UpdatePlayerHPInUItext();
 
@@ -176,7 +175,7 @@ public class UtilityChangedStatController : MonoBehaviour
 
 
 
-    public void ATKSUP(float effectValue) //1004 이거 weaponManager에 있는 speed로 바꿔야돼!!
+    public void ATKSUP(float effectValue)
     {
         if (effectValue <= 0) return;
 
@@ -278,14 +277,21 @@ public class UtilityChangedStatController : MonoBehaviour
 
 
 
-    public void WeighSpeed(float effectValue)
+    public void WeighSpeed(float effectValue) 
     {
-        float minusEffectValue = effectValue *= -1;
+        if (effectValue <= 0) return;
 
-        playerHP.IncreaseMaxHP(minusEffectValue);
-        PlayerUI.Instance.UpdatePlayerHPInUItext();
+        float percent = effectValue / 100f; //퍼센트 값 계산
+
+        playerHP.DecreaseMaxHP(effectValue);
+        PlayerUI.Instance.UpdatePlayerHPInUItext(); //HP 감소
 
         player.UpdateCurrentPlayerHP(playerHP.CurrentHP); //데이터 저장
+
+
+        player.UpdateCurrentPlayerMoveSpeed(percent); //스피드 상승
+
+        ATKSUP(5f); //공속 상승
     }
     public void RemovedWeighSpeed()
     {
