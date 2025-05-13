@@ -25,8 +25,16 @@ namespace BossFSM
 
             if (!hasJumped)
             {
-                boss.Rb.AddForce(jumpDirection * boss.JumpForce, ForceMode2D.Impulse);
-                hasJumped = true;
+                if(Random.value < 0.1f)
+                {
+                    boss.Rb.AddForce(Vector2.up * boss.JumpForce, ForceMode2D.Impulse);
+                    hasJumped = true;
+                }
+                else
+                {
+                    boss.Rb.AddForce(jumpDirection * boss.JumpForce, ForceMode2D.Impulse);
+                    hasJumped = true;
+                }
             }
         }
 

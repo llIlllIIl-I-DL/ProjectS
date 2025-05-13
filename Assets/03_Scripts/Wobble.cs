@@ -29,9 +29,9 @@ public class JellyWobble : MonoBehaviour
 
         // X, Y 방향으로 살짝 눌렸다 펴지는 느낌
         Sequence seq = DOTween.Sequence();
-        seq.Append(transform.DOScale(new Vector3(defaultScale.x * 1.2f, defaultScale.y * 0.8f, 1f), 0.1f).SetEase(Ease.OutQuad));
-        seq.Append(transform.DOScale(new Vector3(defaultScale.x * 0.9f, defaultScale.y * 1.1f, 1f), 0.1f).SetEase(Ease.InOutQuad));
-        seq.Append(transform.DOScale(defaultScale, 0.1f).SetEase(Ease.OutElastic));
+        seq.Append(transform.DOScale(new Vector3(defaultScale.x * 1.2f, defaultScale.y * 0.8f, 1f), 0.4f).SetEase(Ease.OutQuad));
+        seq.Append(transform.DOScale(new Vector3(defaultScale.x * 0.9f, defaultScale.y * 1.1f, 1f), 0.4f).SetEase(Ease.InOutQuad));
+        seq.Append(transform.DOScale(defaultScale, 0.2f).SetEase(Ease.OutElastic));
 
         yield return seq.WaitForCompletion();
 

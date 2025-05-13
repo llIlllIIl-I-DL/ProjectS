@@ -5,6 +5,8 @@ namespace BossFSM
     public class BossAttackState : BossState
     {
         private float attackTimer;
+        private float attackDuration = 4f; // 공격 지속 시간(초)
+        private float attackElapsed = 0f;
         private Transform player;
 
         public BossAttackState(BossStateMachine stateMachine, Boss boss) : base(stateMachine, boss)
@@ -15,6 +17,7 @@ namespace BossFSM
         public override void EnterState()
         {
             attackTimer = 0f;
+            attackElapsed = 0f;
             boss.Animator.SetBool("IsAttack", true);
         }
 
@@ -23,6 +26,7 @@ namespace BossFSM
             if (player == null) return;
 
             attackTimer += Time.deltaTime;
+            attackElapsed += Time.deltaTime;
 
             float distanceToPlayer = Vector3.Distance(boss.transform.position, player.position);
 
@@ -32,18 +36,25 @@ namespace BossFSM
                 return;
             }
 
+            // 공격 지속시간이 끝나면 점프 또는 이동 중 랜덤하게 전환
+            if (attackElapsed >= attackDuration)
+            {
+                if (Random.value < 0.5f)
+                    stateMachine.ChangeState(new BossJumpState(stateMachine, boss));
+                else
+                    stateMachine.ChangeState(new BossMoveState(stateMachine, boss));
+                return;
+            }
+
             // 쿨타임이 끝나면 산성 점액 발사
             if (attackTimer >= boss.AttackCooldown)
             {
                 boss.Animator.SetBool("IsAttack", false);
-
-                // 산성 점액 발사
                 if (boss.AcidSpawnPoint != null)
                 {
-                    FireAcidBullets(boss.AcidSpawnPoint, 10, 120f, 10f); // 5발, 120도, 속도 5
+                    FireAcidBullets(boss.AcidSpawnPoint, 5, 120f, 5f);
                 }
-
-                attackTimer = 0f; // 쿨타임 초기화
+                attackTimer = 0f;
             }
         }
 
@@ -65,16 +76,15 @@ namespace BossFSM
 
         public void FireAcidBullets(Transform spawnPoint, int bulletCount = 5, float spreadAngle = 120f, float bulletSpeed = 5f)
         {
-            float startAngle = 150f; // 10시 방향
-            float angleStep = spreadAngle / (bulletCount - 1);
+            float minAngle = 30f;   // 2시 방향
+            float maxAngle = 150f;  // 10시 방향향
 
             for (int i = 0; i < bulletCount; i++)
             {
-                float angle = startAngle - i * angleStep;
+                float angle = Random.Range(minAngle, maxAngle);
                 float rad = angle * Mathf.Deg2Rad;
                 Vector2 dir = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)).normalized;
 
-                // WeaponManager처럼 방향에 따라 x축 오프셋 적용
                 Vector3 spawnPosition = spawnPoint.position + new Vector3(0, dir.y * 0.2f, 0);
 
                 GameObject acid = ObjectPoolingManager.Instance.GetObject(ObjectPoolingManager.PoolType.AcidBullet);

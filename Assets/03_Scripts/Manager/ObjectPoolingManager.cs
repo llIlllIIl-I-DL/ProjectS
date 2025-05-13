@@ -29,14 +29,23 @@ public class ObjectPool
 
     public GameObject Get(Transform parent = null)
     {
-        GameObject obj = pool.Count > 0 ? pool.Dequeue() : CreateNewObject();
-        
+        GameObject obj = null;
+        // Destroy된 오브젝트가 나올 수 있으니, null이 아닌 오브젝트가 나올 때까지 반복
+        while (pool.Count > 0)
+        {
+            obj = pool.Dequeue();
+            if (obj != null)
+                break;
+        }
+        if (obj == null)
+            obj = CreateNewObject();
+
         if (parent != null)
         {
             obj.transform.SetParent(parent);
             obj.transform.localPosition = Vector3.zero;
         }
-        
+
         obj.SetActive(true);
         return obj;
     }
