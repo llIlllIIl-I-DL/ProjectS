@@ -163,13 +163,13 @@ MonoBehaviour:
   knockbackForce: 0
   ammo: 10
   bulletType: 1
-  isOvercharged: 1
+  isOvercharged: 0
   rustDebuffDuration: 2
   speedReductionPercent: 0.2
   damageOverTimeAmount: 1
   acidEffectPrefab: {fileID: 5382799822232062830, guid: 3c409995c8cd87848a292c959de13b0f, type: 3}
-  swayAmount: 1.5
-  swaySpeed: 4
+  swayAmount: 4
+  swaySpeed: 8
 --- !u!58 &4741245070497508289
 CircleCollider2D:
   m_ObjectHideFlags: 0
