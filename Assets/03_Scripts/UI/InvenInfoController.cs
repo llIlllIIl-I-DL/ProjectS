@@ -233,7 +233,7 @@ public class InvenInfoController : MonoBehaviour
 
                 case 1014:
 
-                    utilityChangedStatController.Trinity(itemData.effectValue);
+                    utilityChangedStatController.Trinity(itemData.effectValue, maxAmmo);
                     break;
 
                 case 1015:

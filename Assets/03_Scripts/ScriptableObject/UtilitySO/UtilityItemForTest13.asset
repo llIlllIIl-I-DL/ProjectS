@@ -22,7 +22,7 @@ MonoBehaviour:
     \uC99D\uAC00, \uB300\uC26C \uAC70\uB9AC \uC99D\uAC00, \uCCB4\uB825 \uAC10\uC18C,
     \uACF5\uACA9\uB825 \uAC10\uC18C."
   id: 1013
-  effectValue: 3
+  effectValue: 5
   isConsumable: 1
   isStackable: 1
   maxStackAmount: 10

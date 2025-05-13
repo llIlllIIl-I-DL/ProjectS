@@ -10,9 +10,10 @@ public class Player : MonoBehaviour
 
     [SerializeField] private bool hasWingsuit = false; // 윙슈트 장착 여부
     [SerializeField] private float sprintDuration = 1.5f; // 스프린트 지속 시간
+    public float SprintDuration => sprintDuration;
+
 
     [SerializeField] public List<int> UnLockedUtility; //player가 현재까지 해금한 특성 리스트(해금 할 때마다 계속해서 쌓이기만 함)
-    //초기화 기능 필요!
 
     // 필수 컴포넌트들
     private PlayerInputHandler inputHandler;
