@@ -2,6 +2,18 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using BossFSM;
+using System.Linq;
+
+
+
+[System.Serializable] // 태그 선택기 클래스 커스텀에디터를 위한 클래스
+public class TagSelector
+{
+    [Tag]
+    public string tag;
+}
+
+
 
 // 총알 추상 클래스
 public abstract class Bullet : MonoBehaviour
@@ -12,10 +24,17 @@ public abstract class Bullet : MonoBehaviour
     [SerializeField] private int maxAmmo = 30;
     [SerializeField] private int currentAmmo;
     [SerializeField] private ElementType bulletType = ElementType.Normal;
+    [SerializeField] private List<TagSelector> targetTags = new List<TagSelector>();
+    public List<TagSelector> TargetTags => targetTags;
     
     [Header("오버차지 설정")]
     [SerializeField] private bool isOvercharged = false;  // 과열 상태 여부
     [SerializeField] private bool isReloading = false;
+
+    private float playerIgnoreTime = 0.1f;
+    private float playerIgnoreTimer = 0f;
+    private bool canHitPlayer = true;// 피격 가능여부 체크
+    private bool ignoreCollisionReset = false; // 중복 해제 방지
 
     public bool IsReloading
     {
@@ -70,49 +89,44 @@ public abstract class Bullet : MonoBehaviour
     protected virtual void Awake()
     {
         // 태그별 충돌 처리 등록
-        collisionHandlers = new Dictionary<string, Action<Collider2D>>
+        collisionHandlers = new Dictionary<string, Action<Collider2D>>();
+
+        foreach (var tagSelector in targetTags) // 충돌 가능 목록
         {
-            { "Mirror", HandleMirrorCollision },
-            { "Destructible", HandleDestructibleCollision },
-            { "Boss", HandleBossCollision },
-            { "Enemy", HandleEnemyCollision }
-        };
+            switch (tagSelector.tag)
+            {
+                case "Mirror":
+                    collisionHandlers["Mirror"] = HandleMirrorCollision;
+                    break;
+                case "Destructible":
+                    collisionHandlers["Destructible"] = HandleDestructibleCollision;
+                    break;
+                case "Boss":
+                    collisionHandlers["Boss"] = HandleBossCollision;
+                    break;
+                case "Enemy":
+                    collisionHandlers["Enemy"] = HandleEnemyCollision;
+                    break;
+                case "Player":
+                    collisionHandlers["Player"] = HandlePlayerCollision;
+                    break;
+                // 필요하다면 추가
+            }
+        }
     }
 
     protected virtual void Start()
     {
         playerObject = GameObject.FindGameObjectWithTag("Player");
-        var bulletCollider = GetComponent<Collider2D>();
-        if (playerObject != null && bulletCollider != null)
-        {
-            var playerCollider = playerObject.GetComponent<Collider2D>();
-            if (playerCollider != null)
-                Physics2D.IgnoreCollision(bulletCollider, playerCollider, true);
 
-            Collider2D[] playerChildColliders = playerObject.GetComponentsInChildren<Collider2D>();
-            foreach (Collider2D childCollider in playerChildColliders)
-            {
-                if (childCollider != null)
-                    Physics2D.IgnoreCollision(bulletCollider, childCollider, true);
-            }
-
-            int bulletLayer = gameObject.layer;
-            int playerLayer = playerObject.layer;
-            Physics2D.IgnoreLayerCollision(bulletLayer, playerLayer, true);
-
-#if UNITY_EDITOR
-            Debug.Log($"레이어 충돌 무시 설정 - 총알 레이어: {LayerMask.LayerToName(bulletLayer)}, 플레이어 레이어: {LayerMask.LayerToName(playerLayer)}");
-#endif
-        }
-#if UNITY_EDITOR
-        Debug.Log("총알 생성됨: " + transform.position + ", 레이어: " + LayerMask.LayerToName(gameObject.layer));
-#endif
+        playerIgnoreTimer = 0f;
+        canHitPlayer = false;
     }
     
     // 업데이트 가상 메서드 추가
     protected virtual void Update()
     {
-        // 파생 클래스에서 오버라이드 가능
+        //
     }
     // 총알 상태 초기화 (풀에서 가져올 때 호출)
     public void ResetBullet()
@@ -122,29 +136,41 @@ public abstract class Bullet : MonoBehaviour
     }
     protected virtual void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Player") ||
-            (playerObject != null && other.transform.IsChildOf(playerObject.transform)))
+
+        // targetTags에 포함된 태그만 충돌 처리
+        string otherTag = other.tag;
+        bool isTargetTag = false;
+        foreach (var t in targetTags)
         {
-            Debug.Log("플레이어 또는 플레이어 자식과 충돌하여 무시됨");
-            return;
+            if (t.tag == otherTag)
+            {
+                isTargetTag = true;
+                break;
+            }
         }
 
-        if (collisionHandlers.TryGetValue(other.tag, out var handler))
+        if (isTargetTag)
         {
-            handler(other);
-        }
-        else
-        {
-            if (((1 << other.gameObject.layer) & (LayerMask.GetMask("Ground", "Wall"))) != 0)
+            // targetTags에 포함된 태그만 딕셔너리에서 처리
+            if (collisionHandlers != null && collisionHandlers.TryGetValue(otherTag, out var handler))
             {
-                Debug.Log("벽과 충돌하여 총알 제거됨: " + other.gameObject.name);
-                ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
+                handler(other);
             }
             else
             {
-                Debug.Log("다른 오브젝트와 충돌: " + other.gameObject.name + ", 태그: " + other.tag + ", 레이어: " + LayerMask.LayerToName(other.gameObject.layer));
+                // targetTags에 포함되어 있지만 별도 핸들러가 없는 경우(예: 벽 등)
+                if (((1 << other.gameObject.layer) & (LayerMask.GetMask("Ground", "Wall"))) != 0)
+                {
+                    Debug.Log("벽과 충돌하여 총알 제거됨: " + other.gameObject.name);
+                    ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
+                }
+                else
+                {
+                    Debug.Log("타겟 태그이지만 별도 핸들러 없음: " + other.gameObject.name + ", 태그: " + other.tag + ", 레이어: " + LayerMask.LayerToName(other.gameObject.layer));
+                }
             }
         }
+        // targetTags에 없는 태그는 무시
 
         if (isOvercharged)
         {
@@ -252,6 +278,17 @@ public abstract class Bullet : MonoBehaviour
         ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
     }
 
+    private void HandlePlayerCollision(Collider2D other)
+    {
+        PlayerHP playerHP = other.GetComponent<PlayerHP>();
+        if (playerHP != null)
+        {
+            playerHP.TakeDamage(damage);
+            Debug.Log($"플레이어가 총알에 맞아 {damage} 데미지를 입었습니다!");
+        }
+        ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
+    }
+
     private void ApplyOverchargeRecoil()// 기존 오버차징 로직 메서드로 분리
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -267,3 +304,4 @@ public abstract class Bullet : MonoBehaviour
         }
     }
 }
+

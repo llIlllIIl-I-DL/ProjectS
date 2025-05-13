@@ -206,9 +206,14 @@ MonoBehaviour:
   bulletSpeed: 4
   damage: 3
   knockbackForce: 5
-  ammo: 20
+  maxAmmo: 30
+  currentAmmo: 0
   bulletType: 2
+  targetTags:
+  - tag: Boss
+  - tag: Enemy
   isOvercharged: 1
+  isReloading: 0
   extraDamageMultiplier: 1.5
   overchargedLifetime: 3
   overchargedScale: 1.2
