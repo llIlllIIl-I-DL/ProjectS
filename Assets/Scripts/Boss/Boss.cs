@@ -47,6 +47,11 @@ namespace BossFSM
         [SerializeField] private Transform acidSpawnPoint; // 생성 위치
         public Transform AcidSpawnPoint => acidSpawnPoint; 
 
+        private bool isInvincible = false; // 무적 상태 플래그
+        private float invincibleTime = 1f; // 무적 지속 시간(초)
+        private float invincibleTimer = 0f;
+
+        private SpriteRenderer spriteRenderer;
 
         private void Awake()
         {
@@ -54,6 +59,7 @@ namespace BossFSM
             stateMachine = GetComponent<BossStateMachine>();
             rb = GetComponent<Rigidbody2D>();
             currentHealth = MaxHealth;
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         }
 
         private void Start()
@@ -65,6 +71,14 @@ namespace BossFSM
 
         public void TakeDamage(float damage)
         {
+            if (isInvincible) return; // 무적 상태면 데미지 무시
+
+            if (Animator != null)
+                Animator.SetTrigger("IsHit"); // 피격 애니메이션 트리거
+
+            isInvincible = true;
+            invincibleTimer = 0f;
+
             if (damage - Defence == 0)
             {
                 // 방어력이 피해를 완전히 상쇄한 경우  
@@ -90,6 +104,32 @@ namespace BossFSM
         void Update()
         {
             contactDamageTimer += Time.deltaTime;
+            if (isInvincible)
+            {
+                invincibleTimer += Time.deltaTime;
+
+                // 깜빡임: 0.1초마다 흰색/원래색 반복
+                if (spriteRenderer != null)
+                {
+                    float blinkInterval = 0.1f;
+                    if (Mathf.FloorToInt(invincibleTimer / blinkInterval) % 2 == 0)
+                        spriteRenderer.color = Color.white;
+                    else
+                        spriteRenderer.color = Color.red; // 원래 색(예시, 실제 원래색으로 바꿔도 됨)
+                }
+
+                if (invincibleTimer >= invincibleTime)
+                {
+                    isInvincible = false;
+                    if (spriteRenderer != null)
+                        spriteRenderer.color = Color.white; // 무적 끝나면 원래 색으로 복구
+                }
+            }
+            else
+            {
+                if (spriteRenderer != null)
+                    spriteRenderer.color = Color.white; // 평상시엔 원래 색
+            }
         }
 
         void OnTriggerStay2D(Collider2D other)
