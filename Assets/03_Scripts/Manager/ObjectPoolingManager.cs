@@ -80,6 +80,7 @@ public class ObjectPoolingManager : MonoBehaviour
     // 프리팹 타입 열거형
     public enum PoolType
     {
+        AcidBullet,
         DebuffEffect,  // 모든 디버프 이펙트를 하나로 통합
         // 총알 타입
         NormalBullet,
