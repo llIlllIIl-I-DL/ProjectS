@@ -5,7 +5,7 @@ namespace BossFSM
     public class BossAttackState : BossState
     {
         private float attackTimer;
-        private float attackDuration = 4f; // 공격 지속 시간(초)
+        private float attackDuration = 3f; // 공격 지속 시간(초)
         private float attackElapsed = 0f;
         private Transform player;
 
