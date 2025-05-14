@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -262,7 +263,7 @@ public class PlayerMovement : MonoBehaviour
 
         while (Time.time < startTime + dashDuration)
         {
-            if (UtilityChangedStatController.Instance.currentUtilityList.FindIndex(u => u.id == 1015) != -1)
+            if (UtilityChangedStatController.Instance.currentUtilityList.Any(u => u.id == 1015))
             {
                 UtilityChangedStatController.Instance.InvincibleWhenDash();
             }

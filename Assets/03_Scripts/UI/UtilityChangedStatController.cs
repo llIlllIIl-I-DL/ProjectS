@@ -28,7 +28,19 @@ public class UtilityChangedStatController : MonoBehaviour
     static PlayerHP playerHP;
     [SerializeField] public PlayerSettings playerSettings;
 
-    public float changedMaxHP;
+
+    public float revertMaxHP;
+    public float revertMaxMP;
+    public float revertATK;
+    public float revertATKS;
+    public float revertMS;
+    public float revertRS;
+    public float revertRD;
+    public float revertDD;
+
+
+
+
     public bool isInvincibleDash = false;
 
     [SerializeField] Bullet bullet;
@@ -97,6 +109,7 @@ public class UtilityChangedStatController : MonoBehaviour
     public void MaxHPUP(float effectValue) //1001
     {
         playerHP.IncreaseMaxHP(effectValue);
+
         PlayerUI.Instance.UpdatePlayerHPInUItext();
 
         player.UpdateCurrentPlayerHP(playerHP.CurrentHP); //데이터 저장
@@ -104,7 +117,7 @@ public class UtilityChangedStatController : MonoBehaviour
 
     public void RemovedMaxHPUP()
     {
-        playerHP.DecreaseMaxHP(changedMaxHP);
+        playerHP.DecreaseMaxHP(revertMaxHP);
 
         PlayerUI.Instance.UpdatePlayerHPInUItext();
 
@@ -119,29 +132,34 @@ public class UtilityChangedStatController : MonoBehaviour
     {
         //maxAmmo = WeaponManager에 있는 에너지 최대치 값
 
-
         if (effectValue <= 0) return; // 0 이하의 값은 무시
+
         float previousMaxMP = maxAmmo; // 이전 최대 HP 저장
 
         float changedMaxMP = maxAmmo * (effectValue / 100);
         float actualIncrease = previousMaxMP - changedMaxMP; // 최대 HP 증가량
 
+        revertMaxMP = changedMaxMP;
+
         WeaponManager.Instance.SetMaxAmmo(Mathf.CeilToInt(previousMaxMP + changedMaxMP));
-
-
-        // 현재 HP도 최대 HP를 초과하지 않도록 조정
 
         float previousCurrentMP = WeaponManager.Instance.AmmoManager.CurrentAmmo;
         WeaponManager.Instance.AmmoManager.CurrentAmmo = Mathf.CeilToInt(Mathf.Clamp(WeaponManager.Instance.AmmoManager.CurrentAmmo + actualIncrease, 0, WeaponManager.Instance.AmmoManager.MaxAmmo));
 
-        Debug.Log($"최대 HP가 {WeaponManager.Instance.AmmoManager.MaxAmmo - previousMaxMP}만큼 증가했습니다. 새로운 최대 HP: {WeaponManager.Instance.AmmoManager.MaxAmmo}");
-
-        //player.UpdateCurrentPlayerMP(maxMP); //데이터 저장용
+        Debug.Log($"최대 MP가 {WeaponManager.Instance.AmmoManager.MaxAmmo - previousMaxMP}만큼 증가했습니다. 새로운 최대 MP: {WeaponManager.Instance.AmmoManager.MaxAmmo}");
+        Debug.Log($"최대 MP: {WeaponManager.Instance.AmmoManager.MaxAmmo} 현재 MP: {WeaponManager.Instance.AmmoManager.CurrentAmmo}");
     }
 
-    public void RemovedMaxMPUP()
+    public void RemovedMaxMPUP(float maxAmmo)
     {
-        Debug.Log("Remove 1002");
+        float previousMaxMP = maxAmmo; // 이전 최대 HP 저장
+
+        WeaponManager.Instance.SetMaxAmmo(Mathf.FloorToInt(previousMaxMP - revertMaxMP));
+
+        float previousCurrentMP = WeaponManager.Instance.AmmoManager.CurrentAmmo;
+        WeaponManager.Instance.AmmoManager.CurrentAmmo = Mathf.CeilToInt(Mathf.Clamp(WeaponManager.Instance.AmmoManager.CurrentAmmo - revertMaxMP, 0, WeaponManager.Instance.AmmoManager.MaxAmmo));
+
+        Debug.Log($"최대 MP: {WeaponManager.Instance.AmmoManager.MaxAmmo} 현재 MP: {WeaponManager.Instance.AmmoManager.CurrentAmmo}");
     }
 
 
@@ -162,7 +180,10 @@ public class UtilityChangedStatController : MonoBehaviour
         if (bullet != null)
         {
             float newDamage = bullet.Damage * (1f + WeaponManager.Instance.AtkUpPercent);
+
             WeaponManager.Instance.SetBulletDamage(newDamage);
+
+            revertATK = newDamage;
         }
 
         Debug.Log($"버프 적용: {effectValue}% 공격력 (현재 총알 속성: {WeaponManager.Instance.GetBulletType()})");
@@ -170,7 +191,18 @@ public class UtilityChangedStatController : MonoBehaviour
 
     public void RemovedATKUP()
     {
-        Debug.Log("Remove 1003");
+        WeaponManager.Instance.SetAtkUpPercent(0); //weaponManager에 전달!!
+
+        var type = WeaponManager.Instance.GetBulletType();
+        var bulletPrefab = WeaponManager.Instance.BulletFactory.GetBulletPrefab(type);
+        var bullet = bulletPrefab.GetComponent<Bullet>();
+
+        if (bullet != null)
+        {
+            float newDamage = revertATK - (revertATK - 1f);
+
+            WeaponManager.Instance.SetBulletDamage(newDamage);
+        }
     }
 
 
@@ -193,11 +225,24 @@ public class UtilityChangedStatController : MonoBehaviour
         {
             float newDamage = bullet.BulletSpeed * (1f + WeaponManager.Instance.SpeedUpPercent);
             WeaponManager.Instance.SetBulletSpeed(newDamage);
+            revertATKS = newDamage;
         }
     }
+
     public void RemovedATKSUP()
     {
-        Debug.Log("Remove 1004");
+        WeaponManager.Instance.SetSpeedUpPercent(0); //weaponManager에 전달!!
+
+        var type = WeaponManager.Instance.GetBulletType();
+        var bulletPrefab = WeaponManager.Instance.BulletFactory.GetBulletPrefab(type);
+        var bullet = bulletPrefab.GetComponent<Bullet>();
+
+        if (bullet != null)
+        {
+            float newDamage = revertATKS - (revertATKS - 1f);
+
+            WeaponManager.Instance.SetBulletSpeed(newDamage);
+        }
     }
 
 
@@ -213,11 +258,14 @@ public class UtilityChangedStatController : MonoBehaviour
         float moveSpeed = playerSettings.moveSpeed * percent; //퍼센트 값 계산
 
         player.UpdateCurrentPlayerMoveSpeed(moveSpeed);
+
+        revertMS = moveSpeed;
+
     }
 
     public void RemovedMSUP()
     {
-        Debug.Log("Remove 1005");
+        player.UpdateCurrentPlayerMoveSpeed(-revertMS);
     }
 
 
@@ -235,11 +283,14 @@ public class UtilityChangedStatController : MonoBehaviour
         float sprintSpeed = playerSettings.sprintMultiplier * percent;
 
         player.UpdateCurrentPlayerRunSpeed(sprintSpeed);
+
+        revertRS = sprintSpeed;
     }
 
     public void RemovedRSUP()
     {
-        Debug.Log("Remove 1006");
+        player.UpdateCurrentPlayerRunSpeed(-revertRS);
+        
     }
 
 
@@ -252,14 +303,16 @@ public class UtilityChangedStatController : MonoBehaviour
 
         float percent = effectValue / 100f; //퍼센트 값 계산
 
-        float sprintSpeed = player.SprintDuration * percent;
+        float sprintDuration = player.SprintDuration * percent;
 
-        player.UpdateCurrentSprintTime(sprintSpeed);
+        player.UpdateCurrentSprintTime(sprintDuration);
+
+        revertRD = sprintDuration;
     }
 
     public void RemovedRDUP()
     {
-        Debug.Log("Remove 1007");
+        player.UpdateCurrentSprintTime(-revertRD);
     }
 
 
@@ -272,15 +325,16 @@ public class UtilityChangedStatController : MonoBehaviour
 
         float percent = effectValue / 100f; //퍼센트 값 계산
 
-        float sprintSpeed = playerSettings.dashDuration * percent;
+        float dashDuration = playerSettings.dashDuration * percent;
 
+        playerSettings.dashDuration += dashDuration;
 
-        playerSettings.dashDuration += sprintSpeed;
+        revertDD = dashDuration;
     }
 
     public void RemovedDDUP()
     {
-        Debug.Log("Remove 1008");
+        playerSettings.dashDuration -= revertDD;
     }
 
 
@@ -293,15 +347,18 @@ public class UtilityChangedStatController : MonoBehaviour
         playerHP.DecreaseMaxHP(effectValue);
         PlayerUI.Instance.UpdatePlayerHPInUItext(); //HP 감소
 
-        player.UpdateCurrentPlayerHP(playerHP.CurrentHP); //데이터 저장
-
         player.UpdateCurrentPlayerMoveSpeed(effectValue); //스피드 상승
 
         ATKSUP(5f); //공속 상승
     }
-    public void RemovedWeighSpeed()
+
+    public void RemovedWeighSpeed(float effectValue)
     {
-        Debug.Log("Remove 1009");
+        MaxHPUP(effectValue);
+
+        RemovedMSUP(); //스피드 감소
+
+        ATKSUP(-5f); //공속 감소
     }
 
 
@@ -313,9 +370,12 @@ public class UtilityChangedStatController : MonoBehaviour
 
         ATKSUP(-effectValue); //수정수정
     }
+
     public void RemovedWeighPower()
     {
-        Debug.Log("Remove 1010");
+        RemovedATKUP();
+
+        RemovedATKSUP();
     }
 
 
@@ -330,7 +390,9 @@ public class UtilityChangedStatController : MonoBehaviour
 
     public void RemovedWeighHealth()
     {
-        Debug.Log("Remove 1011");
+        RemovedMaxHPUP();
+
+        RemovedMSUP();
     }
 
 
@@ -349,9 +411,20 @@ public class UtilityChangedStatController : MonoBehaviour
 
         RSUP(effectValue); // RS 상승
     }
-    public void RemovedBestDefenceIsAttack()
+
+    public void RemovedBestDefenceIsAttack(float effectValue)
     {
-        Debug.Log("Remove 1012");
+        float IncreaseHP = effectValue * 3;
+        MaxHPUP(IncreaseHP); //최대 hp 상승
+
+        float decreaseATK = effectValue * 2;
+        RemovedATKUP(); //ATK 감소
+
+        RemovedATKSUP(); //ATKS 감소
+
+        MSUP(effectValue); //MS 상승
+
+        RemovedRSUP(); // RS 감소
     }
 
 
@@ -370,9 +443,20 @@ public class UtilityChangedStatController : MonoBehaviour
 
         RDUP(3f); //RD 상승
     }
-    public void RemovedSpeedRacer()
+
+    public void RemovedSpeedRacer(float effectValue)
     {
-        Debug.Log("Remove 1013");
+        float increaseHP = effectValue * 3;
+
+        MaxHPUP(increaseHP);
+
+        RemovedATKUP();
+
+        RemovedATKSUP();
+
+        RemovedMSUP();
+
+        RemovedRDUP();
     }
 
 
@@ -397,9 +481,23 @@ public class UtilityChangedStatController : MonoBehaviour
         DDUP(effectValue); //DD상승
 
     }
-    public void RemovedTrinity()
+    public void RemovedTrinity(float maxAmmo)
     {
-        Debug.Log("Remove 1014");
+        RemovedMaxHPUP();
+
+        RemovedMaxMPUP(maxAmmo);
+
+        RemovedATKUP();
+
+        RemovedATKSUP();
+
+        RemovedMSUP();
+
+        RemovedRSUP();
+
+        RemovedRDUP();
+
+        RemovedDDUP();
     }
 
 
@@ -412,7 +510,7 @@ public class UtilityChangedStatController : MonoBehaviour
     }
     public void RemovedInvincibleWhenDash()
     {
-        Debug.Log("Remove 1015");
+        isInvincibleDash = false;
     }
 
 }

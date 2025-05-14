@@ -6103,12 +6103,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b21c92fcb7379aa499a827e63fca70ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
-  playerHP: {fileID: 0}
+  playerSettings: {fileID: 11400000, guid: 83308ca141c58fe47a419e584bbc8df0, type: 2}
+  revertMaxHP: 0
+  revertMaxMP: 0
+  isInvincibleDash: 0
   bullet: {fileID: 8529992230163698548, guid: e4992159c28c2e24ba7b726d9457aee1, type: 3}
   currentUtilityList: []
-  changedMaxHP: 0
-  actualIncrease: 0
 --- !u!1 &3113945353657093581
 GameObject:
   m_ObjectHideFlags: 0

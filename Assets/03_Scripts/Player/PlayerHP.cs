@@ -79,16 +79,13 @@ public class PlayerHP : MonoBehaviour, IDamageable
         float previousCurrentHP = currentHP;
         currentHP = currentHP + changedMaxHP;
 
-        UtilityChangedStatController.Instance.changedMaxHP = changedMaxHP;
+        UtilityChangedStatController.Instance.revertMaxHP = changedMaxHP;
 
         Debug.Log($"최대 HP가 {maxHP - previousMaxHP}만큼 증가했습니다. 새로운 최대 HP: {maxHP}");
     }
 
     public void DecreaseMaxHP(float amount)
     {
-        //maxHP -= changedMaxHP;
-        // currentHP = currentHP - changedMaxHP;
-
         if (amount <= 0) return; // 0 이하의 값은 무시
         float previousMaxHP = maxHP; // 이전 최대 HP 저장
 
@@ -101,7 +98,9 @@ public class PlayerHP : MonoBehaviour, IDamageable
         float previousCurrentHP = currentHP;
         currentHP = currentHP - changedMaxHP;
 
-        UtilityChangedStatController.Instance.changedMaxHP = changedMaxHP;
+        float revertMaxHP = changedMaxHP - currentHP;
+
+        UtilityChangedStatController.Instance.revertMaxHP = changedMaxHP;
 
         Debug.Log($"최대 HP가 {previousMaxHP - maxHP}만큼 감소했습니다. 새로운 최대 HP: {maxHP}");
     }
