@@ -29,6 +29,7 @@ public class UtilityChangedStatController : MonoBehaviour
     [SerializeField] public PlayerSettings playerSettings;
 
     public float changedMaxHP;
+    public bool isInvincibleDash = false;
 
     [SerializeField] Bullet bullet;
 
@@ -405,14 +406,11 @@ public class UtilityChangedStatController : MonoBehaviour
 
 
 
-    public void InvincibleWhenSprint(float effectValue)
+    public void InvincibleWhenDash()
     {
-        //플레이어가 isDash일때
-        //장착 리스트 안에 id == 1015가 있으면
-        //그 기간동안에는
-        //받는 데미지 모두 0
+        isInvincibleDash = true;
     }
-    public void RemovedInvincibleWhenSprint()
+    public void RemovedInvincibleWhenDash()
     {
         Debug.Log("Remove 1015");
     }

@@ -238,7 +238,7 @@ public class InvenInfoController : MonoBehaviour
 
                 case 1015:
 
-                    utilityChangedStatController.InvincibleWhenSprint(itemData.effectValue);
+                    utilityChangedStatController.InvincibleWhenDash();
                     break;
 
             }
@@ -313,7 +313,7 @@ public class InvenInfoController : MonoBehaviour
                 break;
 
             case 1015:
-                utilityChangedStatController.RemovedInvincibleWhenSprint();
+                utilityChangedStatController.RemovedInvincibleWhenDash();
                 break;
 
         }
