@@ -84,9 +84,11 @@ public class ObjectDoor : BaseObject
         // 사운드 효과 재생
         if (playEffects)
         {
+            // 오디오 실행방법이 여러개
             if (isOpen)
             {
                 AudioManager.Instance.PlaySFX("DoorOpen");
+                // AudioSource.PlayClipAtPoint();
             }
             else
             {

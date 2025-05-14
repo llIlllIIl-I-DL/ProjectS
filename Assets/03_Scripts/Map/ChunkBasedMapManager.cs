@@ -9,6 +9,8 @@ using System;
 /// 청크 기반 맵 매니저 클래스
 /// 분할된 맵 청크를 관리하고 플레이어 위치에 따라 필요한 청크를 로드하거나 언로드합니다.
 /// </summary>
+/// 전반적으로 로직 구현에 대한 논리는 잘 갖추어져 있다.
+/// 다만 포트폴리오로 만들때 핵심적으로 한눈에 알아볼수있도록 전개를 할 수 있게 고민이 필요
 public class ChunkBasedMapManager : MonoBehaviour
 {
     [Header("기본 설정")]

@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// 인터페이스를 모아둔 클래스?? 분리해두자 
 public interface IDamageable
 {
     void TakeDamage(float damage);

@@ -46,7 +46,7 @@ public class CostumeSetManager : MonoBehaviour
 
         if (costumeManager != null)
         {
-            // 이벤트 구독
+            // 이벤트 구독 - 굳
             costumeManager.OnPartCollected += OnPartCollected;
             costumeManager.OnCostumeUnlocked += OnCostumeUnlocked;
             costumeManager.OnCostumeActivated += OnCostumeActivated;

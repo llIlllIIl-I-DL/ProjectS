@@ -26,6 +26,8 @@ public class MetroidvaniaDoor : MonoBehaviour
 
             if (player != null)
             {
+                // 스위치를 이용한 제어가 많다.
+                // 안되는 건 아니지만 다른 방법들을 옵션으로 가지고 있어야 이후 처리가 유연함
                 // 도어 타입에 따른 처리
                 switch (doorType)
                 {

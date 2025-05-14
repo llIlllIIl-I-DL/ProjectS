@@ -2,7 +2,12 @@ using UnityEngine;
 
 public abstract class DebuffEffect : MonoBehaviour
 {
+    // 버프 구성에 맞게 잘 구성했다.
+    // 버프 / 디버프는 사실상 같은 개념, 수치만 -로
     protected BaseEnemy targetEnemy;
+    
+    // DebuffData 가 따로 있는데 수치만 분리해서 전달하는 이유가 있는가??
+    // 관리가 어렵고 가독성이 좋지 않다.
     protected float duration;
     protected float intensity;
     protected float tickDamage;
@@ -46,6 +51,7 @@ public abstract class DebuffEffect : MonoBehaviour
     {
         if (targetEnemy == null)
         {
+            // 재활용하는 것 고료
             Destroy(this);
             return;
         }

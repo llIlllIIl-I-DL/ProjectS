@@ -135,6 +135,7 @@ public class EnemyBigDust : BaseEnemy
         chaseState = new ChaseState(this, stateMachine, chaseSpeed, moveInYAxis: false);
 
         // 특수 공격 상태 초기화
+        // 공통된 생성자 데이터가 있음
         chargeAttackState = new ChargeAttackState(
             this,
             stateMachine,
@@ -258,6 +259,7 @@ public class EnemyBigDust : BaseEnemy
 
     #region State Switch Methods
 
+    // 전환함수가 너무 많다.
     /// <summary>
     /// 순찰 상태로 전환
     /// </summary>

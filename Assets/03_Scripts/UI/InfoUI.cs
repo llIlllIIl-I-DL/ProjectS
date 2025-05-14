@@ -16,6 +16,7 @@ public class InfoUI : MonoBehaviour
     [SerializeField] public GameObject utilityPage;
     [SerializeField] public GameObject suitPage;
 
+    List<GameObject>t = new List<GameObject>();
     [SerializeField] GameObject InfoMenu;
     static GameObject previousPage;
 
@@ -39,6 +40,7 @@ public class InfoUI : MonoBehaviour
         }
     }
 
+    // 탭로직 간단하고 좋다
     public void ActivateCategory(GameObject page)
     {
         if (previousPage != null)

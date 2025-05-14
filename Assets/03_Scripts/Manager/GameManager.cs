@@ -117,12 +117,14 @@ public class GameManager : MonoBehaviour
         currentLives = maxLives;
         
         // 매니저 참조 가져오기
+        // 매니저들 싱글톤 생성방법이 너무 재각각
         itemManager = ItemManager.Instance;
         inventoryManager = InventoryManager.Instance;
         costumeManager = CostumeManager.Instance;
         weaponManager = FindObjectOfType<WeaponManager>();
         audioManager = AudioManager.Instance;
 
+        // 직접 초기화 하도록 구성을 하는 것이 좋다.
         // 아직 매니저들이 초기화되지 않았을 수 있으므로, 나중에 참조 설정
         StartCoroutine(SetupManagerReferences());
 
@@ -301,6 +303,7 @@ public class GameManager : MonoBehaviour
     {
         if (costumeManager != null)
         {
+            // ActiveCostumeId 상수처리
             string savedCostumeId = PlayerPrefs.GetString("ActiveCostumeId", "");
             if (!string.IsNullOrEmpty(savedCostumeId))
             {

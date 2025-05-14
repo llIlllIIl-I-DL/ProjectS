@@ -341,8 +341,8 @@ public class ObjectLazer : BaseObject
     private void TriggerInteractions(RaycastHit2D hit, Vector2 direction)
     {
         // 레이저 상호작용 인터페이스
-        ILaserInteractable laserInteractable = hit.collider.GetComponent<ILaserInteractable>();
-        if (laserInteractable != null)
+        // 축약 가능 - 아래 로직과 비교
+        if (hit.collider.TryGetComponent<ILaserInteractable>(out var laserInteractable))
         {
             laserInteractable.OnLaserHit(hit.point, direction);
         }

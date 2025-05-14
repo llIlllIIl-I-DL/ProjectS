@@ -52,6 +52,7 @@ public class UtilityChangedStatController : MonoBehaviour
 
         for (int i = 0; i < currentUtilityList.Count; i++)
         {
+            // 유틸리티의 제어를 여기서 할필요는 없다
             if (invenInfoController.currentEquippedUtility[i].sprite == null)
             {
                 Color temp = invenInfoController.currentEquippedUtility[i].color;
@@ -144,6 +145,8 @@ public class UtilityChangedStatController : MonoBehaviour
 
 
 
+    // 유틸리티 데이터 제어방식
+    // 기존값에 더해주는데 소스를 분리해두는것이 사용하기 편함
 
     public void ATKUP(float effectValue) //1003
     {
@@ -171,6 +174,10 @@ public class UtilityChangedStatController : MonoBehaviour
         Debug.Log("끼얏호~! 1003");
     }
 
+    // Player - Stat : Atk : 100
+    //        - Util : AtakUp : 10
+    //    GetAtk : 
+    
 
 
 

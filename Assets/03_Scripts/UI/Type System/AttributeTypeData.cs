@@ -17,8 +17,9 @@ public enum AttributeTypes
 [CreateAssetMenu(fileName = "AttributeType", menuName = "AttributeType")]
 public class AttributeTypeData : ScriptableObject
 {
+    // 프로퍼티 세팅 
     [SerializeField] private string TypeName;
-    public string typeName { get { return TypeName; } set { TypeName = value; } }
+    public string typeName => TypeName;
 
     public AttributeTypes type;
 

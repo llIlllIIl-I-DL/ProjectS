@@ -63,6 +63,7 @@ public class PlayerAttackingState : PlayerStateBase
     private void FireWeapon()
     {
         // 총알 생성 및 발사
+        // Try 함수 사용 가능
         var weaponManager = player.GetComponent<WeaponManager>();
         if (weaponManager != null)
         {

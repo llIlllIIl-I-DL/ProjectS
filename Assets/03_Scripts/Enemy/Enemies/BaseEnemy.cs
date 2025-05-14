@@ -205,6 +205,8 @@ public abstract class BaseEnemy : DestructibleEntity
         }
     }
     
+    // 구조 잘 잡았다.
+    // 이벤트 방식도 고려할만 함
     /// <summary>
     /// 플레이어가 감지되었을 때 호출 - 상속받은 클래스에서 오버라이드
     /// </summary>
@@ -342,6 +344,7 @@ public abstract class BaseEnemy : DestructibleEntity
         return playerDetected;
     }
 
+    // 그냥 프로퍼티로 해도 될듯
     /// <summary>
     /// 마지막으로 알려진 플레이어 위치 반환
     /// </summary>
@@ -434,7 +437,8 @@ public abstract class BaseEnemy : DestructibleEntity
     // 죽었을 때
     protected virtual void Die()
     {
-        Invoke("ReturnToPool", 1f);
+        // nameof 활용
+        Invoke(nameof(ReturnToPool), 1f);
         // 죽음 애니메이션, 효과음 등
         // 상태이상 초기화
         DebuffManager.Instance.RemoveAllDebuffs(this);

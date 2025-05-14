@@ -33,6 +33,7 @@ public class EnemyManager : Singleton<EnemyManager>
     // 적 프리팹 로드
     private void LoadEnemyPrefab(string address)
     {
+        // 어드레서블 사용 기준??
         Addressables.LoadAssetAsync<GameObject>(address).Completed += (operation) =>
         {
             if (operation.Status == AsyncOperationStatus.Succeeded)

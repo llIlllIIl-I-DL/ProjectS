@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
+// 아이템 기반으로 슬롯 세팅 좋음
 public class TypeItemSlot : MonoBehaviour
 {
     //처음에는 무조건 normal슬롯이 플레이어의 속성이 됨, 혼자만 ui내에서 활성화.
@@ -25,6 +26,8 @@ public class TypeItemSlot : MonoBehaviour
 
     private int slotIndex = 0;
     private bool isActive = false;
+    
+    // 슬롯에 전달된 정보로 알아서 세팅된 구조 좋음
 
     private void Start()
     {

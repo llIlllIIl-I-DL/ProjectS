@@ -11,6 +11,7 @@ public class BossDieState : IEnemyState
 
     public BossDieState(BossStateMachine stateMachine)
     {
+        // 스테이트별 공통 로직이 많다. 추상화 하는 것 고려
         BossStateMachine = stateMachine;
         boss = BossStateMachine.transform;
         animator = stateMachine.GetComponent<Animator>();

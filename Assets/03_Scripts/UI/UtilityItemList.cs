@@ -19,8 +19,10 @@ public class UtilityItemList : ScriptableObject
         }
     }
 
+    // 클론개념 좋음
     public ItemData GetUtilityItemDataForList(int id)
     {
+        // 아이디를 기반으로 하면 Dictioanry 가 유용
         ItemData utilityData = utilityItemList.Find(Data => Data.id == id);
         ItemData cloneData = Instantiate(utilityData);
 

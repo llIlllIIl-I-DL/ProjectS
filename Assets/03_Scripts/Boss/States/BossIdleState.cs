@@ -26,6 +26,7 @@ public class BossIdleState : IEnemyState
     {  
         Debug.Log("Boss Idle 상태 진입");
         
+        // 애니메이션 상수를 이용하자
         animator.SetBool("IsIdle", true);
     }
 

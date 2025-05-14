@@ -165,6 +165,7 @@ public class ObjectPressurePlate : BaseObject
             // 한 오브젝트가 모든 태그를 가져야 하는 경우
             foreach (var obj in objectsOnPlate.Values)
             {
+                // Find 사용 금지
                 GameObject gameObj = GameObject.Find(obj); // 이름으로 찾기 (더 나은 방법이 있을 수 있음)
                 bool hasAllTags = true;
 

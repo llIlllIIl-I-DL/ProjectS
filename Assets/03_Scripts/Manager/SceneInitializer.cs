@@ -36,6 +36,7 @@ public class SceneInitializer : MonoBehaviour
     }
 
     // 매니저 초기화 메서드
+    // 싱글톤 초기화치고는 번거롭다, SceneInitializer 가 아니라 싱글톤 초기화기인듯
     private void InitializeManager<T>(GameObject managerPrefab) where T : MonoBehaviour
     {
         // 이미 해당 타입의 매니저가 존재하는지 확인

@@ -56,6 +56,7 @@ public class InvenInfoController : MonoBehaviour
 
     public void Start()
     {
+        // 플레이어틑 찾을 다른 방법 고민
         player = FindObjectOfType<Player>();
         utilityChangedStatController = GetComponent<UtilityChangedStatController>();
 
@@ -154,7 +155,7 @@ public class InvenInfoController : MonoBehaviour
         {
             utilityChangedStatController.EquippedUtility(itemData); //특성 장착시 UI 업데이트
 
-
+            // 아이디에 따른 결과 처리가 외부에서 하는게 좋음
             switch (itemData.id) //선택한 슬롯 내의 특성 데이터 속 id값을 받아옴
             {
                 case 1001:

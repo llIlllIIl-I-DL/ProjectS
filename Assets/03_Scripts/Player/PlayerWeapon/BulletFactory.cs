@@ -11,12 +11,19 @@ public class BulletFactory : MonoBehaviour
     [SerializeField] private GameObject waterBulletPrefab;
     [SerializeField] private GameObject flameBulletPrefab;
     [SerializeField] private GameObject iceBulletPrefab;
+    
+    private GameObject[] BulletPrefabs;
 
     // 총알 생성 메서드
+    // 리턴형이 Bullet 이나 제네릭인 경우 활용이 더 편함
     public GameObject CreateBullet(ElementType type, Vector3 position, Quaternion rotation, bool isOvercharged = false)
     {
         GameObject bulletObject = null;
 
+        
+        bulletObject = Instantiate(BulletPrefabs[(int)type], position, rotation);
+        
+        // 배열이나 딕셔너리에 보관하는 것도 방법
         // 속성 타입에 따른 총알 생성
         switch (type)
         {

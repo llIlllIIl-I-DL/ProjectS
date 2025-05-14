@@ -91,6 +91,7 @@ namespace Enemy.States
         {
             phaseTimer += Time.deltaTime;
             
+            // 스위치가 길어진다.
             switch (currentPhase)
             {
                 case SlamPhase.Jump:

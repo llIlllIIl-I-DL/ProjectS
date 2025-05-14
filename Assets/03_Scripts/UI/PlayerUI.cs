@@ -71,6 +71,8 @@ public class PlayerUI : MonoBehaviour
 
     public Dictionary<ItemData, Sprite> TypeItemDic = new Dictionary<ItemData, Sprite>();
 
+    WaitForSeconds fadeWait = new WaitForSeconds(0.05f);
+    
     public void Start()
     {
         player = FindObjectOfType<Player>();
@@ -168,7 +170,7 @@ public class PlayerUI : MonoBehaviour
         float elapsed = 0.0f;
         Vector3 originalPosition = healthBar.transform.position;
 
-
+        // 코루틴 활용 좋음 - DoTween 알면 또 좋을듯
         while (elapsed < shakeTime)
         {
             elapsed += Time.deltaTime;
@@ -209,7 +211,8 @@ public class PlayerUI : MonoBehaviour
         for (int i = 0; i < 5; i++)
         {
             alpha += 51;
-            yield return new WaitForSeconds(0.05f);
+            // WaitForSeconds 캐싱
+            yield return fadeWait;
             healLight.color = new Color32(255, 255, 255, alpha);
         }
 

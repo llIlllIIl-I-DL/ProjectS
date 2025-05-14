@@ -26,6 +26,11 @@ public class CostumeManager : MonoBehaviour
     public event CostumeHandler OnCostumeUnlocked;
     public event CostumeHandler OnCostumeActivated;
 
+    // Action 스타일로 구성가능
+    // public event Action<ItemData> OnPartCollected;
+    // public event Action<CostumeSetData> OnCostumeUnlocked;
+    // public event Action<CostumeSetData> OnCostumeActivated;
+    
     private InventoryManager inventoryManager;
 
     private void Awake()

@@ -109,6 +109,7 @@ public class FireTrap : BaseTrap
 
     private void StartDamageCoroutine()
     {
+        // 안전성을 위해 꼭 필요한 처리 - Good
         // 이미 실행 중인 코루틴이 있다면 정지
         StopDamageCoroutine();
 

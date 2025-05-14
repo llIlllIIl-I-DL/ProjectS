@@ -19,6 +19,9 @@ public class ObjectCrackedWall : DestructibleObject
 
     #endregion
 
+    
+    WaitForSeconds wait = new WaitForSeconds(0.1f);
+    
     // 특수 데미지 처리를 위한 메서드 오버라이드
     public override void TakeDamage(float damage)
     {
@@ -44,7 +47,8 @@ public class ObjectCrackedWall : DestructibleObject
 
         Color originalColor = spriteRenderer.color;
         spriteRenderer.color = Color.gray;
-        yield return new WaitForSeconds(0.1f);
+        // 자주 반복되는건 아닌것 같지만 그래도 캐싱하는 습관이 필요할듯
+        yield return wait;
         spriteRenderer.color = originalColor;
 
         // 코루틴 참조 초기화
@@ -100,6 +104,7 @@ public class ObjectCrackedWall : DestructibleObject
         }
 
         // 파괴된 벽은 충돌체와 렌더러를 비활성화
+        // 자주활용되는 것 같다. 상위객체에서 캐싱해두면 작업하기 편할듯
         if (GetComponent<Collider2D>() != null)
             GetComponent<Collider2D>().enabled = false;
 

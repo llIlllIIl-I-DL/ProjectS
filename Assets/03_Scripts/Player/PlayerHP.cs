@@ -98,6 +98,7 @@ public class PlayerHP : MonoBehaviour, IDamageable
         Debug.Log($"플레이어 체력 초기화: {currentHP}/{maxHP}");
         
         // 체력바 UI 업데이트
+        // UI 를 싱글톤으로?? 권장하고 싶지는 않다.
         PlayerUI.Instance?.SetHealthBar(maxHP, currentHP);
     }
 

@@ -16,6 +16,7 @@ public class InvenSlotUI : MonoBehaviour
     [SerializeField] private Button slotInteractBtn;
 
     private ItemData utilityItemData;
+    // 필요한 정보를 캐싱해두는 건 좋다
     private Player player; //player의 특성 포인트 현황을 받아오기 위함 
 
     private void Start()

@@ -85,6 +85,8 @@ public class CreatSlotSystem : MonoBehaviour
     {
         if (slotIndex < slotList.Count)
         {
+            // 나쁜건 아니지만 이미 만들어두고 사용하면 굳이 List 로 쓰는 이유가??
+            // 배열이면 맞는 동작, 리스트면 좀 번거로울 것 같다. - 다만 메모리점으로는 이점이 있음
             slotList[slotIndex].SetItem(ItemData, player);
             slotIndex++;
         }

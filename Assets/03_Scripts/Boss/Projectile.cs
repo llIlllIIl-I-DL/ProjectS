@@ -10,6 +10,7 @@ public class Projectile : MonoBehaviour
     private void Start()
     {
         // 일정 시간이 지나면 자동으로 파괴
+        // 프로젝타일은 자주 사용되는 객체인데 파괴보다 재활용이 좋지 않을까?? - 오브젝트폴
         Destroy(gameObject, lifeTime);
     }
 

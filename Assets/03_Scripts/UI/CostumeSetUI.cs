@@ -78,6 +78,7 @@ public class CostumeSetUI : MonoBehaviour
     }
 
     // 슬롯 업데이트
+    // 데이터는 외부에서 설정하고 Update 만 하면 자동으로 되는 구조 좋음
     private void UpdateSlots()
     {
         // costumeSetData가 null인지 확인
@@ -113,6 +114,8 @@ public class CostumeSetUI : MonoBehaviour
                 // 플레이어가 해당 파츠를 가지고 있는지 확인
                 bool hasItem = partsCollectionStatus.ContainsKey(partItem.id) && partsCollectionStatus[partItem.id];
 
+                // 슬롯에 대한 설정을 여기서 할 필요는 없다.
+                // 슬롯 내부에서 알아서 하자
                 // 아이템 아이콘 설정 및 투명도 조절
                 costumeSlots[i].sprite = partItem.Icon;
                 Color slotColor = costumeSlots[i].color;
@@ -234,6 +237,7 @@ public class CostumeSetUI : MonoBehaviour
             if (playerMovement == null)
             {
                 // 태그로 찾기 시도
+                // 플레이어를 찾기위한 방은은 따로 만들어 두자 - 플레이어 매니저 등
                 GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
                 if (playerObject != null)
                 {
@@ -245,6 +249,7 @@ public class CostumeSetUI : MonoBehaviour
             if (playerMovement != null)
             {
                 // 윙슈트 효과 컴포넌트 가져오기 또는 추가
+                // 기능 외적으로 접근하는데 코드 리소스가 큰 편
                 WingSuitEffect wingSuitEffect = playerMovement.GetComponent<WingSuitEffect>();
                 if (wingSuitEffect == null)
                 {
@@ -270,6 +275,8 @@ public class CostumeSetUI : MonoBehaviour
     // 해금/활성화 버튼 클릭 처리
     public void OnUnlockButtonClicked()
     {
+        // 체크가 필요한 것부터 하나씩 return 으로 예외처리 - Good
+        // 아니면 가로가 너무 깊어진다.
         if (costumeSetData == null)
         {
             Debug.LogWarning("OnUnlockButtonClicked: costumeSetData가 null입니다.");

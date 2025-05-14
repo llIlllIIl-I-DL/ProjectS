@@ -135,6 +135,7 @@ public class Player : MonoBehaviour
 
     private void EnsureComponents()
     {
+        // 확장메서드 만들어두면 좋음
         // 컴포넌트 가져오기 또는 추가
         inputHandler = GetComponent<PlayerInputHandler>();
         if (inputHandler == null)

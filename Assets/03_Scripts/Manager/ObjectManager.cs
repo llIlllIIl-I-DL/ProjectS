@@ -184,6 +184,7 @@ public class ObjectManager : Singleton<ObjectManager>
                 // 타입에 따른 액션 실행
                 if (targetObject is ObjectDoor door)
                 {
+                    // 앤션타입을 enum 으로 만들어두자
                     switch (group.actionType.ToLower())
                     {
                         case "open":

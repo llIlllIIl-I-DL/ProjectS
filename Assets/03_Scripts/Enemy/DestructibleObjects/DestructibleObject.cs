@@ -48,6 +48,7 @@ public class DestructibleObject : DestructibleEntity
         }
         
         // 외형 손상 체크
+        // 함수 분리해두는 것을 권장
         if (!isDamaged && currentHealth <= damageThreshold && damagedSprite != null)
         {
             spriteRenderer.sprite = damagedSprite; 

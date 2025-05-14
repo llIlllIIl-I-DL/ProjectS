@@ -39,6 +39,7 @@ public class StartSceneUI : MonoBehaviour
 
     public void SelectDifficulty()
     {
+        // 씬 이름을 상수화 해두면 좋다.
         easy.onClick.AddListener(() => SceneManager.LoadScene("TempMainScene", LoadSceneMode.Single));
         normal.onClick.AddListener(() => SceneManager.LoadScene("TempMainScene", LoadSceneMode.Single));
         hard.onClick.AddListener(() => SceneManager.LoadScene("TempMainScene", LoadSceneMode.Single));

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,10 +10,20 @@ public class RoomBehavior : MonoBehaviour
 
     private Dictionary<int, GameObject> connectionObjects = new Dictionary<int, GameObject>();
 
+    private Dictionary<ConnectionPoint.ConnectionType, Action<GameObject, GameObject>> setups;
+    
     private void Awake()
     {
         // 방 초기화
         InitializeRoom();
+        
+        setups = new Dictionary<ConnectionPoint.ConnectionType, Action<GameObject, GameObject>>
+        {
+            { ConnectionPoint.ConnectionType.Normal, SetupNormalDoor },
+            { ConnectionPoint.ConnectionType.OneWay, SetupOneWayDoor },
+            { ConnectionPoint.ConnectionType.LockedDoor, SetupLockedDoor },
+            { ConnectionPoint.ConnectionType.AbilityGate, SetupAbilityGate }
+        };
     }
 
     private void InitializeRoom()
@@ -46,6 +57,13 @@ public class RoomBehavior : MonoBehaviour
             // 연결 오브젝트(도어 등) 설정
             ConnectionPoint connPoint = moduleData.connectionPoints[connectionIndex];
 
+            // 델리게이트와 enum 이용시
+            // if (setups.TryGetValue(connPoint.type, out var setupAction))
+            // {
+            //     setupAction.Invoke(connObject, targetRoom);
+            // }
+            
+            
             // 연결 타입에 따른 처리
             switch (connPoint.type)
             {
@@ -71,6 +89,7 @@ public class RoomBehavior : MonoBehaviour
     private void SetupNormalDoor(GameObject doorObject, GameObject targetRoom)
     {
         // 일반 도어 설정
+        // 기능이 전반적으로 유사하다 -> 모듈화할 수 있다.
         MetroidvaniaDoor door = doorObject.GetComponent<MetroidvaniaDoor>();
         if (door == null)
         {

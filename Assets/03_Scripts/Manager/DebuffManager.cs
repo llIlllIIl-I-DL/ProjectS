@@ -73,6 +73,7 @@ public class DebuffManager : MonoBehaviour
     }
 
     // 디버프 적용 메서드
+    // 디버프 정보가 있으면 편할듯
     public void ApplyDebuff(BaseEnemy enemy, DebuffType type, float duration = -1, float intensity = -1, float tickDamage = -1)
     {
         if (enemy == null) return;

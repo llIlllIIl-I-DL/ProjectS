@@ -52,6 +52,8 @@ public abstract class Bullet : MonoBehaviour
 
     protected virtual void Start()
     {
+        // 발사체의 경우 주체를 들고 있는것이 좋은 방법이나, 유연하게 대응 할 수 있으면 더욱 좋다.
+        // 총알이 플레이어를 찾는것보다, 총알을 쏜 사람을 들고 있도록 하는 것을 권장
         playerObject = GameObject.FindGameObjectWithTag("Player");
         var bulletCollider = GetComponent<Collider2D>();
         if (playerObject != null && bulletCollider != null)
@@ -96,6 +98,9 @@ public abstract class Bullet : MonoBehaviour
             return;
         }
 
+        // 스테이나 업데이트처럼 주시적으로 실행되는 경우가 아니라면 2중검사보다
+        // Try 쓰는게 좋을수 있다 - 가독성 측면..
+        // 성능은 태그검사가 빠름
         // 반사경 확인
         if (other.CompareTag("Mirror"))
         {

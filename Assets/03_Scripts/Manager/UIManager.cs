@@ -8,6 +8,7 @@ public class UIManager : Singleton<UIManager> //조금 리팩토링 필요!!
 {
     [SerializeField] public UtilityItemList utilityItemList;
 
+    // UI가 필요한 경우 만들어서 사용할 수 있는 창구면 좋을 것 같다.
     public List<GameObject> allUIPages = new List<GameObject>();
 
     InputUI inputUI;

@@ -47,7 +47,7 @@ public class BossSlashAttackState : IEnemyState
         if( distance< attackRange)
         {
             Debug.Log("근거리 공격");
-            SlashAttackCoroutine();
+            SlashAttackCoroutine(); // ?? 코루틴인것 같음
         }
         else if( distance > attackRange && distance < detectionRange)
         {

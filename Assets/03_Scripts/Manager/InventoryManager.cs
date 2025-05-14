@@ -162,6 +162,7 @@ public class InventoryManager : MonoBehaviour
     // 아이템 타입에 따라 해당 컬렉션에 추가
     private void AddItemToCollection(ItemData item)
     {
+        // 아이템 타입에 따른 딕셔너리로 묶어서 관리가능
         switch (item.itemType)
         {
             case ItemType.WeaponAttribute:
@@ -324,8 +325,11 @@ public class InventoryManager : MonoBehaviour
     // 파츠 타입을 슬롯 인덱스로 변환
     private int GetSlotIndexFromPartType(PartsType partType)
     {
+        // enum 수를 이용하면 간단
+        // return (int)partType - 1;
         switch (partType)
         {
+            
             case PartsType.Head: return 0;
             case PartsType.Body: return 1;
             case PartsType.Arms: return 2;
@@ -426,8 +430,11 @@ public class InventoryManager : MonoBehaviour
     }
 
     // ID로 아이템 찾기
+    // Find 쓸것이었으면 Dictioanry 고려
     public ItemData GetItemById(int id)
     {
+        // List       : O(n)
+        // Dictionary : O(1)
         return allItems.Find(item => item.id == id);
     }
 

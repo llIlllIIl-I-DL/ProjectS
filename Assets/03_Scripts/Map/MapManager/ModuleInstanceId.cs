@@ -16,11 +16,13 @@ public struct ModuleInstanceId : IEquatable<ModuleInstanceId>
         posY = position.y;
     }
 
+    // ToString 활용 좋음
     public override string ToString()
     {
         return $"{moduleGUID}_{posX:F2}_{posY:F2}";
     }
 
+    // 전반적으로 프로퍼티사용을 제한하는 느낌이 늡니다.
     public string GetModuleGuid()
     {
         return moduleGUID;

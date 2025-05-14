@@ -5,6 +5,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
+// UI 기반을 싱글톤
 public class BossWarningUI : Singleton<BossWarningUI>
 {
     [Header("창")]
@@ -35,7 +36,7 @@ public class BossWarningUI : Singleton<BossWarningUI>
 
         Time.timeScale = 0f;
     }
-
+    
     public void YesYesYes()
     {
         isApproved = true;

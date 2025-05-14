@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+// 버튼 기반 - 너무 작은 범위???
 public class BackwardBtn : MonoBehaviour
 {
     [SerializeField] public Button backward;
