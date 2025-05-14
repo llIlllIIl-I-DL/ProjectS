@@ -205,11 +205,13 @@ public class UtilityChangedStatController : MonoBehaviour
 
     public void MSUP(float effectValue)
     {
-        if (effectValue <= 0) return;
+        //if (effectValue <= 0) return;
 
-        float percent = effectValue / 100f; //퍼센트 값 계산
+        float percent = effectValue / 100f;
 
-        player.UpdateCurrentPlayerMoveSpeed(percent);
+        float moveSpeed = playerSettings.moveSpeed * percent; //퍼센트 값 계산
+
+        player.UpdateCurrentPlayerMoveSpeed(moveSpeed);
     }
 
     public void RemovedMSUP()
@@ -229,8 +231,9 @@ public class UtilityChangedStatController : MonoBehaviour
 
         float percent = effectValue / 100f; //퍼센트 값 계산
 
+        float sprintSpeed = playerSettings.sprintMultiplier * percent;
 
-        player.UpdateCurrentPlayerRunSpeed(percent);
+        player.UpdateCurrentPlayerRunSpeed(sprintSpeed);
     }
 
     public void RemovedRSUP()
@@ -248,7 +251,9 @@ public class UtilityChangedStatController : MonoBehaviour
 
         float percent = effectValue / 100f; //퍼센트 값 계산
 
-        player.UpdateCurrentSprintTime(percent);
+        float sprintSpeed = player.SprintDuration * percent;
+
+        player.UpdateCurrentSprintTime(sprintSpeed);
     }
 
     public void RemovedRDUP()
@@ -266,7 +271,10 @@ public class UtilityChangedStatController : MonoBehaviour
 
         float percent = effectValue / 100f; //퍼센트 값 계산
 
-        playerSettings.dashDuration += percent;
+        float sprintSpeed = playerSettings.dashDuration * percent;
+
+
+        playerSettings.dashDuration += sprintSpeed;
     }
 
     public void RemovedDDUP()
@@ -281,15 +289,12 @@ public class UtilityChangedStatController : MonoBehaviour
     {
         if (effectValue <= 0) return;
 
-        float percent = effectValue / 100f; //퍼센트 값 계산
-
         playerHP.DecreaseMaxHP(effectValue);
         PlayerUI.Instance.UpdatePlayerHPInUItext(); //HP 감소
 
         player.UpdateCurrentPlayerHP(playerHP.CurrentHP); //데이터 저장
 
-
-        player.UpdateCurrentPlayerMoveSpeed(percent); //스피드 상승
+        player.UpdateCurrentPlayerMoveSpeed(effectValue); //스피드 상승
 
         ATKSUP(5f); //공속 상승
     }
@@ -305,8 +310,6 @@ public class UtilityChangedStatController : MonoBehaviour
     {
         ATKUP(5f);
 
-
-
         ATKSUP(-effectValue); //수정수정
     }
     public void RemovedWeighPower()
@@ -319,8 +322,11 @@ public class UtilityChangedStatController : MonoBehaviour
 
     public void WeighHealth(float effectValue)
     {
+        MaxHPUP(effectValue);
 
+        MSUP(-3f);
     }
+
     public void RemovedWeighHealth()
     {
         Debug.Log("Remove 1011");
@@ -330,7 +336,17 @@ public class UtilityChangedStatController : MonoBehaviour
 
     public void BestDefenceIsAttack(float effectValue)
     {
+        float decreaseHP = effectValue * 3;
+        playerHP.DecreaseMaxHP(decreaseHP); //최대 hp 감소
 
+        float increaseATK = effectValue * 2;
+        ATKUP(increaseATK); //ATK 상승
+
+        ATKSUP(increaseATK); //ATKS 상승
+
+        MSUP(-effectValue); //MS 감소
+
+        RSUP(effectValue); // RS 상승
     }
     public void RemovedBestDefenceIsAttack()
     {
@@ -342,7 +358,16 @@ public class UtilityChangedStatController : MonoBehaviour
 
     public void SpeedRacer(float effectValue)
     {
+        float decreaseHP = effectValue * 3;
+        playerHP.DecreaseMaxHP(decreaseHP); //최대 hp 감소
 
+        ATKUP(- effectValue); //ATK 감소
+
+        ATKSUP(decreaseHP); //ATKS 상승
+
+        MSUP(decreaseHP); //MS 상승
+
+        RDUP(3f); //RD 상승
     }
     public void RemovedSpeedRacer()
     {
@@ -352,8 +377,23 @@ public class UtilityChangedStatController : MonoBehaviour
 
 
 
-    public void Trinity(float effectValue)
+    public void Trinity(float effectValue, float maxAmmo)
     {
+        MaxHPUP(effectValue); //최대 hp 상승
+
+        MaxMPUP(effectValue, maxAmmo); //최대 MP 상승
+
+        ATKUP(effectValue); //ATK 상승
+
+        ATKSUP(effectValue); //ATKS 상승
+
+        MSUP(effectValue); //MS 상승
+
+        RSUP(effectValue); //RS 상승
+
+        RDUP(effectValue); //RD 상승
+
+        DDUP(effectValue); //DD상승
 
     }
     public void RemovedTrinity()
@@ -367,7 +407,10 @@ public class UtilityChangedStatController : MonoBehaviour
 
     public void InvincibleWhenSprint(float effectValue)
     {
-
+        //플레이어가 isDash일때
+        //장착 리스트 안에 id == 1015가 있으면
+        //그 기간동안에는
+        //받는 데미지 모두 0
     }
     public void RemovedInvincibleWhenSprint()
     {

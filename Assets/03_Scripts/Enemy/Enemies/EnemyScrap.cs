@@ -226,7 +226,7 @@ public class EnemyScrap : BaseEnemy
     /// </summary>
     protected override void OnPlayerLost()
     {
-        // 단순 패트롤 적은 플레이어를 놓치는 것에 반응하지 않음
+        // 필요시 구현
     }
 
     #region State Switch Methods

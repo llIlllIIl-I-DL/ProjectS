@@ -313,6 +313,14 @@ public abstract class BaseEnemy : DestructibleEntity
     {
         // 기본 구현은 비어있음 - 자식 클래스에서 구현
     }
+
+    /// <summary>
+    /// 점프 상태로 전환 - 상속받은 클래스에서 구현
+    /// </summary>
+    public virtual void SwitchToJumpState()
+    {
+        // 기본 구현은 비어있음 - 자식 클래스에서 구현
+    }
     
     /// <summary>
     /// 돌진 공격 상태로 전환 - 상속받은 클래스에서 구현

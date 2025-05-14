@@ -8,18 +8,31 @@ namespace Enemy.States
     public class ChaseState : BaseEnemyState
     {
         #region Variables
-        
+
         // 추격 관련 변수
         protected float chaseSpeed;        // 추격 속도
         protected float losePlayerTime = 3f; // 플레이어를 놓친 후 추격 지속 시간
         protected float losePlayerTimer = 0; // 플레이어를 놓친 후 타이머
         protected bool isPlayerLost = false; // 플레이어를 놓쳤는지 여부
         protected bool moveInYAxis;        // Y축 이동 허용 여부
-        
+
+        // 부드러운 이동을 위한 변수들
+        private float currentSpeed = 0f;   // 현재 속도
+        private float acceleration = 5f;   // 가속도
+        private float deceleration = 5f;   // 감속도
+        private float rotationSpeed = 1f;  // 회전 속도
+        private float minDistanceToTarget = 0.5f; // 목표 지점과의 최소 거리
+        private Vector2 currentDirection;  // 현재 이동 방향
+
+        private float lastKnownPositionThreshold = 0.3f; // 마지막 알려진 위치에 도달했다고 간주할 거리
+        private bool isWaitingAtLastPosition = false; // 마지막 위치에서 대기 중인지 여부
+        private float waitAtLastPositionTime = 1.0f; // 마지막 위치에서 대기할 시간
+        private float waitAtLastPositionTimer = 0f; // 대기 타이머
+
         #endregion
-        
+
         #region Constructor
-        
+
         /// <summary>
         /// 추격 상태 생성자
         /// </summary>
@@ -33,20 +46,22 @@ namespace Enemy.States
             this.chaseSpeed = chaseSpeed;  // 추격 속도
             this.moveInYAxis = moveInYAxis; // Y축 이동 설정
         }
-        
+
         #endregion
-        
+
         #region State Methods
-        
+
         /// <summary>
         /// 추격 상태 진입 시 호출 - 타이머 초기화 및 애니메이션 설정
         /// </summary>
         public override void Enter()
         {
-            // 추격 애니메이션 재생
-            // enemy.GetComponent<Animator>()?.SetBool("IsChasing", true);
             isPlayerLost = false;
             losePlayerTimer = 0;
+            isWaitingAtLastPosition = false;
+            waitAtLastPositionTimer = 0f;
+            currentSpeed = 0f;
+            currentDirection = Vector2.zero;
         }
 
         /// <summary>
@@ -60,11 +75,29 @@ namespace Enemy.States
                 isPlayerLost = true;
                 losePlayerTimer += Time.deltaTime;
 
-                // 일정 시간이 지나면 순찰로 돌아감
+                // 마지막 알려진 위치에 도달했는지 확인
+                if (!isWaitingAtLastPosition)
+                {
+                    Vector2 lastKnownPos = enemy.GetLastKnownPlayerPosition();
+                    float distanceToLastKnownPos = Vector2.Distance(lastKnownPos, enemy.transform.position);
+                    
+                    if (distanceToLastKnownPos < lastKnownPositionThreshold)
+                    {
+                        // 마지막 알려진 위치에 도달했으면 대기 모드로 전환
+                        isWaitingAtLastPosition = true;
+                        waitAtLastPositionTimer = 0f;
+                        enemy.StopMoving(); // 움직임 중지
+                    }
+                }
+                else
+                {
+                    // 마지막 위치에서 대기 중
+                    waitAtLastPositionTimer += Time.deltaTime;
+                }
+
                 if (losePlayerTimer >= losePlayerTime)
                 {
-                    // 순찰 상태로 돌아가기
-                    // enemy.GetComponent<Animator>()?.SetBool("IsChasing", false);
+                    // 플레이어를 놓친 후 시간이 지나면 상태 전환
                     enemy.SwitchToPatrolState();
                     return;
                 }
@@ -74,11 +107,11 @@ namespace Enemy.States
                 // 플레이어를 다시 발견
                 isPlayerLost = false;
                 losePlayerTimer = 0;
+                isWaitingAtLastPosition = false;
 
                 // 공격 범위 안에 있으면 공격 상태로 전환
                 if (enemy.IsInAttackRange())
                 {
-                    // 공격 상태로 전환
                     enemy.SwitchToAttackState();
                     return;
                 }
@@ -90,40 +123,54 @@ namespace Enemy.States
         /// </summary>
         public override void FixedUpdate()
         {
-            // 목표 위치 결정
-            Vector2 targetPosition;
-
-            if (isPlayerLost)
+            // 마지막 위치에서 대기 중이면 움직이지 않음
+            if (isWaitingAtLastPosition)
             {
-                // 플레이어를 놓친 경우, 마지막으로 알려진 위치로 이동
-                targetPosition = enemy.GetLastKnownPlayerPosition();
-            }
-            else
-            {
-                // 플레이어를 쫓기
-                targetPosition = enemy.GetPlayerPosition();
+                enemy.StopMoving();
+                return;
             }
 
-            // 원시 방향 계산
-            Vector2 rawDirection = ((Vector3)targetPosition - enemy.transform.position);
-            Vector2 direction;
+            Vector2 targetPosition = isPlayerLost ? 
+                enemy.GetLastKnownPlayerPosition() : 
+                enemy.GetPlayerPosition();
+
+            // 목표 지점까지의 거리 계산
+            float distanceToTarget = Vector2.Distance(targetPosition, enemy.transform.position);
+
+            // 방향 계산
+            Vector2 targetDirection = ((Vector3)targetPosition - enemy.transform.position).normalized;
             
-            // 이동 방향 결정 (지상 적은 X축만, 공중 적은 X,Y 모두)
-            if (moveInYAxis)
+            // Y축 이동 제한 (지상 적의 경우)
+            if (!moveInYAxis)
             {
-                // X, Y 모두 사용 (공중 적)
-                direction = rawDirection.normalized;
+                targetDirection.y = 0;
+                targetDirection.Normalize();
+            }
+
+            // 부드러운 방향 전환
+            currentDirection = Vector2.Lerp(currentDirection, targetDirection, rotationSpeed * Time.fixedDeltaTime);
+
+            // 속도 조절
+            if (distanceToTarget > minDistanceToTarget)
+            {
+                // 목표 지점이 멀리 있으면 가속
+                currentSpeed = Mathf.MoveTowards(currentSpeed, chaseSpeed, acceleration * Time.fixedDeltaTime);
             }
             else
             {
-                // X 방향으로만 이동 (지상 적)
-                direction = new Vector2(Mathf.Sign(rawDirection.x), 0);
+                // 목표 지점에 가까워지면 감속
+                currentSpeed = Mathf.MoveTowards(currentSpeed, 0, deceleration * Time.fixedDeltaTime);
             }
 
-            // 방향 설정 (스프라이트 플립 등)
-            enemy.SetFacingDirection(direction);
-            // 이동 실행
-            enemy.MoveInDirection(direction, chaseSpeed);
+            // 최종 이동 방향과 속도 적용
+            Vector2 movement = currentDirection * currentSpeed;
+            enemy.MoveInDirection(movement.normalized, currentSpeed);
+
+            // 스프라이트 방향 설정
+            if (currentDirection.x != 0)
+            {
+                enemy.SetFacingDirection(new Vector2(currentDirection.x, 0));
+            }
         }
 
         /// <summary>
@@ -131,13 +178,11 @@ namespace Enemy.States
         /// </summary>
         public override void Exit()
         {
-            // 추격 애니메이션 종료
-            // enemy.GetComponent<Animator>()?.SetBool("IsChasing", false);
-
-            // 이동 정지
             enemy.StopMoving();
+            currentSpeed = 0f;
+            currentDirection = Vector2.zero;
         }
-        
+
         #endregion
     }
 }
