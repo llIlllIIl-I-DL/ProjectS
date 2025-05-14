@@ -328,9 +328,9 @@ public class WeaponManager : Singleton<WeaponManager>
         {
             bulletScale = normalBulletScale;
         }
-
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
         // BulletFactory를 사용하여 총알 생성
-        GameObject bullet = bulletFactory.CreateBullet(currentBulletType, spawnPosition, Quaternion.identity, isOvercharged);
+        GameObject bullet = bulletFactory.CreateBullet(currentBulletType, spawnPosition, Quaternion.identity,player);
 
         // 총알 크기 설정
         bullet.transform.localScale = bulletScale;

@@ -35,7 +35,8 @@ public abstract class Bullet : MonoBehaviour
     private float playerIgnoreTimer = 0f;
     private bool canHitPlayer = true;// 피격 가능여부 체크
     private bool ignoreCollisionReset = false; // 중복 해제 방지
-
+    public GameObject Shooter { get; set; }
+    // 축약가능하면 줄이기
     public bool IsReloading
     {
         get => isReloading;
