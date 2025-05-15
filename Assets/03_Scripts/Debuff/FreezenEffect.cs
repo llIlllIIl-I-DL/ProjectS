@@ -11,10 +11,10 @@ public class FreezeEffect : DebuffEffect
     protected override void ApplyInitialEffect()
     {
         // 원래 속도 저장
-        originalSpeed = targetEnemy.GetMoveSpeed();
+        originalSpeed = targetEnemy.MoveSpeed;
 
         // 속도 감소 (빙결은 더 큰 감소율)
-        targetEnemy.SetMoveSpeed(originalSpeed * (1f - (intensity * 1.5f)));
+        targetEnemy.MoveSpeed = originalSpeed * (1f - (intensity * 1.5f));
 
         // 추가로 공격 속도 감소 적용 가능
         
@@ -40,7 +40,7 @@ public class FreezeEffect : DebuffEffect
         // 원래 상태로 복구
         if (targetEnemy != null)
         {
-            targetEnemy.SetMoveSpeed(originalSpeed);
+            targetEnemy.MoveSpeed = originalSpeed;
             //targetEnemy.ResetAttackSpeedModifier();
             ApplyVisualEffect(false);
         }

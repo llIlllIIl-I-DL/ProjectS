@@ -88,7 +88,7 @@ namespace Enemy.States
             try 
             {
                 // 가능하면 실제 속도 가져오기
-                moveSpeed = enemy.GetMoveSpeed();
+                moveSpeed = enemy.MoveSpeed;
             }
             catch (System.Exception e)
             {

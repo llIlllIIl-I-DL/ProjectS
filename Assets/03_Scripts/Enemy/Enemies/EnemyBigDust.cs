@@ -191,7 +191,7 @@ public class EnemyBigDust : BaseEnemy
         Debug.Log("기본 공격 실행");
 
         // 플레이어 방향 설정
-        Vector2 direction = GetPlayerPosition() - (Vector2)transform.position;
+        Vector2 direction = PlayerPosition - (Vector2)transform.position;
         SetFacingDirection(direction);
 
         // 애니메이션 트리거
@@ -342,7 +342,7 @@ public class EnemyBigDust : BaseEnemy
         // 추격 중일 때만 돌진 판단
         if (currentState == chaseState && playerDetected)
         {
-            float distanceToPlayer = Vector2.Distance(transform.position, GetPlayerPosition());
+            float distanceToPlayer = Vector2.Distance(transform.position, PlayerPosition);
 
             // 플레이어가 공격 범위 밖이면서 추격 범위 안에 있을 때
             if (!IsInAttackRange() && distanceToPlayer > attackRange && distanceToPlayer <= detectionRange)
