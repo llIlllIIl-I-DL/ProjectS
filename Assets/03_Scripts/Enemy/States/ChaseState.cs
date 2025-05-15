@@ -78,7 +78,7 @@ namespace Enemy.States
                 // 마지막 알려진 위치에 도달했는지 확인
                 if (!isWaitingAtLastPosition)
                 {
-                    Vector2 lastKnownPos = enemy.GetLastKnownPlayerPosition();
+                    Vector2 lastKnownPos = enemy.LastKnownPlayerPosition;
                     float distanceToLastKnownPos = Vector2.Distance(lastKnownPos, enemy.transform.position);
                     
                     if (distanceToLastKnownPos < lastKnownPositionThreshold)
@@ -131,8 +131,8 @@ namespace Enemy.States
             }
 
             Vector2 targetPosition = isPlayerLost ? 
-                enemy.GetLastKnownPlayerPosition() : 
-                enemy.GetPlayerPosition();
+                enemy.LastKnownPlayerPosition : 
+                enemy.PlayerPosition;
 
             // 목표 지점까지의 거리 계산
             float distanceToTarget = Vector2.Distance(targetPosition, enemy.transform.position);

@@ -51,7 +51,7 @@ namespace Enemy.States
                 // 마지막 알려진 위치에 도달했는지 확인
                 if (!isWaitingAtLastPosition)
                 {
-                    Vector2 lastKnownPos = enemy.GetLastKnownPlayerPosition();
+                    Vector2 lastKnownPos = enemy.LastKnownPlayerPosition;
                     float distanceToLastKnownPos = Vector2.Distance(lastKnownPos, enemy.transform.position);
                     
                     if (distanceToLastKnownPos < lastKnownPositionThreshold)
@@ -113,12 +113,12 @@ namespace Enemy.States
             if (isPlayerLost)
             {
                 // 플레이어를 놓친 경우, 마지막으로 알려진 위치로 이동
-                targetPosition = enemy.GetLastKnownPlayerPosition();
+                targetPosition = enemy.LastKnownPlayerPosition;
             }
             else
             {
                 // 플레이어를 쫓기
-                targetPosition = enemy.GetPlayerPosition();
+                targetPosition = enemy.PlayerPosition;
             }
 
             // 현재 위치에서 목표 위치까지의 방향 벡터 계산
@@ -128,7 +128,7 @@ namespace Enemy.States
             enemy.SetFacingDirection(direction.x > 0 ? Vector2.right : Vector2.left);
 
             // 실제 이동은 Rigidbody2D를 직접 조작
-            enemy.GetComponent<Rigidbody2D>().velocity = direction * enemy.GetMoveSpeed() * chaseSpeed;
+            enemy.GetComponent<Rigidbody2D>().velocity = direction * enemy.MoveSpeed * chaseSpeed;
         }
 
         public override void OnTriggerEnter2D(Collider2D other) { }
