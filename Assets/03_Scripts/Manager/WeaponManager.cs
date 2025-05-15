@@ -399,8 +399,7 @@ public class WeaponManager : Singleton<WeaponManager>
             }
         }
 
-        // 총알 소멸 처리
-        Destroy(bullet, bulletLifetime);
+
     }
 
     // 발사 방향 계산
@@ -491,5 +490,26 @@ public class WeaponManager : Singleton<WeaponManager>
     public ElementType GetBulletType()
     {
         return currentBulletType;
+    }
+
+    // 파이어 포인트 방향 제어 메서드 추가
+    public void SetFirePointDirection(int direction)
+    {
+        if (firePoint != null)
+        {
+            Vector3 scale = firePoint.localScale;
+            scale.x = Mathf.Abs(scale.x) * direction;
+            firePoint.localScale = scale;
+        }
+    }
+
+    public void ResetFirePointDirection()
+    {
+        if (firePoint != null)
+        {
+            Vector3 scale = firePoint.localScale;
+            scale.x = Mathf.Abs(scale.x);
+            firePoint.localScale = scale;
+        }
     }
 }
