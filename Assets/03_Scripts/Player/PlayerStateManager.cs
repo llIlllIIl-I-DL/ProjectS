@@ -153,6 +153,12 @@ public class PlayerStateManager : MonoBehaviour
 
         // 애니메이션 업데이트
         UpdateAnimation();
+
+        // 공격 입력에 따라 IsAttacking 파라미터 업데이트
+        if (playerAnimator != null && playerAnimator.GetAnimator() != null)
+        {
+            playerAnimator.GetAnimator().SetBool("IsAttacking", inputHandler.IsAttackPressed);
+        }
     }
 
     private void FixedUpdate()
