@@ -262,6 +262,11 @@ public class PlayerMovement : MonoBehaviour
 
         while (Time.time < startTime + dashDuration)
         {
+            if (UtilityChangedStatController.Instance.currentUtilityList.FindIndex(u => u.id == 1015) != -1)
+            {
+                UtilityChangedStatController.Instance.InvincibleWhenDash();
+            }
+
             // 대시 중 일정한 속도 유지
             rb.velocity = new Vector2(facingDirection * dashSpeed, 0f);
             yield return null;
@@ -271,6 +276,7 @@ public class PlayerMovement : MonoBehaviour
         rb.gravityScale = 1;
         OnDashEnd?.Invoke();
 
+        UtilityChangedStatController.Instance.isInvincibleDash = false;
         yield return new WaitForSeconds(settings.dashCooldown);
 
         OnDashCooldownComplete?.Invoke();

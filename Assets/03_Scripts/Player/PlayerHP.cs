@@ -17,7 +17,7 @@ public class PlayerHP : MonoBehaviour, IDamageable
     private bool isDead = false;
 
     private Player player;
-    
+
     public float MaxHP => maxHP;
     public float CurrentHP => currentHP;
 
@@ -33,6 +33,8 @@ public class PlayerHP : MonoBehaviour, IDamageable
 
     public void TakeDamage(float damage)
     {
+        if (UtilityChangedStatController.Instance.isInvincibleDash == true) return;
+
         if (Time.time - lastDamageTime < invincibleTime)
             return;
         lastDamageTime = Time.time;
@@ -41,8 +43,8 @@ public class PlayerHP : MonoBehaviour, IDamageable
         Debug.Log($"플레이어가 {damage} 데미지를 입었습니다. 현재 HP: {currentHP}");
 
 
-            // 플레이어가 데미지를 입으면 Hit 상태로 변경
-            if (playerStateManager != null)
+        // 플레이어가 데미지를 입으면 Hit 상태로 변경
+        if (playerStateManager != null)
         {
             PlayerUI.Instance.SetHealthBar(maxHP, currentHP);
             playerStateManager.ChangeState(PlayerStateType.Hit);
@@ -53,6 +55,7 @@ public class PlayerHP : MonoBehaviour, IDamageable
         {
             Die();
         }
+
     }
 
     public void Heal(float amount)
@@ -110,7 +113,7 @@ public class PlayerHP : MonoBehaviour, IDamageable
         currentHP = maxHP;
         isDead = false; // 사망 상태 초기화
         Debug.Log($"플레이어 체력 초기화: {currentHP}/{maxHP}");
-        
+
         // 체력바 UI 업데이트
         PlayerUI.Instance?.SetHealthBar(maxHP, currentHP);
     }
@@ -119,16 +122,16 @@ public class PlayerHP : MonoBehaviour, IDamageable
     {
         // 이미 사망 상태면 중복 처리 방지
         if (isDead) return;
-        
+
         isDead = true;
         Debug.Log("플레이어가 사망했습니다.");
-        
+
         // 사망 상태로 전환
         if (playerStateManager != null)
         {
             playerStateManager.ChangeState(PlayerStateType.Death);
         }
-        
+
         // GameManager에 사망 알림
         if (GameManager.Instance != null)
         {

@@ -10,9 +10,10 @@ public class Player : MonoBehaviour
 
     [SerializeField] private bool hasWingsuit = false; // 윙슈트 장착 여부
     [SerializeField] private float sprintDuration = 1.5f; // 스프린트 지속 시간
+    public float SprintDuration => sprintDuration;
+
 
     [SerializeField] public List<int> UnLockedUtility; //player가 현재까지 해금한 특성 리스트(해금 할 때마다 계속해서 쌓이기만 함)
-    //초기화 기능 필요!
 
     // 필수 컴포넌트들
     private PlayerInputHandler inputHandler;
@@ -208,8 +209,6 @@ public class Player : MonoBehaviour
 
     public void UpdateCurrentInventory()
     {
-        // I키를 눌렀을 때 나타나는 모든 정보를 여기에 취합. 특성 포인트라든지, 획득한 복장이라든지...
-
         int nowUtilityPoint = utilityPoint;
         CurrentUtilityPoint = nowUtilityPoint;
     }

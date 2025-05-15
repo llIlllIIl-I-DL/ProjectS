@@ -13,7 +13,12 @@ public class RustBullet : Bullet
     private Vector3 startPosition;
     private float elapsedTime = 0f;
 
-
+    private void OnEnable()
+    {
+        startPosition = transform.position;
+        elapsedTime = 0f;
+        IsOvercharged = false; // 보스는 항상 흔들리게
+    }
     protected override void Start()
     {
         BulletType = ElementType.Rust;

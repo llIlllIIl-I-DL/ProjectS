@@ -5,7 +5,7 @@ namespace BossFSM
     public class BossIdleState : BossState
     {
         private float idleTimer;
-        private float idleDuration = 2f;
+        private float idleDuration = 2f;// 대기 시간
 
         public BossIdleState(BossStateMachine stateMachine, Boss boss) : base(stateMachine, boss)
         {
@@ -25,6 +25,7 @@ namespace BossFSM
             {
                 stateMachine.ChangeState(new BossMoveState(stateMachine, boss));
             }
+
         }
 
         public override void ExitState()
