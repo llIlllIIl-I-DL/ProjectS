@@ -32,6 +32,8 @@ public class PlayerStateManager : MonoBehaviour
     private bool isCrouching;
     private bool isClimbing;
 
+    private int lastWallDirection = 1; // 벽 방향 저장용
+
     
     // 프로퍼티
     public PlayerStateType CurrentState => currentStateType;
@@ -295,6 +297,9 @@ public class PlayerStateManager : MonoBehaviour
         {
             ChangeState(PlayerStateType.Falling);
         }
+
+        // 벽 슬라이딩에서 벗어날 때 WeaponManager에 벽 슬라이딩 상태와 벽 방향 전달
+        WeaponManager.Instance.SetWallSlideInfo(false, 0);
     }
 
     public void ChangeState(PlayerStateType newState)
@@ -322,6 +327,18 @@ public class PlayerStateManager : MonoBehaviour
         // 상태 변경 이벤트 발생
         OnStateChanged?.Invoke(newState);
         Debug.Log($"상태 변경: {newState}");
+
+        // 벽 슬라이딩 진입 시 WeaponManager에 벽 슬라이딩 상태와 벽 방향 전달
+        if (newState == PlayerStateType.WallSliding)
+        {
+            lastWallDirection = collisionDetector.WallDirection;
+            WeaponManager.Instance.SetWallSlideInfo(true, lastWallDirection);
+        }
+        // 벽 슬라이딩에서 벗어날 때
+        else if (currentStateType == PlayerStateType.WallSliding)
+        {
+            WeaponManager.Instance.SetWallSlideInfo(false, 0);
+        }
     }
 
     private void HandleRespawn()
