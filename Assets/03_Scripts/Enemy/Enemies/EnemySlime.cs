@@ -3,24 +3,30 @@ using UnityEngine;
 using Enemy.States;
 
 /// <summary>
-/// 순찰, 추적, 공격을 하는 멍멍이 // 플레이어가 자신보다 높은 곳에 있으면 점프를 함
+/// 순찰, 추적을 하는 슬라임 적 클래스 
+/// 약간 통통튀듯이 움직이고움직인 자리에 점액을 남김, 점액은 지속시간 후에 사라지고 플레이어가 닿으면 데미지를 받음
 /// </summary>
-public class EnemyLittleShredder : BaseEnemy
+public class EnemySlime : BaseEnemy
 {
     #region Variables
 
     [Header("순찰 설정")]
     [SerializeField] private float patrolDistance; // 순찰 거리
     [SerializeField] private float patrolWaitTime; // 방향 전환 시 대기 시간
+
     [Header("추격 설정")]
     [SerializeField] private float chaseSpeed; // 추격 속도 // 배수로 잡힘 ex) 1로 설정하면 기본 속도, 2로 설정하면 두 배 속도
-    [Header("공격 설정")]
-    [SerializeField] private float attackSpeed; // 공격 속도
+
     [Header("점프 설정")]
-    [SerializeField] private float jumpPower = 5f;
-    [SerializeField] private float jumpDistance = 3f;
-    [SerializeField] private float jumpCooldown = 3f;
-    [SerializeField] private float randomJumpChance = 0.1f; // 매 초마다 점프할 확률
+    [SerializeField] private float jumpPower;
+    [SerializeField] private float jumpDistance;
+    [SerializeField] private float jumpCooldown;
+    [SerializeField] private float randomJumpChance; // 매 초마다 점프할 확률
+    
+    [Header("장판 설정")]
+    [SerializeField] private float slimeDuration = 3f; // 슬라임 장판 지속 시간
+    [SerializeField] private float slimeDamage = 1f; // 슬라임 장판 데미지
+    [SerializeField] private float slimeDamageInterval = 1f; // 슬라임 장판 데미지 주는 간격
 
     private float randomJumpTimer = 0f;
 
@@ -73,7 +79,6 @@ public class EnemyLittleShredder : BaseEnemy
                 randomJumpTimer = 0f;
                 if (Random.value < randomJumpChance) // 설정된 확률로 점프
                 {
-                    Debug.Log("랜덤 점프 시도!");
                     SwitchToJumpState();
                 }
             }
@@ -103,7 +108,6 @@ public class EnemyLittleShredder : BaseEnemy
 
         // 상태 생성 (두 개의 웨이포인트 설정)
         patrolState = new PatrolState(this, stateMachine, new Vector2[] { leftPoint, rightPoint }, patrolWaitTime);
-        attackState = new AttackState(this, stateMachine, attackSpeed);
         chaseState = new ChaseState(this, stateMachine, chaseSpeed);
         jumpState = new JumpState(this, stateMachine, jumpPower, jumpDistance, jumpCooldown);
 
@@ -132,20 +136,7 @@ public class EnemyLittleShredder : BaseEnemy
     /// </summary>
     public override void PerformAttack()
     {
-        // 추격 후 공격상태에서 범위안에 들어왔다면 물어뜯기
-        // 플레이어가 있고 공격 범위 내에 있는지 확인
-        if (playerTransform != null && IsInAttackRange())
-        {
-            // 플레이어에게 데미지 주기
-            IDamageable playerDamageable = playerTransform.GetComponent<IDamageable>();
-            if (playerDamageable != null)
-            {
-                playerDamageable.TakeDamage(attackPower);
-                Debug.Log($"{gameObject.name}이(가) 플레이어에게 {attackPower} 데미지를 입혔습니다.");
-
-                // 공격 이펙트 등 추가 요소 구현 가능
-            }
-        }
+        // 슬라임은 충돌 공격만 처리하기때문에 이부분은 비워둠
     }
 
     /// <summary>
@@ -223,14 +214,6 @@ public class EnemyLittleShredder : BaseEnemy
     public override void SwitchToChaseState()
     {
         stateMachine.ChangeState(chaseState);
-    }
-
-    /// <summary>
-    /// 공격 상태로 전환
-    /// </summary>
-    public override void SwitchToAttackState()
-    {
-        stateMachine.ChangeState(attackState);
     }
 
     /// <summary>
