@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerDeathState : PlayerStateBase
+public class PlayerDeathMovementState : PlayerMovementStateBase
 {
     private float deathStartTime;
     private float deathAnimationDuration = 2.0f; // 사망 애니메이션 재생 시간
@@ -11,7 +11,7 @@ public class PlayerDeathState : PlayerStateBase
     // 외부에서 리스폰 상태 확인용 프로퍼티
     public bool HasRespawned => hasRespawned;
 
-    public PlayerDeathState(PlayerStateManager stateManager) : base(stateManager)
+    public PlayerDeathMovementState(PlayerMovementStateMachine stateMachine) : base(stateMachine)
     {
     }
 
@@ -21,14 +21,13 @@ public class PlayerDeathState : PlayerStateBase
         deathStartTime = Time.time;
         hasRespawned = false;
         
-        player.SetJumping(false);
-        player.SetWallSliding(false);
-        player.SetSprinting(false);
-        player.SetCrouching(false);
-        player.SetClimbing(false);
+        stateMachine.SetJumping(false);
+        stateMachine.SetWallSliding(false);
+        stateMachine.SetCrouching(false);
+        stateMachine.SetClimbing(false);
         
         // 사망 애니메이션 재생
-        var playerAnimator = player.GetComponent<PlayerAnimator>();
+        var playerAnimator = stateMachine.gameObject.GetComponent<PlayerAnimator>();
         if (playerAnimator != null)
         {
             // 애니메이션 초기화 후 사망 애니메이션 설정
@@ -63,7 +62,7 @@ public class PlayerDeathState : PlayerStateBase
             hasRespawned = true;
             
             // 애니메이션 반복 방지를 위해 애니메이터 정지
-            var playerAnimator = player.GetComponent<PlayerAnimator>();
+            var playerAnimator = stateMachine.gameObject.GetComponent<PlayerAnimator>();
             if (playerAnimator != null)
             {
                 // 애니메이터 속도를 0으로 설정하여 애니메이션 정지
@@ -91,7 +90,7 @@ public class PlayerDeathState : PlayerStateBase
     {
         // 사망 상태에서는 입력 처리 없음
         // 모든 입력을 무시하도록 PlayerInputHandler를 비활성화할 수도 있음
-        var inputHandler = player.GetInputHandler();
+        var inputHandler = stateMachine.GetInputHandler();
         if (inputHandler != null && inputHandler.enabled)
         {
             inputHandler.enabled = false;
@@ -103,7 +102,7 @@ public class PlayerDeathState : PlayerStateBase
         Debug.Log("PlayerDeathState Exit 메서드 호출 - 사망 상태 종료");
         
         // 상태 종료 시 정리
-        var playerAnimator = player.GetComponent<PlayerAnimator>();
+        var playerAnimator = stateMachine.gameObject.GetComponent<PlayerAnimator>();
         if (playerAnimator != null)
         {
             playerAnimator.SetDead(false);
@@ -115,7 +114,7 @@ public class PlayerDeathState : PlayerStateBase
         Debug.Log("사망 상태 종료 시 물리 효과 다시 활성화");
         
         // 입력 처리 다시 활성화
-        var inputHandler = player.GetInputHandler();
+        var inputHandler = stateMachine.GetInputHandler();
         if (inputHandler != null && !inputHandler.enabled)
         {
             inputHandler.enabled = true;
@@ -130,7 +129,7 @@ public class PlayerDeathState : PlayerStateBase
     private void DisablePhysics()
     {
         // Rigidbody2D 비활성화 또는 kinematic 설정
-        var rb = player.GetComponent<Rigidbody2D>();
+        var rb = stateMachine.gameObject.GetComponent<Rigidbody2D>();
         if (rb != null)
         {
             rb.velocity = Vector2.zero;
@@ -138,7 +137,7 @@ public class PlayerDeathState : PlayerStateBase
         }
         
         // 콜라이더 비활성화 (선택적)
-        var colliders = player.GetComponents<Collider2D>();
+        var colliders = stateMachine.gameObject.GetComponents<Collider2D>();
         foreach (var collider in colliders)
         {
             collider.enabled = false;
@@ -148,14 +147,14 @@ public class PlayerDeathState : PlayerStateBase
     private void EnablePhysics()
     {
         // Rigidbody2D 다시 활성화
-        var rb = player.GetComponent<Rigidbody2D>();
+        var rb = stateMachine.gameObject.GetComponent<Rigidbody2D>();
         if (rb != null)
         {
             rb.isKinematic = false;
         }
         
         // 콜라이더 다시 활성화
-        var colliders = player.GetComponents<Collider2D>();
+        var colliders = stateMachine.gameObject.GetComponents<Collider2D>();
         foreach (var collider in colliders)
         {
             collider.enabled = true;

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerAttackingState : PlayerStateBase
+public class PlayerAttackingAttackState : PlayerAttackStateBase
 {
     private float attackStartTime;
     private float attackDuration = 0.25f; // 공격 모션 지속 시간
@@ -9,7 +9,7 @@ public class PlayerAttackingState : PlayerStateBase
 
     private Vector2 lastAimDirection;
 
-    public PlayerAttackingState(PlayerStateManager stateManager) : base(stateManager)
+    public PlayerAttackingAttackState(PlayerAttackStateMachine stateMachine) : base(stateMachine)
     {
     }
 
@@ -18,12 +18,15 @@ public class PlayerAttackingState : PlayerStateBase
         attackStartTime = Time.time;
 
         // 플레이어가 바라보는 방향 저장
-        lastAimDirection = new Vector2(player.GetMovement().FacingDirection, 0).normalized;
+        lastAimDirection = new Vector2(stateMachine.GetMovement().FacingDirection, 0).normalized;
 
         // 총알 발사
         //FireWeapon();
 
         Debug.Log("공격 상태 시작: 총 발사");
+        
+        // 공격 상태 설정
+        stateMachine.SetAttacking(true);
     }
 
     public override void Update()
@@ -32,38 +35,56 @@ public class PlayerAttackingState : PlayerStateBase
         if (Time.time >= attackStartTime + attackDuration)
         {
             // 공격 끝난 후 상태 전환
-            var collisionDetector = player.GetCollisionDetector();
-            var inputHandler = player.GetInputHandler();
+            var inputHandler = stateMachine.GetInputHandler();
 
-            if (!collisionDetector.IsGrounded)
+            if (inputHandler.IsMoving())
             {
-                player.ChangeState(PlayerStateType.Falling);
-            }
-            else if (inputHandler.IsMoving())
-            {
-                player.ChangeState(PlayerStateType.Running);
+                // 이동중이면서 계속 공격키 누르고 있으면 MoveAttacking으로 전환
+                if (inputHandler.IsAttackPressed)
+                {
+                    stateMachine.ChangeState(AttackStateType.MoveAttacking);
+                }
+                else
+                {
+                    stateMachine.ChangeState(AttackStateType.None);
+                }
             }
             else
             {
-                player.ChangeState(PlayerStateType.Idle);
+                // 정지 상태에서 계속 공격키 누르고 있으면 다시 Attacking 상태로
+                if (inputHandler.IsAttackPressed)
+                {
+                    stateMachine.ChangeState(AttackStateType.Attacking);
+                }
+                else
+                {
+                    stateMachine.ChangeState(AttackStateType.None);
+                }
             }
         }
     }
 
-    public override void FixedUpdate()
+    public override void HandleInput()
     {
-        // 공격 중에도 이동은 가능하게 처리
-        var inputHandler = player.GetInputHandler();
-        var movement = player.GetMovement();
+        var inputHandler = stateMachine.GetInputHandler();
+        
+        // 차징 버튼을 누르면 차징 상태로 전환
+        if (inputHandler.IsChargingAttack)
+        {
+            stateMachine.ChangeState(AttackStateType.Charging);
+        }
+    }
 
-        // 속도 감소 없이 이동
-        movement.Move(inputHandler.MoveDirection);
+    public override void Exit()
+    {
+        Debug.Log("공격 상태 종료");
+        stateMachine.SetAttacking(false);
     }
 
     private void FireWeapon()
     {
         // 총알 생성 및 발사
-        var weaponManager = player.GetComponent<WeaponManager>();
+        var weaponManager = stateMachine.GetWeaponManager();
         if (weaponManager != null)
         {
             weaponManager.FireNormalBullet();
@@ -75,7 +96,7 @@ public class PlayerAttackingState : PlayerStateBase
         }
 
         // 공격 쿨다운 시작
-        player.StartCoroutine(AttackCooldown());
+        stateMachine.StartCoroutine(AttackCooldown());
     }
 
     private System.Collections.IEnumerator AttackCooldown()
@@ -83,11 +104,6 @@ public class PlayerAttackingState : PlayerStateBase
         canAttackAgain = false;
         yield return new WaitForSeconds(attackCooldown);
         canAttackAgain = true;
-    }
-
-    public override void Exit()
-    {
-        Debug.Log("공격 상태 종료");
     }
 
     // 연속 공격 가능 여부 체크

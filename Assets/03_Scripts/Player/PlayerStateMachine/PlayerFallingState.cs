@@ -1,46 +1,43 @@
 using UnityEngine;
 
-public class PlayerFallingState : IPlayerState
+public class PlayerFallingMovementState : PlayerMovementStateBase
 {
-    private PlayerStateManager stateManager;
     private float fallStartTime;
 
-    public PlayerFallingState(PlayerStateManager stateManager)
+    public PlayerFallingMovementState(PlayerMovementStateMachine stateMachine) : base(stateMachine)
     {
-        this.stateManager = stateManager;
     }
 
-    public void Enter()
+    public override void Enter()
     {
         fallStartTime = Time.time;
         Debug.Log("낙하 상태 시작");
     }
 
-    public void HandleInput()
+    public override void HandleInput()
     {
         // 낙하 중 입력 처리
-        // 대부분의 입력 처리는 PlayerStateManager의 이벤트 핸들러에서 처리됨
+        // 대부분의 입력 처리는 PlayerMovementStateMachine의 이벤트 핸들러에서 처리됨
     }
 
-    public void Update()
+    public override void Update()
     {
-        var collisionDetector = stateManager.GetCollisionDetector();
+        var collisionDetector = stateMachine.GetCollisionDetector();
 
         // 땅에 닿으면 상태 전환 (HandleGroundedChanged에서 처리)
 
         // 벽에 닿으면 벽 슬라이딩 상태로 전환
         if (collisionDetector.IsTouchingWall && !collisionDetector.IsGrounded)
         {
-            stateManager.ChangeState(PlayerStateType.WallSliding);
+            stateMachine.ChangeState(MovementStateType.WallSliding);
         }
     }
 
-    public void FixedUpdate()
+    public override void FixedUpdate()
     {
         // 낙하 중 이동 처리
-        var inputHandler = stateManager.GetInputHandler();
-        var movement = stateManager.GetMovement();
-        var settings = stateManager.GetSettings();
+        var inputHandler = stateMachine.GetInputHandler();
+        var movement = stateMachine.GetMovement();
 
         // 낙하 중 이동 (공중 조작)
         movement.Move(inputHandler.MoveDirection);
@@ -53,7 +50,7 @@ public class PlayerFallingState : IPlayerState
         }
     }
 
-    public void Exit()
+    public override void Exit()
     {
         Debug.Log("낙하 상태 종료");
     }

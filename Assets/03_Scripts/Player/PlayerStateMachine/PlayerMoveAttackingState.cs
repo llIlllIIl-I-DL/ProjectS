@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerMoveAttackingState : PlayerStateBase
+public class PlayerMoveAttackingAttackState : PlayerAttackStateBase
 {
     private float attackStartTime;
     private float attackDuration = 0.25f; // 공격 모션 지속 시간
@@ -9,58 +9,65 @@ public class PlayerMoveAttackingState : PlayerStateBase
 
     private Vector2 lastAimDirection;
 
-    public PlayerMoveAttackingState(PlayerStateManager stateManager) : base(stateManager)
+    public PlayerMoveAttackingAttackState(PlayerAttackStateMachine stateMachine) : base(stateMachine)
     {
     }
 
     public override void Enter()
     {
         attackStartTime = Time.time;
-        lastAimDirection = new Vector2(player.GetMovement().FacingDirection, 0).normalized;
+        lastAimDirection = new Vector2(stateMachine.GetMovement().FacingDirection, 0).normalized;
         //FireWeapon(); // 필요시 무기 발사
         Debug.Log("이동+공격 상태 시작: 총 발사");
+        
+        // 공격 상태 설정
+        stateMachine.SetAttacking(true);
     }
 
     public override void Update()
     {
         if (Time.time >= attackStartTime + attackDuration)
         {
-            var collisionDetector = player.GetCollisionDetector();
-            var inputHandler = player.GetInputHandler();
+            var inputHandler = stateMachine.GetInputHandler();
 
-            if (!collisionDetector.IsGrounded)
+            // 여전히 이동 중이면서 계속 공격키를 누르고 있으면 유지
+            if (inputHandler.IsMoving() && inputHandler.IsAttackPressed)
             {
-                player.ChangeState(PlayerStateType.Falling);
+                stateMachine.ChangeState(AttackStateType.MoveAttacking);
             }
-            else if (inputHandler.IsMoving() && inputHandler.IsAttackPressed)
-            {
-                player.ChangeState(PlayerStateType.MoveAttacking);
-            }
+            // 이동만 하고 있으면 None 상태로 전환
             else if (inputHandler.IsMoving())
             {
-                player.ChangeState(PlayerStateType.Running);
+                stateMachine.ChangeState(AttackStateType.None);
             }
+            // 정지 상태에서 공격키만 누르고 있으면 일반 공격으로 전환
             else if (inputHandler.IsAttackPressed)
             {
-                player.ChangeState(PlayerStateType.Attacking);
+                stateMachine.ChangeState(AttackStateType.Attacking);
             }
+            // 아무 입력도 없으면 None 상태로 전환
             else
             {
-                player.ChangeState(PlayerStateType.Idle);
+                stateMachine.ChangeState(AttackStateType.None);
             }
         }
     }
 
-    public override void FixedUpdate()
+    public override void HandleInput()
     {
-        var inputHandler = player.GetInputHandler();
-        var movement = player.GetMovement();
-        movement.Move(inputHandler.MoveDirection); // 속도 감소 없이 이동
+        var inputHandler = stateMachine.GetInputHandler();
+        
+        // 차징 버튼을 누르면 차징 상태로 전환
+        if (inputHandler.IsChargingAttack)
+        {
+            stateMachine.ChangeState(AttackStateType.Charging);
+        }
     }
 
     public override void Exit()
     {
         Debug.Log("이동+공격 상태 종료");
+        stateMachine.SetAttacking(false);
     }
 
     // 연속 공격 가능 여부 체크

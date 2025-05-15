@@ -486,7 +486,7 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(0.1f); // 짧은 대기 시간으로 모든 상태가 리셋될 시간 확보
             
             Debug.Log("플레이어 상태를 Idle로 변경 시작");
-            playerStateManager.ChangeState(PlayerStateType.Idle);
+            playerStateManager.ChangeState(MovementStateType.Idle);
             Debug.Log("플레이어 상태 Idle로 변경 완료");
         }
         

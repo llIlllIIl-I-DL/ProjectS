@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerHitState : PlayerStateBase
+public class PlayerHitMovementState : PlayerMovementStateBase
 {
     private float hitStartTime;
     private float hitDuration = 0.5f;         // 피격 상태 지속 시간
@@ -10,21 +10,20 @@ public class PlayerHitState : PlayerStateBase
     private float invincibilityDuration = 1.5f; // 무적 시간
     private Vector2 knockbackDirection;        // 넉백 방향
 
-    public PlayerHitState(PlayerStateManager stateManager) : base(stateManager)
+    public PlayerHitMovementState(PlayerMovementStateMachine stateMachine) : base(stateMachine)
     {
     }
 
     public override void Enter()
     {
         // 상태 초기화
-        player.SetJumping(false);
-        player.SetWallSliding(false);
-        player.SetSprinting(false);
+        stateMachine.SetJumping(false);
+        stateMachine.SetWallSliding(false);
         
         hitStartTime = Time.time;
         
         // 피격 애니메이션 재생 (애니메이션 파라미터가 있다고 가정)
-        var playerAnimator = player.GetComponent<PlayerAnimator>();
+        var playerAnimator = stateMachine.gameObject.GetComponent<PlayerAnimator>();
         if (playerAnimator != null)
         {
             // IsHit 애니메이션 파라미터 설정
@@ -32,14 +31,14 @@ public class PlayerHitState : PlayerStateBase
         }
         
         // 넉백 방향 설정 (플레이어가 바라보는 반대 방향으로)
-        var movement = player.GetMovement();
+        var movement = stateMachine.GetMovement();
         knockbackDirection = new Vector2(-movement.FacingDirection, 0.5f).normalized;
         
         // 넉백 적용
         ApplyKnockback();
         
         // 무적 시간 설정 (코루틴 실행은 MonoBehaviour에서만 가능하므로 PlayerStateManager에 요청)
-        player.StartCoroutine(InvincibilityRoutine());
+        stateMachine.StartCoroutine(InvincibilityRoutine());
         
         // 디버그 로그
         Debug.Log("피격 상태 진입: 넉백 적용");
@@ -67,7 +66,7 @@ public class PlayerHitState : PlayerStateBase
     public override void Exit()
     {
         // 상태 종료 시 정리
-        var playerAnimator = player.GetComponent<PlayerAnimator>();
+        var playerAnimator = stateMachine.gameObject.GetComponent<PlayerAnimator>();
         if (playerAnimator != null)
         {
             playerAnimator.ResetTrigger("Hit");
@@ -77,7 +76,7 @@ public class PlayerHitState : PlayerStateBase
     private void ApplyKnockback()
     {
         // Rigidbody2D에 즉시 힘 적용
-        var rb = player.GetComponent<Rigidbody2D>();
+        var rb = stateMachine.gameObject.GetComponent<Rigidbody2D>();
         if (rb != null)
         {
             // 현재 속도를 0으로 리셋 후 넉백 적용
@@ -89,15 +88,15 @@ public class PlayerHitState : PlayerStateBase
     private void ReturnToNormalState()
     {
         // 상태에 따라 적절한 상태로 전환
-        var collisionDetector = player.GetCollisionDetector();
+        var collisionDetector = stateMachine.GetCollisionDetector();
         
         if (!collisionDetector.IsGrounded)
         {
-            player.ChangeState(PlayerStateType.Falling);
+            stateMachine.ChangeState(MovementStateType.Falling);
         }
         else
         {
-            player.ChangeState(PlayerStateType.Idle);
+            stateMachine.ChangeState(MovementStateType.Idle);
         }
     }
 
