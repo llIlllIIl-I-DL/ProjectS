@@ -1,43 +1,46 @@
 using UnityEngine;
 
-public class PlayerFallingMovementState : PlayerMovementStateBase
+public class PlayerFallingState : IPlayerState
 {
+    private PlayerStateManager stateManager;
     private float fallStartTime;
 
-    public PlayerFallingMovementState(PlayerMovementStateMachine stateMachine) : base(stateMachine)
+    public PlayerFallingState(PlayerStateManager stateManager)
     {
+        this.stateManager = stateManager;
     }
 
-    public override void Enter()
+    public void Enter()
     {
         fallStartTime = Time.time;
         Debug.Log("낙하 상태 시작");
     }
 
-    public override void HandleInput()
+    public void HandleInput()
     {
         // 낙하 중 입력 처리
-        // 대부분의 입력 처리는 PlayerMovementStateMachine의 이벤트 핸들러에서 처리됨
+        // 대부분의 입력 처리는 PlayerStateManager의 이벤트 핸들러에서 처리됨
     }
 
-    public override void Update()
+    public void Update()
     {
-        var collisionDetector = stateMachine.GetCollisionDetector();
+        var collisionDetector = stateManager.GetCollisionDetector();
 
         // 땅에 닿으면 상태 전환 (HandleGroundedChanged에서 처리)
 
         // 벽에 닿으면 벽 슬라이딩 상태로 전환
         if (collisionDetector.IsTouchingWall && !collisionDetector.IsGrounded)
         {
-            stateMachine.ChangeState(MovementStateType.WallSliding);
+            stateManager.ChangeState(PlayerStateType.WallSliding);
         }
     }
 
-    public override void FixedUpdate()
+    public void FixedUpdate()
     {
         // 낙하 중 이동 처리
-        var inputHandler = stateMachine.GetInputHandler();
-        var movement = stateMachine.GetMovement();
+        var inputHandler = stateManager.GetInputHandler();
+        var movement = stateManager.GetMovement();
+        var settings = stateManager.GetSettings();
 
         // 낙하 중 이동 (공중 조작)
         movement.Move(inputHandler.MoveDirection);
@@ -50,7 +53,7 @@ public class PlayerFallingMovementState : PlayerMovementStateBase
         }
     }
 
-    public override void Exit()
+    public void Exit()
     {
         Debug.Log("낙하 상태 종료");
     }

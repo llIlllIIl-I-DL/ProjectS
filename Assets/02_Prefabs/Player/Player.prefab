@@ -223,7 +223,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHP: 10
   currentHP: 0
-  invincibleTime: 0.2
 --- !u!114 &752108482168258628
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -238,9 +237,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   settings: {fileID: 11400000, guid: 83308ca141c58fe47a419e584bbc8df0, type: 2}
   hasWingsuit: 0
-  sprintDuration: 1.5
-  UnLockedUtility: 
-  utilityPoint: 0
   CurrentattributeTypeData: {fileID: 0}
 --- !u!114 &4995387987602289083
 MonoBehaviour:

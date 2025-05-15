@@ -71,7 +71,7 @@ public class PlayerAnimator : MonoBehaviour
         }
     }
 
-    public void UpdateAnimation(MovementStateType state, bool isMoving, Vector2 velocity)
+    public void UpdateAnimation(PlayerStateType state, bool isMoving, Vector2 velocity)
     {
         if (animator == null) return;
 
@@ -85,35 +85,35 @@ public class PlayerAnimator : MonoBehaviour
         // 상태별 파라미터
         if (HasParameter("IsSprinting"))
         {
-            animator.SetBool("IsSprinting", state == MovementStateType.Sprinting);
+            animator.SetBool("IsSprinting", state == PlayerStateType.Sprinting);
         }
 
         if (HasParameter("IsJumping"))
-            animator.SetBool("IsJumping", state == MovementStateType.Jumping);
+            animator.SetBool("IsJumping", state == PlayerStateType.Jumping);
 
         if (HasParameter("IsFalling"))
-            animator.SetBool("IsFalling", state == MovementStateType.Falling);
+            animator.SetBool("IsFalling", state == PlayerStateType.Falling);
 
         if (HasParameter("IsWallSliding"))
-            animator.SetBool("IsWallSliding", state == MovementStateType.WallSliding);
+            animator.SetBool("IsWallSliding", state == PlayerStateType.WallSliding);
 
         if (HasParameter("IsDashing"))
-            animator.SetBool("IsDashing", state == MovementStateType.Dashing);
+            animator.SetBool("IsDashing", state == PlayerStateType.Dashing);
 
         if (HasParameter("IsHit"))
-            animator.SetBool("IsHit", state == MovementStateType.Hit);
+            animator.SetBool("IsHit", state == PlayerStateType.Hit);
 
         if (HasParameter("IsAttacking"))
-            animator.SetBool("IsAttacking", false); // 공격은 별도의 상태 머신에서 처리
+            animator.SetBool("IsAttacking", state == PlayerStateType.Attacking);
 
         // 앉기 상태 파라미터
         if (HasParameter("IsCrouching"))
-            animator.SetBool("IsCrouching", state == MovementStateType.Crouching);
+            animator.SetBool("IsCrouching", state == PlayerStateType.Crouching);
             
         // 사망 상태 파라미터 - 이미 설정된 상태면 중복 설정하지 않음
         if (HasParameter("IsDead"))
         {
-            bool shouldBeDead = state == MovementStateType.Death;
+            bool shouldBeDead = state == PlayerStateType.Death;
             
             // 상태가 변경되었을 때만 설정
             if (isDeadState != shouldBeDead)
@@ -127,7 +127,7 @@ public class PlayerAnimator : MonoBehaviour
         // 사다리 오르기 상태 파라미터
         if (HasParameter("IsClimbing"))
         {
-            bool isClimbingState = state == MovementStateType.Climbing;
+            bool isClimbingState = state == PlayerStateType.Climbing;
             animator.SetBool("IsClimbing", isClimbingState);
 
             // 사다리 상태가 아니면 애니메이션 일시정지 해제
@@ -348,47 +348,5 @@ public class PlayerAnimator : MonoBehaviour
                 }
             }
         }
-    }
-
-    // 이동 애니메이션 업데이트
-    public void UpdateMovementAnimation(MovementStateType state, bool isMoving, Vector2 velocity)
-    {
-        if (animator == null) return;
-
-        // 이동 관련 파라미터 설정
-        animator.SetBool("IsMoving", isMoving);
-        
-        // 속도 설정
-        animator.SetFloat("MoveSpeed", Mathf.Abs(velocity.x));
-        animator.SetFloat("VerticalSpeed", velocity.y);
-        
-        // 상태별 애니메이션 파라미터 설정
-        animator.SetBool("IsRunning", state == MovementStateType.Running);
-        animator.SetBool("IsSprinting", state == MovementStateType.Sprinting);
-        animator.SetBool("IsJumping", state == MovementStateType.Jumping);
-        animator.SetBool("IsFalling", state == MovementStateType.Falling);
-        animator.SetBool("IsWallSliding", state == MovementStateType.WallSliding);
-        animator.SetBool("IsDashing", state == MovementStateType.Dashing);
-        animator.SetBool("IsHit", state == MovementStateType.Hit);
-        animator.SetBool("IsCrouching", state == MovementStateType.Crouching);
-        
-        // 사망 상태 처리
-        bool shouldBeDead = state == MovementStateType.Death;
-        SetDead(shouldBeDead);
-        
-        // 사다리 상태 처리
-        bool isClimbingState = state == MovementStateType.Climbing;
-        SetClimbing(isClimbingState);
-    }
-
-    // 공격 상태 애니메이션 업데이트를 위한 새 메서드 추가
-    public void UpdateAttackAnimation(AttackStateType state)
-    {
-        if (animator == null) return;
-        
-        // 공격 관련 파라미터 설정
-        animator.SetBool("IsAttacking", state == AttackStateType.Attacking || state == AttackStateType.MoveAttacking);
-        animator.SetBool("IsCharging", state == AttackStateType.Charging);
-        animator.SetBool("IsOvercharging", state == AttackStateType.Overcharging);
     }
 }

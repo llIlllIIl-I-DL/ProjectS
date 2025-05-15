@@ -1,23 +1,17 @@
-public enum MovementStateType
+public enum PlayerStateType
 {
     Idle,
     Running,
+    Sprinting,
     Jumping,
     Falling,
-    Dashing,
     WallSliding,
-    Crouching,
-    Climbing,
-    Hit,
-    Sprinting,
-    Death
-}
-
-public enum AttackStateType
-{
-    None,
+    Dashing,
     Attacking,
     MoveAttacking,
-    Charging,
-    Overcharging
+    Hit,
+    Crouching,
+    CrouchWalking,
+    Climbing,
+    Death
 }

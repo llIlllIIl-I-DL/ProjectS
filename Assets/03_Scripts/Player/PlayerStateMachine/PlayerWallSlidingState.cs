@@ -4,10 +4,11 @@ using UnityEngine;
 /// 벽 슬라이딩 상태를 처리하는 클래스
 /// 플레이어가 벽에 붙어 미끄러지는 동작을 관리
 /// </summary>
-public class PlayerWallSlidingMovementState : PlayerMovementStateBase
+public class PlayerWallSlidingState : IPlayerState
 {
     #region 변수
 
+    private readonly PlayerStateManager stateManager;
     private float wallSlideStartTime;
     private int wallDirection; // 벽의 방향: -1(왼쪽), 1(오른쪽)
     
@@ -19,8 +20,9 @@ public class PlayerWallSlidingMovementState : PlayerMovementStateBase
 
     #region 초기화
 
-    public PlayerWallSlidingMovementState(PlayerMovementStateMachine stateMachine) : base(stateMachine)
+    public PlayerWallSlidingState(PlayerStateManager stateManager)
     {
+        this.stateManager = stateManager;
     }
 
     #endregion
@@ -30,15 +32,15 @@ public class PlayerWallSlidingMovementState : PlayerMovementStateBase
     /// <summary>
     /// 벽 슬라이딩 상태 진입 시 호출
     /// </summary>
-    public override void Enter()
+    public void Enter()
     {
         // 필요한 컴포넌트 캐싱
-        movement = stateMachine.GetMovement();
-        collisionDetector = stateMachine.GetCollisionDetector();
-        inputHandler = stateMachine.GetInputHandler();
+        movement = stateManager.GetMovement();
+        collisionDetector = stateManager.GetCollisionDetector();
+        inputHandler = stateManager.GetInputHandler();
         
         // 벽 슬라이딩 상태 설정
-        stateMachine.SetWallSliding(true);
+        stateManager.SetWallSliding(true);
         wallSlideStartTime = Time.time;
         
         // 벽 방향 감지
@@ -50,7 +52,7 @@ public class PlayerWallSlidingMovementState : PlayerMovementStateBase
     /// <summary>
     /// 벽 슬라이딩 중 입력 처리
     /// </summary>
-    public override void HandleInput()
+    public void HandleInput()
     {
         // 벽에서 반대 방향으로 입력하면 벽에서 떨어짐
         if (ShouldDetachFromWall())
@@ -62,7 +64,7 @@ public class PlayerWallSlidingMovementState : PlayerMovementStateBase
     /// <summary>
     /// 벽 슬라이딩 중 매 프레임 업데이트
     /// </summary>
-    public override void Update()
+    public void Update()
     {
         // 상태가 변경되었는지 확인 (지상에 착지 또는 벽에서 떨어짐)
         if (CheckStateTransitions())
@@ -74,7 +76,7 @@ public class PlayerWallSlidingMovementState : PlayerMovementStateBase
     /// <summary>
     /// 벽 슬라이딩 중 물리 업데이트 (고정 타임스텝)
     /// </summary>
-    public override void FixedUpdate()
+    public void FixedUpdate()
     {
         ApplyWallSlide();
     }
@@ -82,10 +84,10 @@ public class PlayerWallSlidingMovementState : PlayerMovementStateBase
     /// <summary>
     /// 벽 슬라이딩 상태 종료 시 호출
     /// </summary>
-    public override void Exit()
+    public void Exit()
     {
         // 벽 슬라이딩 상태 종료
-        stateMachine.SetWallSliding(false);
+        stateManager.SetWallSliding(false);
         Debug.Log("벽 슬라이딩 상태 종료");
     }
 
@@ -159,10 +161,10 @@ public class PlayerWallSlidingMovementState : PlayerMovementStateBase
     {
         // 이동 중이면 Running, 아니면 Idle
         var targetState = inputHandler.IsMoving() ? 
-                         MovementStateType.Running : 
-                         MovementStateType.Idle;
+                         PlayerStateType.Running : 
+                         PlayerStateType.Idle;
                          
-        stateMachine.ChangeState(targetState);
+        stateManager.ChangeState(targetState);
     }
 
     /// <summary>
@@ -170,7 +172,7 @@ public class PlayerWallSlidingMovementState : PlayerMovementStateBase
     /// </summary>
     private void ExitToFallingState()
     {
-        stateMachine.ChangeState(MovementStateType.Falling);
+        stateManager.ChangeState(PlayerStateType.Falling);
     }
 
     /// <summary>
@@ -182,8 +184,7 @@ public class PlayerWallSlidingMovementState : PlayerMovementStateBase
         bool fastSlide = inputHandler.IsDownPressed;
         
         // 벽 슬라이딩 물리 적용
-        var settings = stateMachine.gameObject.GetComponent<PlayerSettings>();
-        float slideSpeed = settings != null ? settings.wallSlideSpeed : 2f;
+        float slideSpeed = stateManager.GetSettings().wallSlideSpeed;
         movement.WallSlide(slideSpeed, fastSlide);
     }
 

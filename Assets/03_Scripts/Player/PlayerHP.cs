@@ -14,7 +14,6 @@ public class PlayerHP : MonoBehaviour, IDamageable
     private readonly float MAX_HP = 100f;
 
     private PlayerStateManager playerStateManager;
-    private PlayerMovementStateMachine movementStateMachine;
     private bool isDead = false;
 
     private Player player;
@@ -28,7 +27,6 @@ public class PlayerHP : MonoBehaviour, IDamageable
         maxHP = Mathf.Clamp(maxHP, MIN_HP, MAX_HP);
         currentHP = maxHP;
         playerStateManager = GetComponent<PlayerStateManager>();
-        movementStateMachine = GetComponent<PlayerMovementStateMachine>();
         player = GetComponent<Player>();
     }
 
@@ -46,10 +44,10 @@ public class PlayerHP : MonoBehaviour, IDamageable
 
 
         // 플레이어가 데미지를 입으면 Hit 상태로 변경
-        if (movementStateMachine != null)
+        if (playerStateManager != null)
         {
             PlayerUI.Instance.SetHealthBar(maxHP, currentHP);
-            movementStateMachine.ChangeState(MovementStateType.Hit);
+            playerStateManager.ChangeState(PlayerStateType.Hit);
             PlayerUI.Instance.UpdatePlayerHPInUItext();
         }
 
@@ -129,9 +127,9 @@ public class PlayerHP : MonoBehaviour, IDamageable
         Debug.Log("플레이어가 사망했습니다.");
 
         // 사망 상태로 전환
-        if (movementStateMachine != null)
+        if (playerStateManager != null)
         {
-            movementStateMachine.ChangeState(MovementStateType.Death);
+            playerStateManager.ChangeState(PlayerStateType.Death);
         }
 
         // GameManager에 사망 알림

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerCrouchingMovementState : PlayerMovementStateBase
+public class PlayerCrouchingState : PlayerStateBase
 {
     private float crouchingMoveSpeed = 3.5f; // 기본값
     private float originalColliderHeight;
@@ -11,27 +11,19 @@ public class PlayerCrouchingMovementState : PlayerMovementStateBase
     private CapsuleCollider2D playerCollider;
     private BoxCollider2D boxCollider; // 플레이어가 BoxCollider2D를 사용하는 경우 대비
 
-    public PlayerCrouchingMovementState(PlayerMovementStateMachine stateMachine) : base(stateMachine)
+    public PlayerCrouchingState(PlayerStateManager stateManager) : base(stateManager)
     {
-        // PlayerStateManager를 통해 settings 가져오기
-        var stateManager = stateMachine.gameObject.GetComponent<PlayerStateManager>();
-        if (stateManager != null)
+        // 플레이어 설정에서 값을 가져옵니다
+        var settings = stateManager.GetSettings();
+        if (settings != null)
         {
-            var settings = stateManager.GetSettings();
-            if (settings != null)
-            {
-                Debug.Log("PlayerSettings 발견");
-                crouchingMoveSpeed = settings.crouchSpeed;
-                crouchingOffsetY = settings.crouchOffsetY;
-            }
-            else
-            {
-                Debug.LogWarning("PlayerSettings를 찾을 수 없습니다. 기본값을 사용합니다.");
-            }
+            Debug.Log("PlayerSettings 발견");
+            crouchingMoveSpeed = settings.crouchSpeed;
+            crouchingOffsetY = settings.crouchOffsetY;
         }
         else
         {
-            Debug.LogWarning("PlayerStateManager를 찾을 수 없습니다. 기본값을 사용합니다.");
+            Debug.LogWarning("PlayerSettings를 찾을 수 없습니다. 기본값을 사용합니다.");
         }
         
         Debug.Log("PlayerCrouchingState 생성자 실행");
@@ -40,31 +32,12 @@ public class PlayerCrouchingMovementState : PlayerMovementStateBase
     private void InitializeCollider()
     {
         // CapsuleCollider2D 또는 BoxCollider2D 찾기
-        playerCollider = stateMachine.gameObject.GetComponent<CapsuleCollider2D>();
+        playerCollider = player.GetComponent<CapsuleCollider2D>();
         
-        if (playerCollider != null)
-        {
-            Debug.Log($"CapsuleCollider2D 찾음: {playerCollider.name}, 현재 크기: {playerCollider.size}");
-            originalColliderHeight = playerCollider.size.y;
-            crouchingColliderHeight = originalColliderHeight * 0.6f; // 기본값
-            
-            // PlayerStateManager를 통해 settings 가져오기
-            var stateManager = stateMachine.gameObject.GetComponent<PlayerStateManager>();
-            if (stateManager != null)
-            {
-                var settings = stateManager.GetSettings();
-                if (settings != null)
-                {
-                    crouchingColliderHeight = originalColliderHeight * settings.crouchHeightRatio;
-                }
-            }
-            
-            Debug.Log($"콜라이더 초기화 완료: 원래 높이={originalColliderHeight}, 앉을 때 높이={crouchingColliderHeight}, 오프셋={crouchingOffsetY}");
-        }
-        else
+        
         {
             // BoxCollider2D 시도
-            boxCollider = stateMachine.gameObject.GetComponent<BoxCollider2D>();
+            boxCollider = player.GetComponent<BoxCollider2D>();
             
             if (boxCollider != null)
             {
@@ -72,15 +45,11 @@ public class PlayerCrouchingMovementState : PlayerMovementStateBase
                 originalColliderHeight = boxCollider.size.y;
                 crouchingColliderHeight = originalColliderHeight * 0.6f; // 기본값
                 
-                // PlayerStateManager를 통해 settings 가져오기
-                var stateManager = stateMachine.gameObject.GetComponent<PlayerStateManager>();
-                if (stateManager != null)
+                // PlayerSettings의 crouchHeightRatio 값 사용 시도
+                var settings = player.GetSettings();
+                if (settings != null && settings.GetType().GetField("crouchHeightRatio") != null)
                 {
-                    var settings = stateManager.GetSettings();
-                    if (settings != null)
-                    {
-                        crouchingColliderHeight = originalColliderHeight * settings.crouchHeightRatio;
-                    }
+                    crouchingColliderHeight = originalColliderHeight * settings.crouchHeightRatio;
                 }
                 
                 Debug.Log($"콜라이더 초기화 완료: 원래 높이={originalColliderHeight}, 앉을 때 높이={crouchingColliderHeight}, 오프셋={crouchingOffsetY}");
@@ -100,7 +69,7 @@ public class PlayerCrouchingMovementState : PlayerMovementStateBase
         InitializeCollider();
         
         // 상태 플래그 설정
-        stateMachine.SetCrouching(true);
+        player.SetCrouching(true);
         
         // Collider 크기 조절
         AdjustColliderSize(true);
@@ -122,7 +91,7 @@ public class PlayerCrouchingMovementState : PlayerMovementStateBase
         AdjustColliderSize(false);
         
         // 상태 플래그 해제
-        stateMachine.SetCrouching(false);
+        player.SetCrouching(false);
         
         Debug.Log("앉기 상태 종료: 콜라이더 크기 복원");
     }
@@ -204,26 +173,21 @@ public class PlayerCrouchingMovementState : PlayerMovementStateBase
 
     public override void HandleInput()
     {
-        var inputHandler = stateMachine.GetInputHandler();
+        var inputHandler = player.GetInputHandler();
         
         // 앉은 상태에서 점프 입력 시
         if (inputHandler.JumpPressed)
         {
             // 앉기 상태를 종료하고, 일반적인 점프 로직으로 진행
-            ExitCrouchState();
+            player.ExitCrouchState();
             return;
         }
         
         // 앉은 상태에서 아래 방향키를 떼면 일어섬
         if (!inputHandler.IsDownPressed)
         {
-            ExitCrouchState();
+            player.ExitCrouchState();
         }
-    }
-
-    private void ExitCrouchState()
-    {
-        stateMachine.ChangeState(MovementStateType.Idle);
     }
 
     public override void Update()
@@ -241,8 +205,8 @@ public class PlayerCrouchingMovementState : PlayerMovementStateBase
 
     public override void FixedUpdate()
     {
-        var inputHandler = stateMachine.GetInputHandler();
-        var movement = stateMachine.GetMovement();
+        var inputHandler = player.GetInputHandler();
+        var movement = player.GetMovement();
         
         // 앉은 상태에서 이동 (감소된 속도로)
         if (inputHandler.IsMoving())

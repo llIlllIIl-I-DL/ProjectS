@@ -202,5 +202,5 @@ MonoBehaviour:
   targetTags:
   - tag: Boss
   - tag: Enemy
-  isOvercharged: 0
+  isOvercharged: 1
   isReloading: 0

@@ -5,6 +5,15 @@ public interface IDamageable
     void TakeDamage(float damage);
 }
 
+public interface IPlayerState
+{
+    void Enter();
+    void HandleInput();
+    void Update();
+    void FixedUpdate();
+    void Exit();
+}
+
 public interface IEnemyState
 {
     void Enter();           // 상태에 진입했을 때
@@ -28,25 +37,4 @@ public interface IInteractable
 public interface ILaserInteractable
 {
     void OnLaserHit(Vector2 hitpoint, Vector2 direction); 
-}
-
-// 기본 상태 인터페이스 (공통)
-public interface IPlayerState
-{
-    void Enter();
-    void Exit();
-    void Update();
-    void HandleInput();
-}
-
-// 이동 상태 인터페이스
-public interface IPlayerMovementState: IPlayerState
-{
-    void FixedUpdate();
-}
-
-// 공격 상태 인터페이스
-public interface IPlayerAttackState: IPlayerState
-{
-
 }

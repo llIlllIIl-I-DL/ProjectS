@@ -22,10 +22,6 @@ public class Player : MonoBehaviour
     private PlayerStateManager stateManager;
     private PlayerAnimator playerAnimator;
     private PlayerHP playerHP;
-    
-    // 상태 머신 컴포넌트
-    private PlayerMovementStateMachine movementStateMachine;
-    private PlayerAttackStateMachine attackStateMachine;
 
     public int utilityPoint;
 
@@ -110,10 +106,10 @@ public class Player : MonoBehaviour
                 playerAnimator.SetSprinting(true);
             }
             
-            // 상태 머신 업데이트
-            if (movementStateMachine != null)
+            // 상태 매니저 업데이트
+            if (stateManager != null)
             {
-                movementStateMachine.ChangeState(MovementStateType.Sprinting);
+                stateManager.ChangeState(PlayerStateType.Sprinting);
             }
             
             // 일정 시간 후 스프린트 비활성화
@@ -134,16 +130,16 @@ public class Player : MonoBehaviour
                 playerAnimator.SetSprinting(false);
             }
             
-            // 상태 머신 업데이트 (이동 중이면 Running, 아니면 Idle)
-            if (movementStateMachine != null && inputHandler != null)
+            // 상태 매니저 업데이트 (이동 중이면 Running, 아니면 Idle)
+            if (stateManager != null && inputHandler != null)
             {
                 if (inputHandler.IsMoving())
                 {
-                    movementStateMachine.ChangeState(MovementStateType.Running);
+                    stateManager.ChangeState(PlayerStateType.Running);
                 }
                 else
                 {
-                    movementStateMachine.ChangeState(MovementStateType.Idle);
+                    stateManager.ChangeState(PlayerStateType.Idle);
                 }
             }
         }
@@ -167,15 +163,6 @@ public class Player : MonoBehaviour
         stateManager = GetComponent<PlayerStateManager>();
         if (stateManager == null)
             stateManager = gameObject.AddComponent<PlayerStateManager>();
-            
-        // 상태 머신 컴포넌트 가져오기
-        movementStateMachine = GetComponent<PlayerMovementStateMachine>();
-        if (movementStateMachine == null)
-            movementStateMachine = gameObject.AddComponent<PlayerMovementStateMachine>();
-            
-        attackStateMachine = GetComponent<PlayerAttackStateMachine>();
-        if (attackStateMachine == null)
-            attackStateMachine = gameObject.AddComponent<PlayerAttackStateMachine>();
 
         playerAnimator = GetComponent<PlayerAnimator>();
         if (playerAnimator == null)
