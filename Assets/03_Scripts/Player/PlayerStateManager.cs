@@ -124,6 +124,7 @@ public class PlayerStateManager : MonoBehaviour
         states.Add(PlayerStateType.WallSliding, new PlayerWallSlidingState(this));
         states.Add(PlayerStateType.Dashing, new PlayerDashingState(this));
         states.Add(PlayerStateType.Attacking, new PlayerAttackingState(this));
+        states.Add(PlayerStateType.MoveAttacking, new PlayerMoveAttackingState(this));
         states.Add(PlayerStateType.Hit, new PlayerHitState(this));
         states.Add(PlayerStateType.Crouching, new PlayerCrouchingState(this));
         states.Add(PlayerStateType.Climbing, new PlayerClimbingState(this));
@@ -431,8 +432,13 @@ public class PlayerStateManager : MonoBehaviour
         // 대시 중에는 공격 불가
         if (isDashing) return;
         
+        // 이동+공격 입력 시 MoveAttacking 상태로 전환
+        if (inputHandler.IsMoving() && inputHandler.IsAttackPressed)
+        {
+            ChangeState(PlayerStateType.MoveAttacking);
+        }
         // 현재 공격 중이라면, 연속 공격 가능한지 체크
-        if (currentStateType == PlayerStateType.Attacking)
+        else if (currentStateType == PlayerStateType.Attacking)
         {
             PlayerAttackingState attackState = states[PlayerStateType.Attacking] as PlayerAttackingState;
             if (attackState != null && attackState.CanAttack())

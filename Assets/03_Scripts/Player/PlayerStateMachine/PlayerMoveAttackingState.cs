@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerAttackingState : PlayerStateBase
+public class PlayerMoveAttackingState : PlayerStateBase
 {
     private float attackStartTime;
     private float attackDuration = 0.25f; // 공격 모션 지속 시간
@@ -9,29 +9,22 @@ public class PlayerAttackingState : PlayerStateBase
 
     private Vector2 lastAimDirection;
 
-    public PlayerAttackingState(PlayerStateManager stateManager) : base(stateManager)
+    public PlayerMoveAttackingState(PlayerStateManager stateManager) : base(stateManager)
     {
     }
 
     public override void Enter()
     {
         attackStartTime = Time.time;
-
-        // 플레이어가 바라보는 방향 저장
         lastAimDirection = new Vector2(player.GetMovement().FacingDirection, 0).normalized;
-
-        // 총알 발사
-        //FireWeapon();
-
-        Debug.Log("공격 상태 시작: 총 발사");
+        //FireWeapon(); // 필요시 무기 발사
+        Debug.Log("이동+공격 상태 시작: 총 발사");
     }
 
     public override void Update()
     {
-        // 공격 모션 종료 체크
         if (Time.time >= attackStartTime + attackDuration)
         {
-            // 공격 끝난 후 상태 전환
             var collisionDetector = player.GetCollisionDetector();
             var inputHandler = player.GetInputHandler();
 
@@ -39,9 +32,17 @@ public class PlayerAttackingState : PlayerStateBase
             {
                 player.ChangeState(PlayerStateType.Falling);
             }
+            else if (inputHandler.IsMoving() && inputHandler.IsAttackPressed)
+            {
+                player.ChangeState(PlayerStateType.MoveAttacking);
+            }
             else if (inputHandler.IsMoving())
             {
                 player.ChangeState(PlayerStateType.Running);
+            }
+            else if (inputHandler.IsAttackPressed)
+            {
+                player.ChangeState(PlayerStateType.Attacking);
             }
             else
             {
@@ -52,42 +53,14 @@ public class PlayerAttackingState : PlayerStateBase
 
     public override void FixedUpdate()
     {
-        // 공격 중에도 이동은 가능하게 처리
         var inputHandler = player.GetInputHandler();
         var movement = player.GetMovement();
-
-        // 속도 감소 없이 이동
-        movement.Move(inputHandler.MoveDirection);
-    }
-
-    private void FireWeapon()
-    {
-        // 총알 생성 및 발사
-        var weaponManager = player.GetComponent<WeaponManager>();
-        if (weaponManager != null)
-        {
-            weaponManager.FireNormalBullet();
-        }
-        else
-        {
-            // 임시 총알 생성 로직 (WeaponManager가 없을 경우)
-            WeaponManager.Instance.FireNormalBullet();
-        }
-
-        // 공격 쿨다운 시작
-        player.StartCoroutine(AttackCooldown());
-    }
-
-    private System.Collections.IEnumerator AttackCooldown()
-    {
-        canAttackAgain = false;
-        yield return new WaitForSeconds(attackCooldown);
-        canAttackAgain = true;
+        movement.Move(inputHandler.MoveDirection); // 속도 감소 없이 이동
     }
 
     public override void Exit()
     {
-        Debug.Log("공격 상태 종료");
+        Debug.Log("이동+공격 상태 종료");
     }
 
     // 연속 공격 가능 여부 체크
@@ -95,4 +68,4 @@ public class PlayerAttackingState : PlayerStateBase
     {
         return canAttackAgain;
     }
-}
+} 
