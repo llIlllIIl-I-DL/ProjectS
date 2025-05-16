@@ -2,7 +2,7 @@ using UnityEngine;
 namespace BossFSM
 {
 
-    public class Boss : MonoBehaviour, IDamageable
+    public class Boss : MonoBehaviour, IDamageable, IDebuffable
     {
         public Animator Animator { get; private set; }
         private BossStateMachine stateMachine;
@@ -10,8 +10,12 @@ namespace BossFSM
         private Rigidbody2D rb;
         public Rigidbody2D Rb => rb; // Rigidbody2D를 외부에서 접근할 수 있도록 공개합니다.
         [Header("이동 속도")]
-        [SerializeField] private float moveSpeed = 2f; // 보스의 이동 속도  
-        public float MoveSpeed => moveSpeed;
+        [SerializeField] private float moveSpeed = 2f;
+        public float MoveSpeed
+        {
+            get => moveSpeed;
+            set => moveSpeed = value;
+        }
         [Header("공격 범위")]
         [SerializeField] private float attackRange = 1f; // 보스의 공격 범위  
         public float AttackRange => attackRange;
@@ -22,14 +26,22 @@ namespace BossFSM
         [SerializeField] private float attackCooldown = 1f; // 공격 쿨타임  
         public float AttackCooldown => attackCooldown;
         [Header("방어력")]
-        [SerializeField] private float defence = 0f; // 보스의 방어력  
-        public float Defence => defence;
+        [SerializeField] private float defence = 0f;
+        public float Defence
+        {
+            get => defence;
+            set => defence = value;
+        }
         [Header("최대 체력")]
-        [SerializeField] private float maxHealth = 100;
-        public float MaxHealth => maxHealth;
+        [SerializeField] private float maxHP = 100;
+        public float MaxHP => maxHP;
         [Header("현재 체력")]
-        [SerializeField] private float currentHealth;
-        public float CurrentHealth => currentHealth;
+        [SerializeField] private float currentHP;
+        public float CurrentHP
+        {
+            get => currentHP;
+            set => currentHP = value;
+        }
         [Header("점프 지속 시간")]
         [SerializeField] private float jumpDuration = 0.5f; // 점프 지속 시간
         public float JumpDuration => jumpDuration;
@@ -58,7 +70,7 @@ namespace BossFSM
             Animator = GetComponentInChildren<Animator>();
             stateMachine = GetComponent<BossStateMachine>();
             rb = GetComponent<Rigidbody2D>();
-            currentHealth = MaxHealth;
+            CurrentHP = MaxHP;
             spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         }
 
@@ -68,6 +80,7 @@ namespace BossFSM
             currentState = new BossIdleState(stateMachine, this); // Initialize currentState  
             stateMachine.ChangeState(currentState);
         }
+
 
         public void TakeDamage(float damage)
         {
@@ -83,19 +96,19 @@ namespace BossFSM
             {
                 // 방어력이 피해를 완전히 상쇄한 경우  
                 // 최소 데미지 1로 설정  
-                currentHealth -= 1;
+                CurrentHP -= 1;
                 return;
             }
             else if (damage - Defence < 0)
             {
                 // 방어력이 피해를 일부 상쇄한 경우  
-                currentHealth -= 0;
+                CurrentHP -= 0;
             }
             else
             {
-                currentHealth -= damage - Defence;
+                CurrentHP -= damage - Defence;
             }
-            if (currentHealth <= 0)
+            if (CurrentHP <= 0)
             {
                 Die();
             }

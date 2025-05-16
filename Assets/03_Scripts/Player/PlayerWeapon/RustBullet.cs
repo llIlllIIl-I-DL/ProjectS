@@ -40,11 +40,10 @@ public class RustBullet : Bullet
         transform.position += new Vector3(0, sway * Time.deltaTime, 0);
     }
 
-    protected override void ApplySpecialEffect(BaseEnemy enemy)
+    protected override void ApplySpecialEffect(IDebuffable target)
     {
-        // rustDebuffDuration, speedReductionPercent, damageOverTimeAmount는 RustBullet의 변수라고 가정
         DebuffManager.Instance.ApplyDebuff(
-            enemy,
+            target,
             DebuffType.Rust,
             rustDebuffDuration,         // duration
             speedReductionPercent,      // intensity (예: 0.3f = 30% 감소)

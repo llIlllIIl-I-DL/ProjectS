@@ -9,7 +9,7 @@ public class NormalBullet : Bullet
         base.Start();
     }
 
-    protected override void ApplySpecialEffect(BaseEnemy enemy)
+    protected override void ApplySpecialEffect(IDebuffable target)
     {
         // 일반 총알은 특별한 효과 없음
     }
