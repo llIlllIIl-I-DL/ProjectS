@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class EnemyBullet : MonoBehaviour
 {
-    private float damage; // private으로 변경
-    public float speed = 10f;
-    public float lifetime = 5f;
-    public bool isPiercing = false;  // 관통 여부
-    
+    [SerializeField] private float damage = 10f;
+    [SerializeField] public float speed = 10f;
+    [SerializeField] public float lifetime = 5f;
+    [SerializeField] public bool isPiercing = false;  // 관통 여부
+
     /// <summary>
     /// 총알 데미지 설정
     /// </summary>

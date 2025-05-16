@@ -12,10 +12,16 @@ public class PlayerHP : MonoBehaviour, IDebuffable
     private readonly float MIN_HP = 0f;
     private readonly float MAX_HP = 100f;
 
+    public event System.Action<float, float> OnHPChanged;
+
     public float CurrentHP
     {
         get => currentHP;
-        set => currentHP = Mathf.Clamp(value, MIN_HP, maxHP);
+        set
+        {
+            currentHP = Mathf.Clamp(value, MIN_HP, maxHP);
+            OnHPChanged?.Invoke(maxHP, currentHP);
+        }
     }
 
     public float MoveSpeed
@@ -70,7 +76,7 @@ public class PlayerHP : MonoBehaviour, IDebuffable
 
     public void TakeDamage(float amount)
     {
-        currentHP = Mathf.Clamp(currentHP - amount, MIN_HP, maxHP);
+        CurrentHP = currentHP - amount;
         if (currentHP <= 0)
         {
             Die();
@@ -79,7 +85,7 @@ public class PlayerHP : MonoBehaviour, IDebuffable
 
     public void Heal(float amount)
     {
-        currentHP = Mathf.Clamp(currentHP + amount, MIN_HP, maxHP);
+        CurrentHP = currentHP + amount;
     }
 
     public void IncreaseMaxHP(float amount)
@@ -87,6 +93,7 @@ public class PlayerHP : MonoBehaviour, IDebuffable
         if (amount <= 0) return;
         maxHP += amount;
         currentHP = Mathf.Clamp(currentHP, MIN_HP, maxHP);
+        OnHPChanged?.Invoke(maxHP, currentHP);
     }
 
     public void DecreaseMaxHP(float amount)
@@ -94,11 +101,13 @@ public class PlayerHP : MonoBehaviour, IDebuffable
         if (amount <= 0) return;
         maxHP = Mathf.Max(MIN_HP, maxHP - amount);
         currentHP = Mathf.Clamp(currentHP, MIN_HP, maxHP);
+        OnHPChanged?.Invoke(maxHP, currentHP);
     }
 
     public void ResetHealth()
     {
         currentHP = maxHP;
+        OnHPChanged?.Invoke(maxHP, currentHP);
     }
 
     private void Die()
