@@ -1,10 +1,7 @@
 using UnityEngine;
 
-public class EnemyBullet : MonoBehaviour
+public class EnemyBullet : Bullet
 {
-    [SerializeField] private float damage = 10f;
-    [SerializeField] public float speed = 10f;
-    [SerializeField] public float lifetime = 5f;
     [SerializeField] public bool isPiercing = false;  // 관통 여부
 
     /// <summary>
@@ -12,13 +9,14 @@ public class EnemyBullet : MonoBehaviour
     /// </summary>
     public void SetDamage(float newDamage)
     {
-        damage = newDamage;
+        Damage = newDamage;
     }
     
-    private void Start()
+    protected override void Start()
     {
-        // 일정 시간 후 자동 파괴
-        Destroy(gameObject, lifetime);
+        base.Start();
+        // 일정 시간 후 자동 파괴 (Bullet의 lifeTime 사용)
+        //Destroy(gameObject, LifeTime);
     }
     
     private void OnTriggerEnter2D(Collider2D other)
@@ -30,18 +28,25 @@ public class EnemyBullet : MonoBehaviour
             IDamageable player = other.GetComponent<IDamageable>();
             if (player != null)
             {
-                player.TakeDamage(damage);
-                Debug.Log($"플레이어에게 {damage} 데미지!");
+                player.TakeDamage(Damage);
+                Debug.Log($"플레이어에게 {Damage} 데미지!");
             }
-            
-            // 관통이 아니면 파괴
+            // 관통이 아니면 풀링 반환
             if (!isPiercing)
-                Destroy(gameObject);
+                ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
         }
         // 벽이나 장애물과 충돌
         else if (((1 << other.gameObject.layer) & (LayerMask.GetMask("Ground", "Wall", "NoCollision"))) != 0)
         {
-            Destroy(gameObject);
+            ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
         }
     }
+
+    protected override void ApplySpecialEffect(IDebuffable target)
+    {
+        // 적 전용 총알은 특수 효과 없음
+    }
+
+    // 필요하다면 EnemyBullet만의 고유 기능 추가
+    // (예: 관통 처리 등)
 }

@@ -89,7 +89,9 @@ public class ObjectPoolingManager : MonoBehaviour
         PoisonBullet,
         WaterBullet,
         FlameBullet,
-        IceBullet
+        IceBullet,
+        EnemyBullet,
+        BossBullet,
         // 필요한 타입 추가
     }
 

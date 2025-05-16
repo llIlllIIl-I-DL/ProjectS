@@ -7,8 +7,9 @@ public class BossMoveState : IEnemyState
     private Transform boss;
     private Rigidbody2D rb;
     private Animator animator;
+    private BossHealth bossHealth;
 
-    private float moveSpeed = 3f;
+    //private float moveSpeed = 3f;
     private float detectionRange = 10f;
     private float attackRange = 5f;
     private bool isDead;
@@ -69,11 +70,11 @@ public class BossMoveState : IEnemyState
         // [수정] 빠른 추적 모드일 경우 이동 속도 증가
         if (BossStateMachine.isFastChasingAfterProjectile)
         {
-            moveSpeed = 3f; // 빠른 속도로 이동
+            bossHealth.MoveSpeed = 3f; // 빠른 속도로 이동
         }
         else
         {
-            moveSpeed = 1f; // 기본 속도
+            bossHealth.MoveSpeed = 1f; // 기본 속도
         }
     }
 
@@ -94,7 +95,7 @@ public class BossMoveState : IEnemyState
         }
 
         Vector2 direction = (player.position - boss.position).normalized;
-        rb.velocity = new Vector2(direction.x * moveSpeed, rb.velocity.y); // x축으로만 이동
+        rb.velocity = new Vector2(direction.x * bossHealth.MoveSpeed, rb.velocity.y); // x축으로만 이동
 
         animator?.SetFloat("MoveSpeed", Mathf.Abs(rb.velocity.x));
     }

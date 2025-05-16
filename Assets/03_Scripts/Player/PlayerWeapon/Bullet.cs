@@ -157,6 +157,8 @@ public abstract class Bullet : MonoBehaviour
     }
     protected virtual void OnTriggerEnter2D(Collider2D other)
     {
+        // 발사자와의 충돌 무시
+        if (other.gameObject == Shooter) return;
         string otherTag = other.tag;
         if (collisionHandlers != null && collisionHandlers.TryGetValue(otherTag, out var handler))
         {
