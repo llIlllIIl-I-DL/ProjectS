@@ -139,7 +139,7 @@ namespace Enemy.States
                         CreateShockwave();
                         
                         // 공격 상태로 전환
-                        enemy.SwitchToAttackState();
+                        enemy.SwitchToState<AttackState>();
                     }
                     break;
             }

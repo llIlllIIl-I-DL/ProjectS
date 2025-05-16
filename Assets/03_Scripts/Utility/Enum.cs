@@ -14,3 +14,14 @@ public enum PlayerStateType
     Climbing,
     Death
 }
+
+public enum EnemyStateType
+{
+    Idle,
+    Patrol,
+    Chase,
+    Attack,
+    Jump,
+    ChargeAttack,
+    SlamAttack
+}
