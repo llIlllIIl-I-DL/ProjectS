@@ -87,6 +87,13 @@ public class PlayerStateManager : MonoBehaviour
         {
             movement.OnDirectionChanged += HandleDirectionChanged;
         }
+
+        var playerHP = GetComponent<PlayerHP>();
+        if (playerHP != null)
+        {
+            playerHP.OnDamaged += HandlePlayerDamaged;
+            playerHP.OnDied += HandlePlayerDied;
+        }
     }
 
     private void OnDisable()
@@ -111,6 +118,13 @@ public class PlayerStateManager : MonoBehaviour
         if (movement != null)
         {
             movement.OnDirectionChanged -= HandleDirectionChanged;
+        }
+
+        var playerHP = GetComponent<PlayerHP>();
+        if (playerHP != null)
+        {
+            playerHP.OnDamaged -= HandlePlayerDamaged;
+            playerHP.OnDied -= HandlePlayerDied;
         }
     }
 
@@ -712,5 +726,17 @@ public class PlayerStateManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    void HandlePlayerDamaged(float amount)
+    {
+        // 피격 상태로 전환
+        ChangeState(PlayerStateType.Hit);
+    }
+
+    void HandlePlayerDied()
+    {
+        // 사망 상태로 전환
+        ChangeState(PlayerStateType.Death);
     }
 }

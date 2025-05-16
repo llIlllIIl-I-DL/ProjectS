@@ -3,6 +3,7 @@ using UnityEngine;
 public class RustEffect : DebuffEffect
 {
     private float originalSpeed;
+    private float originalDefence;
 
     protected override void ApplyInitialEffect()
     {
@@ -10,11 +11,12 @@ public class RustEffect : DebuffEffect
 
         // 원래 속도 저장
         originalSpeed = targetDebuffable.MoveSpeed;
+        originalDefence = targetDebuffable.Defence;
 
         // 속도 감소 적용 (intensity는 0.0-1.0 사이의 값, 감소율을 나타냄)
         targetDebuffable.MoveSpeed = originalSpeed * (1f - intensity);
         // 방어력 감소 적용
-        targetDebuffable.Defence = targetDebuffable.Defence * (1f - intensity);
+        targetDebuffable.Defence = originalDefence * (1f - intensity);
 
         // 시각적 효과 적용 (색상 변경 등)
         ApplyVisualEffect(true);
@@ -44,9 +46,8 @@ public class RustEffect : DebuffEffect
         if (targetDebuffable != null)
         {
             targetDebuffable.MoveSpeed = originalSpeed;
+            targetDebuffable.Defence = originalDefence;
             ApplyVisualEffect(false);
-            // 방어력 복구
-            targetDebuffable.Defence = targetDebuffable.Defence / (1f - intensity);
         }
     }
 

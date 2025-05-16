@@ -13,6 +13,8 @@ public class PlayerHP : MonoBehaviour, IDebuffable
     private readonly float MAX_HP = 100f;
 
     public event System.Action<float, float> OnHPChanged;
+    public event System.Action<float> OnDamaged;
+    public event System.Action OnDied;
 
     public float CurrentHP
     {
@@ -76,7 +78,14 @@ public class PlayerHP : MonoBehaviour, IDebuffable
 
     public void TakeDamage(float amount)
     {
+        if (currentHP <= 0) return;
+
+        float prevHP = currentHP;
         CurrentHP = currentHP - amount;
+
+        if (CurrentHP < prevHP)
+            OnDamaged?.Invoke(amount);
+
         if (currentHP <= 0)
         {
             Die();
@@ -112,7 +121,7 @@ public class PlayerHP : MonoBehaviour, IDebuffable
 
     private void Die()
     {
-        // 사망 처리(이벤트, 상태 전환 등은 PlayerStateManager 등에서 처리)
         Debug.Log("플레이어가 사망했습니다.");
+        OnDied?.Invoke();
     }
 }
