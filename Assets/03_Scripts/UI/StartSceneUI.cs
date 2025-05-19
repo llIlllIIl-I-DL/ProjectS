@@ -39,9 +39,9 @@ public class StartSceneUI : MonoBehaviour
 
     public void SelectDifficulty()
     {
-        easy.onClick.AddListener(() => SceneManager.LoadScene("TempMainScene", LoadSceneMode.Single));
-        normal.onClick.AddListener(() => SceneManager.LoadScene("TempMainScene", LoadSceneMode.Single));
-        hard.onClick.AddListener(() => SceneManager.LoadScene("TempMainScene", LoadSceneMode.Single));
+        easy.onClick.AddListener(() => SceneManager.LoadScene("MainScene", LoadSceneMode.Single));
+        normal.onClick.AddListener(() => SceneManager.LoadScene("MainScene", LoadSceneMode.Single));
+        hard.onClick.AddListener(() => SceneManager.LoadScene("MainScene", LoadSceneMode.Single));
     }
 
 
