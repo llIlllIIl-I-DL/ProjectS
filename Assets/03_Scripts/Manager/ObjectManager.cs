@@ -205,6 +205,18 @@ public class ObjectManager : Singleton<ObjectManager>
                             break;
                     }
                 }
+
+                
+                if (targetObject is NPC npc)
+                {
+                    switch (group.actionType.ToLower())
+                    {
+                        case "talk":
+                            npc.TalkToNPC();
+                            break;
+                    }
+                }
+                
             }
         }
     }

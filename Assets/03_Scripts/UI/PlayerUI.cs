@@ -66,6 +66,8 @@ public class PlayerUI : MonoBehaviour
 
 
     private Player player;
+    private BoxCollider2D playercollider;
+
     private PlayerHP playerHP;
     private TypeItemSlotList typeItemSlotList;
 
@@ -75,6 +77,7 @@ public class PlayerUI : MonoBehaviour
     {
         player = FindObjectOfType<Player>();
         playerHP = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHP>();
+        playercollider = GameObject.FindGameObjectWithTag("Player").GetComponent<BoxCollider2D>();
 
         float maxHP = playerHP.MaxHP;
         float currentHP = playerHP.CurrentHP;
@@ -361,6 +364,9 @@ public class PlayerUI : MonoBehaviour
             ToStartMenu(_gameOverWindow);
         }
     }
+
+
+
     public void ToStartMenu(GameObject _gameOverWindow) //스타트 씬으로 이동!!
     {
         SceneManager.LoadScene("TempStartScene", LoadSceneMode.Single);

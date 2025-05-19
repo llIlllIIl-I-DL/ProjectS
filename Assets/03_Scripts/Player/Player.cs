@@ -24,6 +24,7 @@ public class Player : MonoBehaviour
     private PlayerHP playerHP;
 
     public int utilityPoint;
+    public bool isNPCCollision = false;
 
 
     [HideInInspector] public float CurrentMoveSpeed { get; private set; } //현재 이동 속도
@@ -173,6 +174,25 @@ public class Player : MonoBehaviour
             playerHP = gameObject.AddComponent<PlayerHP>();
     }
 
+    /*
+    public void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("NPC"))
+        {
+            isNPCCollision = true;
+            Debug.Log("저는 NPC입니다");
+        }
+    }
+
+    public void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("NPC"))
+        {
+            isNPCCollision = false;
+            Debug.Log("어디가세요??");
+        }
+    }
+    */
 
 
 

@@ -16,6 +16,7 @@ TagManager:
   - Boss
   - PlayerAttack
   - Wall
+  - NPC
   layers:
   - Default
   - TransparentFX

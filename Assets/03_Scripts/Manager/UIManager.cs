@@ -10,6 +10,7 @@ public class UIManager : Singleton<UIManager> //조금 리팩토링 필요!!
 
     public List<GameObject> allUIPages = new List<GameObject>();
 
+    NPCInteract npcInteract;
     InputUI inputUI;
     Player player;
 
@@ -20,7 +21,18 @@ public class UIManager : Singleton<UIManager> //조금 리팩토링 필요!!
         inputUI = FindObjectOfType<InputUI>();
         player = FindObjectOfType<Player>();
 
+        npcInteract = GetComponent<NPCInteract>();
+
         utilityItemList.GetUtility(player); //플레이어의 특성 15개 아이템 데이터를 담아두는 리스트
+    }
+
+    public void NPCTalkInteraction(Sprite faceIcon)
+    {
+        npcInteract.ShowTalkBox(faceIcon);
+    }
+    public void ClosedNPCTalkInteraction(Sprite faceIcon)
+    {
+        npcInteract.ClosedShowTalkBox(faceIcon);
     }
 
     public void CloseAllPage() //모든 UI 창은 뒤로가기 버튼 뿐만 아니라 ESC를 눌렀을 때에도 false가 됨
