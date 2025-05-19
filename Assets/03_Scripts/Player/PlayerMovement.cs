@@ -5,10 +5,11 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private PlayerSettings settings;
+    private Rigidbody2D rb;
+    private PlayerHP stats; // PlayerStats로 이름 변경 예정
     //싱글톤 선언
     public static PlayerMovement Instance { get; private set; }
 
-    private Rigidbody2D rb;
     private int facingDirection = 1;
 
     // 상태 플래그
@@ -40,6 +41,7 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        stats = GetComponent<PlayerHP>(); // PlayerStats로 변경 예정
         stateManager = GetComponent<PlayerStateManager>();
         
         // 마찰력 자료 확인
@@ -90,7 +92,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // 목표 속도 (스프린트 상태 반영, 단 앉기 상태에서는 스프린트 불가)
-        float currentMoveSpeed = settings.moveSpeed;
+        float currentMoveSpeed = stats != null ? stats.MoveSpeed : settings.moveSpeed;
         if ((sprint || isSprinting) && !isCrouching)
         {
             currentMoveSpeed += settings.sprintMultiplier;
@@ -228,16 +230,9 @@ public class PlayerMovement : MonoBehaviour
 
     public void Jump(float force)
     {
-        // 수평 속도 제한
-        float currentXVelocity = rb.velocity.x;
-        if (Mathf.Abs(currentXVelocity) > settings.moveSpeed * 1.5f)
-        {
-            currentXVelocity = Mathf.Sign(currentXVelocity) * settings.moveSpeed * 1.5f;
-        }
-        rb.velocity = new Vector2(currentXVelocity, 0);
-
-        // 수직 속도 설정
-        rb.velocity = new Vector2(rb.velocity.x, force);
+        float jumpForce = force;
+        // 필요하다면 stats에서 점프력 등도 받아올 수 있음
+        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
     }
 
     public void JumpCut()
@@ -382,7 +377,7 @@ public class PlayerMovement : MonoBehaviour
     public float GetCurrentMoveSpeed()
     {
         // settings.moveSpeed에 스프린트 상태를 고려한 값을 반환
-        float currentSpeed = settings.moveSpeed;
+        float currentSpeed = stats != null ? stats.MoveSpeed : settings.moveSpeed;
         if (isSprinting)
         {
             currentSpeed *= settings.sprintMultiplier;

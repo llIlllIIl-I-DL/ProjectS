@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// 모든 적 캐릭터의 기본 클래스
 /// </summary>
-public abstract class BaseEnemy : DestructibleEntity
+public abstract class BaseEnemy : DestructibleEntity, IDebuffable
 {
     #region Variables
 
@@ -380,7 +380,6 @@ public abstract class BaseEnemy : DestructibleEntity
 
     public float MoveSpeed {get => moveSpeed; set => moveSpeed = value;}
 
-
     #endregion
 
     #region Effects
@@ -407,8 +406,6 @@ public abstract class BaseEnemy : DestructibleEntity
             Destroy(effect, 1f); // 1초 후에 효과 삭제
         }
     }
-
-    
 
     #endregion
 
@@ -464,5 +461,12 @@ public abstract class BaseEnemy : DestructibleEntity
         base.TakeDamage(finalDamage);
         
         Debug.Log($"{gameObject.name}이(가) {damage} 데미지를 받았고, 방어력 {defence}로 인해 {finalDamage} 데미지만큼만 피해를 입었습니다.");
+    }
+
+    // IDebuffable 구현
+    public float CurrentHP
+    {
+        get => currentHealth;
+        set => currentHealth = Mathf.Clamp(value, 0, maxHealth);
     }
 }

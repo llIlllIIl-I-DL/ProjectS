@@ -32,6 +32,8 @@ public class PlayerStateManager : MonoBehaviour
     private bool isCrouching;
     private bool isClimbing;
 
+    private int lastWallDirection = 1; // 벽 방향 저장용
+
     
     // 프로퍼티
     public PlayerStateType CurrentState => currentStateType;
@@ -85,6 +87,13 @@ public class PlayerStateManager : MonoBehaviour
         {
             movement.OnDirectionChanged += HandleDirectionChanged;
         }
+
+        var playerHP = GetComponent<PlayerHP>();
+        if (playerHP != null)
+        {
+            playerHP.OnDamaged += HandlePlayerDamaged;
+            playerHP.OnDied += HandlePlayerDied;
+        }
     }
 
     private void OnDisable()
@@ -110,6 +119,13 @@ public class PlayerStateManager : MonoBehaviour
         {
             movement.OnDirectionChanged -= HandleDirectionChanged;
         }
+
+        var playerHP = GetComponent<PlayerHP>();
+        if (playerHP != null)
+        {
+            playerHP.OnDamaged -= HandlePlayerDamaged;
+            playerHP.OnDied -= HandlePlayerDied;
+        }
     }
 
     private void InitializeStates()
@@ -124,6 +140,7 @@ public class PlayerStateManager : MonoBehaviour
         states.Add(PlayerStateType.WallSliding, new PlayerWallSlidingState(this));
         states.Add(PlayerStateType.Dashing, new PlayerDashingState(this));
         states.Add(PlayerStateType.Attacking, new PlayerAttackingState(this));
+        states.Add(PlayerStateType.MoveAttacking, new PlayerMoveAttackingState(this));
         states.Add(PlayerStateType.Hit, new PlayerHitState(this));
         states.Add(PlayerStateType.Crouching, new PlayerCrouchingState(this));
         states.Add(PlayerStateType.Climbing, new PlayerClimbingState(this));
@@ -152,6 +169,12 @@ public class PlayerStateManager : MonoBehaviour
 
         // 애니메이션 업데이트
         UpdateAnimation();
+
+        // 공격 입력에 따라 IsAttacking 파라미터 업데이트
+        if (playerAnimator != null && playerAnimator.GetAnimator() != null)
+        {
+            playerAnimator.GetAnimator().SetBool("IsAttacking", inputHandler.IsAttackPressed);
+        }
     }
 
     private void FixedUpdate()
@@ -288,6 +311,9 @@ public class PlayerStateManager : MonoBehaviour
         {
             ChangeState(PlayerStateType.Falling);
         }
+
+        // 벽 슬라이딩에서 벗어날 때 WeaponManager에 벽 슬라이딩 상태와 벽 방향 전달
+        WeaponManager.Instance.SetWallSlideInfo(false, 0);
     }
 
     public void ChangeState(PlayerStateType newState)
@@ -315,6 +341,18 @@ public class PlayerStateManager : MonoBehaviour
         // 상태 변경 이벤트 발생
         OnStateChanged?.Invoke(newState);
         Debug.Log($"상태 변경: {newState}");
+
+        // 벽 슬라이딩 진입 시 WeaponManager에 벽 슬라이딩 상태와 벽 방향 전달
+        if (newState == PlayerStateType.WallSliding)
+        {
+            lastWallDirection = collisionDetector.WallDirection;
+            WeaponManager.Instance.SetWallSlideInfo(true, lastWallDirection);
+        }
+        // 벽 슬라이딩에서 벗어날 때
+        else if (currentStateType == PlayerStateType.WallSliding)
+        {
+            WeaponManager.Instance.SetWallSlideInfo(false, 0);
+        }
     }
 
     private void HandleRespawn()
@@ -431,8 +469,13 @@ public class PlayerStateManager : MonoBehaviour
         // 대시 중에는 공격 불가
         if (isDashing) return;
         
+        // 이동+공격 입력 시 MoveAttacking 상태로 전환
+        if (inputHandler.IsMoving() && inputHandler.IsAttackPressed)
+        {
+            ChangeState(PlayerStateType.MoveAttacking);
+        }
         // 현재 공격 중이라면, 연속 공격 가능한지 체크
-        if (currentStateType == PlayerStateType.Attacking)
+        else if (currentStateType == PlayerStateType.Attacking)
         {
             PlayerAttackingState attackState = states[PlayerStateType.Attacking] as PlayerAttackingState;
             if (attackState != null && attackState.CanAttack())
@@ -683,5 +726,17 @@ public class PlayerStateManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    void HandlePlayerDamaged(float amount)
+    {
+        // 피격 상태로 전환
+        ChangeState(PlayerStateType.Hit);
+    }
+
+    void HandlePlayerDied()
+    {
+        // 사망 상태로 전환
+        ChangeState(PlayerStateType.Death);
     }
 }
