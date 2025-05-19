@@ -7,12 +7,12 @@ public class RustEffect : DebuffEffect
     protected override void ApplyInitialEffect()
     {
         // 원래 속도 저장
-        originalSpeed = targetEnemy.GetMoveSpeed();
+        originalSpeed = targetEnemy.MoveSpeed;
 
         // 속도 감소 적용 (intensity는 0.0-1.0 사이의 값, 감소율을 나타냄)
-        targetEnemy.SetMoveSpeed(originalSpeed * (1f - intensity));
+        targetEnemy.MoveSpeed = originalSpeed * (1f - intensity);
         // 방어력 감소 적용
-        targetEnemy.SetDefence(targetEnemy.GetDefence() * (1f - intensity));
+        targetEnemy.Defence = targetEnemy.Defence * (1f - intensity);
 
         // 시각적 효과 적용 (색상 변경 등)
         ApplyVisualEffect(true);
@@ -42,10 +42,10 @@ public class RustEffect : DebuffEffect
         // 원래 속도로 복구
         if (targetEnemy != null)
         {
-            targetEnemy.SetMoveSpeed(originalSpeed);
+            targetEnemy.MoveSpeed = originalSpeed;
             ApplyVisualEffect(false);
             // 방어력 복구
-            targetEnemy.SetDefence(targetEnemy.GetDefence() / (1f - intensity));
+            targetEnemy.Defence = targetEnemy.Defence / (1f - intensity);
 
         }
     }

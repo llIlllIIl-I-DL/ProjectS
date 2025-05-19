@@ -353,12 +353,12 @@ public abstract class BaseEnemy : DestructibleEntity
     /// <summary>
     /// 마지막으로 알려진 플레이어 위치 반환
     /// </summary>
-    public Vector2 GetLastKnownPlayerPosition() => lastKnownPlayerPosition;
+    public Vector2 LastKnownPlayerPosition => lastKnownPlayerPosition;
 
     /// <summary>
     /// 현재 플레이어 위치 반환
     /// </summary>
-    public Vector2 GetPlayerPosition() => playerTransform != null ? playerTransform.position : transform.position;
+    public Vector2 PlayerPosition => playerTransform != null ? playerTransform.position : transform.position;
 
     /// <summary>
     /// 플레이어가 공격 범위 내에 있는지 확인
@@ -374,22 +374,11 @@ public abstract class BaseEnemy : DestructibleEntity
     /// <summary>
     /// 에너미 상태이상 여부 확인
     /// 
-    public float GetAttackPower() => attackPower;
-    public void SetAttackPower(float value)
-    {
-        attackPower = value;
-    }
-    public float GetDefence() => defence;
-    public void SetDefence(float value)
-    {
-        defence = value;
-    }
-    public float GetMoveSpeed() => moveSpeed;
-    public void SetMoveSpeed(float speed)
-    {
-        moveSpeed = speed;
-    }
+    public float AttackPower {get => attackPower; set => attackPower = value;}
 
+    public float Defence {get => defence; set => defence = value;}
+
+    public float MoveSpeed {get => moveSpeed; set => moveSpeed = value;}
 
 
     #endregion

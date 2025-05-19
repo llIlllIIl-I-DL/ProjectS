@@ -77,7 +77,7 @@ namespace Enemy.States
             if (canAttack)
             {
                 // 적 방향 설정 (플레이어 방향으로 회전)
-                Vector2 direction = enemy.GetPlayerPosition() - (Vector2)enemy.transform.position;
+                Vector2 direction = enemy.PlayerPosition - (Vector2)enemy.transform.position;
                 enemy.SetFacingDirection(direction);
 
                 // 공격 실행
