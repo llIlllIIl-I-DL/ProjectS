@@ -25,3 +25,10 @@ public enum EnemyStateType
     ChargeAttack,
     SlamAttack
 }
+
+public enum RotationType // ObjectRotatingPlatform에서 사용
+{
+    Center,
+    Left,   
+    Right    
+}
