@@ -76,6 +76,9 @@ public class PlayerUI : MonoBehaviour
         player = FindObjectOfType<Player>();
         playerHP = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHP>();
 
+        // HP 변경 이벤트 구독
+        playerHP.OnHPChanged += OnPlayerHPChanged;
+
         float maxHP = playerHP.MaxHP;
         float currentHP = playerHP.CurrentHP;
 
@@ -104,8 +107,15 @@ public class PlayerUI : MonoBehaviour
         }
 
         UpdatePlayerHPInUItext();
+        SetHealthBar(playerHP.MaxHP, playerHP.CurrentHP);
         // 초기 무기 속성 설정
         UpdateWeaponAttributeUI(InventoryManager.Instance.EquippedWeaponAttribute);
+    }
+
+    private void OnPlayerHPChanged(float maxHP, float currentHP)
+    {
+        SetHealthBar(maxHP, currentHP);
+        UpdatePlayerHPInUItext();
     }
 
     public void Voscuro(Vector3 realPosition, float maxHP, float currentHP)

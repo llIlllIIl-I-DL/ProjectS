@@ -36,6 +36,9 @@ public class WeaponManager : Singleton<WeaponManager>
     private ElementType currentBulletType = ElementType.Normal;
     private PlayerMovement playerMovement;
 
+    private bool isWallSliding = false;
+    private int wallDirection = 1; // -1: 왼쪽, 1: 오른쪽
+
     private void Start()
     {
         InitializeComponents();
@@ -328,9 +331,9 @@ public class WeaponManager : Singleton<WeaponManager>
         {
             bulletScale = normalBulletScale;
         }
-
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
         // BulletFactory를 사용하여 총알 생성
-        GameObject bullet = bulletFactory.CreateBullet(currentBulletType, spawnPosition, Quaternion.identity, isOvercharged);
+        GameObject bullet = bulletFactory.CreateBullet(currentBulletType, spawnPosition, Quaternion.identity,player);
 
         // 총알 크기 설정
         bullet.transform.localScale = bulletScale;
@@ -399,32 +402,26 @@ public class WeaponManager : Singleton<WeaponManager>
             }
         }
 
-        // 총알 소멸 처리
-        Destroy(bullet, bulletLifetime);
+
     }
 
     // 발사 방향 계산
     private Vector2 GetAimDirection()
     {
-        // 플레이어 참조 얻기
+        if (isWallSliding)
+        {
+            // 벽의 반대 방향으로 발사
+            return wallDirection == 1 ? Vector2.left : Vector2.right;
+        }
+        // 기존 로직
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
-            // 스프라이트 방향 확인
             SpriteRenderer spriteRenderer = player.GetComponent<SpriteRenderer>();
             if (spriteRenderer != null)
             {
-                // 스프라이트가 X축으로 플립되었는지 확인
-                if (spriteRenderer.flipX)
-                {
-                    return Vector2.left;
-                }
-                else
-                {
-                    return Vector2.right;
-                }
+                return spriteRenderer.flipX ? Vector2.left : Vector2.right;
             }
-            // 스프라이트 렌더러가 없는 경우 Transform 스케일로 확인
             else if (player.transform.localScale.x < 0)
             {
                 return Vector2.left;
@@ -434,9 +431,6 @@ public class WeaponManager : Singleton<WeaponManager>
                 return Vector2.right;
             }
         }
-
-        // 플레이어가 없는 경우 기본값 반환
-        Debug.LogWarning("플레이어를 찾을 수 없습니다. 기본 방향(오른쪽)으로 발사합니다.");
         return Vector2.right;
     }
 
@@ -491,5 +485,32 @@ public class WeaponManager : Singleton<WeaponManager>
     public ElementType GetBulletType()
     {
         return currentBulletType;
+    }
+
+    // 파이어 포인트 방향 제어 메서드 추가
+    public void SetFirePointDirection(int direction)
+    {
+        if (firePoint != null)
+        {
+            Vector3 scale = firePoint.localScale;
+            scale.x = Mathf.Abs(scale.x) * direction;
+            firePoint.localScale = scale;
+        }
+    }
+
+    public void ResetFirePointDirection()
+    {
+        if (firePoint != null)
+        {
+            Vector3 scale = firePoint.localScale;
+            scale.x = Mathf.Abs(scale.x);
+            firePoint.localScale = scale;
+        }
+    }
+
+    public void SetWallSlideInfo(bool isSliding, int wallDir)
+    {
+        isWallSliding = isSliding;
+        wallDirection = wallDir;
     }
 }

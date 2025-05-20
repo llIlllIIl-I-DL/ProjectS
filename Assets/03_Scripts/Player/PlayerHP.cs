@@ -1,147 +1,127 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerHP : MonoBehaviour, IDamageable
+public class PlayerHP : MonoBehaviour, IDebuffable
 {
     [SerializeField] private float maxHP = 10;
     [SerializeField] private float currentHP;
-    [SerializeField] private float invincibleTime = 0.2f;
-
-    private float lastDamageTime = -999f;
+    [SerializeField] private float moveSpeed;
+    [SerializeField] private float sprintMultiplier;
+    [SerializeField] private float jumpForce;
+    [SerializeField] private float defence = 0f;
 
     private readonly float MIN_HP = 0f;
     private readonly float MAX_HP = 100f;
 
-    private PlayerStateManager playerStateManager;
-    private bool isDead = false;
+    public event System.Action<float, float> OnHPChanged;
+    public event System.Action<float> OnDamaged;
+    public event System.Action OnDied;
 
-    private Player player;
+    public float CurrentHP
+    {
+        get => currentHP;
+        set
+        {
+            currentHP = Mathf.Clamp(value, MIN_HP, maxHP);
+            OnHPChanged?.Invoke(maxHP, currentHP);
+        }
+    }
 
-    public float MaxHP => maxHP;
-    public float CurrentHP => currentHP;
+    public float MoveSpeed
+    {
+        get => moveSpeed;
+        set => moveSpeed = value;
+    }
+
+    public float SprintMultiplier
+    {
+        get => sprintMultiplier;
+        set => sprintMultiplier = value;
+    }
+
+    public float JumpForce
+    {
+        get => jumpForce;
+        set => jumpForce = value;
+    }
+
+    public float Defence
+    {
+        get => defence;
+        set => defence = value;
+    }
+
+    public float MaxHP
+    {
+        get => maxHP;
+        set => maxHP = value;
+    }
 
     private void Awake()
     {
-        // maxHP를 0과 100 사이로 클램프
-        maxHP = Mathf.Clamp(maxHP, MIN_HP, MAX_HP);
-        currentHP = maxHP;
-        playerStateManager = GetComponent<PlayerStateManager>();
-        player = GetComponent<Player>();
+        // PlayerSettings에서 moveSpeed, sprintMultiplier, jumpForce 초기값 받아오기
+        var player = GetComponent<Player>();
+        if (player != null)
+        {
+            var settingsField = player.GetType().GetField("settings", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (settingsField != null)
+            {
+                var settings = settingsField.GetValue(player) as PlayerSettings;
+                if (settings != null)
+                {
+                    moveSpeed = settings.moveSpeed;
+                    sprintMultiplier = settings.sprintMultiplier;
+                    jumpForce = settings.jumpForce;
+                }
+            }
+        }
     }
 
-
-    public void TakeDamage(float damage)
+    public void TakeDamage(float amount)
     {
-        if (UtilityChangedStatController.Instance.isInvincibleDash == true) return;
+        if (currentHP <= 0) return;
 
-        if (Time.time - lastDamageTime < invincibleTime)
-            return;
-        lastDamageTime = Time.time;
+        float prevHP = currentHP;
+        CurrentHP = currentHP - amount;
 
-        currentHP = Mathf.Clamp(currentHP - damage, MIN_HP, maxHP);
-        Debug.Log($"플레이어가 {damage} 데미지를 입었습니다. 현재 HP: {currentHP}");
-
-
-        // 플레이어가 데미지를 입으면 Hit 상태로 변경
-        if (playerStateManager != null)
-        {
-            PlayerUI.Instance.SetHealthBar(maxHP, currentHP);
-            playerStateManager.ChangeState(PlayerStateType.Hit);
-            PlayerUI.Instance.UpdatePlayerHPInUItext();
-        }
+        if (CurrentHP < prevHP)
+            OnDamaged?.Invoke(amount);
 
         if (currentHP <= 0)
         {
             Die();
         }
-
     }
 
     public void Heal(float amount)
     {
-        currentHP = Mathf.Clamp(currentHP + amount, MIN_HP, maxHP);
-        Debug.Log($"플레이어가 {amount}만큼 회복했습니다. 현재 HP: {currentHP}");
+        CurrentHP = currentHP + amount;
     }
 
     public void IncreaseMaxHP(float amount)
     {
-        if (amount <= 0) return; // 0 이하의 값은 무시
-        float previousMaxHP = maxHP; // 이전 최대 HP 저장
-
-        float changedMaxHP = maxHP * (amount / maxHP);
-        float actualIncrease = previousMaxHP - changedMaxHP; // 최대 HP 증가량
-
-        maxHP = previousMaxHP + changedMaxHP;
-
-        // 현재 HP도 최대 HP를 초과하지 않도록 조정
-
-        float previousCurrentHP = currentHP;
-        currentHP = currentHP + changedMaxHP;
-
-        UtilityChangedStatController.Instance.changedMaxHP = changedMaxHP;
-
-        Debug.Log($"최대 HP가 {maxHP - previousMaxHP}만큼 증가했습니다. 새로운 최대 HP: {maxHP}");
+        if (amount <= 0) return;
+        maxHP += amount;
+        currentHP = Mathf.Clamp(currentHP, MIN_HP, maxHP);
+        OnHPChanged?.Invoke(maxHP, currentHP);
     }
 
     public void DecreaseMaxHP(float amount)
     {
-        //maxHP -= changedMaxHP;
-        // currentHP = currentHP - changedMaxHP;
-
-        if (amount <= 0) return; // 0 이하의 값은 무시
-        float previousMaxHP = maxHP; // 이전 최대 HP 저장
-
-        float changedMaxHP = maxHP * (amount / maxHP);
-
-        maxHP = previousMaxHP - changedMaxHP;
-
-        // 현재 HP도 최대 HP를 초과하지 않도록 조정
-
-        float previousCurrentHP = currentHP;
-        currentHP = currentHP - changedMaxHP;
-
-        UtilityChangedStatController.Instance.changedMaxHP = changedMaxHP;
-
-        Debug.Log($"최대 HP가 {previousMaxHP - maxHP}만큼 감소했습니다. 새로운 최대 HP: {maxHP}");
+        if (amount <= 0) return;
+        maxHP = Mathf.Max(MIN_HP, maxHP - amount);
+        currentHP = Mathf.Clamp(currentHP, MIN_HP, maxHP);
+        OnHPChanged?.Invoke(maxHP, currentHP);
     }
 
-
-    // 체력 초기화 (부활 시 사용)
     public void ResetHealth()
     {
         currentHP = maxHP;
-        isDead = false; // 사망 상태 초기화
-        Debug.Log($"플레이어 체력 초기화: {currentHP}/{maxHP}");
-
-        // 체력바 UI 업데이트
-        PlayerUI.Instance?.SetHealthBar(maxHP, currentHP);
+        OnHPChanged?.Invoke(maxHP, currentHP);
     }
 
     private void Die()
     {
-        // 이미 사망 상태면 중복 처리 방지
-        if (isDead) return;
-
-        isDead = true;
         Debug.Log("플레이어가 사망했습니다.");
-
-        // 사망 상태로 전환
-        if (playerStateManager != null)
-        {
-            playerStateManager.ChangeState(PlayerStateType.Death);
-        }
-
-        // GameManager에 사망 알림
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.PlayerDied(gameObject);
-        }
-    }
-
-    // 최대 체력을 반환하는 메서드
-    public float GetMaxHealth()
-    {
-        return maxHP;
+        OnDied?.Invoke();
     }
 }

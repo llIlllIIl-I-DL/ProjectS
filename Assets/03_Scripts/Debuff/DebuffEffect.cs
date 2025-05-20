@@ -2,7 +2,7 @@ using UnityEngine;
 
 public abstract class DebuffEffect : MonoBehaviour
 {
-    protected BaseEnemy targetEnemy;
+    protected IDebuffable targetDebuffable;
     protected float duration;
     protected float intensity;
     protected float tickDamage;
@@ -10,16 +10,16 @@ public abstract class DebuffEffect : MonoBehaviour
     protected DebuffType debuffType;
     protected GameObject visualEffect;
 
-    private DebuffData debuffData;
+    private DebuffDataSO debuffData;
 
     public DebuffType DebuffType => debuffType;
 
     protected virtual void Awake()
     {
-        targetEnemy = GetComponent<BaseEnemy>();
+        targetDebuffable = GetComponent<IDebuffable>();
     }
 
-    public virtual void Initialize(DebuffType type, float duration, float intensity, float tickDamage, DebuffData data)
+    public virtual void Initialize(DebuffType type, float duration, float intensity, float tickDamage, DebuffDataSO data)
     {
         this.debuffType = type;
         this.duration = duration;
@@ -44,7 +44,7 @@ public abstract class DebuffEffect : MonoBehaviour
 
     protected virtual void Update()
     {
-        if (targetEnemy == null)
+        if (targetDebuffable == null)
         {
             Destroy(this);
             return;
@@ -98,7 +98,7 @@ public abstract class DebuffEffect : MonoBehaviour
     protected virtual void OnDestroy()
     {
         // 디버프 효과가 제거될 때 정리 작업
-        if (targetEnemy != null)
+        if (targetDebuffable != null)
         {
             RemoveEffect();
         }

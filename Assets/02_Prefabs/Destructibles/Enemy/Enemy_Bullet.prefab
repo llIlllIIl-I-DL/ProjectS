@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 3546217566183659771}
   - component: {fileID: 3312261300980514314}
   - component: {fileID: 5636726809772335327}
-  - component: {fileID: 7409811013188975370}
   - component: {fileID: 966385195440241855}
+  - component: {fileID: 171064652714286781}
   m_Layer: 14
   m_Name: Enemy_Bullet
   m_TagString: Enemy
@@ -102,7 +102,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -114,21 +114,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &7409811013188975370
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4363198470078929428}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8177935134fcc4c4aa421c7ada905a90, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 10
-  lifetime: 5
-  isPiercing: 0
 --- !u!61 &966385195440241855
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -174,3 +159,27 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.107947, y: 0.36523342}
   m_EdgeRadius: 0
+--- !u!114 &171064652714286781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4363198470078929428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8177935134fcc4c4aa421c7ada905a90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletSpeed: 4
+  damage: 10
+  knockbackForce: 5
+  maxAmmo: 30
+  currentAmmo: 0
+  bulletType: 0
+  targetTags:
+  - tag: Player
+  isOvercharged: 0
+  isReloading: 0
+  lifeTime: 3
+  isPiercing: 1

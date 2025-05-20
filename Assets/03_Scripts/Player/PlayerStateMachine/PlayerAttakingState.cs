@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerAttackingState : PlayerStateBase
 {
     private float attackStartTime;
-    private float attackDuration = 0.25f; // 공격 모션 지속 시간
+    private float attackDuration = 1f; // 공격 모션 지속 시간
     private float attackCooldown = 0.2f;  // 공격 쿨다운
     private bool canAttackAgain = true;
 
@@ -28,12 +28,18 @@ public class PlayerAttackingState : PlayerStateBase
 
     public override void Update()
     {
+        // 이동 입력에 따라 AttakingMove 파라미터 업데이트
+        var inputHandler = player.GetInputHandler();
+        var playerAnimator = player.GetComponent<PlayerAnimator>();
+        if (playerAnimator != null)
+        {
+            playerAnimator.GetAnimator()?.SetFloat("AttakingMove", inputHandler.MoveDirection.magnitude);
+        }
         // 공격 모션 종료 체크
         if (Time.time >= attackStartTime + attackDuration)
         {
             // 공격 끝난 후 상태 전환
             var collisionDetector = player.GetCollisionDetector();
-            var inputHandler = player.GetInputHandler();
 
             if (!collisionDetector.IsGrounded)
             {
@@ -56,8 +62,8 @@ public class PlayerAttackingState : PlayerStateBase
         var inputHandler = player.GetInputHandler();
         var movement = player.GetMovement();
 
-        // 공격 중 속도 감소 (선택적)
-        movement.Move(inputHandler.MoveDirection * 0.5f);
+        // 속도 감소 없이 이동
+        movement.Move(inputHandler.MoveDirection);
     }
 
     private void FireWeapon()

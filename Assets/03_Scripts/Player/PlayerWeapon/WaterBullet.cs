@@ -12,10 +12,10 @@ public class WaterBullet : Bullet
         base.Start();
     }
 
-    protected override void ApplySpecialEffect(BaseEnemy enemy)
+    protected override void ApplySpecialEffect(IDebuffable target)
     {
         // 적의 이동속도를 감소시킴 (구현 필요)
-        Debug.Log($"적 {enemy.name}의 이동속도가 {slowPercent}% 감소됨, 지속시간: {slowDuration}초");
+        Debug.Log($"적 {target}의 이동속도가 {slowPercent}% 감소됨, 지속시간: {slowDuration}초");
         // 여기서 실제 슬로우 적용 로직 구현 필요
     }
 } 

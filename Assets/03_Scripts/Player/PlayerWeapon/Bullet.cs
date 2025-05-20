@@ -35,7 +35,8 @@ public abstract class Bullet : MonoBehaviour
     private float playerIgnoreTimer = 0f;
     private bool canHitPlayer = true;// 피격 가능여부 체크
     private bool ignoreCollisionReset = false; // 중복 해제 방지
-
+    public GameObject Shooter { get; set; }
+    // 축약가능하면 줄이기
     public bool IsReloading
     {
         get => isReloading;
@@ -77,19 +78,32 @@ public abstract class Bullet : MonoBehaviour
         get => currentAmmo;
         set => currentAmmo = value;
     }
+    public float LifeTime
+    {
+        get => lifeTime;
+        set => lifeTime = value;
+    }
 
     protected bool hasHitEnemy = false;
     protected GameObject playerObject; // 플레이어 게임오브젝트 참조
 
     private Dictionary<string, Action<Collider2D>> collisionHandlers;
 
+    [Header("총알 지속 시간")]
+    [SerializeField] protected float lifeTime = 3f; // 총알의 기본 지속 시간(초)
+    protected float lifeTimer = 0f;
+
+    protected Rigidbody2D rb; // Rigidbody2D 캐싱
+
     // 총알 특수 효과 추상 메서드
-    protected abstract void ApplySpecialEffect(BaseEnemy enemy);
+    protected abstract void ApplySpecialEffect(IDebuffable target);
 
     protected virtual void Awake()
     {
         // 태그별 충돌 처리 등록
         collisionHandlers = new Dictionary<string, Action<Collider2D>>();
+
+        rb = GetComponent<Rigidbody2D>(); // Rigidbody2D 캐싱
 
         foreach (var tagSelector in targetTags) // 충돌 가능 목록
         {
@@ -102,13 +116,13 @@ public abstract class Bullet : MonoBehaviour
                     collisionHandlers["Destructible"] = HandleDestructibleCollision;
                     break;
                 case "Boss":
-                    collisionHandlers["Boss"] = HandleBossCollision;
+                    collisionHandlers["Boss"] = HandleDamageableCollision;
                     break;
                 case "Enemy":
-                    collisionHandlers["Enemy"] = HandleEnemyCollision;
+                    collisionHandlers["Enemy"] = HandleDamageableCollision;
                     break;
                 case "Player":
-                    collisionHandlers["Player"] = HandlePlayerCollision;
+                    collisionHandlers["Player"] = HandleDamageableCollision;
                     break;
                 // 필요하다면 추가
             }
@@ -126,49 +140,29 @@ public abstract class Bullet : MonoBehaviour
     // 업데이트 가상 메서드 추가
     protected virtual void Update()
     {
-        //
+        // 기존 업데이트 로직
+        // 총알의 생존 시간 관리
+        lifeTimer += Time.deltaTime;
+        if (lifeTimer >= lifeTime)
+        {
+            Destroy(gameObject);
+        }
     }
     // 총알 상태 초기화 (풀에서 가져올 때 호출)
-    public void ResetBullet()
+    public virtual void ResetBullet()
     {
         // 필요한 초기화 작업
         // 예: 충돌 카운터 리셋, 효과 초기화 등
+        lifeTimer = 0f; // 타이머 초기화
     }
     protected virtual void OnTriggerEnter2D(Collider2D other)
     {
-
-        // targetTags에 포함된 태그만 충돌 처리
+        // 발사자와의 충돌 무시
+        if (other.gameObject == Shooter) return;
         string otherTag = other.tag;
-        bool isTargetTag = false;
-        foreach (var t in targetTags)
+        if (collisionHandlers != null && collisionHandlers.TryGetValue(otherTag, out var handler))
         {
-            if (t.tag == otherTag)
-            {
-                isTargetTag = true;
-                break;
-            }
-        }
-
-        if (isTargetTag)
-        {
-            // targetTags에 포함된 태그만 딕셔너리에서 처리
-            if (collisionHandlers != null && collisionHandlers.TryGetValue(otherTag, out var handler))
-            {
-                handler(other);
-            }
-            else
-            {
-                // targetTags에 포함되어 있지만 별도 핸들러가 없는 경우(예: 벽 등)
-                if (((1 << other.gameObject.layer) & (LayerMask.GetMask("Ground", "Wall"))) != 0)
-                {
-                    Debug.Log("벽과 충돌하여 총알 제거됨: " + other.gameObject.name);
-                    ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
-                }
-                else
-                {
-                    Debug.Log("타겟 태그이지만 별도 핸들러 없음: " + other.gameObject.name + ", 태그: " + other.tag + ", 레이어: " + LayerMask.LayerToName(other.gameObject.layer));
-                }
-            }
+            handler(other);
         }
         // targetTags에 없는 태그는 무시
 
@@ -245,47 +239,23 @@ public abstract class Bullet : MonoBehaviour
         }
     }
 
-    private void HandleBossCollision(Collider2D other) // 보스 충돌 처리
+    private void HandleDamageableCollision(Collider2D other)
     {
-        BossHealth boss = other.GetComponent<BossHealth>();
-        Boss boss2 = other.GetComponent<Boss>();
-        if (boss != null)
+        IDamageable damageable = other.GetComponent<IDamageable>();
+        if (damageable != null)
         {
-            boss.TakeDamage(damage);
-            ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
-        }
-        if (boss2 != null)
-        {
-            boss2.TakeDamage(damage);
-            ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
-        }
-    }
+            damageable.TakeDamage(damage);
 
-    private void HandleEnemyCollision(Collider2D other) // 에너미 충돌 처리
-    {
-        BaseEnemy enemy = other.GetComponent<BaseEnemy>();
-        if (enemy != null)
-        {
-            enemy.TakeDamage(damage);
-            hasHitEnemy = true;
+            // IDebuffable도 구현했다면 디버프 효과도 적용
+            if (damageable is IDebuffable debuffable)
+            {
+                ApplySpecialEffect(debuffable);
+            }
 
-            Vector2 hitPoint = CalculateHitPoint(other);
-            ApplySpecialEffect(enemy);
-            Vector2 knockbackDirection = (other.transform.position - transform.position).normalized;
-            enemy.ApplyKnockback(knockbackDirection, knockbackForce);
-            enemy.PlayHitEffect(hitPoint);
+            // 필요하다면 넉백, 이펙트 등도 캐스팅해서 처리
+            // (debuffable as BaseEnemy)?.ApplyKnockback(...);
         }
-        ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
-    }
 
-    private void HandlePlayerCollision(Collider2D other)
-    {
-        PlayerHP playerHP = other.GetComponent<PlayerHP>();
-        if (playerHP != null)
-        {
-            playerHP.TakeDamage(damage);
-            Debug.Log($"플레이어가 총알에 맞아 {damage} 데미지를 입었습니다!");
-        }
         ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
     }
 

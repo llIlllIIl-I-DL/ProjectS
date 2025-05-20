@@ -12,13 +12,13 @@ public class IceBullet : Bullet
         base.Start();
     }
 
-    protected override void ApplySpecialEffect(BaseEnemy enemy)
+    protected override void ApplySpecialEffect(IDebuffable target)
     {
         // 적을 얼릴 확률 계산
         if (Random.Range(0f, 100f) <= freezeChance)
         {
             // 적을 얼림 (구현 필요)
-            Debug.Log($"적 {enemy.name}이(가) {freezeDuration}초 동안 얼음에 얼었습니다!");
+            Debug.Log($"적 {target}이(가) {freezeDuration}초 동안 얼음에 얼었습니다!");
             // 여기서 실제 동결 효과 적용 로직 구현 필요
         }
     }

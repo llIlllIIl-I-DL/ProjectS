@@ -8,6 +8,7 @@ public enum PlayerStateType
     WallSliding,
     Dashing,
     Attacking,
+    MoveAttacking,
     Hit,
     Crouching,
     CrouchWalking,

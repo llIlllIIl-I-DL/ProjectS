@@ -2,10 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BossHealth : MonoBehaviour, IDamageable
+public class BossHealth : MonoBehaviour, IDebuffable
 {
     [SerializeField] public float maxHP;
     [SerializeField]  private float currentHP;
+    [SerializeField] private float defence;
+    [SerializeField] private float moveSpeed;
+
+    public float Defence
+    {
+        get => defence;
+        set => defence = value;
+    }
+    public float CurrentHP
+    {
+        get => currentHP;
+        set => currentHP = value;
+    }
+    public float MoveSpeed
+    {
+        get => moveSpeed;
+        set => moveSpeed = value;
+    }
+
 
     public event System.Action OnBossDied;
 
