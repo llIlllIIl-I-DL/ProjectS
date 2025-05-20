@@ -49,7 +49,7 @@ namespace BossFSM
             // 쿨타임이 끝나면 산성 점액 발사
             if (attackTimer >= boss.AttackCooldown)
             {
-                boss.Animator.SetBool("IsAttack", false);
+                boss.Animator.SetBool("IsAttack", false); // 공격 애니메이션
                 if (boss.AcidSpawnPoint != null)
                 {
                     FireAcidBullets(boss.AcidSpawnPoint, 5, 120f, 5f);
@@ -60,6 +60,8 @@ namespace BossFSM
 
         public void OnStayCollision2D(Collider2D other)
         {
+            if (other == null) return;
+
             if (other.gameObject.CompareTag("Player"))
             {
                 if (attackTimer >= boss.AttackCooldown)
@@ -76,6 +78,16 @@ namespace BossFSM
 
         public void FireAcidBullets(Transform spawnPoint, int bulletCount = 5, float spreadAngle = 120f, float bulletSpeed = 5f)
         {
+
+            if (spawnPoint == null) return; // 스폰 포인트 체크
+
+            // ObjectPoolingManager 존재 여부 확인
+            if (ObjectPoolingManager.Instance == null)
+            {
+                Debug.LogError("ObjectPoolingManager.Instance is null!");
+                return;
+            }
+
             float minAngle = 30f;   // 2시 방향
             float maxAngle = 150f;  // 10시 방향향
 
@@ -87,18 +99,25 @@ namespace BossFSM
 
                 Vector3 spawnPosition = spawnPoint.position + new Vector3(0, dir.y * 0.2f, 0);
 
-                GameObject acid = ObjectPoolingManager.Instance.GetObject(ObjectPoolingManager.PoolType.AcidBullet);
-                if (acid != null)
+                try
                 {
-                    acid.transform.position = spawnPosition;
-                    acid.transform.rotation = Quaternion.Euler(0, 0, angle);
-                    acid.SetActive(true);
-
-                    Rigidbody2D rb = acid.GetComponent<Rigidbody2D>();
-                    if (rb != null)
+                    GameObject acid = ObjectPoolingManager.Instance.GetObject(ObjectPoolingManager.PoolType.AcidBullet);
+                    if (acid != null)
                     {
-                        rb.velocity = dir * bulletSpeed;
+                        acid.transform.position = spawnPosition;
+                        acid.transform.rotation = Quaternion.Euler(0, 0, angle);
+                        acid.SetActive(true);
+
+                        Rigidbody2D rb = acid.GetComponent<Rigidbody2D>();
+                        if (rb != null)
+                        {
+                            rb.velocity = dir * bulletSpeed;
+                        }
                     }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"Error spawning acid bullet: {e.Message}");
                 }
             }
         }

@@ -17,10 +17,17 @@ namespace BossFSM
             deathTimer = 0f;
             boss.Animator.SetTrigger("Die");
             // 보스의 콜라이더 비활성화
-            Collider bossCollider = boss.GetComponent<Collider>();
+            Collider2D bossCollider = boss.GetComponent<Collider2D>();
             if (bossCollider != null)
             {
                 bossCollider.enabled = false;
+            }
+
+            // 리지드바디 동작 중지 (선택적)
+            if (boss.Rb != null)
+            {
+                boss.Rb.velocity = Vector2.zero;
+                boss.Rb.isKinematic = true; // 물리 영향을 받지 않도록 설정
             }
         }
 
