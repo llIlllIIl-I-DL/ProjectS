@@ -5,9 +5,9 @@ using UnityEngine;
 public class BossHealth : MonoBehaviour, IDebuffable
 {
     [SerializeField] public float maxHP;
-    [SerializeField]  private float currentHP;
+    [SerializeField] private float currentHP;
     [SerializeField] private float defence;
-    [SerializeField] private float moveSpeed =3 ;
+    [SerializeField] private float moveSpeed = 3;
 
     public float Defence
     {

@@ -44,8 +44,8 @@ GameObject:
   - component: {fileID: 1639416485537054702}
   - component: {fileID: 634314374460300833}
   - component: {fileID: 1408053583132829215}
-  - component: {fileID: 8702896894736832699}
-  - component: {fileID: 8383834027665949347}
+  - component: {fileID: 9104626096230436622}
+  - component: {fileID: 8649766649589793062}
   m_Layer: 13
   m_Name: Boss
   m_TagString: Boss
@@ -214,26 +214,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 6
---- !u!114 &8702896894736832699
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3534091277783148190}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a79568b698b7abe4abdff8c03c2f615b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bossHealth: {fileID: 0}
-  playerTransform: {fileID: 0}
-  projectilePrefab: {fileID: 8185762800821648384, guid: 5e2ab09353e4dd04684a03973d264cc3, type: 3}
-  firePoint: {fileID: 8652785267295511849}
-  chaseRange: 5
-  isFastChasingAfterProjectile: 0
-  KickCooldown: 20
---- !u!114 &8383834027665949347
+--- !u!114 &9104626096230436622
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -245,6 +226,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e1b22b3029e63848982c3cf195b7359, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 100
-  currentHP: 100
-  damage: 0
+  maxHP: 50
+  currentHP: 50
+  defence: 10
+  moveSpeed: 3
+  damage: 5
+--- !u!114 &8649766649589793062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3534091277783148190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79568b698b7abe4abdff8c03c2f615b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bossHealth: {fileID: 9104626096230436622}
+  playerTransform: {fileID: 0}
+  projectilePrefab: {fileID: 8185762800821648384, guid: 5e2ab09353e4dd04684a03973d264cc3, type: 3}
+  firePoint: {fileID: 8652785267295511849}
+  chaseRange: 5
+  isFastChasingAfterProjectile: 0
