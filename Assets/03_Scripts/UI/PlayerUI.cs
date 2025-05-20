@@ -5,6 +5,9 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
 using System; // Exception 클래스 사용을 위해 추가
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class PlayerUI : MonoBehaviour
 {
@@ -338,73 +341,137 @@ public class PlayerUI : MonoBehaviour
 
     public void ShowGameOverUI()
     {
-        // 부모 없이 먼저 인스턴스화하고
-        _fadeOut = Instantiate(fadeOut);
-        _fadeOut.alpha = 0;
-        
-        // 생성 후 부모 설정
-        if (gameOverWindowParents != null && _fadeOut != null)
+        try
         {
-            try
+            // 모든 캔버스 찾기
+            Canvas worldCanvas = null;
+            Canvas[] allCanvases = FindObjectsOfType<Canvas>();
+            
+            foreach (Canvas canvas in allCanvases)
             {
-                _fadeOut.transform.SetParent(gameOverWindowParents, false);
+                // 메인 캔버스 또는 월드 캔버스 찾기
+                if (canvas.renderMode == RenderMode.ScreenSpaceOverlay || 
+                    canvas.renderMode == RenderMode.ScreenSpaceCamera)
+                {
+                    worldCanvas = canvas;
+                    break;
+                }
             }
-            catch (Exception e)
+            
+            if (worldCanvas == null)
             {
-                Debug.LogWarning($"게임오버 UI 부모 설정 실패: {e.Message}");
-                // 부모 설정이 실패해도 UI는 표시되어야 함
+                Debug.LogWarning("캔버스를 찾을 수 없습니다. UI가 제대로 표시되지 않을 수 있습니다.");
+            }
+            
+            // 부모 없이 먼저 인스턴스화
+            _fadeOut = Instantiate(fadeOut);
+            if (_fadeOut != null)
+            {
+                _fadeOut.alpha = 0;
+                
+                // 찾은 캔버스를 부모로 설정
+                if (worldCanvas != null)
+                {
+                    _fadeOut.transform.SetParent(worldCanvas.transform, false);
+                }
+                
+                StartCoroutine(FadeOut(_fadeOut));
+            }
+            else
+            {
+                Debug.LogError("fadeOut 인스턴스 생성 실패");
+                // 실패해도 시작 씬으로 이동
+                StartCoroutine(DelayedSceneLoad(4.0f));
             }
         }
-
-        StartCoroutine(FadeOut(_fadeOut));
+        catch (Exception e)
+        {
+            Debug.LogError($"게임오버 UI 생성 중 오류 발생: {e.Message}");
+            // 오류가 발생해도 씬 전환 시도
+            StartCoroutine(DelayedSceneLoad(4.0f));
+        }
     }
 
-    IEnumerator FadeOut(CanvasGroup _fadeOut)
+    IEnumerator FadeOut(CanvasGroup _fadeOutCanvas)
     {
-        float alpha = _fadeOut.alpha;
+        if (_fadeOutCanvas == null)
+        {
+            Debug.LogError("FadeOut: _fadeOutCanvas is null");
+            yield break;
+        }
+
+        float alpha = _fadeOutCanvas.alpha;
 
         yield return new WaitForSeconds(1);
 
         while (alpha < 1f)
         {
             alpha += Time.deltaTime * fadeSpeed;
-
-            float temp = _fadeOut.alpha;
-            temp = alpha;
-            _fadeOut.alpha = temp;
-
+            _fadeOutCanvas.alpha = alpha;
             yield return null;
         }
 
-
         if (gameOverWindow != null)
         {
-            // 부모 없이 먼저 인스턴스화
-            _gameOverWindow = Instantiate(gameOverWindow);
+            // 대신 월드 캔버스를 찾아서 사용
+            Canvas worldCanvas = null;
             
-            // 생성 후 부모 설정
-            if (gameOverWindowParents != null && _gameOverWindow != null)
+            // 먼저 모든 캔버스를 찾습니다
+            Canvas[] allCanvases = FindObjectsOfType<Canvas>();
+            foreach (Canvas canvas in allCanvases)
             {
-                try
+                // 메인 캔버스 또는 월드 캔버스 찾기
+                if (canvas.renderMode == RenderMode.ScreenSpaceOverlay || 
+                    canvas.renderMode == RenderMode.ScreenSpaceCamera)
                 {
-                    _gameOverWindow.transform.SetParent(gameOverWindowParents, false);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogWarning($"게임오버 윈도우 부모 설정 실패: {e.Message}");
-                    // 부모 설정이 실패해도 UI는 표시되어야 함
+                    worldCanvas = canvas;
+                    break;
                 }
             }
+            
+            if (worldCanvas == null)
+            {
+                Debug.LogWarning("캔버스를 찾을 수 없습니다. UI가 제대로 표시되지 않을 수 있습니다.");
+            }
 
+            // 부모 없이 인스턴스화
+            GameObject gameOverWindowInstance = null;
+            
+            try
+            {
+                // 항상 부모 없이 인스턴스화
+                gameOverWindowInstance = Instantiate(gameOverWindow);
+                
+                // 안전하게 월드 캔버스를 사용하여 부모 설정
+                if (worldCanvas != null && gameOverWindowInstance != null)
+                {
+                    gameOverWindowInstance.transform.SetParent(worldCanvas.transform, false);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"게임오버 윈도우 생성 오류: {e.Message}");
+            }
+
+            _gameOverWindow = gameOverWindowInstance;
             yield return new WaitForSeconds(3);
-
-            ToStartMenu(_gameOverWindow);
+            
+            // 씬 전환
+            SceneManager.LoadScene("TempStartScene", LoadSceneMode.Single);
+            Debug.Log("스타트씬 이동!!");
         }
     }
-    public void ToStartMenu(GameObject _gameOverWindow) //스타트 씬으로 이동!!
+
+    // 지연된 씬 로드 코루틴
+    private IEnumerator DelayedSceneLoad(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        SceneManager.LoadScene("TempStartScene", LoadSceneMode.Single);
+    }
+
+    public void ToStartMenu(GameObject _gameOverWindow) // 이 메소드는 더 이상 필요 없습니다.
     {
         SceneManager.LoadScene("TempStartScene", LoadSceneMode.Single);
-
         Debug.Log("스타트씬 이동!!");
     }
 }
