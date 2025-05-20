@@ -70,12 +70,16 @@ public class ObjectActivatorPlatform : BaseObject
         // 임시 플랫폼의 경우 초기 상태 설정
         if (isTemporaryPlatform)
         {
-            isActivated = true;  // 처음에는 활성화 상태로 시작
-            if (platformCollider != null && enableColliderOnActivate)
+            // 처음에는 활성화 상태로 시작
+            isActivated = true;
+            CompleteActivation(); // 완전한 활성화 처리를 위해 호출
+        }
+        else
+        {
+            // 일반 플랫폼의 경우
+            if (platformCollider != null && !isActivated && enableColliderOnActivate)
             {
-                platformCollider.enabled = true;
-                platformAnimator.SetTrigger(activateAnimTrigger);
-
+                platformCollider.enabled = false; // 비활성화 상태면 콜라이더도 비활성화
             }
         }
 
