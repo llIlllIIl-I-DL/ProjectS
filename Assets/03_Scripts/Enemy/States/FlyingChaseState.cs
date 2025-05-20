@@ -77,7 +77,7 @@ namespace Enemy.States
                 if (losePlayerTimer >= losePlayerTime)
                 {
                     // 플레이어를 놓친 후 시간이 지나면 상태 전환
-                    enemy.SwitchToPatrolState();
+                    enemy.SwitchToState<PatrolState>();
                     return;
                 }
             }
@@ -92,7 +92,7 @@ namespace Enemy.States
                 if (enemy.IsInAttackRange())
                 {
                     // 공격 상태로 전환
-                    enemy.SwitchToAttackState();
+                    enemy.SwitchToState<AttackState>();
                     return;
                 }
             }

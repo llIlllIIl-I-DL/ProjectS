@@ -58,7 +58,7 @@ namespace Enemy.States
             if (idleTimer >= idleDuration)
             {
                 // 순찰 상태로 전환
-                enemy.SwitchToPatrolState();
+                enemy.SwitchToState<PatrolState>();
                 return;
             }
 
@@ -66,7 +66,7 @@ namespace Enemy.States
             if (enemy.IsPlayerDetected())
             {
                 // 추격 상태로 전환
-                enemy.SwitchToChaseState();
+                enemy.SwitchToState<ChaseState>();
             }
         }
 

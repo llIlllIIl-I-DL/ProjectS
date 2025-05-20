@@ -15,3 +15,21 @@ public enum PlayerStateType
     Climbing,
     Death
 }
+
+public enum EnemyStateType
+{
+    Idle,
+    Patrol,
+    Chase,
+    Attack,
+    Jump,
+    ChargeAttack,
+    SlamAttack
+}
+
+public enum RotationType // ObjectRotatingPlatform에서 사용
+{
+    Center,
+    Left,   
+    Right    
+}

@@ -57,7 +57,7 @@ namespace Enemy.States
             {
                 // 공격 타이머 저장
                 globalAttackTimer = attackTimer;
-                enemy.SwitchToChaseState();
+                enemy.SwitchToState<PatrolState>();
                 return;
             }
 
