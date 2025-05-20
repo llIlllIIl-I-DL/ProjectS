@@ -37,15 +37,17 @@ public class BossHealth : MonoBehaviour, IDebuffable
         animator = GetComponent<Animator>(); // Animator 연결
 
         // 보스가 죽었을 때 상태머신에 알림
-        OnBossDied += () =>
-        {
-            BossStateMachine stateMachine = GetComponent<BossStateMachine>();
-            if (stateMachine != null)
-            {
-                stateMachine.SetDead(); // 보스가 죽음 처리
-            }
-        };
+        OnBossDied += HandleStateMachineNotification;
 
+    }
+
+    private void HandleStateMachineNotification()
+    {
+        BossStateMachine stateMachine = GetComponent<BossStateMachine>();
+        if (stateMachine != null)
+        {
+            stateMachine.SetDead(); // 보스가 죽음 처리
+        }
     }
 
     public void OnTriggerEnter2D(Collider2D other)
@@ -60,12 +62,12 @@ public class BossHealth : MonoBehaviour, IDebuffable
         currentHP -= damage;
         if (currentHP < 0) currentHP = 0;
 
-        Debug.Log($"[BossHealth] 데미지 받음! 남은 체력: {currentHP} !!!!");
+        Debug.Log($"[BossHealth] 데미지 받음! 남은 체력: {currentHP}");
 
         // 애니메이션 재생
-        animator?.SetTrigger("setHit");
+        animator?.SetTrigger(GameConstants.AnimParams.HIT);
 
-        if (currentHP == 0)
+        if (currentHP <= 0)
         {
             OnBossDied?.Invoke();
         }
