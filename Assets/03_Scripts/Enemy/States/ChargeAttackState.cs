@@ -89,7 +89,7 @@ namespace Enemy.States
             {
                 // 돌진 완료, 이전 상태로 돌아가기
                 Debug.Log("돌진 공격 완료, 공격 상태로 전환");
-                enemy.SwitchToAttackState();
+                enemy.SwitchToState<AttackState>();
             }
         }
         
@@ -142,7 +142,7 @@ namespace Enemy.States
                 // - 효과음 재생: AudioManager.PlaySFX("HitSound");
                 
                 // 플레이어와 충돌한 후에 내려찍기 상태로 전환
-                enemy.SwitchToSlamAttackState();
+                enemy.SwitchToState<SlamAttackState>();
             }
             // 벽과 충돌
             else if (collision.gameObject.CompareTag("Wall"))

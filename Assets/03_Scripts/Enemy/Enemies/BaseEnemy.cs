@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections.Generic;
+using System;
 
 /// <summary>
 /// 모든 적 캐릭터의 기본 클래스
@@ -41,6 +43,59 @@ public abstract class BaseEnemy : DestructibleEntity, IDebuffable
     private string poolKey; // 어느 풀에 속하는지 식별
     private EnemyManager manager;
     
+    #endregion
+
+    #region State Management
+
+    // 모든 상태를 저장할 딕셔너리 - 타입을 키로 사용
+    protected Dictionary<Type, IEnemyState> statesByType = new Dictionary<Type, IEnemyState>();
+
+    /// <summary>
+    /// 상태 등록 - 제네릭 메서드로 타입 추론 활용
+    /// </summary>
+    protected T RegisterState<T>(T state) where T : IEnemyState
+    {
+        Type stateType = typeof(T);
+        if (statesByType.ContainsKey(stateType))
+        {
+            statesByType[stateType] = state;
+        }
+        else
+        {
+            statesByType.Add(stateType, state);
+        }
+        return state;
+    }
+
+    /// <summary>
+    /// 상태 가져오기 - 제네릭 메서드
+    /// </summary>
+    public T GetState<T>() where T : class, IEnemyState
+    {
+        Type stateType = typeof(T);
+        if (statesByType.TryGetValue(stateType, out IEnemyState state) && state is T typedState)
+        {
+            return typedState;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 상태 전환 - 제네릭 메서드
+    /// </summary>
+    public void SwitchToState<T>() where T : class, IEnemyState
+    {
+        T state = GetState<T>();
+        if (state != null)
+        {
+            stateMachine.ChangeState(state);
+        }
+        else
+        {
+            Debug.LogWarning($"{gameObject.name}에 등록되지 않은 상태({typeof(T).Name})로 전환을 시도했습니다.");
+        }
+    }
+
     #endregion
 
     #region Unity Lifecycle Methods
@@ -278,66 +333,6 @@ public abstract class BaseEnemy : DestructibleEntity, IDebuffable
         Debug.Log($"{gameObject.name}이(가) 넉백을 받았습니다. 방향: {direction}, 힘: {force}");
     }
 
-    #endregion
-
-    #region State Switch Methods
-    
-    /// <summary>
-    /// 대기 상태로 전환 - 상속받은 클래스에서 구현
-    /// </summary>
-    public virtual void SwitchToIdleState()
-    {
-        // 기본 구현은 비어있음 - 자식 클래스에서 구현
-    }
-
-    /// <summary>
-    /// 순찰 상태로 전환 - 상속받은 클래스에서 구현
-    /// </summary>
-    public virtual void SwitchToPatrolState()
-    {
-        // 기본 구현은 비어있음 - 자식 클래스에서 구현
-    }
-    
-    /// <summary>
-    /// 추격 상태로 전환 - 상속받은 클래스에서 구현
-    /// </summary>
-    public virtual void SwitchToChaseState()
-    {
-        // 기본 구현은 비어있음 - 자식 클래스에서 구현
-    }
-
-    /// <summary>
-    /// 공격 상태로 전환 - 상속받은 클래스에서 구현
-    /// </summary>
-    public virtual void SwitchToAttackState()
-    {
-        // 기본 구현은 비어있음 - 자식 클래스에서 구현
-    }
-
-    /// <summary>
-    /// 점프 상태로 전환 - 상속받은 클래스에서 구현
-    /// </summary>
-    public virtual void SwitchToJumpState()
-    {
-        // 기본 구현은 비어있음 - 자식 클래스에서 구현
-    }
-    
-    /// <summary>
-    /// 돌진 공격 상태로 전환 - 상속받은 클래스에서 구현
-    /// </summary>
-    public virtual void SwitchToChargeAttackState()
-    {
-        // 기본 구현은 비어있음 - 자식 클래스에서 구현
-    }
-    
-    /// <summary>
-    /// 내려찍기 공격 상태로 전환 - 상속받은 클래스에서 구현
-    /// </summary>
-    public virtual void SwitchToSlamAttackState()
-    {
-        // 기본 구현은 비어있음 - 자식 클래스에서 구현
-    }
-    
     #endregion
 
     #region Getters and Setters

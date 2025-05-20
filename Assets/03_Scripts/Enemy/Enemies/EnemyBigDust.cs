@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Enemy.States;
 
@@ -33,10 +32,6 @@ public class EnemyBigDust : BaseEnemy
     [SerializeField] private float slamSpeed; // 내려찍기 속도
     [SerializeField] private float slamCooldown; // 내려찍기 쿨타임
 
-    // 상태들
-    private PatrolState patrolState;
-    private AttackState attackState;
-    private ChaseState chaseState;
     private ChargeAttackState chargeAttackState;
     private SlamAttackState slamAttackState;
 
@@ -54,11 +49,6 @@ public class EnemyBigDust : BaseEnemy
     #region Properties
 
     public IEnemyState currentState => stateMachine.CurrentState;
-
-    // 상태 접근자 메서드들
-    public AttackState GetAttackState() => attackState;
-    public PatrolState GetPatrolState() => patrolState;
-    public ChaseState GetChaseState() => chaseState;
 
     #endregion
 
@@ -125,38 +115,19 @@ public class EnemyBigDust : BaseEnemy
     /// </summary>
     protected override void InitializeEnemy()
     {
-        // 순찰 경로 설정 (시작점 기준 좌우로 순찰)
+        // 순찰 경로 설정
         Vector2 leftPoint = startPosition - new Vector2(patrolDistance, 0);
         Vector2 rightPoint = startPosition + new Vector2(patrolDistance, 0);
 
-        // 상태 생성 및 초기화
-        patrolState = new PatrolState(this, stateMachine, new Vector2[] { leftPoint, rightPoint }, patrolWaitTime);
-        attackState = new AttackState(this, stateMachine, attackSpeed);
-        chaseState = new ChaseState(this, stateMachine, chaseSpeed, moveInYAxis: false);
-
-        // 특수 공격 상태 초기화
-        chargeAttackState = new ChargeAttackState(
-            this,
-            stateMachine,
-            chargeSpeed,
-            chargeDistance,
-            chargePower,
-            "Charge" // 애니메이션 트리거
-        );
-
-        slamAttackState = new SlamAttackState(
-            this,
-            stateMachine,
-            slamSpeed,
-            slamDistance,
-            3, // 데미지
-            "Slam", // 애니메이션 트리거
-            slamJumpPower, // 점프 힘
-            false // X축으로만 이동
-        );
+        // 상태 생성 및 등록 - 변수 선언과 동시에 등록
+        RegisterState(new PatrolState(this, stateMachine, new Vector2[] { leftPoint, rightPoint }, patrolWaitTime));
+        RegisterState(new AttackState(this, stateMachine, attackSpeed));
+        RegisterState(new ChaseState(this, stateMachine, chaseSpeed, moveInYAxis: false));
+        RegisterState(new ChargeAttackState(this, stateMachine, chargeSpeed, chargeDistance, chargePower, "Charge"));
+        RegisterState(new SlamAttackState(this, stateMachine, slamSpeed, slamDistance, 3, "Slam", slamJumpPower, false));
 
         // 초기 상태 설정
-        stateMachine.ChangeState(patrolState);
+        SwitchToState<PatrolState>();
     }
 
     /// <summary>
@@ -221,11 +192,11 @@ public class EnemyBigDust : BaseEnemy
         yield return new WaitForSeconds(delay);
         if (playerDetected)
         {
-            stateMachine.ChangeState(chaseState);
+            SwitchToState<ChaseState>();
         }
         else
         {
-            stateMachine.ChangeState(patrolState);
+            SwitchToState<PatrolState>();
         }
         Debug.Log($"{gameObject.name}이(가) 넉백 후 이동을 재개합니다.");
     }
@@ -239,10 +210,11 @@ public class EnemyBigDust : BaseEnemy
     /// </summary>
     protected override void OnPlayerDetected()
     {
-        // 플레이어 감지 시 추격 상태로 전환
-        if (currentState != chaseState && currentState != attackState)
+        // 플레이어 감지 시 추격 상태로 전환 - 타입 기반으로 간단하게 전환
+        var currentState = stateMachine.CurrentState;
+        if (currentState != GetState<ChaseState>() && currentState != GetState<AttackState>())
         {
-            stateMachine.ChangeState(chaseState);
+            SwitchToState<ChaseState>();
         }
     }
 
@@ -252,50 +224,6 @@ public class EnemyBigDust : BaseEnemy
     protected override void OnPlayerLost()
     {
         // 플레이어 놓침 처리 (필요시 구현)
-    }
-
-    #endregion
-
-    #region State Switch Methods
-
-    /// <summary>
-    /// 순찰 상태로 전환
-    /// </summary>
-    public override void SwitchToPatrolState()
-    {
-        stateMachine.ChangeState(patrolState);
-    }
-
-    /// <summary>
-    /// 공격 상태로 전환
-    /// </summary>
-    public override void SwitchToAttackState()
-    {
-        stateMachine.ChangeState(attackState);
-    }
-
-    /// <summary>
-    /// 추격 상태로 전환
-    /// </summary>
-    public override void SwitchToChaseState()
-    {
-        stateMachine.ChangeState(chaseState);
-    }
-
-    /// <summary>
-    /// 내려찍기 상태로 전환
-    /// </summary>
-    public override void SwitchToSlamAttackState()
-    {
-        stateMachine.ChangeState(slamAttackState);
-    }
-
-    /// <summary>
-    /// 돌진 상태로 전환
-    /// </summary>
-    public override void SwitchToChargeAttackState()
-    {
-        stateMachine.ChangeState(chargeAttackState);
     }
 
     #endregion
@@ -336,19 +264,18 @@ public class EnemyBigDust : BaseEnemy
     private void CheckAndPerformChargeAttack()
     {
         // 이미 돌진 상태이거나 쿨다운 중이면 무시
-        if (currentState == chargeAttackState || !chargeReady)
+        if (stateMachine.CurrentState == GetState<ChargeAttackState>() || !chargeReady)
             return;
 
         // 추격 중일 때만 돌진 판단
-        if (currentState == chaseState && playerDetected)
+        if (stateMachine.CurrentState == GetState<ChaseState>() && playerDetected)
         {
             float distanceToPlayer = Vector2.Distance(transform.position, PlayerPosition);
 
             // 플레이어가 공격 범위 밖이면서 추격 범위 안에 있을 때
             if (!IsInAttackRange() && distanceToPlayer > attackRange && distanceToPlayer <= detectionRange)
             {
-                Debug.Log($"추격 범위 내에서 돌진 공격! 거리: {distanceToPlayer}");
-                stateMachine.ChangeState(chargeAttackState);
+                SwitchToState<ChargeAttackState>();
                 chargeReady = false;
                 chargeCooldownTimer = 0f;
             }
@@ -361,17 +288,17 @@ public class EnemyBigDust : BaseEnemy
     private void CheckAndPerformSlamAttack()
     {
         // 이미 내려찍기 상태이거나 쿨다운 중이면 무시
-        if (currentState == slamAttackState || !slamReady)
+        if (stateMachine.CurrentState == GetState<SlamAttackState>() || !slamReady)
             return;
 
         // 공격 상태일 때만 내려찍기 판단
-        if (currentState == attackState && playerDetected)
+        if (stateMachine.CurrentState == GetState<AttackState>() && playerDetected)
         {
             // 일정 확률(20%)로 내려찍기 시도
             if (Random.value < 0.2f)
             {
                 Debug.Log("내려찍기 공격 시작!");
-                stateMachine.ChangeState(slamAttackState);
+                SwitchToState<SlamAttackState>();
                 slamReady = false;
                 slamCooldownTimer = 0f;
             }

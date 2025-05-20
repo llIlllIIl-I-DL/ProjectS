@@ -76,7 +76,7 @@ namespace Enemy.States
             if (enemy.IsPlayerDetected())
             {
                 // 플레이어 발견 시 추격 상태로 전환
-                enemy.SwitchToChaseState();
+                enemy.SwitchToState<ChaseState>();
                 return;
     }       
             // 이동 방향 결정
