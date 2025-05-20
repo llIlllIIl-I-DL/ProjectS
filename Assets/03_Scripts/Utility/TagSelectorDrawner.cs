@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
+#if UNITY_EIDTOR
 [CustomPropertyDrawer(typeof(TagAttribute))]
 public class TagSelectorDrawer : PropertyDrawer
 {
@@ -16,3 +17,4 @@ public class TagSelectorDrawer : PropertyDrawer
         }
     }
 }
+#endif
