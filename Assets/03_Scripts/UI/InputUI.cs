@@ -113,6 +113,6 @@ public class InputUI : MonoBehaviour
 
     public void ToMainMenu()
     {
-        SceneManager.LoadScene("TempMainScene", LoadSceneMode.Single);
+        SceneManager.LoadScene("TempStartScene", LoadSceneMode.Single);
     }
 }
