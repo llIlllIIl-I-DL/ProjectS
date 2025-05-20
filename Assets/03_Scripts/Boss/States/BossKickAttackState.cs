@@ -3,77 +3,59 @@ using System.Collections;
 
 public class BossKickAttackState : IEnemyState
 {
-    private BossStateMachine BossStateMachine;
-    private Transform boss;
-    private Transform player;
-    private Animator animator;
+    private readonly BossStateMachine stateMachine;
+    private readonly Transform bossTransform;
+    private readonly Transform playerTransform;
+    private readonly Animator animator;
 
-    private float kickRange = 2f;
-    private int kickDamage = 30;
-    private float attackDelay = 0.3f;
-
-    public BossKickAttackState(BossStateMachine bossStateMachine)
+    public BossKickAttackState(BossStateMachine stateMachine)
     {
-        BossStateMachine = bossStateMachine;
-        boss = bossStateMachine.transform;
-        player = bossStateMachine.playerTransform;
-        animator = bossStateMachine.GetComponent<Animator>();
+        this.stateMachine = stateMachine;
+        bossTransform = stateMachine.transform;
+        playerTransform = stateMachine.playerTransform;
+        animator = stateMachine.GetComponent<Animator>();
     }
 
-    public void Enter() // 상태에 진입했을 때
+    public void Enter()
     {
-        if (animator != null)
-        {
-        Debug.Log("Boss Kick 상태 진입####");
-        animator.SetBool("IsKicking", true);
-        BossStateMachine.StartCoroutine(PerformKickAfterDelay());
-        }
+        if (animator == null) return;
+        
+        Debug.Log("Boss Kick 상태 진입");
+        animator.SetBool(GameConstants.AnimParams.IS_KICKING, true);
+        
+        // 킥 쿨다운 갱신
+        stateMachine.UpdateKickCooldown();
+        
+        // 킥 공격 수행
+        stateMachine.StartCoroutine(PerformKickAfterDelay());
     }
 
-    public void Exit()// 상태에서 나갈 때
+    public void Exit()
     {
-        Debug.Log("Boss Kick 상태 종료####");
-        animator.SetBool("IsKicking", false);
+        Debug.Log("Boss Kick 상태 종료");
+        animator.SetBool(GameConstants.AnimParams.IS_KICKING, false);
     }
 
-    public void Update()// 매 프레임 업데이트
-    {
+    public void Update() { }
 
-    }
+    public void FixedUpdate() { }
 
-    public void FixedUpdate()// 물리 업데이트
-    {
+    public void OnTriggerEnter2D(Collider2D other) { }
 
-    }
-
-    public void OnTriggerEnter2D(Collider2D other)// 트리거 충돌 감지
-    {
-
-    }
-
-    // 공격 딜레이 후 데미지 판정만
+    // 공격 딜레이 후 데미지 판정
     private IEnumerator PerformKickAfterDelay()
     {
-        yield return new WaitForSeconds(attackDelay);
+        yield return new WaitForSeconds(GameConstants.Boss.KICK_ATTACK_DELAY);
 
-        if (player != null && Vector2.Distance(boss.position, player.position) <= kickRange)
+        if (playerTransform != null && 
+            Vector2.Distance(bossTransform.position, playerTransform.position) <= GameConstants.Boss.KICK_RANGE)
         {
-            var damageable = player.GetComponent<IDamageable>();
+            var damageable = playerTransform.GetComponent<IDamageable>();
             if (damageable != null)
             {
-                damageable.TakeDamage(kickDamage);
-                Debug.Log("Kick 데미지: " + kickDamage + "###");
+                damageable.TakeDamage(GameConstants.Boss.KICK_DAMAGE);
+                Debug.Log($"Kick 데미지: {GameConstants.Boss.KICK_DAMAGE}");
             }
         }
     }
-
-    // 이 메서드는 애니메이션 이벤트에서 호출됨
-    public void OnKickAnimationEnd()
-    {
-        if (BossStateMachine != null && BossStateMachine.currentState is BossKickAttackState)
-        {
-            BossStateMachine.ChangeState(BossState.Idle);
-        }
-    }
-
 }

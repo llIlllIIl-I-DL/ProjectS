@@ -1,62 +1,43 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BossDieState : IEnemyState
 {
-    private BossStateMachine BossStateMachine;
-    private Transform boss;
-    private Animator animator;
-    private Rigidbody2D rb;
+    private readonly BossStateMachine stateMachine;
+    private readonly Transform boss;
+    private readonly Animator animator;
+    private readonly Rigidbody2D rb;
 
     public BossDieState(BossStateMachine stateMachine)
     {
-        BossStateMachine = stateMachine;
-        boss = BossStateMachine.transform;
+        this.stateMachine = stateMachine;
+        boss = stateMachine.transform;
         animator = stateMachine.GetComponent<Animator>();
         rb = stateMachine.GetComponent<Rigidbody2D>();
     }
 
     public void Enter()
     {
-        Debug.Log("Boss 사망 상태 진입");
-        
-        // 물리 효과 비활성화
+        Debug.Log("[BossDieState] Enter");
+
         if (rb != null)
         {
             rb.velocity = Vector2.zero;
             rb.isKinematic = true;
         }
 
-        // 사망 애니메이션 재생
-        if (animator != null)
-        {
-            animator.SetTrigger("setDie");
-        }
-
+        animator?.SetTrigger("setDie");
         animator.enabled = false;
 
-        // 보스 오브젝트 비활성화 (또는 파괴)
-        //BossStateMachine.gameObject.SetActive(false);
+        // Optional: 게임 오브젝트 비활성화
+        // stateMachine.gameObject.SetActive(false);
     }
 
     public void Exit()
     {
-        Debug.Log("Boss 사망 상태 종료");
+        Debug.Log("[BossDieState] Exit");
     }
 
-    public void Update()
-    {
-
-    }
-
-    public void FixedUpdate()
-    {
-
-    }
-
-    public void OnTriggerEnter2D(Collider2D other)
-    {
-
-    }
+    public void Update() { }
+    public void FixedUpdate() { }
+    public void OnTriggerEnter2D(Collider2D other) { }
 }

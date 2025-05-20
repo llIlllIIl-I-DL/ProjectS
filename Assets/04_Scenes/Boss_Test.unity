@@ -811,7 +811,6 @@ MonoBehaviour:
   firePoint: {fileID: 2121112092}
   chaseRange: 5
   isFastChasingAfterProjectile: 0
-  KickCooldown: 20
 --- !u!61 &980502332
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -896,9 +895,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e1b22b3029e63848982c3cf195b7359, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 10
-  currentHP: 1
-  damage: 0
+  maxHP: 100
+  currentHP: 100
 --- !u!212 &980502335
 SpriteRenderer:
   m_ObjectHideFlags: 0

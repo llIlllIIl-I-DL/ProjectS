@@ -3,100 +3,92 @@ using UnityEngine;
 
 public class BossSlashAttackState : IEnemyState
 {
-    private BossStateMachine BossStateMachine;
-    private Transform bossTransform;
-    private Transform playerTransform;
-    private Animator animator;
-
-    [SerializeField] private float detectionRange = 10f; //플레이어를 감지하는 거리
-    [SerializeField] private float attackRange = 5f; //근접 공격 거리
-
-    private int slashDamage = 20;
-    private float attackDelay = 0.5f;
-    private float returnToIdleDelay = 1.0f;
+    private readonly BossStateMachine stateMachine;
+    private readonly Transform bossTransform;
+    private readonly Transform playerTransform;
+    private readonly Animator animator;
 
     private bool isAttackFinished = false;
 
     public BossSlashAttackState(BossStateMachine stateMachine)
     {
-        BossStateMachine = stateMachine;
+        this.stateMachine = stateMachine;
         bossTransform = stateMachine.transform;
         playerTransform = stateMachine.playerTransform;
         animator = stateMachine.GetComponent<Animator>();
     }
 
-    public void Enter()// 상태에 진입했을 때
+    public void Enter()
     {
-        Debug.Log("Boss Slash 상태 진입###");
-        animator.SetBool("IsSlashing", true);
+        Debug.Log("Boss Slash 상태 진입");
+        animator.SetBool(GameConstants.AnimParams.IS_SLASHING, true);
         isAttackFinished = false;
     }
-    public void Exit()// 상태에서 나갈 때
+    
+    public void Exit()
     {
-        Debug.Log("Boss Slash 상태 종료###");
-        animator.SetBool("IsSlashing", false);
+        Debug.Log("Boss Slash 상태 종료");
+        animator.SetBool(GameConstants.AnimParams.IS_SLASHING, false);
     }
 
-    public void Update()// 매 프레임 업데이트
+    public void Update()
     {
         if (playerTransform == null || bossTransform == null) return;
 
         float distance = Vector3.Distance(playerTransform.position, bossTransform.position);
 
-        if (distance < attackRange && !isAttackFinished)
+        if (distance < GameConstants.Boss.ATTACK_RANGE && !isAttackFinished)
         {
             Debug.Log("근거리 공격");
             isAttackFinished = true;
-            BossStateMachine.StartCoroutine(SlashAttackCoroutine());
+            stateMachine.StartCoroutine(SlashAttackCoroutine());
         }
-        else if (distance > attackRange && distance < detectionRange)
+        else if (distance > GameConstants.Boss.ATTACK_RANGE && distance < GameConstants.Boss.DETECTION_RANGE)
         {
-            BossStateMachine.ChangeState(BossState.ProjectileAttack);
+            stateMachine.ChangeState(BossState.ProjectileAttack);
         }
-        else if (distance >= detectionRange)
+        else if (distance >= GameConstants.Boss.DETECTION_RANGE)
         {
-            BossStateMachine.ChangeState(BossState.Idle);
+            stateMachine.ChangeState(BossState.Idle);
         }
     }
 
-    public void FixedUpdate()// 물리 업데이트
+    public void FixedUpdate() { }
+    
+    public void OnTriggerEnter2D(Collider2D other)
     {
-
-    }
-    public void OnTriggerEnter2D(Collider2D other)// 트리거 충돌 감지
-    {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag(GameConstants.Tags.PLAYER))
         {
-            if (BossStateMachine.CanKick)
+            if (stateMachine.CanKick)
             {
-                Debug.Log("Kick 공격 진입!###");
-                BossStateMachine.ChangeState(BossState.KickAttack);
+                Debug.Log("Kick 공격 진입!");
+                stateMachine.ChangeState(BossState.KickAttack);
             }
             else
             {
-                float remain = BossStateMachine.KickCooldown - (Time.time - BossStateMachine.LastKickTime);
-                Debug.Log($"Kick 쿨다운 중... 남은 시간: {remain:F1}초###");
+                float remainingTime = stateMachine.KickCooldown - (Time.time - stateMachine.LastKickTime);
+                Debug.Log($"Kick 쿨다운 중... 남은 시간: {remainingTime:F1}초");
             }
         }
     }
 
-    private IEnumerator SlashAttackCoroutine() //근접 공격 반복 코루틴
+    private IEnumerator SlashAttackCoroutine()
     {
-        yield return new WaitForSeconds(attackDelay);
+        yield return new WaitForSeconds(GameConstants.Boss.ATTACK_DELAY);
 
-        if (playerTransform != null && Vector2.Distance(bossTransform.position, playerTransform.position) <= attackRange)
+        if (playerTransform != null && 
+            Vector2.Distance(bossTransform.position, playerTransform.position) <= GameConstants.Boss.ATTACK_RANGE)
         {
             var damageable = playerTransform.GetComponent<IDamageable>();
             if (damageable != null)
             {
-                damageable.TakeDamage(slashDamage);
-                Debug.Log("Slash 데미지: " + slashDamage + "@@@@");
+                damageable.TakeDamage(GameConstants.Boss.SLASH_DAMAGE);
+                Debug.Log($"Slash 데미지: {GameConstants.Boss.SLASH_DAMAGE}");
             }
         }
 
-        yield return new WaitForSeconds(returnToIdleDelay);
-
-        isAttackFinished = true;
+        yield return new WaitForSeconds(GameConstants.Boss.RETURN_TO_IDLE_DELAY);
+        
+        stateMachine.ChangeState(BossState.Idle);
     }
-
 }

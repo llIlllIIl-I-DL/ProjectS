@@ -30,6 +30,7 @@ namespace BossFSM
         [Header("현재 체력")]
         [SerializeField] private float currentHealth;
         public float CurrentHealth => currentHealth;
+
         [Header("점프 지속 시간")]
         [SerializeField] private float jumpDuration = 0.5f; // 점프 지속 시간
         public float JumpDuration => jumpDuration;
@@ -45,11 +46,35 @@ namespace BossFSM
         [SerializeField] private GameObject acidPrefab; // 산성 점액 프리팹
 
         [SerializeField] private Transform acidSpawnPoint; // 생성 위치
-        public Transform AcidSpawnPoint => acidSpawnPoint; 
+        public Transform AcidSpawnPoint => acidSpawnPoint;
 
-        private bool isInvincible = false; // 무적 상태 플래그
-        private float invincibleTime = 1f; // 무적 지속 시간(초)
+        [Header("장판 생성 위치")]
+        [SerializeField] private Transform groundCheckPoint; //장판 생성
+        public Transform GroundCheckPoint => groundCheckPoint;
+
+        [Header("패턴 관련")]
+        private bool hasDropAttack = false;
+        public bool HasDropAttack { get => hasDropAttack; set => hasDropAttack = value; }
+        private bool hasSplit = false;
+        public bool HasSplit { get => hasSplit; set => hasSplit = value; }
+        private bool isInvincible = false; //무적 상태 플래그
+        private float invincibleTime = 1f; //무적 지속 시간
         private float invincibleTimer = 0f;
+        [SerializeField] private bool isMiniBoss = false;
+        public bool IsMiniBoss => isMiniBoss;
+        [SerializeField] private BossPatternType patternType = BossPatternType.All;
+        public BossPatternType PatternType => patternType;
+
+        // 미니 보스 패턴 타입
+        public enum BossPatternType
+        {
+            All,        // 모든 패턴 사용 (메인 보스)
+            Puddle,     // 독 장판 패턴만 사용 (미니 보스 1)
+            Projectile  // 투사체 패턴만 사용 (미니 보스 2)
+        }
+
+        [SerializeField] private LayerMask groundLayer;
+        public LayerMask GroundLayer => groundLayer;
 
         private SpriteRenderer spriteRenderer;
 
@@ -60,6 +85,13 @@ namespace BossFSM
             rb = GetComponent<Rigidbody2D>();
             currentHealth = MaxHealth;
             spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+            // 미니 보스인 경우 크기와 체력 조절
+            if (isMiniBoss)
+            {
+                transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
+                currentHealth = maxHealth * 0.3f; // 메인 보스의 30% 체력
+            }
         }
 
         private void Start()
