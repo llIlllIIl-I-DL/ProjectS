@@ -232,7 +232,7 @@ public class InvenInfoController : MonoBehaviour
                     break;
 
                 case 1014:
-
+                    maxAmmo = WeaponManager.Instance.AmmoManager.MaxAmmo;
                     utilityChangedStatController.Trinity(itemData.effectValue, maxAmmo);
                     break;
 
@@ -261,7 +261,8 @@ public class InvenInfoController : MonoBehaviour
                 break;
 
             case 1002:
-                utilityChangedStatController.RemovedMaxMPUP();
+                maxAmmo = WeaponManager.Instance.AmmoManager.MaxAmmo;
+                utilityChangedStatController.RemovedMaxMPUP(maxAmmo);
                 break;
 
             case 1003:
@@ -289,7 +290,7 @@ public class InvenInfoController : MonoBehaviour
                 break;
 
             case 1009:
-                utilityChangedStatController.RemovedWeighSpeed();
+                utilityChangedStatController.RemovedWeighSpeed(itemdata.effectValue);
                 break;
 
             case 1010:
@@ -301,15 +302,16 @@ public class InvenInfoController : MonoBehaviour
                 break;
 
             case 1012:
-                utilityChangedStatController.RemovedBestDefenceIsAttack();
+                utilityChangedStatController.RemovedBestDefenceIsAttack(itemdata.effectValue);
                 break;
 
             case 1013:
-                utilityChangedStatController.RemovedSpeedRacer();
+                utilityChangedStatController.RemovedSpeedRacer(itemdata.effectValue);
                 break;
 
             case 1014:
-                utilityChangedStatController.RemovedTrinity();
+                maxAmmo = WeaponManager.Instance.AmmoManager.MaxAmmo;
+                utilityChangedStatController.RemovedTrinity(maxAmmo);
                 break;
 
             case 1015:

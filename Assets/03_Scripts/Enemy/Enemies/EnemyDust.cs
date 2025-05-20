@@ -13,9 +13,6 @@ public class EnemyDust : BaseEnemy
     [SerializeField] private float patrolDistance; // 순찰 거리
     [SerializeField] private float patrolWaitTime; // 방향 전환 시 대기 시간
 
-    // 상태들
-    private PatrolState patrolState;
-
     // 순찰 시작점
     private Vector2 startPosition;
 
@@ -71,10 +68,10 @@ public class EnemyDust : BaseEnemy
         Vector2 rightPoint = startPosition + new Vector2(patrolDistance, 0);
 
         // 상태 생성 (두 개의 웨이포인트 설정)
-        patrolState = new PatrolState(this, stateMachine, new Vector2[] { leftPoint, rightPoint }, patrolWaitTime);
+        RegisterState(new PatrolState(this, stateMachine, new Vector2[] { leftPoint, rightPoint }, patrolWaitTime));
 
         // 상태 머신 초기화
-        stateMachine.ChangeState(patrolState);
+        SwitchToState<PatrolState>();
     }
 
     /// <summary>
@@ -117,7 +114,7 @@ public class EnemyDust : BaseEnemy
     private IEnumerator KnockbackCoroutine(float delay)
     {
         yield return new WaitForSeconds(delay);
-        stateMachine.ChangeState(patrolState);
+        SwitchToState<PatrolState>();
         Debug.Log($"{gameObject.name}이(가) 넉백 후 이동을 재개합니다.");
     }
 
@@ -140,22 +137,6 @@ public class EnemyDust : BaseEnemy
     {
         // 단순 패트롤 적은 플레이어를 놓치는 것에 반응하지 않음
     }
-
-    #endregion
-
-    #region State Switch Methods
-
-    /// <summary>
-    /// 순찰 상태로 전환
-    /// </summary>
-    public override void SwitchToPatrolState()
-    {
-        stateMachine.ChangeState(patrolState);
-    }
-
-    /// <summary>
-    /// 대기 상태로 전환
-    /// </summary>
 
     #endregion
 }

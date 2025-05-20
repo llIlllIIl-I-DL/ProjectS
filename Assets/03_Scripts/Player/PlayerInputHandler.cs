@@ -371,6 +371,7 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
             {
                 baseObject.TryInteract(interactor);
             }
+
             else
             {
                 Debug.LogWarning("상호작용 가능한 오브젝트가 범위 내에 없습니다.");

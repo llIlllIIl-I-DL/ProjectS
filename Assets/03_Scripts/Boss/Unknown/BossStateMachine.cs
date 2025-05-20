@@ -8,7 +8,7 @@ public enum BossState
     ProjectileAttack,
     SlashAttack,
     KickAttack,
-    Die,
+    Die
 }
 
 public class BossStateMachine : MonoBehaviour
@@ -16,22 +16,23 @@ public class BossStateMachine : MonoBehaviour
     public IEnemyState currentState;
     private Dictionary<BossState, IEnemyState> states = new Dictionary<BossState, IEnemyState>();
 
-    public BossHealth bossHealth; // 체력 컴포넌트 참조
-
+    [Header("참조")]
+    public BossHealth bossHealth;
     public Transform playerTransform;
-    private Animator animator;
     public GameObject projectilePrefab;
     public Transform firePoint;
+    
+    [Header("설정")]
     public float chaseRange = 5f;
-
     public bool isFastChasingAfterProjectile = false;
-
-    public float KickCooldown = 20f;
+    
+    // 킥 공격 관련
     private float lastKickTime = -Mathf.Infinity;
-
+    public float KickCooldown => GameConstants.Boss.KICK_COOLDOWN;
     public float LastKickTime => lastKickTime;
     public bool CanKick => Time.time - lastKickTime >= KickCooldown;
-
+    
+    private Animator animator;
     private bool isDead = false;
 
     private void Awake()
@@ -43,8 +44,17 @@ public class BossStateMachine : MonoBehaviour
 
     private void Start()
     {
-        playerTransform = GameObject.FindWithTag("Player")?.transform;
+        playerTransform = GameObject.FindWithTag(GameConstants.Tags.PLAYER)?.transform;
 
+        // 상태 초기화
+        InitializeStates();
+        
+        // 기본 상태로 시작
+        ChangeState(BossState.Idle);
+    }
+    
+    private void InitializeStates()
+    {
         // 상태 추가
         states.Add(BossState.Idle, new BossIdleState(this));
         states.Add(BossState.Move, new BossMoveState(this));
@@ -52,20 +62,20 @@ public class BossStateMachine : MonoBehaviour
         states.Add(BossState.SlashAttack, new BossSlashAttackState(this));
         states.Add(BossState.KickAttack, new BossKickAttackState(this));
         states.Add(BossState.Die, new BossDieState(this));
-
-        ChangeState(BossState.Idle);
     }
 
     public void ChangeState(BossState state)
     {
-        // 이미 죽은 상태면 상태 전이 차단
+        // 이미 죽은 상태면 Die 상태 외의 상태 전이 차단
         if (isDead && state != BossState.Die) return;
 
+        // 존재하지 않는 상태나 이미 현재 상태인 경우 무시
         if (!states.ContainsKey(state)) return;
         if (currentState == states[state]) return;
 
-        Debug.Log($"[BossStateMachine] 상태 전이: {currentState} → {state}!!!");
+        Debug.Log($"[BossStateMachine] 상태 전이: {currentState} → {state}");
 
+        // 상태 전환 처리
         currentState?.Exit();
         currentState = states[state];
         currentState?.Enter();
@@ -76,13 +86,22 @@ public class BossStateMachine : MonoBehaviour
         if (isDead) return;
 
         isDead = true;
-        Die();
+        SetDead();
     }
 
-    public void Die()
+    public void SetDead()
     {
-        animator.Play("Boss_Die");
+        if (isDead) return;
+
+        isDead = true;
+        Debug.Log("[BossStateMachine] 보스가 사망했습니다.");
+
+        // 상태 전환
+        currentState?.Exit();
         ChangeState(BossState.Die);
+
+        // 사망 애니메이션 트리거
+        animator?.SetTrigger(GameConstants.AnimParams.DEAD);
     }
 
     private void Update()
@@ -93,34 +112,23 @@ public class BossStateMachine : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (isDead) return;
         currentState?.FixedUpdate();
     }
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, 10f);
+        Gizmos.DrawWireSphere(transform.position, GameConstants.Boss.DETECTION_RANGE);
+        
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, 5f);
+        Gizmos.DrawWireSphere(transform.position, GameConstants.Boss.ATTACK_RANGE);
     }
 
-    public void SetDead()
-    {
-        if (isDead) return;
-
-        isDead = true;
-        Debug.Log("[BossStateMachine] 보스가 사망했습니다.!!!!");
-
-        currentState?.Exit(); // 현재 상태 종료
-        ChangeState(BossState.Die); // 반드시 Die 상태로 전이
-
-        // 사망 애니메이션 트리거
-        animator?.SetTrigger("setDead"); // 또는 "setDie"
-    }
+    // 애니메이션 이벤트에서 호출되는 메서드들
     public void OnDeathAnimationEnd()
     {
         animator.enabled = false;
-        // 기타 처리: 피격 무시, 오브젝트 제거 등
     }
 
     public void OnKickAnimationEnd()
@@ -129,5 +137,11 @@ public class BossStateMachine : MonoBehaviour
         {
             ChangeState(BossState.Idle);
         }
+    }
+    
+    // 킥 공격 사용 시 쿨다운 갱신
+    public void UpdateKickCooldown()
+    {
+        lastKickTime = Time.time;
     }
 }

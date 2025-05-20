@@ -520,10 +520,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -600,17 +600,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2daa0fec5340633459056cca03e6312b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fadeSpeed: 1.5
+  gameOverWindow: {fileID: 0}
+  gameOverWindowParents: {fileID: 0}
+  fadeOut: {fileID: 0}
   healthBar: {fileID: 3126895040349416064}
   healthBarImage: {fileID: 3882892272320650666}
   healLight: {fileID: 9132223395364604895}
-  healHP: 10
-  healButton: {fileID: 1655060135389157709}
+  hpText: {fileID: 0}
   Basic: {fileID: 6717012051936619077}
   Hurt: {fileID: 5259337640600633874}
   VeryHurt: {fileID: 7912244326916692216}
   killme: {fileID: 2519381150801956295}
-  shakeTime: 0.5
-  shakeRange: 2
+  ammoBar: {fileID: 0}
+  ammoBarImage: {fileID: 0}
+  ammoBarLight: {fileID: 0}
+  attributeType: {fileID: 0}
+  typeName: {fileID: 0}
+  typeIcon: {fileID: 0}
+  utilityPointText: {fileID: 0}
 --- !u!1 &5259337640600633874
 GameObject:
   m_ObjectHideFlags: 0

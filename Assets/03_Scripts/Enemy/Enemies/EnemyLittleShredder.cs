@@ -29,20 +29,12 @@ public class EnemyLittleShredder : BaseEnemy
     private PatrolState patrolState;
     private AttackState attackState;
     private ChaseState chaseState;
-    private JumpState jumpState;
 
     // 순찰 시작점
     private Vector2 startPosition;
 
     // 상태 머신
     public IEnemyState currentState => stateMachine.CurrentState;
-
-    // 상태 접근자 메서드들
-    public IdleState GetIdleState() => idleState;
-    public PatrolState GetPatrolState() => patrolState;
-    public AttackState GetAttackState() => attackState;
-    public ChaseState GetChaseState() => chaseState;
-    public JumpState GetJumpState() => jumpState;
 
     #endregion
 
@@ -74,7 +66,7 @@ public class EnemyLittleShredder : BaseEnemy
                 if (Random.value < randomJumpChance) // 설정된 확률로 점프
                 {
                     Debug.Log("랜덤 점프 시도!");
-                    SwitchToJumpState();
+                    SwitchToState<JumpState>();
                 }
             }
         }
@@ -102,13 +94,13 @@ public class EnemyLittleShredder : BaseEnemy
         Vector2 rightPoint = startPosition + new Vector2(patrolDistance, 0);
 
         // 상태 생성 (두 개의 웨이포인트 설정)
-        patrolState = new PatrolState(this, stateMachine, new Vector2[] { leftPoint, rightPoint }, patrolWaitTime);
-        attackState = new AttackState(this, stateMachine, attackSpeed);
-        chaseState = new ChaseState(this, stateMachine, chaseSpeed);
-        jumpState = new JumpState(this, stateMachine, jumpPower, jumpDistance, jumpCooldown);
+        RegisterState(new PatrolState(this, stateMachine, new Vector2[] { leftPoint, rightPoint }, patrolWaitTime));
+        RegisterState(new AttackState(this, stateMachine, attackSpeed));
+        RegisterState(new ChaseState(this, stateMachine, chaseSpeed));
+        RegisterState(new JumpState(this, stateMachine, jumpPower, jumpDistance, jumpCooldown));
 
         // 상태 머신 초기화
-        stateMachine.ChangeState(patrolState);
+        SwitchToState<PatrolState>();
     }
 
     /// <summary>
@@ -165,11 +157,11 @@ public class EnemyLittleShredder : BaseEnemy
         yield return new WaitForSeconds(delay);
         if (playerDetected)
         {
-            stateMachine.ChangeState(chaseState);
+            SwitchToState<ChaseState>();
         }
         else
         {
-            stateMachine.ChangeState(patrolState);
+            SwitchToState<PatrolState>();
         }
     }
 
@@ -185,7 +177,7 @@ public class EnemyLittleShredder : BaseEnemy
         // 추격 상태로 전환
         if (currentState != chaseState && currentState != attackState)
         {
-            stateMachine.ChangeState(chaseState);
+            SwitchToState<ChaseState>();
         }
     }
 
@@ -195,50 +187,6 @@ public class EnemyLittleShredder : BaseEnemy
     protected override void OnPlayerLost()
     {
         // 필요시 구현
-    }
-
-    #endregion
-
-    #region State Switch Methods
-
-    /// <summary>
-    /// 대기 상태로 전환
-    /// </summary>
-    public override void SwitchToIdleState()
-    {
-        stateMachine.ChangeState(idleState);
-    }
-
-    /// <summary>
-    /// 순찰 상태로 전환
-    /// </summary>
-    public override void SwitchToPatrolState()
-    {
-        stateMachine.ChangeState(patrolState);
-    }
-
-    /// <summary>
-    /// 추격 상태로 전환
-    /// </summary>
-    public override void SwitchToChaseState()
-    {
-        stateMachine.ChangeState(chaseState);
-    }
-
-    /// <summary>
-    /// 공격 상태로 전환
-    /// </summary>
-    public override void SwitchToAttackState()
-    {
-        stateMachine.ChangeState(attackState);
-    }
-
-    /// <summary>
-    /// 점프 상태로 전환
-    /// </summary>
-    public override void SwitchToJumpState()
-    {
-        stateMachine.ChangeState(jumpState);
     }
 
     #endregion

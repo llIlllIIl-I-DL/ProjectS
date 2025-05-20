@@ -69,6 +69,8 @@ public class PlayerUI : MonoBehaviour
 
 
     private Player player;
+    private BoxCollider2D playercollider;
+
     private PlayerHP playerHP;
     private TypeItemSlotList typeItemSlotList;
 
@@ -78,6 +80,7 @@ public class PlayerUI : MonoBehaviour
     {
         player = FindObjectOfType<Player>();
         playerHP = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHP>();
+        playercollider = GameObject.FindGameObjectWithTag("Player").GetComponent<BoxCollider2D>();
 
         // HP 변경 이벤트 구독
         playerHP.OnHPChanged += OnPlayerHPChanged;
@@ -462,6 +465,7 @@ public class PlayerUI : MonoBehaviour
         }
     }
 
+
     // 지연된 씬 로드 코루틴
     private IEnumerator DelayedSceneLoad(float delay)
     {
@@ -470,6 +474,7 @@ public class PlayerUI : MonoBehaviour
     }
 
     public void ToStartMenu(GameObject _gameOverWindow) // 이 메소드는 더 이상 필요 없습니다.
+
     {
         SceneManager.LoadScene("TempStartScene", LoadSceneMode.Single);
         Debug.Log("스타트씬 이동!!");

@@ -61,7 +61,7 @@ namespace Enemy.States
                 if (jumpTimer >= jumpCooldown)
                 {
                     Debug.Log("점프 쿨다운 완료, 순찰 상태로 전환");
-                    enemy.SwitchToPatrolState();
+                    enemy.SwitchToState<PatrolState>();
                 }
             }
             

@@ -22,7 +22,7 @@ public class EnemySlime : BaseEnemy
     [SerializeField] private float jumpDistance;
     [SerializeField] private float jumpCooldown;
     [SerializeField] private float randomJumpChance; // 매 초마다 점프할 확률
-    
+
     [Header("장판 설정")]
     [SerializeField] private float slimeDuration = 3f; // 슬라임 장판 지속 시간
     [SerializeField] private float slimeDamage = 1f; // 슬라임 장판 데미지
@@ -69,7 +69,7 @@ public class EnemySlime : BaseEnemy
     protected override void Update()
     {
         base.Update(); // BaseEnemy의 Update 호출
-        
+
         // 순찰 상태일 때만 랜덤 점프 체크
         if (currentState == patrolState)
         {
@@ -79,7 +79,7 @@ public class EnemySlime : BaseEnemy
                 randomJumpTimer = 0f;
                 if (Random.value < randomJumpChance) // 설정된 확률로 점프
                 {
-                    SwitchToJumpState();
+                    SwitchToState<JumpState>();
                 }
             }
         }
@@ -107,12 +107,12 @@ public class EnemySlime : BaseEnemy
         Vector2 rightPoint = startPosition + new Vector2(patrolDistance, 0);
 
         // 상태 생성 (두 개의 웨이포인트 설정)
-        patrolState = new PatrolState(this, stateMachine, new Vector2[] { leftPoint, rightPoint }, patrolWaitTime);
-        chaseState = new ChaseState(this, stateMachine, chaseSpeed);
-        jumpState = new JumpState(this, stateMachine, jumpPower, jumpDistance, jumpCooldown);
+        RegisterState(new PatrolState(this, stateMachine, new Vector2[] { leftPoint, rightPoint }, patrolWaitTime));
+        RegisterState(new ChaseState(this, stateMachine, chaseSpeed));
+        RegisterState(new JumpState(this, stateMachine, jumpPower, jumpDistance, jumpCooldown));
 
         // 상태 머신 초기화
-        stateMachine.ChangeState(patrolState);
+        SwitchToState<PatrolState>();
     }
 
     /// <summary>
@@ -156,11 +156,11 @@ public class EnemySlime : BaseEnemy
         yield return new WaitForSeconds(delay);
         if (playerDetected)
         {
-            stateMachine.ChangeState(chaseState);
+            SwitchToState<ChaseState>();
         }
         else
         {
-            stateMachine.ChangeState(patrolState);
+            SwitchToState<PatrolState>();
         }
     }
 
@@ -176,7 +176,7 @@ public class EnemySlime : BaseEnemy
         // 추격 상태로 전환
         if (currentState != chaseState && currentState != attackState)
         {
-            stateMachine.ChangeState(chaseState);
+            SwitchToState<ChaseState>();
         }
     }
 
@@ -186,42 +186,6 @@ public class EnemySlime : BaseEnemy
     protected override void OnPlayerLost()
     {
         // 필요시 구현
-    }
-
-    #endregion
-
-    #region State Switch Methods
-
-    /// <summary>
-    /// 대기 상태로 전환
-    /// </summary>
-    public override void SwitchToIdleState()
-    {
-        stateMachine.ChangeState(idleState);
-    }
-
-    /// <summary>
-    /// 순찰 상태로 전환
-    /// </summary>
-    public override void SwitchToPatrolState()
-    {
-        stateMachine.ChangeState(patrolState);
-    }
-
-    /// <summary>
-    /// 추격 상태로 전환
-    /// </summary>
-    public override void SwitchToChaseState()
-    {
-        stateMachine.ChangeState(chaseState);
-    }
-
-    /// <summary>
-    /// 점프 상태로 전환
-    /// </summary>
-    public override void SwitchToJumpState()
-    {
-        stateMachine.ChangeState(jumpState);
     }
 
     #endregion

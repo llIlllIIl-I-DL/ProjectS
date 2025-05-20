@@ -18,8 +18,6 @@ public class EnemySupuerDust : BaseEnemy
     [SerializeField] private float maxRotationAngle;      // 최대 회전 각도 (제한된 각도만 회전하고 싶을 경우)
     [SerializeField] private bool rotateToPlayer = true;  // 플레이어 방향으로 회전 여부
     
-    // 상태
-    private IdleState idleState;
     private AttackState attackState;
     
     // 참조 및 속성
@@ -33,10 +31,6 @@ public class EnemySupuerDust : BaseEnemy
     
     // 현재 상태 가져오기 (상태 전환 로직용)
     public IEnemyState currentState => stateMachine.CurrentState;
-    
-    // 상태 접근자 메서드들
-    public IdleState GetIdleState() => idleState;
-    public AttackState GetAttackState() => attackState;
     
     #endregion
 
@@ -94,11 +88,12 @@ public class EnemySupuerDust : BaseEnemy
     protected override void InitializeEnemy()
     {
         // 상태 생성
-        idleState = new IdleState(this, stateMachine);
-        attackState = new AttackState(this, stateMachine, fireRate);
+        RegisterState(new IdleState(this, stateMachine));
+        RegisterState(new AttackState(this, stateMachine, fireRate));
+        RegisterState(new PatrolState(this, stateMachine, new Vector2[] { startPosition }, 0f)); // 고정 위치
         
         // 초기 상태 설정
-        stateMachine.ChangeState(idleState);
+        SwitchToState<IdleState>();
     }
     
     /// <summary>
@@ -111,11 +106,11 @@ public class EnemySupuerDust : BaseEnemy
         // 플레이어 감지 시 상태 전환
         if (playerDetected && currentState != attackState)
         {
-            stateMachine.ChangeState(attackState);
+            SwitchToState<AttackState>();
         }
         else if (!playerDetected && currentState == attackState)
         {
-            stateMachine.ChangeState(idleState);
+            SwitchToState<IdleState>();
         }
         
         // 플레이어를 향해 회전 (제한된 각도 내에서)
@@ -231,26 +226,6 @@ public class EnemySupuerDust : BaseEnemy
         // 디버깅
         Debug.DrawRay(firePoint.position, fireDirection * 3f, Color.red, 0.5f);
         Debug.Log($"총알 발사 방향: {fireDirection}, 각도: {angle}도, 데미지: {attackPower}");
-    }
-    
-    #endregion
-
-    #region State Switch Methods
-    
-    /// <summary>
-    /// 대기 상태로 전환
-    /// </summary>
-    public override void SwitchToIdleState()
-    {
-        stateMachine.ChangeState(idleState);
-    }
-    
-    /// <summary>
-    /// 공격 상태로 전환
-    /// </summary>
-    public override void SwitchToAttackState()
-    {
-        stateMachine.ChangeState(attackState);
     }
     
     #endregion

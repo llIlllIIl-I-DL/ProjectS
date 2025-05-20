@@ -115,15 +115,13 @@ public class EnemyScrap : BaseEnemy
     /// </summary>
     protected override void InitializeEnemy()
     {
-        flyingPatrolState = new FlyingPatrolState(this, stateMachine, patrolDistance, patrolWaitTime);
-        flyingChaseState = new FlyingChaseState(this, stateMachine, chaseSpeed);
-        attackState = new AttackState(this, stateMachine, attackSpeed);
+        RegisterState(new FlyingPatrolState(this, stateMachine, patrolDistance, patrolWaitTime));
+        RegisterState(new FlyingChaseState(this, stateMachine, chaseSpeed));
+        RegisterState(new AttackState(this, stateMachine, attackSpeed));
 
 
         // 상태 머신 초기화
-        stateMachine.ChangeState(flyingPatrolState);
-
-        // 나머지 초기화...
+        SwitchToState<FlyingPatrolState>();
     }
 
     /// <summary>
@@ -228,33 +226,6 @@ public class EnemyScrap : BaseEnemy
     {
         // 필요시 구현
     }
-
-    #region State Switch Methods
-
-    /// <summary>
-    /// 공격 상태로 전환
-    /// </summary>
-    public override void SwitchToAttackState()
-    {
-        stateMachine.ChangeState(attackState);
-    }
-    /// <summary>
-    /// 순찰 상태로 전환
-    /// </summary>
-    public override void SwitchToPatrolState()
-    {
-        stateMachine.ChangeState(flyingPatrolState);
-    }
-
-    /// <summary>
-    /// 추격 상태로 전환
-    /// </summary>
-    public override void SwitchToChaseState()
-    {
-        stateMachine.ChangeState(flyingChaseState);
-    }
-
-    #endregion
 
     #endregion
 
