@@ -963,6 +963,11 @@ MonoBehaviour:
   m_CameraActivatedEvent:
     m_PersistentCalls:
       m_Calls: []
+--- !u!4 &1135739955 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8993827512999552491, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+  m_PrefabInstance: {fileID: 2066729056}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1886332053 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3137287986617449566, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
@@ -1436,6 +1441,10 @@ PrefabInstance:
       propertyPath: poolInfos.Array.data[5].initialSize
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 4689504699989131009, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: firePoint
+      value: 
+      objectReference: {fileID: 1135739955}
     - target: {fileID: 5125172913699271901, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
       propertyPath: defaultDebuffs.Array.data[0]
       value: 
