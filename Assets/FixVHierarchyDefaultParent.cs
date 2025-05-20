@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEditor;
 
-public class FixVHierarchyDefaultParent : EditorWindow
+#if UNITY_EDITOR
+public class FixVHierarchyDefaultParent : UnityEditor.EditorWindow
 {
     [MenuItem("Tools/Fix VHierarchy Default Parent Error")]
     public static void FixVHierarchyError()
@@ -14,4 +15,5 @@ public class FixVHierarchyDefaultParent : EditorWindow
         // 또는 메뉴를 통해 관리하려면 아래 메뉴 경로를 사용할 수 있습니다:
         // Tools > vHierarchy > Shortcuts > D to set default parent
     }
-} 
+}
+#endif 

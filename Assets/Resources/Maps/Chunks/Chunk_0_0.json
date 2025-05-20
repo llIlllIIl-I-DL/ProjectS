@@ -1,12 +1,14 @@
 {
     "placedModules": [
         {
-            "moduleGUID": "707c39880b2858b47aee46ecdd4ab4b1",
+            "moduleGUID": "5381dff4897522644a0e55be21e4b9cc",
             "position": {
                 "x": 20.0,
                 "y": 4.0
             },
             "rotationStep": 0,
+            "moduleType": "",
+            "itemID": "",
             "connections": []
         }
     ]

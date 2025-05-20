@@ -1,21 +1,25 @@
 {
     "placedModules": [
         {
-            "moduleGUID": "01d7bc8c05cbc33458a10312aa2ab3f7",
+            "moduleGUID": "c3c51cae96933c3439105d0b24ef54f7",
             "position": {
                 "x": 226.0,
                 "y": -125.0
             },
             "rotationStep": 0,
+            "moduleType": "",
+            "itemID": "",
             "connections": []
         },
         {
-            "moduleGUID": "07f38c8060dbc1c4e89aca163e2a0794",
+            "moduleGUID": "9646cae2de9bf2d4e8fa2124dc12d27a",
             "position": {
                 "x": 268.0,
                 "y": -117.0
             },
             "rotationStep": 0,
+            "moduleType": "",
+            "itemID": "",
             "connections": []
         }
     ]

@@ -1,84 +1,102 @@
 {
     "placedModules": [
         {
-            "moduleGUID": "30de75c168ca40748b535003ec42b551",
+            "moduleGUID": "52bb7f134500a214e97756cccdbf6f62",
             "position": {
                 "x": 36.0,
                 "y": -20.0
             },
             "rotationStep": 0,
+            "moduleType": "",
+            "itemID": "",
             "connections": []
         },
         {
-            "moduleGUID": "aa929fc7419e16c478dfc4ed000edcab",
+            "moduleGUID": "d8d4be460bb916c4abac21af6d6b045d",
             "position": {
                 "x": 41.0,
                 "y": -45.0
             },
             "rotationStep": 0,
+            "moduleType": "",
+            "itemID": "",
             "connections": []
         },
         {
-            "moduleGUID": "be37de2bb7ee5fa428e211191b409cd1",
+            "moduleGUID": "1ef274a0256587041bf7cf2b80302355",
             "position": {
                 "x": 70.0,
                 "y": -52.0
             },
             "rotationStep": 0,
+            "moduleType": "",
+            "itemID": "",
             "connections": []
         },
         {
-            "moduleGUID": "b12f08229855271448bb9ffd08bbea72",
+            "moduleGUID": "cdb2abfae7f92e54f8cbfb75d0ed237a",
             "position": {
                 "x": 75.0,
                 "y": -23.0
             },
             "rotationStep": 0,
+            "moduleType": "",
+            "itemID": "",
             "connections": []
         },
         {
-            "moduleGUID": "2063a5fe5a19b4b43a0ce8624381de7b",
+            "moduleGUID": "522a6e51c8992074aa9c8e81defba642",
             "position": {
                 "x": 90.0,
                 "y": -23.0
             },
             "rotationStep": 0,
+            "moduleType": "",
+            "itemID": "",
             "connections": []
         },
         {
-            "moduleGUID": "585b4ac1f654ea642bcf13d9f60f477b",
+            "moduleGUID": "cb8eafabd563dcc4b971f35b35387be4",
             "position": {
                 "x": 94.0,
                 "y": -7.0
             },
             "rotationStep": 0,
+            "moduleType": "",
+            "itemID": "",
             "connections": []
         },
         {
-            "moduleGUID": "c6d4777bea50fba4ea1a64329f0f63e6",
+            "moduleGUID": "4008d4523ca7b08428055c7413dc44e0",
             "position": {
                 "x": 95.0,
                 "y": -58.0
             },
             "rotationStep": 0,
+            "moduleType": "",
+            "itemID": "",
             "connections": []
         },
         {
-            "moduleGUID": "e2abd2ee279cbb74b9fe71a80b8f8f87",
+            "moduleGUID": "ac885c85efa1c744c8b76d5494efb9e9",
             "position": {
                 "x": 74.0,
                 "y": -78.0
             },
             "rotationStep": 0,
+            "moduleType": "",
+            "itemID": "",
             "connections": []
         },
         {
-            "moduleGUID": "f4dbe31d4f7a9c14aa1af8e232f1e9ba",
+            "moduleGUID": "3a87bae31f73dcd4d8c05eaa0af6c94e",
             "position": {
                 "x": 15.0,
                 "y": -88.0
             },
             "rotationStep": 0,
+            "moduleType": "",
+            "itemID": "",
             "connections": []
         }
     ]

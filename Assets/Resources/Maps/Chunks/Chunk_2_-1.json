@@ -1,39 +1,47 @@
 {
     "placedModules": [
         {
-            "moduleGUID": "a821c40179bee394392742e0991e21bc",
+            "moduleGUID": "38107d48391b19c43b7b62ab0eb007f7",
             "position": {
                 "x": 204.0,
                 "y": -46.0
             },
             "rotationStep": 0,
+            "moduleType": "",
+            "itemID": "",
             "connections": []
         },
         {
-            "moduleGUID": "1fc3bf584c13ca044b5820081d8c3ebf",
+            "moduleGUID": "4345808419dcb034597fa016d38d813f",
             "position": {
                 "x": 234.0,
                 "y": -61.0
             },
             "rotationStep": 0,
+            "moduleType": "",
+            "itemID": "",
             "connections": []
         },
         {
-            "moduleGUID": "2ed17622cde23804695fb3024154bf35",
+            "moduleGUID": "853c09e85dc38794880f97654b15100a",
             "position": {
                 "x": 211.0,
                 "y": -27.0
             },
             "rotationStep": 0,
+            "moduleType": "",
+            "itemID": "",
             "connections": []
         },
         {
-            "moduleGUID": "4ef9d82fefc7a0141bc4e65b99d9c09d",
+            "moduleGUID": "047a6d6651278774d83f658e7e041dc1",
             "position": {
                 "x": 205.0,
                 "y": -96.0
             },
             "rotationStep": 0,
+            "moduleType": "",
+            "itemID": "",
             "connections": []
         }
     ]

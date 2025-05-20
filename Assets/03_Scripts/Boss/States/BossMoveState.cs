@@ -21,6 +21,7 @@ public class BossMoveState : IEnemyState
         player = stateMachine.playerTransform;
         rb = stateMachine.GetComponent<Rigidbody2D>();
         animator = stateMachine.GetComponent<Animator>();
+        bossHealth = stateMachine.bossHealth;
     }
 
     public void Enter()// 상태에 진입했을 때
@@ -39,7 +40,7 @@ public class BossMoveState : IEnemyState
     }
     public void Update()// 매 프레임 업데이트
     {
-        if (player == null || boss == null) return;
+        if (player == null || boss == null || bossHealth == null) return;
 
         //float distance = Vector2.Distance(boss.position, player.position);
 
@@ -81,7 +82,7 @@ public class BossMoveState : IEnemyState
 
     public void FixedUpdate()// 물리 업데이트
     {
-        if (player == null || boss == null || rb == null) return;
+        if (player == null || boss == null || rb == null || bossHealth == null) return;
 
         float distance = Vector2.Distance(player.position, boss.position);
 

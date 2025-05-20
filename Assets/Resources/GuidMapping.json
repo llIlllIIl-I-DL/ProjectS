@@ -1,0 +1,96 @@
+{
+    "mappings": [
+        {
+            "guid": "d8d4be460bb916c4abac21af6d6b045d",
+            "resourcesPath": "Modules/Aether_Dome_1-1"
+        },
+        {
+            "guid": "1ef274a0256587041bf7cf2b80302355",
+            "resourcesPath": "Modules/Aether_Dome_1-2"
+        },
+        {
+            "guid": "cdb2abfae7f92e54f8cbfb75d0ed237a",
+            "resourcesPath": "Modules/Aether_Dome_1-3"
+        },
+        {
+            "guid": "522a6e51c8992074aa9c8e81defba642",
+            "resourcesPath": "Modules/Aether_Dome_1-4-2"
+        },
+        {
+            "guid": "cb8eafabd563dcc4b971f35b35387be4",
+            "resourcesPath": "Modules/Aether_Dome_1-4"
+        },
+        {
+            "guid": "ca64d7544e32ffd469ac428635e987fd",
+            "resourcesPath": "Modules/Aether_Dome_1-5"
+        },
+        {
+            "guid": "066a9595f2030da44ba35501802c6aff",
+            "resourcesPath": "Modules/Aether_Dome_1-6"
+        },
+        {
+            "guid": "4008d4523ca7b08428055c7413dc44e0",
+            "resourcesPath": "Modules/Aether_Dome_1-7"
+        },
+        {
+            "guid": "4f415d945dc4c684595522dab789a437",
+            "resourcesPath": "Modules/Aether_Dome_1-8"
+        },
+        {
+            "guid": "6769d0baf5e1b7f4e98117d31fb6efc1",
+            "resourcesPath": "Modules/Aether_Dome_1-9"
+        },
+        {
+            "guid": "ac885c85efa1c744c8b76d5494efb9e9",
+            "resourcesPath": "Modules/Aether_Dome_1-10"
+        },
+        {
+            "guid": "3a87bae31f73dcd4d8c05eaa0af6c94e",
+            "resourcesPath": "Modules/Aether_Dome_1-11"
+        },
+        {
+            "guid": "38107d48391b19c43b7b62ab0eb007f7",
+            "resourcesPath": "Modules/Aether_Dome_1-12"
+        },
+        {
+            "guid": "c6879388610b8fe42b827b078648026d",
+            "resourcesPath": "Modules/Aether_Dome_1-13"
+        },
+        {
+            "guid": "4345808419dcb034597fa016d38d813f",
+            "resourcesPath": "Modules/Aether_Dome_1-14"
+        },
+        {
+            "guid": "853c09e85dc38794880f97654b15100a",
+            "resourcesPath": "Modules/Aether_Dome_1-15"
+        },
+        {
+            "guid": "047a6d6651278774d83f658e7e041dc1",
+            "resourcesPath": "Modules/Aether_Dome_1-16"
+        },
+        {
+            "guid": "c3c51cae96933c3439105d0b24ef54f7",
+            "resourcesPath": "Modules/Aether_Dome_1-17"
+        },
+        {
+            "guid": "9646cae2de9bf2d4e8fa2124dc12d27a",
+            "resourcesPath": "Modules/Aether_Dome_1-18"
+        },
+        {
+            "guid": "ea323b183312a594db05dc4205ec2940",
+            "resourcesPath": "Modules/Aether_Dome_1-19-Boss"
+        },
+        {
+            "guid": "0d66cf435bcdb8442bec75d8318cf494",
+            "resourcesPath": "Modules/Registance_BaseCamp_1"
+        },
+        {
+            "guid": "52bb7f134500a214e97756cccdbf6f62",
+            "resourcesPath": "Modules/StartCorrider"
+        },
+        {
+            "guid": "5381dff4897522644a0e55be21e4b9cc",
+            "resourcesPath": "Modules/StartPosition"
+        }
+    ]
+}

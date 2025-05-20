@@ -33,8 +33,16 @@ public class BulletFactory : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"Bullet prefab not found for type: {type}");
-            return bulletPrefabMap[ElementType.Normal];
+            Debug.LogError($"Bullet prefab not found for type: {type}. Please check if all bullet prefabs are properly assigned in the inspector.");
+            if (bulletPrefabMap.TryGetValue(ElementType.Normal, out var normalPrefab))
+            {
+                return normalPrefab;
+            }
+            else
+            {
+                Debug.LogError("Normal bullet prefab is also missing! Please assign at least the Normal bullet prefab in the inspector.");
+                return null;
+            }
         }
     }
 } 
