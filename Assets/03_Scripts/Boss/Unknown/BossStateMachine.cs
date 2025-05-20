@@ -21,17 +21,17 @@ public class BossStateMachine : MonoBehaviour
     public Transform playerTransform;
     public GameObject projectilePrefab;
     public Transform firePoint;
-    
+
     [Header("설정")]
     public float chaseRange = 5f;
     public bool isFastChasingAfterProjectile = false;
-    
+
     // 킥 공격 관련
     private float lastKickTime = -Mathf.Infinity;
     public float KickCooldown => GameConstants.Boss.KICK_COOLDOWN;
     public float LastKickTime => lastKickTime;
     public bool CanKick => Time.time - lastKickTime >= KickCooldown;
-    
+
     private Animator animator;
     private bool isDead = false;
 
@@ -48,11 +48,11 @@ public class BossStateMachine : MonoBehaviour
 
         // 상태 초기화
         InitializeStates();
-        
+
         // 기본 상태로 시작
         ChangeState(BossState.Idle);
     }
-    
+
     private void InitializeStates()
     {
         // 상태 추가
@@ -120,7 +120,7 @@ public class BossStateMachine : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, GameConstants.Boss.DETECTION_RANGE);
-        
+
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, GameConstants.Boss.ATTACK_RANGE);
     }
@@ -138,7 +138,7 @@ public class BossStateMachine : MonoBehaviour
             ChangeState(BossState.Idle);
         }
     }
-    
+
     // 킥 공격 사용 시 쿨다운 갱신
     public void UpdateKickCooldown()
     {

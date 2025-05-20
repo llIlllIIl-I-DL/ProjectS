@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -24,7 +25,7 @@ public class StartSceneUI : MonoBehaviour
 
     void Start()
     {
-        newBtn.onClick.AddListener(() => NewGame());
+        newBtn.onClick.AddListener(() => SceneManager.LoadScene("MainScene", LoadSceneMode.Single));
         loadBtn.onClick.AddListener(() => LoadMenu());
         optionBtn.onClick.AddListener(() => OptionMenu());
         exitBtn.onClick.AddListener(() => CloseGame());
@@ -33,8 +34,8 @@ public class StartSceneUI : MonoBehaviour
 
     public void NewGame()
     {
-        difficultyMenu.SetActive(true);
-        SelectDifficulty();
+        //difficultyMenu.SetActive(true);
+        //SelectDifficulty();
     }
 
     public void SelectDifficulty()

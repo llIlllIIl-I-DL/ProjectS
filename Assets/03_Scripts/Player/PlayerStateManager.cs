@@ -376,6 +376,12 @@ public class PlayerStateManager : MonoBehaviour
             {
                 PerformWallJump();
             }
+            // 대시 중에도 점프 가능하도록 수정
+            else if (isDashing)
+            {
+                // 대시 점프 실행
+                PerformDashJump();
+            }
             // 점프 가능한 상태이면 점프
             else if (lastGroundedTime > 0)
             {
@@ -387,6 +393,23 @@ public class PlayerStateManager : MonoBehaviour
     private void PerformWallJump()
     {
         movement.WallJump(settings.wallJumpForce, settings.wallJumpDirection);
+        ChangeState(PlayerStateType.Jumping);
+        lastJumpTime = 0;
+    }
+    
+    // 대시 중 점프 메서드 추가
+    private void PerformDashJump()
+    {
+        Debug.Log("대시 중 점프 실행 - 대시 속도 0.5초간 유지");
+        
+        // 대시 상태를 유지하면서 Y 속도만 점프 속도로 설정
+        isJumping = true;
+        
+        // Jump 메서드에서 대시 속도를 유지하면서 점프
+        movement.Jump(settings.jumpForce);
+        
+        // 점프 상태로 변경 (대시 상태에서 벗어남)
+        isDashing = false;
         ChangeState(PlayerStateType.Jumping);
         lastJumpTime = 0;
     }

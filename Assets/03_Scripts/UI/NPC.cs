@@ -52,6 +52,7 @@ public class NPC : BaseObject
         if (istalking == false)
         {
             UIManager.Instance.NPCTalkInteraction(npcFaceIcon);
+            Destroy(interactionButtonUI);
             istalking = true;
         }
 

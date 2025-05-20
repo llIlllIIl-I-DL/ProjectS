@@ -212,8 +212,9 @@ MonoBehaviour:
   targetTags:
   - tag: Boss
   - tag: Enemy
-  isOvercharged: 1
+  isOvercharged: 0
   isReloading: 0
+  lifeTime: 3
   extraDamageMultiplier: 1.5
   overchargedLifetime: 3
   overchargedScale: 1.2

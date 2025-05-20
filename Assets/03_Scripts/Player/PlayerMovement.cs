@@ -19,6 +19,12 @@ public class PlayerMovement : MonoBehaviour
     private float slopeAngle;
     private Vector2 slopeNormalPerpendicular;
     
+    // 대시 관련 변수
+    private float currentDashSpeed = 0f;
+    private bool wasDashing = false;
+    private float dashSpeedDecayRate = 0.95f; // 대시 속도 감소율 (settings에서 초기화됨)
+    private float dashSpeedTimer = 0f; // 대시 속도 유지 타이머
+    
     [Header("경사로 설정")]
     [SerializeField] private float maxSlopeAngle = 45f;
     [SerializeField] private PhysicsMaterial2D noFriction;
@@ -43,6 +49,12 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         stats = GetComponent<PlayerHP>(); // PlayerStats로 변경 예정
         stateManager = GetComponent<PlayerStateManager>();
+        
+        // 설정에서 값 초기화
+        if (settings != null)
+        {
+            dashSpeedDecayRate = settings.dashSpeedDecayRate;
+        }
         
         // 마찰력 자료 확인
         if (noFriction == null || fullFriction == null)
@@ -231,8 +243,19 @@ public class PlayerMovement : MonoBehaviour
     public void Jump(float force)
     {
         float jumpForce = force;
-        // 필요하다면 stats에서 점프력 등도 받아올 수 있음
-        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+        
+        // 대시 중 점프시 대시 속도 유지
+        if (wasDashing && Mathf.Abs(currentDashSpeed) > 0.1f)
+        {
+            // 대시 중 점프 - X축 속도는 대시 속도 유지
+            rb.velocity = new Vector2(currentDashSpeed, jumpForce);
+            Debug.Log($"대시 점프: X축 속도 {currentDashSpeed} 유지, Y축 속도 {jumpForce} 적용");
+        }
+        else
+        {
+            // 일반 점프
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+        }
     }
 
     public void JumpCut()
@@ -245,6 +268,10 @@ public class PlayerMovement : MonoBehaviour
 
     public void Dash(float dashSpeed, float dashDuration)
     {
+        // 대시 속도 저장
+        currentDashSpeed = facingDirection * dashSpeed;
+        wasDashing = true;
+        
         StartCoroutine(DashCoroutine(dashSpeed, dashDuration));
     }
 
@@ -256,24 +283,47 @@ public class PlayerMovement : MonoBehaviour
         rb.velocity = new Vector2(facingDirection * dashSpeed, 0f);
         rb.gravityScale = 0;
 
-        while (Time.time < startTime + dashDuration)
+        // 대시 중 상태를 확인하기 위한 플래그
+        bool dashInterrupted = false;
+
+        while (Time.time < startTime + dashDuration && !dashInterrupted)
         {
             if (UtilityChangedStatController.Instance.currentUtilityList.Any(u => u.id == 1015))
             {
                 UtilityChangedStatController.Instance.InvincibleWhenDash();
             }
 
-            // 대시 중 일정한 속도 유지
-            rb.velocity = new Vector2(facingDirection * dashSpeed, 0f);
+            // y 속도가 0이 아니면 점프했다는 의미
+            if (rb.velocity.y > 0.1f)
+            {
+                // 점프로 인해 대시가 중단됨
+                dashInterrupted = true;
+                Debug.Log("대시 중 점프로 인해 대시가 중단되었습니다.");
+                break;
+            }
+
+            // 대시 중 일정한 속도 유지 (x 축만)
+            rb.velocity = new Vector2(facingDirection * dashSpeed, rb.velocity.y);
             yield return null;
         }
 
-        // 대시 종료 시 중력 복원
+        // 대시 종료 시 중력 복원 (점프로 중단된 경우 포함)
         rb.gravityScale = 1;
         OnDashEnd?.Invoke();
 
         UtilityChangedStatController.Instance.isInvincibleDash = false;
-        yield return new WaitForSeconds(settings.dashCooldown);
+        
+        // 점프로 인해 대시가 중단된 경우에는 쿨다운 시간을 단축
+        float cooldownTime = dashInterrupted ? settings.dashCooldown * 0.5f : settings.dashCooldown;
+        
+        // 점프로 인해 대시가 중단되지 않았을 경우에만 대시 상태 초기화
+        if (!dashInterrupted)
+        {
+            currentDashSpeed = 0f;
+            wasDashing = false;
+        }
+        
+        yield return new WaitForSeconds(cooldownTime);
 
         OnDashCooldownComplete?.Invoke();
     }
@@ -395,6 +445,34 @@ public class PlayerMovement : MonoBehaviour
             facingDirection = direction;
             OnDirectionChanged?.Invoke(facingDirection);
             Debug.Log($"PlayerMovement: 캐릭터 방향이 {facingDirection}로 변경되었습니다.");
+        }
+    }
+
+    // 대시 속도 감소 메서드 (점프 상태에서 호출)
+    public void ApplyDashSpeedDecay()
+    {
+        if (wasDashing && Mathf.Abs(currentDashSpeed) > 0.1f)
+        {
+            // 타이머가 0이면 대시 점프를 한 시점이므로 타이머 초기화
+            if (dashSpeedTimer <= 0f && settings != null)
+            {
+                dashSpeedTimer = settings.dashJumpSpeedDuration;
+                Debug.Log($"대시 점프: 대시 속도 {currentDashSpeed} 유지 시간 {dashSpeedTimer}초");
+            }
+            
+            // 타이머 감소
+            dashSpeedTimer -= Time.deltaTime;
+            
+            // 타이머가 종료되면 대시 속도 초기화
+            if (dashSpeedTimer <= 0f)
+            {
+                currentDashSpeed = 0f;
+                wasDashing = false;
+                Debug.Log("대시 속도 유지 시간 종료");
+            }
+            
+            // 실제 X축 속도를 대시 속도로 설정 (타이머 동안 일정하게 유지)
+            rb.velocity = new Vector2(currentDashSpeed, rb.velocity.y);
         }
     }
 }

@@ -53,6 +53,9 @@ public class PlayerJumpingState : IPlayerState
 
         // 점프 중 이동 (공중 조작)
         movement.Move(inputHandler.MoveDirection);
+        
+        // 대시 후 점프 시 대시 속도 감소 처리
+        movement.ApplyDashSpeedDecay();
 
         // 공중에서 중력 가속도 적용은 Rigidbody2D에 의해 자동으로 처리됨
     }
