@@ -3,16 +3,20 @@ using UnityEngine;
 public class RustEffect : DebuffEffect
 {
     private float originalSpeed;
+    private float originalDefence;
 
     protected override void ApplyInitialEffect()
     {
+        if (targetDebuffable == null) return;
+
         // 원래 속도 저장
-        originalSpeed = targetEnemy.GetMoveSpeed();
+        originalSpeed = targetDebuffable.MoveSpeed;
+        originalDefence = targetDebuffable.Defence;
 
         // 속도 감소 적용 (intensity는 0.0-1.0 사이의 값, 감소율을 나타냄)
-        targetEnemy.SetMoveSpeed(originalSpeed * (1f - intensity));
+        targetDebuffable.MoveSpeed = originalSpeed * (1f - intensity);
         // 방어력 감소 적용
-        targetEnemy.SetDefence(targetEnemy.GetDefence() * (1f - intensity));
+        targetDebuffable.Defence = originalDefence * (1f - intensity);
 
         // 시각적 효과 적용 (색상 변경 등)
         ApplyVisualEffect(true);
@@ -32,27 +36,24 @@ public class RustEffect : DebuffEffect
 
     protected override void ApplyTickEffect()
     {
+        if (targetDebuffable == null) return;
         // 틱당 데미지 적용
-        targetEnemy.TakeDamage(tickDamage);
-
+        targetDebuffable.TakeDamage(tickDamage);
     }
 
     protected override void RemoveEffect()
     {
-        // 원래 속도로 복구
-        if (targetEnemy != null)
+        if (targetDebuffable != null)
         {
-            targetEnemy.SetMoveSpeed(originalSpeed);
+            targetDebuffable.MoveSpeed = originalSpeed;
+            targetDebuffable.Defence = originalDefence;
             ApplyVisualEffect(false);
-            // 방어력 복구
-            targetEnemy.SetDefence(targetEnemy.GetDefence() / (1f - intensity));
-
         }
     }
 
     private void ApplyVisualEffect(bool apply)
     {
-        SpriteRenderer renderer = targetEnemy.GetComponentInChildren<SpriteRenderer>();
+        SpriteRenderer renderer = targetDebuffable.gameObject.GetComponentInChildren<SpriteRenderer>();
         if (renderer != null)
         {
             if (apply)

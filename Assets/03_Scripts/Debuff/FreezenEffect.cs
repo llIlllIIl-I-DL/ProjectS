@@ -10,11 +10,12 @@ public class FreezeEffect : DebuffEffect
 
     protected override void ApplyInitialEffect()
     {
+        if (targetDebuffable == null) return;
         // 원래 속도 저장
-        originalSpeed = targetEnemy.GetMoveSpeed();
+        originalSpeed = targetDebuffable.MoveSpeed;
 
         // 속도 감소 (빙결은 더 큰 감소율)
-        targetEnemy.SetMoveSpeed(originalSpeed * (1f - (intensity * 1.5f)));
+        targetDebuffable.MoveSpeed = originalSpeed * (1f - (intensity * 1.5f));
 
         // 추가로 공격 속도 감소 적용 가능
         
@@ -25,8 +26,9 @@ public class FreezeEffect : DebuffEffect
 
     protected override void ApplyTickEffect()
     {
+        if (targetDebuffable == null) return;
         // 빙결 데미지
-        targetEnemy.TakeDamage(tickDamage);
+        targetDebuffable.TakeDamage(tickDamage);
 
         // 추가 효과: 낮은 확률로 일시적 스턴
         if (Random.value < 0.05f * intensity)
@@ -37,18 +39,17 @@ public class FreezeEffect : DebuffEffect
 
     protected override void RemoveEffect()
     {
-        // 원래 상태로 복구
-        if (targetEnemy != null)
+        if (targetDebuffable != null)
         {
-            targetEnemy.SetMoveSpeed(originalSpeed);
-            //targetEnemy.ResetAttackSpeedModifier();
+            targetDebuffable.MoveSpeed = originalSpeed;
+            //targetDebuffable.ResetAttackSpeedModifier();
             ApplyVisualEffect(false);
         }
     }
 
     private void ApplyVisualEffect(bool apply)
     {
-        Renderer renderer = targetEnemy.GetComponentInChildren<Renderer>();
+        Renderer renderer = targetDebuffable.gameObject.GetComponentInChildren<Renderer>();
         if (renderer != null)
         {
             if (apply)

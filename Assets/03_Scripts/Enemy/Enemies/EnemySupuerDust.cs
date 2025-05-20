@@ -196,29 +196,37 @@ public class EnemySupuerDust : BaseEnemy
             fireDirection = firePoint.right;
         }
         
-        // 총알 생성 - 방향에 맞는 회전값 적용
         float angle = Mathf.Atan2(fireDirection.y, fireDirection.x) * Mathf.Rad2Deg;
         Quaternion bulletRotation = Quaternion.Euler(0, 0, angle);
+
+        // 풀링 매니저에서 총알 가져오기
+        GameObject bullet = ObjectPoolingManager.Instance.GetObject(ObjectPoolingManager.PoolType.EnemyBullet);
+        if (bullet == null)
+        {
+            Debug.LogWarning("풀에서 총알을 가져오지 못했습니다!");
+            return;
+        }
+        bullet.transform.position = firePoint.position;
+        bullet.transform.rotation = bulletRotation;
         
-        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, bulletRotation);
+        // 발사자 지정
+        Bullet bulletScript = bullet.GetComponent<Bullet>();
+        if (bulletScript != null)
+        {
+            bulletScript.Shooter = this.gameObject;
+        }
         
         // 총알에 속도와 데미지 적용
         Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
-        EnemyBullet enemyBullet = bullet.GetComponent<EnemyBullet>();
-        
-        if (bulletRb != null && enemyBullet != null)
+        if (bulletRb != null)
         {
             bulletRb.velocity = fireDirection * bulletSpeed;
-            enemyBullet.SetDamage(attackPower); // attackPower를 총알 데미지로 설정
         }
         else
         {
             Debug.LogWarning("총알에 필요한 컴포넌트가 없습니다!");
             return;
         }
-        
-        // 총알 수명 (메모리 관리)
-        Destroy(bullet, 5f);
         
         // 디버깅
         Debug.DrawRay(firePoint.position, fireDirection * 3f, Color.red, 0.5f);

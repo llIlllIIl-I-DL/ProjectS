@@ -12,10 +12,10 @@ public class FlameBullet : Bullet
         base.Start();
     }
 
-    protected override void ApplySpecialEffect(BaseEnemy enemy)
+    protected override void ApplySpecialEffect(IDebuffable target)
     {
         // 적에게 화상 효과 적용 (DoT 데미지 구현 필요)
-        Debug.Log($"적 {enemy.name}에게 화상 효과 적용, 초당 {burnDamagePerSecond} 데미지, 지속시간: {burnDuration}초");
+        Debug.Log($"적 {target}에게 화상 효과 적용, 초당 {burnDamagePerSecond} 데미지, 지속시간: {burnDuration}초");
         // 여기서 실제 화상 데미지 적용 로직 구현 필요
     }
 } 

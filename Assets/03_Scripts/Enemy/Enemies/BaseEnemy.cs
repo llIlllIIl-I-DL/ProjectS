@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// 모든 적 캐릭터의 기본 클래스
 /// </summary>
-public abstract class BaseEnemy : DestructibleEntity
+public abstract class BaseEnemy : DestructibleEntity, IDebuffable
 {
     #region Variables
 
@@ -353,12 +353,12 @@ public abstract class BaseEnemy : DestructibleEntity
     /// <summary>
     /// 마지막으로 알려진 플레이어 위치 반환
     /// </summary>
-    public Vector2 GetLastKnownPlayerPosition() => lastKnownPlayerPosition;
+    public Vector2 LastKnownPlayerPosition => lastKnownPlayerPosition;
 
     /// <summary>
     /// 현재 플레이어 위치 반환
     /// </summary>
-    public Vector2 GetPlayerPosition() => playerTransform != null ? playerTransform.position : transform.position;
+    public Vector2 PlayerPosition => playerTransform != null ? playerTransform.position : transform.position;
 
     /// <summary>
     /// 플레이어가 공격 범위 내에 있는지 확인
@@ -374,23 +374,11 @@ public abstract class BaseEnemy : DestructibleEntity
     /// <summary>
     /// 에너미 상태이상 여부 확인
     /// 
-    public float GetAttackPower() => attackPower;
-    public void SetAttackPower(float value)
-    {
-        attackPower = value;
-    }
-    public float GetDefence() => defence;
-    public void SetDefence(float value)
-    {
-        defence = value;
-    }
-    public float GetMoveSpeed() => moveSpeed;
-    public void SetMoveSpeed(float speed)
-    {
-        moveSpeed = speed;
-    }
+    public float AttackPower {get => attackPower; set => attackPower = value;}
 
+    public float Defence {get => defence; set => defence = value;}
 
+    public float MoveSpeed {get => moveSpeed; set => moveSpeed = value;}
 
     #endregion
 
@@ -418,8 +406,6 @@ public abstract class BaseEnemy : DestructibleEntity
             Destroy(effect, 1f); // 1초 후에 효과 삭제
         }
     }
-
-    
 
     #endregion
 
@@ -475,5 +461,12 @@ public abstract class BaseEnemy : DestructibleEntity
         base.TakeDamage(finalDamage);
         
         Debug.Log($"{gameObject.name}이(가) {damage} 데미지를 받았고, 방어력 {defence}로 인해 {finalDamage} 데미지만큼만 피해를 입었습니다.");
+    }
+
+    // IDebuffable 구현
+    public float CurrentHP
+    {
+        get => currentHealth;
+        set => currentHealth = Mathf.Clamp(value, 0, maxHealth);
     }
 }

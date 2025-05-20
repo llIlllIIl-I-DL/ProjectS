@@ -60,7 +60,7 @@ namespace Enemy.States
             startPosition = enemy.transform.position;
             
             // 플레이어 방향 계산
-            Vector2 rawDirection = enemy.GetPlayerPosition() - (Vector2)enemy.transform.position;
+            Vector2 rawDirection = enemy.PlayerPosition - (Vector2)enemy.transform.position;
             
             // X축으로만 돌진하도록 Y값을 0으로 설정 
             chargeDirection = new Vector2(Mathf.Sign(rawDirection.x), 0);

@@ -11,20 +11,6 @@ public enum DebuffType
     Poison,     // 독
     // 추가 디버프 타입
 }
-
-// 디버프 데이터를 담는 구조체
-[System.Serializable]
-public struct DebuffData
-{
-    public DebuffType type;
-    public float duration;
-    public float intensity;  // 디버프 효과의 강도 (%, 0.0-1.0)
-    public float tickDamage; // 초당 데미지
-    public GameObject visualEffectPrefab;
-    public Color tintColor;  // 적용될 색상
-    public AudioClip effectSound;
-}
-
 // 디버프 매니저
 public class DebuffManager : MonoBehaviour
 {
@@ -44,10 +30,10 @@ public class DebuffManager : MonoBehaviour
     }
 
     [Header("Default Debuff Settings")]
-    [SerializeField] private List<DebuffData> defaultDebuffs = new List<DebuffData>();
+    [SerializeField] private List<DebuffDataSO> defaultDebuffs = new List<DebuffDataSO>();
 
     // 디버프 타입별 데이터 캐시
-    private Dictionary<DebuffType, DebuffData> debuffDataCache = new Dictionary<DebuffType, DebuffData>();
+    private Dictionary<DebuffType, DebuffDataSO> debuffDataCache = new Dictionary<DebuffType, DebuffDataSO>();
 
     private void Awake()
     {
@@ -66,19 +52,19 @@ public class DebuffManager : MonoBehaviour
 
     private void CacheDefaultDebuffs()
     {
-        foreach (DebuffData data in defaultDebuffs)
+        foreach (DebuffDataSO data in defaultDebuffs)
         {
             debuffDataCache[data.type] = data;
         }
     }
 
     // 디버프 적용 메서드
-    public void ApplyDebuff(BaseEnemy enemy, DebuffType type, float duration = -1, float intensity = -1, float tickDamage = -1)
+    public void ApplyDebuff(IDebuffable target, DebuffType type, float duration = -1, float intensity = -1, float tickDamage = -1)
     {
-        if (enemy == null) return;
+        if (target == null) return;
 
         // 디버프 데이터 가져오기
-        if (!debuffDataCache.TryGetValue(type, out DebuffData data))
+        if (!debuffDataCache.TryGetValue(type, out DebuffDataSO data))
         {
             Debug.LogWarning($"Debuff type {type} not found in cache.");
             return;
@@ -90,7 +76,7 @@ public class DebuffManager : MonoBehaviour
         float finalTickDamage = tickDamage > 0 ? tickDamage : data.tickDamage;
 
         // 해당 적에게 디버프 컴포넌트 찾기
-        DebuffEffect existingDebuff = GetDebuffComponent(enemy, type);
+        DebuffEffect existingDebuff = GetDebuffComponent(target, type);
 
         if (existingDebuff != null)
         {
@@ -100,14 +86,16 @@ public class DebuffManager : MonoBehaviour
         else
         {
             // 새로운 디버프 적용
-            CreateDebuffEffect(enemy, type, data, finalDuration, finalIntensity, finalTickDamage);
+            CreateDebuffEffect(target, type, data, finalDuration, finalIntensity, finalTickDamage);
         }
     }
 
     // 특정 타입의 디버프 컴포넌트 가져오기
-    private DebuffEffect GetDebuffComponent(BaseEnemy enemy, DebuffType type)
+    private DebuffEffect GetDebuffComponent(IDebuffable target, DebuffType type)
     {
-        DebuffEffect[] debuffs = enemy.GetComponents<DebuffEffect>();
+        var mono = target as MonoBehaviour;
+        if (mono == null) return null;
+        DebuffEffect[] debuffs = mono.GetComponents<DebuffEffect>();
         foreach (DebuffEffect debuff in debuffs)
         {
             if (debuff.DebuffType == type)
@@ -119,47 +107,47 @@ public class DebuffManager : MonoBehaviour
     }
 
     // 새 디버프 효과 생성
-    private void CreateDebuffEffect(BaseEnemy enemy, DebuffType type, DebuffData data, float duration, float intensity, float tickDamage)
+    private void CreateDebuffEffect(IDebuffable target, DebuffType type, DebuffDataSO data, float duration, float intensity, float tickDamage)
     {
         switch (type)
         {
             case DebuffType.Rust:
-                RustEffect rustEffect = enemy.gameObject.AddComponent<RustEffect>();
+                RustEffect rustEffect = target.gameObject.AddComponent<RustEffect>();
                 rustEffect.Initialize(type, duration, intensity, tickDamage, data);
                 break;
 /*
             case DebuffType.Freeze:
-                FreezeEffect freezeEffect = enemy.gameObject.AddComponent<FreezeEffect>();
+                FreezeEffect freezeEffect = target.gameObject.AddComponent<FreezeEffect>();
                 freezeEffect.Initialize(type, duration, intensity, tickDamage, data);
                 break;
 
             case DebuffType.Burn:
-                BurnEffect burnEffect = enemy.gameObject.AddComponent<BurnEffect>();
+                BurnEffect burnEffect = target.gameObject.AddComponent<BurnEffect>();
                 burnEffect.Initialize(type, duration, intensity, tickDamage, data);
                 break;
 
             // 추가 디버프 타입 처리...
 
             default:
-                GenericDebuffEffect genericEffect = enemy.gameObject.AddComponent<GenericDebuffEffect>();
+                GenericDebuffEffect genericEffect = target.gameObject.AddComponent<GenericDebuffEffect>();
                 genericEffect.Initialize(type, duration, intensity, tickDamage, data);
                 break;*/
         }
 
         // 시각 효과 생성
-        CreateVisualEffect(enemy, data);
+        CreateVisualEffect(target, data);
     }
 
     // 시각 효과 생성
-    private void CreateVisualEffect(BaseEnemy enemy, DebuffData data)
+    private void CreateVisualEffect(IDebuffable target, DebuffDataSO data)
     {
         if (data.visualEffectPrefab != null)
         {
             // 풀링 매니저 사용
-            GameObject effect = ObjectPoolingManager.Instance.GetDebuffEffect(data.type, enemy.transform);
+            GameObject effect = ObjectPoolingManager.Instance.GetDebuffEffect(data.type, target.transform);
             
             // 이펙트 참조를 DebuffEffect에 전달
-            DebuffEffect debuffEffect = GetDebuffComponent(enemy, data.type);
+            DebuffEffect debuffEffect = GetDebuffComponent(target, data.type);
             if (debuffEffect != null)
             {
                 debuffEffect.SetVisualEffect(effect);
@@ -169,22 +157,27 @@ public class DebuffManager : MonoBehaviour
         // 사운드 효과 재생
         if (data.effectSound != null)
         {
-            AudioSource audio = enemy.GetComponent<AudioSource>();
-            if (audio == null)
+            AudioSource audio = null;
+            var mono = target as MonoBehaviour;
+            if (mono != null)
             {
-                audio = enemy.gameObject.AddComponent<AudioSource>();
+                audio = mono.GetComponent<AudioSource>();
+                if (audio == null)
+                {
+                    audio = mono.gameObject.AddComponent<AudioSource>();
+                }
+                audio.PlayOneShot(data.effectSound);
             }
-
-            audio.PlayOneShot(data.effectSound);
         }
     }
 
     // 디버프 제거
-    public void RemoveDebuff(BaseEnemy enemy, DebuffType type)
+    public void RemoveDebuff(IDamageable target, DebuffType type)
     {
-        if (enemy == null) return;
-
-        DebuffEffect debuff = GetDebuffComponent(enemy, type);
+        if (target == null) return;
+        var mono = target as MonoBehaviour;
+        if (mono == null) return;
+        DebuffEffect debuff = GetDebuffComponent(target as IDebuffable, type);
         if (debuff != null)
         {
             debuff.RemoveDebuff();
@@ -192,11 +185,12 @@ public class DebuffManager : MonoBehaviour
     }
 
     // 모든 디버프 제거
-    public void RemoveAllDebuffs(BaseEnemy enemy)
+    public void RemoveAllDebuffs(IDamageable target)
     {
-        if (enemy == null) return;
-
-        DebuffEffect[] debuffs = enemy.GetComponents<DebuffEffect>();
+        if (target == null) return;
+        var mono = target as MonoBehaviour;
+        if (mono == null) return;
+        DebuffEffect[] debuffs = mono.GetComponents<DebuffEffect>();
         foreach (DebuffEffect debuff in debuffs)
         {
             debuff.RemoveDebuff();

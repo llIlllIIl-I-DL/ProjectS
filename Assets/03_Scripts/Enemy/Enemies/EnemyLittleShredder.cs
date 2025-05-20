@@ -17,10 +17,12 @@ public class EnemyLittleShredder : BaseEnemy
     [Header("공격 설정")]
     [SerializeField] private float attackSpeed; // 공격 속도
     [Header("점프 설정")]
-    [SerializeField] private float jumpPower; // 점프 힘
-    [SerializeField] private float jumpDistance; // 점프 거리
-    [SerializeField] private float jumpCooldown; // 점프 쿨타임
+    [SerializeField] private float jumpPower = 5f;
+    [SerializeField] private float jumpDistance = 3f;
+    [SerializeField] private float jumpCooldown = 3f;
+    [SerializeField] private float randomJumpChance = 0.1f; // 매 초마다 점프할 확률
 
+    private float randomJumpTimer = 0f;
 
     // 상태들
     private IdleState idleState;
@@ -61,6 +63,21 @@ public class EnemyLittleShredder : BaseEnemy
     protected override void Update()
     {
         base.Update(); // BaseEnemy의 Update 호출
+        
+        // 순찰 상태일 때만 랜덤 점프 체크
+        if (currentState == patrolState)
+        {
+            randomJumpTimer += Time.deltaTime;
+            if (randomJumpTimer >= 1f) // 매 초마다 체크
+            {
+                randomJumpTimer = 0f;
+                if (Random.value < randomJumpChance) // 설정된 확률로 점프
+                {
+                    Debug.Log("랜덤 점프 시도!");
+                    SwitchToJumpState();
+                }
+            }
+        }
     }
 
     /// <summary>

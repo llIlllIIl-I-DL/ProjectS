@@ -209,8 +209,6 @@ public class Player : MonoBehaviour
 
     public void UpdateCurrentInventory()
     {
-        // I키를 눌렀을 때 나타나는 모든 정보를 여기에 취합. 특성 포인트라든지, 획득한 복장이라든지...
-
         int nowUtilityPoint = utilityPoint;
         CurrentUtilityPoint = nowUtilityPoint;
     }

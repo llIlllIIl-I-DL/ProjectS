@@ -74,7 +74,7 @@ namespace Enemy.States
             startPosition = enemy.transform.position;
             
             // 플레이어 위치 저장 (내려찍기 목표 지점)
-            targetPosition = enemy.GetPlayerPosition();
+            targetPosition = enemy.PlayerPosition;
             
             // 초기화
             currentPhase = SlamPhase.Jump;
