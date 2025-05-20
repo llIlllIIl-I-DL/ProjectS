@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
-using System; // WeaponManager.OnAmmoChanged 구독을 위해 추가
+using System; // Exception 클래스 사용을 위해 추가
 
 public class PlayerUI : MonoBehaviour
 {
@@ -338,8 +338,23 @@ public class PlayerUI : MonoBehaviour
 
     public void ShowGameOverUI()
     {
-        _fadeOut = Instantiate(fadeOut, gameOverWindowParents);
+        // 부모 없이 먼저 인스턴스화하고
+        _fadeOut = Instantiate(fadeOut);
         _fadeOut.alpha = 0;
+        
+        // 생성 후 부모 설정
+        if (gameOverWindowParents != null && _fadeOut != null)
+        {
+            try
+            {
+                _fadeOut.transform.SetParent(gameOverWindowParents, false);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"게임오버 UI 부모 설정 실패: {e.Message}");
+                // 부모 설정이 실패해도 UI는 표시되어야 함
+            }
+        }
 
         StartCoroutine(FadeOut(_fadeOut));
     }
@@ -364,7 +379,22 @@ public class PlayerUI : MonoBehaviour
 
         if (gameOverWindow != null)
         {
-            _gameOverWindow = Instantiate(gameOverWindow, gameOverWindowParents);
+            // 부모 없이 먼저 인스턴스화
+            _gameOverWindow = Instantiate(gameOverWindow);
+            
+            // 생성 후 부모 설정
+            if (gameOverWindowParents != null && _gameOverWindow != null)
+            {
+                try
+                {
+                    _gameOverWindow.transform.SetParent(gameOverWindowParents, false);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"게임오버 윈도우 부모 설정 실패: {e.Message}");
+                    // 부모 설정이 실패해도 UI는 표시되어야 함
+                }
+            }
 
             yield return new WaitForSeconds(3);
 
