@@ -460,7 +460,7 @@ public class PlayerUI : MonoBehaviour
             yield return new WaitForSeconds(3);
             
             // 씬 전환
-            SceneManager.LoadScene("TempStartScene", LoadSceneMode.Single);
+            SceneManager.LoadScene("StartScene", LoadSceneMode.Single);
             Debug.Log("스타트씬 이동!!");
         }
     }
@@ -470,13 +470,13 @@ public class PlayerUI : MonoBehaviour
     private IEnumerator DelayedSceneLoad(float delay)
     {
         yield return new WaitForSeconds(delay);
-        SceneManager.LoadScene("TempStartScene", LoadSceneMode.Single);
+        SceneManager.LoadScene("StartScene", LoadSceneMode.Single);
     }
 
     public void ToStartMenu(GameObject _gameOverWindow) // 이 메소드는 더 이상 필요 없습니다.
 
     {
-        SceneManager.LoadScene("TempStartScene", LoadSceneMode.Single);
+        SceneManager.LoadScene("StartScene", LoadSceneMode.Single);
         Debug.Log("스타트씬 이동!!");
     }
 }
