@@ -59,6 +59,7 @@ MonoBehaviour:
   detectionRange: 0
   contactDamage: 20
   dealsDamageOnContact: 1
+  damageInterval: 1.5
   destructionEffect: {fileID: 9174822137840911509, guid: e5623deedc49c4b7f88cd66604a12a00, type: 3}
   hitEffect: {fileID: 4570405473215393228, guid: 0b8595a57512f4d41a3ed4373b374989, type: 3}
   patrolDistance: 3
@@ -196,7 +197,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_Sprite: {fileID: 21300000, guid: b4d4ca181ee84455db8be78af9035794, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

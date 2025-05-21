@@ -226,7 +226,7 @@ MonoBehaviour:
   currentHP: 100
   moveSpeed: 0
   sprintMultiplier: 0
-  jumpForce: 0
+  jumpForce: 6
   defence: 0
 --- !u!114 &752108482168258628
 MonoBehaviour:
@@ -245,6 +245,7 @@ MonoBehaviour:
   sprintDuration: 1.5
   UnLockedUtility: 
   utilityPoint: 1
+  isNPCCollision: 0
   CurrentattributeTypeData: {fileID: 0}
 --- !u!114 &4995387987602289083
 MonoBehaviour:
@@ -404,8 +405,8 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
-  m_Sprite: {fileID: -1228319855, guid: 73da35e5f9e8d964b9ed8500f1fb8478, type: 3}
+  m_SortingOrder: 13
+  m_Sprite: {fileID: -205634818, guid: 712a2bc19005ac54491e319a31303617, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -478,11 +479,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1705543345121223928, guid: b93dfe54a578b15499a5454f04b342b8, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0.26
       objectReference: {fileID: 0}
     - target: {fileID: 1705543345121223928, guid: b93dfe54a578b15499a5454f04b342b8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.164
+      value: 0.393
       objectReference: {fileID: 0}
     - target: {fileID: 1705543345121223928, guid: b93dfe54a578b15499a5454f04b342b8, type: 3}
       propertyPath: m_LocalPosition.z
