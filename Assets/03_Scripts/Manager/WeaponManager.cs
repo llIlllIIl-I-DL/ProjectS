@@ -366,6 +366,15 @@ public class WeaponManager : Singleton<WeaponManager>
                 }
             }
             bulletScript.Damage = damage;
+            
+            // 총알의 오버차지 상태 설정
+            bulletScript.IsOvercharged = isOvercharged;
+            if (isOvercharged) {
+                Debug.Log("오버차지 상태로 총알 발사!");
+                
+                // 총알 발사 직후 바로 오버차지 데미지 적용
+                ApplyOverchargeRecoilDamage();
+            }
         }
 
         // 총알 회전 설정
@@ -524,5 +533,30 @@ public class WeaponManager : Singleton<WeaponManager>
     {
         isWallSliding = isSliding;
         wallDirection = wallDir;
+    }
+
+    // 오버차지 데미지를 플레이어에게 즉시 적용
+    private void ApplyOverchargeRecoilDamage()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            PlayerHP playerHP = player.GetComponent<PlayerHP>();
+            if (playerHP != null)
+            {
+                float selfDamage = playerHP.MaxHP * 0.05f;
+                Debug.Log($"오버차지 반동 즉시 적용: 플레이어 최대 체력 = {playerHP.MaxHP}, 데미지 = {selfDamage}");
+                playerHP.TakeDamage(selfDamage);
+                Debug.Log($"과열 공격 반동으로 플레이어가 {selfDamage} 데미지를 즉시 입었습니다! 현재 체력: {playerHP.CurrentHP}");
+            }
+            else
+            {
+                Debug.LogError("PlayerHP 컴포넌트를 찾을 수 없습니다!");
+            }
+        }
+        else
+        {
+            Debug.LogError("Player 태그를 가진 오브젝트를 찾을 수 없습니다!");
+        }
     }
 }
