@@ -161,8 +161,8 @@ MonoBehaviour:
   bulletSpeed: 2
   damage: 1
   knockbackForce: 0
-  maxAmmo: 30
-  currentAmmo: 0
+  maxAmmo: 10
+  currentAmmo: 10
   bulletType: 1
   targetTags:
   - tag: Boss
