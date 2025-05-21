@@ -29,6 +29,8 @@ public class PlayerSettings : ScriptableObject
     public float dashSpeed = 15f;
     public float dashDuration = 0.2f;
     public float dashCooldown = 0.4f;
+    public float dashSpeedDecayRate = 0.95f; // 대시 후 점프 시 속도 감소율 (프레임당)
+    public float dashJumpSpeedDuration = 0.5f; // 대시 점프 시 대시 속도 유지 시간 (초)
 
     [Header("벽 상호작용")]
     public float wallSlideSpeed = 3f;

@@ -15,10 +15,19 @@ public class NPCInteract : MonoBehaviour
     {
         Time.timeScale = 0;
 
+
         Image[] images = talkBox.GetComponentsInChildren<Image>();
         faceIcon = images[1];
 
-        faceIcon.sprite = fIcon;
+        if (fIcon != null)
+        {
+            faceIcon.sprite = fIcon;
+        }
+
+        else
+        {
+            _talkBox = null;
+        }
 
         _talkBox = Instantiate(talkBox);
     }

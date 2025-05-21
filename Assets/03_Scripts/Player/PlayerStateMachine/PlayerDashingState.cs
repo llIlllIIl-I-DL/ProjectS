@@ -21,8 +21,12 @@ public class PlayerDashingState : IPlayerState
 
     public void HandleInput()
     {
-        // 대시 중에는 다른 입력이 무시됨
-        // 대시가 끝난 후 점프 입력은 PlayerStateManager에서 처리됨
+        // 대시 중에도 점프 입력을 처리 (다른 입력은 여전히 무시)
+        var inputHandler = stateManager.GetInputHandler();
+        
+        // 점프 입력이 들어오면 StateManager의 HandleJumpInput을 호출하지 않고
+        // 여기서는 입력 상태만 확인합니다.
+        // 실제 대시 중 점프 처리는 PlayerStateManager에서 담당
     }
 
     public void Update()

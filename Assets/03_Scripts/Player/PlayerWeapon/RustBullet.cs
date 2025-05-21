@@ -10,34 +10,56 @@ public class RustBullet : Bullet
     [SerializeField] private float swayAmount = 1.5f;    // 좌우 흔들림 폭
     [SerializeField] private float swaySpeed = 2f;       // 흔들림 속도
 
-    private Vector3 startPosition;
+    private Vector3 originalPosition; // 원래 진행 방향의 위치
+    private Vector3 lastFramePosition; // 마지막 프레임의 위치
     private float elapsedTime = 0f;
+    private Vector3 swayOffset = Vector3.zero; // 흔들림 오프셋
 
     private void OnEnable()
     {
-        startPosition = transform.position;
+        originalPosition = transform.position;
+        lastFramePosition = transform.position;
         elapsedTime = 0f;
-        IsOvercharged = false; // 보스는 항상 흔들리게
+        swayOffset = Vector3.zero;
+        IsOvercharged = false;
     }
+
     protected override void Start()
     {
         BulletType = ElementType.Rust;
         base.Start();
-        startPosition = transform.position;
+        originalPosition = transform.position;
+        lastFramePosition = transform.position;
     }
+
     protected override void Update()
     {
+        // 기본 총알 이동 로직 실행
         base.Update();
-        elapsedTime += Time.deltaTime;
-        // 좌우로 흔들리기
-        float sway = Mathf.Sin(elapsedTime * swaySpeed) * swayAmount;
-        // 현재 위치에서 y값만 흔들리게
-        // 차지된 상태면 흔들리지 않음
-        if (IsOvercharged)
+
+        // 기본 이동 후의 위치 계산 (흔들림 제외)
+        Vector3 baseMovement = transform.position - lastFramePosition;
+        originalPosition += baseMovement;
+        
+        // 오버차지 상태가 아닐 때만 흔들림 적용
+        if (!IsOvercharged)
         {
-            sway = 0f;
+            elapsedTime += Time.deltaTime;
+            // 좌우로 흔들리는 오프셋 계산
+            float sway = Mathf.Sin(elapsedTime * swaySpeed) * swayAmount;
+            swayOffset = new Vector3(0, sway, 0) * Time.deltaTime;
+            // 흔들림 오프셋 적용
+            transform.position = originalPosition + swayOffset;
         }
-        transform.position += new Vector3(0, sway * Time.deltaTime, 0);
+        else
+        {
+            // 오버차지 상태에서는 원래 경로로 설정
+            transform.position = originalPosition;
+            swayOffset = Vector3.zero;
+        }
+
+        // 마지막 프레임 위치 업데이트
+        lastFramePosition = transform.position;
     }
 
     protected override void ApplySpecialEffect(IDebuffable target)
