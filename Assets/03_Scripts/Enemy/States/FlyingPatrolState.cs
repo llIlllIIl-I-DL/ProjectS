@@ -11,19 +11,19 @@ namespace Enemy.States
         private Vector2 patrolEnd;
         private bool movingRight = true;
         private float initialPatrolY; // 초기 순찰 높이
-        
+
         public FlyingPatrolState(BaseEnemy enemy, EnemyStateMachine stateMachine, float patrolDistance, float waitTime)
             : base(enemy, stateMachine)
         {
             this.patrolDistance = patrolDistance;
             this.waitTime = waitTime;
-            
+
             // 순찰 범위 설정
             patrolStart = enemy.transform.position;
             initialPatrolY = patrolStart.y; // 초기 순찰 높이 저장
             patrolEnd = new Vector2(patrolStart.x + patrolDistance, patrolStart.y);
         }
-        
+
         public override void Enter()
         {
             waitCounter = 0;
@@ -52,9 +52,16 @@ namespace Enemy.States
                 // 이미 올바른 높이에 있으면 현재 위치를 원래 위치로 설정
                 EnemyScrap scrapEnemy = enemy as EnemyScrap;
                 if (scrapEnemy != null)
-            {
+                {
                     scrapEnemy.SetCurrentPositionAsOriginalY();
                 }
+            }
+
+            // 애니메이션 설정
+            if (enemy.Animator != null)
+            {
+                enemy.Animator.SetBool("isFlying", true); // 비행 애니메이션 시작
+                enemy.Animator.SetBool("isAttacking", false); // 공격 애니메이션 중지
             }
         }
 
@@ -70,20 +77,20 @@ namespace Enemy.States
             {
                 waitCounter -= Time.deltaTime;
                 return;
-}
-            
+            }
+
             // 플레이어 감지 확인
             if (enemy.IsPlayerDetected())
             {
                 // 플레이어 발견 시 추격 상태로 전환
-                enemy.SwitchToState<ChaseState>();
+                enemy.SwitchToState<FlyingChaseState>();
                 return;
-    }       
+            }
             // 이동 방향 결정
             Vector2 targetPosition = movingRight ? patrolEnd : patrolStart;
-            
+
             // 목표 지점에 도달했는지 확인
-            if (Vector2.Distance(new Vector2(enemy.transform.position.x, 0), 
+            if (Vector2.Distance(new Vector2(enemy.transform.position.x, 0),
                                 new Vector2(targetPosition.x, 0)) < 0.1f)
             {
                 // 방향 전환 및 대기
@@ -95,6 +102,7 @@ namespace Enemy.States
 
         public override void FixedUpdate()
         {
+            enemy.Animator.SetBool("isFlying", true);
             if (waitCounter <= 0)
             {
                 // 이동 방향 설정
@@ -104,7 +112,7 @@ namespace Enemy.States
                 enemy.MoveInDirection(direction);
             }
         }
-        
+
         public override void OnTriggerEnter2D(Collider2D other) { }
     }
 }

@@ -44,6 +44,10 @@ public class EnemyBigDust : BaseEnemy
     // 참조 및 속성
     private Vector2 startPosition; // 순찰 시작점
 
+    private bool isHit = false;
+    private float hitAnimationDuration = 0.5f;
+    private float hitAnimationTimer = 0f;
+
     #endregion
 
     #region Properties
@@ -68,7 +72,20 @@ public class EnemyBigDust : BaseEnemy
     /// </summary>
     protected override void Update()
     {
-        base.Update(); // BaseEnemy의 Update 호출
+        base.Update();
+
+        // Hit 애니메이션 타이머 처리
+        if (isHit)
+        {
+            hitAnimationTimer += Time.deltaTime;
+            if (hitAnimationTimer >= hitAnimationDuration)
+            {
+                isHit = false;
+                hitAnimationTimer = 0f;
+                animator.SetLayerWeight(1, 0f); // Hit 레이어 비활성화
+                animator.ResetTrigger("IsHit");
+            }
+        }
     }
 
     /// <summary>
@@ -103,7 +120,20 @@ public class EnemyBigDust : BaseEnemy
     /// </summary>
     public override void TakeDamage(float damage)
     {
-        base.TakeDamage(damage);
+        if (isDestroyed) return;
+
+        float finalDamage = Mathf.Max(damage - defence, 1f);
+
+        // Hit 애니메이션 처리
+        if (animator != null && !isHit)
+        {
+            isHit = true;
+            hitAnimationTimer = 0f;
+            animator.SetLayerWeight(1, 1f); // Hit 레이어 가중치 설정
+            animator.SetTrigger("IsHit");
+        }
+
+        base.TakeDamage(finalDamage);
     }
 
     #endregion
@@ -155,7 +185,7 @@ public class EnemyBigDust : BaseEnemy
     }
 
     /// <summary>
-    /// 공격 실행 (공격 범위 내에서 호출됨)
+    /// 공격 실행
     /// </summary>
     public override void PerformAttack()
     {
@@ -165,13 +195,20 @@ public class EnemyBigDust : BaseEnemy
         Vector2 direction = PlayerPosition - (Vector2)transform.position;
         SetFacingDirection(direction);
 
-        // 애니메이션 트리거
-        // GetComponent<Animator>()?.SetTrigger("Attack");
-
         // 공격 로직 - 범위 내 플레이어에게 데미지
         if (IsInAttackRange())
         {
-            // 플레이어에게 데미지 (구현 필요)
+            IDamageable playerDamageable = playerTransform.GetComponent<IDamageable>();
+            if (playerDamageable != null)
+            {
+                Animator.SetTrigger("IsAttack");
+                playerDamageable.TakeDamage(attackPower);
+                Debug.Log($"{gameObject.name}이(가) 플레이어에게 {attackPower} 데미지를 입혔습니다.");
+            }
+        }
+        else
+        {
+            Debug.Log("공격 범위 밖이라 공격하지 않음");
         }
     }
 
@@ -201,6 +238,19 @@ public class EnemyBigDust : BaseEnemy
         Debug.Log($"{gameObject.name}이(가) 넉백 후 이동을 재개합니다.");
     }
 
+    public override bool IsInAttackRange()
+    {
+        
+        if (!playerDetected) return false;
+        float distanceToPlayer = Vector2.Distance(transform.position, PlayerPosition);
+        // 디버깅용 로그
+        Debug.Log($"플레이어와의 거리: {distanceToPlayer}, 공격 범위: {attackRange}");
+
+        Animator.SetBool("IsIdle", true);
+        Animator.SetBool("IsWalking", false);
+        return distanceToPlayer <= attackRange;
+        
+    }
     #endregion
 
     #region Player Detection

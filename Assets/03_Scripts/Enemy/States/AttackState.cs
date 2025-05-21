@@ -32,11 +32,11 @@ namespace Enemy.States
         {
             this.attackCooldown = attackCooldown;
         }
-        
+
         #endregion
-        
+
         #region State Methods
-        
+
         /// <summary>
         /// 공격 상태 진입 시 호출
         /// </summary>
@@ -45,6 +45,7 @@ namespace Enemy.States
             // 이전 공격 타이머 값을 유지
             attackTimer = globalAttackTimer;
             canAttack = attackTimer >= attackCooldown;
+
         }
 
         /// <summary>
@@ -57,7 +58,32 @@ namespace Enemy.States
             {
                 // 공격 타이머 저장
                 globalAttackTimer = attackTimer;
-                enemy.SwitchToState<PatrolState>();
+                
+                // 플레이어가 여전히 감지 범위 안에 있는지 확인
+                if (enemy.IsPlayerDetected())
+                {
+                    // 감지 범위 안에 있으면 추격 상태로 전환
+                    if (enemy is EnemyScrap)
+                    {
+                        enemy.SwitchToState<FlyingChaseState>();
+                    }
+                    else
+                    {
+                        enemy.SwitchToState<ChaseState>();
+                    }
+                }
+                else
+                {
+                    // 감지 범위를 벗어났으면 순찰 상태로 전환
+                    if (enemy is EnemyScrap)
+                    {
+                        enemy.SwitchToState<FlyingPatrolState>();
+                    }
+                    else
+                    {
+                        enemy.SwitchToState<PatrolState>();
+                    }
+                }
                 return;
             }
 

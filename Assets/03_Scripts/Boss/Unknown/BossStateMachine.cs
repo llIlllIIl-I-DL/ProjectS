@@ -8,7 +8,8 @@ public enum BossState
     ProjectileAttack,
     SlashAttack,
     KickAttack,
-    Die
+    Die,
+    Inactive,
 }
 
 public class BossStateMachine : MonoBehaviour
@@ -34,12 +35,21 @@ public class BossStateMachine : MonoBehaviour
 
     private Animator animator;
     private bool isDead = false;
+    private bool isActive = false;
+
+    // 이벤트
+    public System.Action OnBossBattle;
+    public System.Action OnBossDefeated;
 
     private void Awake()
     {
         bossHealth = GetComponent<BossHealth>();
         animator = GetComponentInChildren<Animator>();
-        bossHealth.OnBossDied += HandleBossDeath;
+        // 사망 이벤트
+        if (bossHealth != null)
+        {
+            bossHealth.OnBossDied += HandleBossDeath;
+        }
     }
 
     private void Start()
@@ -50,7 +60,7 @@ public class BossStateMachine : MonoBehaviour
         InitializeStates();
 
         // 기본 상태로 시작
-        ChangeState(BossState.Idle);
+        ChangeState(BossState.Inactive);
     }
 
     private void InitializeStates()
@@ -62,6 +72,7 @@ public class BossStateMachine : MonoBehaviour
         states.Add(BossState.SlashAttack, new BossSlashAttackState(this));
         states.Add(BossState.KickAttack, new BossKickAttackState(this));
         states.Add(BossState.Die, new BossDieState(this));
+        states.Add(BossState.Inactive, new BossInactiveState(this)); // 비활성화 상태 추가
     }
 
     public void ChangeState(BossState state)
@@ -69,16 +80,60 @@ public class BossStateMachine : MonoBehaviour
         // 이미 죽은 상태면 Die 상태 외의 상태 전이 차단
         if (isDead && state != BossState.Die) return;
 
+        // 비활성화 상태이고, 활성화 상태로 전환하는 것이 아니라면 상태 변경 무시
+        if (!isActive && state != BossState.Inactive && state != BossState.Die) return;
+
         // 존재하지 않는 상태나 이미 현재 상태인 경우 무시
         if (!states.ContainsKey(state)) return;
         if (currentState == states[state]) return;
 
-        Debug.Log($"[BossStateMachine] 상태 전이: {currentState} → {state}");
+        Debug.Log($"[BossStateMachine] 상태 전이: {(currentState != null ? currentState.GetType().Name : "none")} → {state}");
 
         // 상태 전환 처리
         currentState?.Exit();
         currentState = states[state];
         currentState?.Enter();
+    }
+
+    // 플레이어 감지 메소드 (BossRoomTrigger에서 호출)
+    public void DetectPlayer(Transform player)
+    {
+        if (player == null || isDead) return;
+
+        Debug.Log("[BossStateMachine] 플레이어 감지!");
+
+        // 플레이어 참조 설정
+        playerTransform = player;
+
+        // 보스 활성화
+        ActivateBoss();
+    }
+
+    // 보스 활성화 메소드
+    public void ActivateBoss()
+    {
+        if (isActive || isDead) return;
+
+        isActive = true;
+        Debug.Log("[BossStateMachine] 보스 활성화!");
+
+        // 이벤트 발생
+        OnBossBattle?.Invoke();
+
+        // 초기 상태 설정
+        ChangeState(BossState.Idle);
+    }
+
+    // 보스 비활성화 메소드
+    public void DeactivateBoss()
+    {
+        if (!isActive || isDead) return;
+
+        isActive = false;
+        Debug.Log("[BossStateMachine] 보스 비활성화!");
+
+        // 비활성화 상태로 전환
+        ChangeState(BossState.Inactive);
     }
 
     private void HandleBossDeath()

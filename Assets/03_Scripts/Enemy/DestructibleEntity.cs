@@ -52,26 +52,33 @@ public abstract class DestructibleEntity : MonoBehaviour, IDestructible
     {
         if (isDestroyed) return;
         
+        // 데미지 적용을 먼저
         currentHealth -= damage;
         
-        // 피격 효과 관리 개선
-        if (flashCoroutine != null)
-        {
-            StopCoroutine(flashCoroutine);
-            if (spriteRenderer != null)
-            {
-                spriteRenderer.color = Color.white; // 기본 색상으로 리셋
-            }
-        }
-        
-        // 새 코루틴 시작 및 참조 저장
-        flashCoroutine = StartCoroutine(FlashEffect());
+        // 애니메이션과 이펙트를 별도로 처리
+        // OnDamaged();
         
         // 파괴 체크
         if (currentHealth <= 0)
         {
             DestroyEntity();
         }
+    }
+    
+    // 새로운 protected 가상 메서드 추가
+    protected virtual void OnDamaged()
+    {
+        // 피격 효과 관리
+        if (flashCoroutine != null)
+        {
+            StopCoroutine(flashCoroutine);
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = Color.white;
+            }
+        }
+        
+        flashCoroutine = StartCoroutine(FlashEffect());
     }
     
     // <summary>
@@ -84,10 +91,10 @@ public abstract class DestructibleEntity : MonoBehaviour, IDestructible
         DropItem();
         
         // 콜라이더 비활성화
-        GetComponent<Collider2D>().enabled = false;
+        // GetComponent<Collider2D>().enabled = false;
         
         // 지연 파괴
-        Destroy(gameObject, 1f);
+        Destroy(gameObject, 1.5f);
         Debug.Log($"{gameObject.name} 파괴 됨");
     }
     

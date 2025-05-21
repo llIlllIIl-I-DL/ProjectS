@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 501523382063693841}
   - component: {fileID: 4402080379882476782}
   - component: {fileID: 7739246131164750639}
+  - component: {fileID: 5752444461491107594}
   m_Layer: 8
   m_Name: Enemy_BigDust
   m_TagString: Enemy
@@ -76,7 +77,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 885fc7cfc73c440ba9ccf19665bf3ba2, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 684f84d507969453887eedfb7c57fa9a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -146,18 +147,18 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.00000023841858, y: -0.07247317}
+  m_Offset: {x: -0.07810855, y: -0.75426555}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 5.12, y: 5.12}
+    oldSize: {x: 8, y: 8}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 3.453423, y: 4.5402155}
+  m_Size: {x: 1.7740965, y: 2.5060935}
   m_EdgeRadius: 0
 --- !u!114 &7739246131164750639
 MonoBehaviour:
@@ -177,22 +178,45 @@ MonoBehaviour:
   dropChance: 0.3
   moveSpeed: 3
   attackPower: 10
+  defence: 0
   attackRange: 2.5
   detectionRange: 7
   contactDamage: 1
   dealsDamageOnContact: 1
+  damageInterval: 1.5
   destructionEffect: {fileID: 9174822137840911509, guid: e5623deedc49c4b7f88cd66604a12a00, type: 3}
   hitEffect: {fileID: 4570405473215393228, guid: 0b8595a57512f4d41a3ed4373b374989, type: 3}
   patrolDistance: 5
   patrolWaitTime: 3
   chaseSpeed: 1
-  attackSpeed: 5
+  attackSpeed: 2
   chargePower: 10
   chargeDistance: 5
-  chargeSpeed: 5
-  chargeCooldown: 5
+  chargeSpeed: 4
+  chargeCooldown: 7
   slamPower: 5
   slamJumpPower: 0
   slamDistance: 3
-  slamSpeed: 5
-  slamCooldown: 3
+  slamSpeed: 4
+  slamCooldown: 8
+--- !u!95 &5752444461491107594
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6643864592962319589}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 7050fc2fb4972440087dba46e9036cf4, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

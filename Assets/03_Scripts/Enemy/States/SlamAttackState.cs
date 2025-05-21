@@ -114,8 +114,7 @@ namespace Enemy.States
                         currentPhase = SlamPhase.Slam;
                         phaseTimer = 0f;
                         
-                        // 애니메이션 트리거 (내려찍기)
-                        // enemy.GetComponent<Animator>()?.SetTrigger("SlamDown");
+                        enemy.Animator.SetTrigger("IsAttack");
                         
                         // moveToPlayerX가 true일 때만 X 이동 실행
                         if (moveToPlayerX)

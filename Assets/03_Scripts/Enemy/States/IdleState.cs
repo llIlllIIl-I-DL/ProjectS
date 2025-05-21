@@ -28,11 +28,11 @@ namespace Enemy.States
         {
             this.idleDuration = idleDuration;
         }
-        
+
         #endregion
-        
+
         #region State Methods
-        
+
         /// <summary>
         /// 대기 상태 진입 시 호출 - 타이머 초기화 및 애니메이션 설정
         /// </summary>
@@ -41,9 +41,14 @@ namespace Enemy.States
             idleTimer = 0f;
             // 대기 애니메이션 재생
             // enemy.GetComponent<Animator>()?.SetBool("IsIdle", true);
-            
+
             // 이동 중지
             enemy.StopMoving();
+            
+            if (enemy.Animator != null)
+            {
+                enemy.Animator.SetBool("IsIdle", true);
+            }
         }
 
         /// <summary>

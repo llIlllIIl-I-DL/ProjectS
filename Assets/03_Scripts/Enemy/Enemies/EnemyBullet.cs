@@ -2,8 +2,13 @@ using UnityEngine;
 
 public class EnemyBullet : Bullet
 {
-    [SerializeField] public bool isPiercing = false;  // 관통 여부
+    [SerializeField] public bool isPiercing = false;
+    [Header("충돌 애니메이션")]
+    [SerializeField] private string groundHitAnimTrigger = "GroundHit";
+    [SerializeField] private string wallHitAnimTrigger = "WallHit";
 
+    private BaseEnemy enemy;
+    
     /// <summary>
     /// 총알 데미지 설정
     /// </summary>
@@ -19,7 +24,7 @@ public class EnemyBullet : Bullet
         //Destroy(gameObject, LifeTime);
     }
     
-    private void OnTriggerEnter2D(Collider2D other)
+    protected override void OnTriggerEnter2D(Collider2D other)
     {
         // 플레이어와 충돌한 경우
         if (other.CompareTag("Player"))
@@ -38,6 +43,16 @@ public class EnemyBullet : Bullet
         // 벽이나 장애물과 충돌
         else if (((1 << other.gameObject.layer) & (LayerMask.GetMask("Ground", "Wall", "NoCollision"))) != 0)
         {
+            // 레이어에 따라 다른 애니메이션 재생
+            if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
+            {
+                if (enemy.Animator != null) enemy.Animator.SetTrigger(groundHitAnimTrigger);
+            }
+            else if (other.gameObject.layer == LayerMask.NameToLayer("Wall"))
+            {
+                if (enemy.Animator != null) enemy.Animator.SetTrigger(wallHitAnimTrigger);
+            }
+
             ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
         }
     }
