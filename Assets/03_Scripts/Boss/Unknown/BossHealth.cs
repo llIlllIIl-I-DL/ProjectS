@@ -52,7 +52,12 @@ public class BossHealth : MonoBehaviour, IDebuffable
 
     public void OnTriggerEnter2D(Collider2D other)
     {
-        TakeDamage(damage);
+        if (other.CompareTag(GameConstants.Tags.PLAYERATTACK))
+        {
+            TakeDamage(damage);
+        }
+
+        return;
     }
 
     public void TakeDamage(float damage)
