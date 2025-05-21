@@ -22,6 +22,16 @@ public class ChunkBasedMapManagerEditor : Editor
     private bool showChunkSettings = true;
     private bool showSceneSettings = true;
     private bool showJsonSettings = true;
+    private bool showPrefabSettings = true; // 프리팹 기반 설정 폴드아웃 상태
+    
+    // 직렬화된 프로퍼티
+    private SerializedProperty chunkPrefabsProperty;
+
+    private void OnEnable()
+    {
+        // 직렬화된 프로퍼티 초기화
+        chunkPrefabsProperty = serializedObject.FindProperty("chunkPrefabs");
+    }
     
     public override void OnInspectorGUI()
     {
@@ -96,32 +106,81 @@ public class ChunkBasedMapManagerEditor : Editor
         
         EditorGUILayout.Space();
         
+        // 프리팹 기반 청크 설정
+        showPrefabSettings = EditorGUILayout.Foldout(showPrefabSettings, "프리팹 기반 청크 설정", true);
+        if (showPrefabSettings)
+        {
+            EditorGUI.indentLevel++;
+            
+            // 프리팹 기반 활성화 여부
+            mapManager.usePrefabBasedChunks = EditorGUILayout.Toggle("프리팹 기반 사용", mapManager.usePrefabBasedChunks);
+            
+            // 프리팹 기반 활성화 상태에서만 나머지 설정을 표시
+            using (new EditorGUI.DisabledScope(!mapManager.usePrefabBasedChunks))
+            {
+                // 기본 청크 프리팹 이름
+                mapManager.defaultChunkPrefabName = EditorGUILayout.TextField("기본 프리팹 이름", mapManager.defaultChunkPrefabName);
+                
+                // 기본 청크 프리팹 직접 할당
+                mapManager.defaultChunkPrefab = (GameObject)EditorGUILayout.ObjectField("기본 청크 프리팹", mapManager.defaultChunkPrefab, typeof(GameObject), false);
+                
+                // 프리팹 배열 필드
+                EditorGUILayout.LabelField("청크 프리팹 배열");
+                EditorGUI.indentLevel++;
+                
+                // 배열 크기 조정 필드
+                EditorGUILayout.PropertyField(chunkPrefabsProperty, true);
+                serializedObject.ApplyModifiedProperties();
+                
+                EditorGUI.indentLevel--;
+                
+                // 청크 루트 오브젝트
+                mapManager.chunksRoot = (Transform)EditorGUILayout.ObjectField("청크 부모 Transform", mapManager.chunksRoot, typeof(Transform), true);
+                
+                // 프리팹 청크 관련 도움말 
+                EditorGUILayout.HelpBox("프리팹 기반 로드 방식은 씬 기반보다 빠르고 메모리 관리에 효율적입니다. '기본 청크 프리팹'을 직접 할당하면 Resources 폴더에서 찾을 필요 없이 사용합니다.", MessageType.Info);
+            }
+            
+            EditorGUI.indentLevel--;
+        }
+        
+        EditorGUILayout.Space();
+        
         // 씬 설정
         showSceneSettings = EditorGUILayout.Foldout(showSceneSettings, "씬 설정", true);
         if (showSceneSettings)
         {
             EditorGUI.indentLevel++;
-            mapManager.sceneNameFormat = EditorGUILayout.TextField("씬 이름 형식", mapManager.sceneNameFormat);
-            mapManager.baseSceneName = EditorGUILayout.TextField("기본 씬 이름", mapManager.baseSceneName);
             
-            // 씬 정보 표시
-            if (!string.IsNullOrEmpty(mapManager.baseSceneName))
+            using (new EditorGUI.DisabledScope(mapManager.usePrefabBasedChunks))
             {
-                bool baseSceneExists = false;
+                mapManager.sceneNameFormat = EditorGUILayout.TextField("씬 이름 형식", mapManager.sceneNameFormat);
+                mapManager.baseSceneName = EditorGUILayout.TextField("기본 씬 이름", mapManager.baseSceneName);
                 
-                // Build Settings에서 씬 검색
-                foreach (var scene in EditorBuildSettings.scenes)
+                // 프리팹 모드일 때 도움말 표시
+                if (mapManager.usePrefabBasedChunks)
                 {
-                    if (scene.path.Contains(mapManager.baseSceneName))
-                    {
-                        baseSceneExists = true;
-                        break;
-                    }
+                    EditorGUILayout.HelpBox("프리팹 기반 모드에서는 씬 설정이 사용되지 않습니다.", MessageType.Info);
                 }
-                
-                if (!baseSceneExists)
+                // 씬 정보 표시
+                else if (!string.IsNullOrEmpty(mapManager.baseSceneName))
                 {
-                    EditorGUILayout.HelpBox("기본 씬이 Build Settings에 없습니다!", MessageType.Warning);
+                    bool baseSceneExists = false;
+                    
+                    // Build Settings에서 씬 검색
+                    foreach (var scene in EditorBuildSettings.scenes)
+                    {
+                        if (scene.path.Contains(mapManager.baseSceneName))
+                        {
+                            baseSceneExists = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!baseSceneExists)
+                    {
+                        EditorGUILayout.HelpBox("기본 씬이 Build Settings에 없습니다!", MessageType.Warning);
+                    }
                 }
             }
             
@@ -183,6 +242,58 @@ public class ChunkBasedMapManagerEditor : Editor
                 }
                 
                 EditorGUI.indentLevel--;
+            }
+            
+            EditorGUILayout.Space();
+            
+            // 프리팹 청크 정보 (프리팹 모드일 때만)
+            if (mapManager.usePrefabBasedChunks)
+            {
+                bool showPrefabChunkInfo = EditorGUILayout.Foldout(true, "프리팹 청크 인스턴스", true);
+                if (showPrefabChunkInfo)
+                {
+                    EditorGUI.indentLevel++;
+                    
+                    // GetChunkInstances 메서드가 있으면 사용
+                    var instances = mapManager.GetChunkInstances();
+                    EditorGUILayout.LabelField("인스턴스 수", instances.Count.ToString());
+                    
+                    // 활성화된 청크 vs 비활성화된 청크 표시
+                    int activeCount = 0;
+                    foreach (var chunk in instances)
+                    {
+                        if (chunk.Value != null && chunk.Value.activeSelf)
+                            activeCount++;
+                    }
+                    
+                    EditorGUILayout.LabelField("활성화된 청크", activeCount.ToString());
+                    EditorGUILayout.LabelField("비활성화된 청크", (instances.Count - activeCount).ToString());
+                    
+                    // 청크별 상세 정보
+                    if (instances.Count > 0)
+                    {
+                        EditorGUILayout.LabelField("청크 목록:", EditorStyles.boldLabel);
+                        foreach (var chunk in instances)
+                        {
+                            if (chunk.Value != null)
+                            {
+                                EditorGUILayout.BeginHorizontal();
+                                
+                                // 청크 활성화 상태에 따라 색상 변경
+                                GUI.color = chunk.Value.activeSelf ? Color.green : Color.gray;
+                                EditorGUILayout.LabelField($"  청크 ({chunk.Key.x}, {chunk.Key.y})", 
+                                    $"[{(chunk.Value.activeSelf ? "활성" : "비활성")}] {chunk.Value.name}");
+                                
+                                // 색상 복원
+                                GUI.color = Color.white;
+                                
+                                EditorGUILayout.EndHorizontal();
+                            }
+                        }
+                    }
+                    
+                    EditorGUI.indentLevel--;
+                }
             }
             
             EditorGUILayout.Space();
@@ -339,6 +450,16 @@ public class ChunkBasedMapManagerEditor : Editor
             "- JSON에서 모듈 로드: 활성화하면 JSON 파일에서 모듈 데이터를 읽어 인스턴스화합니다.\n" +
             "- 비활성화하면 청크 씬에 미리 배치된 모듈을 사용합니다.\n" +
             "- 런타임 환경에서도 Resources 폴더에서 JSON 파일을 찾을 수 있어야 합니다.", 
+            MessageType.Info);
+            
+        EditorGUILayout.Space();
+        
+        EditorGUILayout.LabelField("5. 프리팹 기반 청크 시스템", EditorStyles.boldLabel);
+        EditorGUILayout.HelpBox(
+            "- 프리팹 기반 모드: 씬 기반 대신 프리팹을 사용하여 청크를 로드/언로드합니다.\n" +
+            "- 장점: 씬 로드보다 성능이 좋고, 메모리 관리가 효율적이며, 화면 깜빡임이 줄어듭니다.\n" +
+            "- 기본 청크 프리팹: Inspector에서 직접 할당하거나 Resources 폴더에서 로드할 수 있습니다.\n" +
+            "- 여러 종류의 청크 프리팹: 다양한 청크 형태를 배열에 추가하여 사용할 수 있습니다.", 
             MessageType.Info);
         
         EditorGUILayout.Space();

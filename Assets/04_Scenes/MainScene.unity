@@ -870,6 +870,10 @@ PrefabInstance:
       value: 250
       objectReference: {fileID: 0}
     - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: playerTransform
+      value: 
+      objectReference: {fileID: 1886332053}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
       propertyPath: moduleGuidMappings.Array.size
       value: 23
       objectReference: {fileID: 0}
