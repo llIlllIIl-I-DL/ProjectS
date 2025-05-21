@@ -62,6 +62,14 @@ namespace Enemy.States
             waitAtLastPositionTimer = 0f;
             currentSpeed = 0f;
             currentDirection = Vector2.zero;
+
+            // 애니메이션 파라미터 설정
+            if (enemy.Animator != null)
+            {
+                enemy.Animator.SetBool("IsWalking", true);
+                enemy.Animator.SetBool("IsIdle", false);
+                enemy.Animator.SetBool("IsAttacking", false);
+            }
         }
 
         /// <summary>
@@ -127,6 +135,7 @@ namespace Enemy.States
             if (isWaitingAtLastPosition)
             {
                 enemy.StopMoving();
+                
                 return;
             }
 

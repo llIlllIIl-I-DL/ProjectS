@@ -87,9 +87,33 @@ namespace Enemy.States
             // 일정 거리 이동 후 돌진 종료
             if (distanceTraveled >= chargeDistance || hasReachedTarget)
             {
-                // 돌진 완료, 이전 상태로 돌아가기
-                Debug.Log("돌진 공격 완료, 공격 상태로 전환");
-                enemy.SwitchToState<AttackState>();
+                // 디버깅용 로그 추가
+                Debug.Log($"IsPlayerDetected: {enemy.IsPlayerDetected()}, IsInAttackRange: {enemy.IsInAttackRange()}");
+                
+                // 먼저 플레이어 감지 상태 업데이트
+                bool playerDetected = enemy.IsPlayerDetected();
+                bool inAttackRange = enemy.IsInAttackRange();
+
+                // 상태 전환 로직
+                if (inAttackRange) // 공격 범위 체크를 먼저
+                {
+                    Debug.Log("공격 범위 안에 있어 AttackState로 전환");
+                    enemy.SwitchToState<AttackState>();
+                    enemy.Animator.SetBool("IsIdle", true);
+                    enemy.Animator.SetBool("IsWalking", false);
+                }
+                else if (playerDetected) // 그 다음 감지 범위 체크
+                {
+                    Debug.Log("추격 범위 안에 있어 ChaseState로 전환");
+                    enemy.SwitchToState<ChaseState>();
+                }
+                else // 둘 다 아닌 경우
+                {
+                    Debug.Log("감지되지 않아 PatrolState로 전환");
+                    enemy.SwitchToState<PatrolState>();
+                }
+                
+                return;
             }
         }
         
