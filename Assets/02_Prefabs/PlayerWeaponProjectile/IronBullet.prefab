@@ -212,6 +212,7 @@ MonoBehaviour:
   targetTags:
   - tag: Boss
   - tag: Enemy
+  - tag: Mirror
   isOvercharged: 0
   isReloading: 0
   lifeTime: 3
