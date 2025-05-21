@@ -20,6 +20,7 @@ public abstract class DestructibleEntity : MonoBehaviour, IDestructible
     protected bool isDestroyed = false;
     protected SpriteRenderer spriteRenderer;
     protected Coroutine flashCoroutine; // 코루틴 참조를 저장할 변수 추가
+    protected Rigidbody2D rb;
     
     #endregion
 
@@ -89,7 +90,11 @@ public abstract class DestructibleEntity : MonoBehaviour, IDestructible
         isDestroyed = true;
         PlayDestructionEffect();
         DropItem();
-
+        if (rb != null)
+        {
+            rb.velocity = Vector2.zero;
+            rb.isKinematic = true; // 물리 엔진의 영향을 받지 않도록 설정
+        }
         // 콜라이더 비활성화
         GetComponent<Collider2D>().enabled = false;
         
