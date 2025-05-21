@@ -42,11 +42,6 @@ public class EnemyScrap : BaseEnemy
     // 상태 머신
     public IEnemyState currentState => stateMachine.CurrentState;
 
-    // 상태 접근자 메서드들
-    public IdleState GetIdleState() => idleState;
-    public AttackState GetAttackState() => attackState;
-    public FlyingChaseState GetChaseState() => flyingChaseState;
-
     #endregion
 
     #region Unity Lifecycle Methods
@@ -145,6 +140,7 @@ public class EnemyScrap : BaseEnemy
     /// </summary>
     public override void PerformAttack()
     {
+        Animator.SetTrigger("IsAttack");
         // 플레이어가 있고 공격 범위 내에 있는지 확인
         if (playerTransform != null && IsInAttackRange())
         {
@@ -215,7 +211,7 @@ public class EnemyScrap : BaseEnemy
         {
             // 추격 상태로 전환하기 전에 현재 높이를 유지
             SetCurrentPositionAsOriginalY();
-            stateMachine.ChangeState(flyingChaseState);
+            SwitchToState<FlyingChaseState>();
         }
     }
 

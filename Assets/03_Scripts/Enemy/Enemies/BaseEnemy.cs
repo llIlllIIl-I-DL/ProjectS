@@ -32,6 +32,7 @@ public abstract class BaseEnemy : DestructibleEntity, IDebuffable
     protected Transform playerTransform; 
     protected Rigidbody2D rb;
     protected Animator animator;
+    public Animator Animator => animator;
     
     // 플레이어 감지
     protected bool playerDetected = false;
@@ -358,7 +359,7 @@ public abstract class BaseEnemy : DestructibleEntity, IDebuffable
     /// <summary>
     /// 플레이어가 공격 범위 내에 있는지 확인
     /// </summary>
-    public bool IsInAttackRange() 
+    public virtual bool IsInAttackRange() 
     {
         if (playerTransform == null) return false;
         
@@ -448,12 +449,24 @@ public abstract class BaseEnemy : DestructibleEntity, IDebuffable
     public override void TakeDamage(float damage)
     {
         if (isDestroyed) return;
-
-        // 방어력만큼 데미지 감소 (최소 1의 데미지는 보장)
+        
+        // 방어력 계산
         float finalDamage = Mathf.Max(damage - defence, 1f);
         
-        // 부모 클래스의 TakeDamage 호출하여 실제 데미지 적용
+        // 애니메이션 트리거를 먼저 설정
+        if (animator != null)
+        {
+            animator.SetTrigger("IsHit");
+        }
+        
+        // 부모 클래스의 TakeDamage 호출
         base.TakeDamage(finalDamage);
+
+        if (currentHealth <= 0)
+        {
+            DestroyEntity();
+            animator.SetTrigger("IsDead");
+        }
         
         Debug.Log($"{gameObject.name}이(가) {damage} 데미지를 받았고, 방어력 {defence}로 인해 {finalDamage} 데미지만큼만 피해를 입었습니다.");
     }
