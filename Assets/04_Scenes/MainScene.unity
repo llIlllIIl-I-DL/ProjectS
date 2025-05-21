@@ -862,17 +862,105 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: chunkSize
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: chunksRoot
+      value: 
+      objectReference: {fileID: 212864826}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
       propertyPath: loadDistance
-      value: 200
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
       propertyPath: unloadDistance
-      value: 250
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
       propertyPath: playerTransform
       value: 
       objectReference: {fileID: 1886332053}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: defaultChunkPrefab
+      value: 
+      objectReference: {fileID: 2525157024811471646, guid: 4c3f65345b11c7340b3ad73c3280722b, type: 3}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: enableDirectMapping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: usePrefabBasedChunks
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: defaultChunkPrefabName
+      value: SampleMap
+      objectReference: {fileID: 0}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: chunkPrefabs.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: chunkPrefabs.Array.data[0]
+      value: 
+      objectReference: {fileID: 6487850698782976006, guid: 4289b4bcdfc393c42958271560606ceb, type: 3}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: chunkPrefabs.Array.data[1]
+      value: 
+      objectReference: {fileID: 4957830053461602560, guid: 232adb3b8458f874e92ca5e5711f9739, type: 3}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: chunkPrefabs.Array.data[2]
+      value: 
+      objectReference: {fileID: 2911542062397061568, guid: 787cfc9c4e99f9840b6afa0adf5a2aea, type: 3}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: chunkPrefabs.Array.data[3]
+      value: 
+      objectReference: {fileID: 5781892941165238746, guid: 81d04e240a7e13c45988f0df50784b2a, type: 3}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: chunkPrefabs.Array.data[4]
+      value: 
+      objectReference: {fileID: 3725098163437901537, guid: 0229da88271011d45a71ad8b4e8b5b23, type: 3}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: chunkPrefabs.Array.data[5]
+      value: 
+      objectReference: {fileID: 1530070712026799722, guid: b1cc669d79a5ce3458e333817ff0c824, type: 3}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: chunkPrefabs.Array.data[6]
+      value: 
+      objectReference: {fileID: 5781892941165238746, guid: 066d2c8c4d86cf04db8be2cee4ff1be8, type: 3}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: chunkPrefabs.Array.data[7]
+      value: 
+      objectReference: {fileID: 3725098163437901537, guid: 87a58293491274f45a02ec63a6f6ee8b, type: 3}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: chunkPrefabs.Array.data[8]
+      value: 
+      objectReference: {fileID: 1530070712026799722, guid: 074444119b98dcf4c9541c421ca64b35, type: 3}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: chunkPrefabs.Array.data[9]
+      value: 
+      objectReference: {fileID: 5880822175603880960, guid: 3d60719f76d44124dbff4572d18d087f, type: 3}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: chunkPrefabs.Array.data[10]
+      value: 
+      objectReference: {fileID: 5880822175603880960, guid: 3d60719f76d44124dbff4572d18d087f, type: 3}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: chunkPrefabs.Array.data[11]
+      value: 
+      objectReference: {fileID: 7571015800742022394, guid: c605f5d45da4a284c99534c5fa6acfb0, type: 3}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: chunkPrefabs.Array.data[12]
+      value: 
+      objectReference: {fileID: 7571015800742022394, guid: c605f5d45da4a284c99534c5fa6acfb0, type: 3}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: chunkPrefabs.Array.data[13]
+      value: 
+      objectReference: {fileID: 3189813134239274427, guid: 6331df1885957f64690452992da55b5b, type: 3}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: chunkPrefabs.Array.data[14]
+      value: 
+      objectReference: {fileID: 5266088671065641663, guid: 6064f541a44c0374fb2f2350c1d7045b, type: 3}
     - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
       propertyPath: moduleGuidMappings.Array.size
       value: 23

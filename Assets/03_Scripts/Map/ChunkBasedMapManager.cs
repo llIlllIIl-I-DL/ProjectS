@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using System.IO;
 using System;
 
@@ -20,16 +19,11 @@ public class ChunkBasedMapManager : MonoBehaviour
     public float loadDistance = 150f; // 이 거리 내의 청크를 로드
     public float unloadDistance = 200f; // 이 거리 밖의 청크를 언로드
     
-    [Header("프리팹 기반 청크 설정")]
-    public bool usePrefabBasedChunks = true; // true이면 프리팹 기반, false이면 씬 기반
+    [Header("프리팹 청크 설정")]
     public GameObject[] chunkPrefabs; // 청크 프리팹 배열
     public string defaultChunkPrefabName = "DefaultChunk"; // 기본 청크 프리팹 이름
     public GameObject defaultChunkPrefab; // 기본 청크 프리팹 직접 할당
     public Transform chunksRoot; // 인스턴스화된 청크의 부모 Transform
-    
-    [Header("청크 씬 설정")]
-    public string sceneNameFormat = "Chunk_{0}_{1}"; // 청크 씬 이름 형식 (x, y 좌표가 들어감)
-    public string baseSceneName; // 기본 씬 이름 (항상 로드되어 있어야 함)
     
     [Header("JSON 파일 설정")]
     public bool loadModulesFromJson = true; // true면 JSON에서 모듈 로드, false면 씬에 이미 배치된 모듈 사용
@@ -41,6 +35,11 @@ public class ChunkBasedMapManager : MonoBehaviour
     public int minChunkY = -1000; // 최소 청크 Y 좌표
     public int maxChunkY = 1000;  // 최대 청크 Y 좌표
     public bool limitChunkRange = true; // 청크 범위 제한 활성화
+    
+    [Header("모듈 매핑 설정")]
+    public List<RoomModuleGuidMapping> moduleGuidMappings = new List<RoomModuleGuidMapping>();
+    public bool enableDirectMapping = true; // 직접 매핑 활성화
+    public string moduleResourcesPath = "Modules"; // RoomModule SO가 저장된 Resources 폴더 경로
     
     // 현재 로드된 청크 관리
     private HashSet<Vector2Int> loadedChunks = new HashSet<Vector2Int>();
@@ -72,10 +71,6 @@ public class ChunkBasedMapManager : MonoBehaviour
         public List<ModuleGuidPathMapping> mappings = new List<ModuleGuidPathMapping>();
     }
 
-    // GUID-경로 매핑 필드 추가
-    private ModuleGuidMappingData guidMappingData;
-    private bool mappingInitialized = false;
-    
     [System.Serializable]
     public class RoomModuleGuidMapping
     {
@@ -83,25 +78,17 @@ public class ChunkBasedMapManager : MonoBehaviour
         public RoomModule module;  // 인스펙터에서 직접 연결할 모듈
     }
 
-    [Header("모듈 매핑 설정")]
-    public List<RoomModuleGuidMapping> moduleGuidMappings = new List<RoomModuleGuidMapping>();
-    public bool enableDirectMapping = true; // 직접 매핑 활성화
-    
     private void Start()
     {
-        // 로그 파일 위치 출력 (빌드에서 디버깅 용이하게)
         Debug.Log($"로그 파일 위치: {Application.persistentDataPath}/Player.log");
         Debug.Log($"애플리케이션 버전: {Application.version}, 플랫폼: {Application.platform}");
         
-        // GUID-경로 매핑 로드
-        LoadGuidPathMapping();
+        LoadAllModules();
         
         Debug.Log("========== 청크 기반 맵 매니저 초기화 시작 ==========");
         
-        // 리소스 폴더 검사
         CheckResourcesFolder();
         
-        // 플레이어 찾기 및 설정
         if (playerTransform == null)
         {
             Debug.Log("playerTransform이 null, Player 태그로 찾기 시도");
@@ -113,81 +100,33 @@ public class ChunkBasedMapManager : MonoBehaviour
             }
             Debug.Log($"플레이어 찾음: {playerTransform.name} (위치: {playerTransform.position})");
         }
-        else
-        {
-            Debug.Log($"플레이어 이미 설정됨: {playerTransform.name} (위치: {playerTransform.position})");
-        }
         
-        // 설정 정보 출력
         Debug.Log($"청크 기반 맵 설정: [청크 크기: {chunkSize}] [로드 거리: {loadDistance}] [언로드 거리: {unloadDistance}]");
-        Debug.Log($"리소스 경로: [{resourcesJsonFolder}] [씬 이름 형식: {sceneNameFormat}] [JSON 형식: {jsonFileFormat}]");
         
-        // 청크 프리팹 캐싱 (프리팹 기반일 경우)
-        if (usePrefabBasedChunks)
+        // 청크 루트 생성
+        if (chunksRoot == null) 
         {
-            Debug.Log("프리팹 기반 청크 시스템 초기화");
-            
-            // 청크 루트 생성
-            if (chunksRoot == null) 
+            chunksRoot = new GameObject("ChunksRoot").transform;
+            chunksRoot.SetParent(transform);
+            Debug.Log("청크 부모 오브젝트 생성됨: ChunksRoot");
+        }
+        
+        // 프리팹 캐시 초기화
+        if (chunkPrefabs != null && chunkPrefabs.Length > 0)
+        {
+            foreach (var prefab in chunkPrefabs)
             {
-                chunksRoot = new GameObject("ChunksRoot").transform;
-                chunksRoot.SetParent(transform);
-                Debug.Log("청크 부모 오브젝트 생성됨: ChunksRoot");
-            }
-            else
-            {
-                Debug.Log($"기존 청크 부모 오브젝트 사용: {chunksRoot.name}");
-            }
-            
-            // 프리팹 캐시 초기화
-            if (chunkPrefabs != null && chunkPrefabs.Length > 0)
-            {
-                foreach (var prefab in chunkPrefabs)
+                if (prefab != null)
                 {
-                    if (prefab != null)
-                    {
-                        prefabCache[prefab.name] = prefab;
-                        Debug.Log($"청크 프리팹 캐싱됨: {prefab.name}");
-                    }
+                    prefabCache[prefab.name] = prefab;
+                    Debug.Log($"청크 프리팹 캐싱됨: {prefab.name}");
                 }
-                Debug.Log($"총 {prefabCache.Count}개 청크 프리팹 캐싱 완료");
             }
-            else
-            {
-                Debug.LogWarning("청크 프리팹이 설정되지 않았습니다!");
-            }
+            Debug.Log($"총 {prefabCache.Count}개 청크 프리팹 캐싱 완료");
         }
         else
         {
-            // 빌드에 포함된 모든 씬 로깅
-            Debug.Log("빌드에 포함된 씬 목록:");
-            for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
-            {
-                string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
-                string sceneNameFromPath = Path.GetFileNameWithoutExtension(scenePath);
-                Debug.Log($"  씬 #{i}: {sceneNameFromPath} (경로: {scenePath})");
-            }
-            
-            // 현재 로드된 씬 로깅
-            Debug.Log("현재 로드된 씬 목록:");
-            for (int i = 0; i < SceneManager.sceneCount; i++)
-            {
-                Scene scene = SceneManager.GetSceneAt(i);
-                Debug.Log($"  씬: {scene.name} (경로: {scene.path}, 로드됨: {scene.isLoaded})");
-            }
-            
-            // 기본 씬은 항상 로드되어 있어야 함
-            if (!string.IsNullOrEmpty(baseSceneName) && 
-                SceneManager.GetSceneByName(baseSceneName).IsValid() && 
-                !SceneManager.GetSceneByName(baseSceneName).isLoaded)
-            {
-                Debug.Log($"기본 씬 로드 시도: {baseSceneName}");
-                SceneManager.LoadScene(baseSceneName, LoadSceneMode.Additive);
-            }
-            else
-            {
-                Debug.Log($"기본 씬 상태: [이름: {baseSceneName}] [비어있음: {string.IsNullOrEmpty(baseSceneName)}] [이미 로드됨: {SceneManager.GetSceneByName(baseSceneName).isLoaded}]");
-            }
+            Debug.LogWarning("청크 프리팹이 설정되지 않았습니다!");
         }
         
         // 모듈 부모 오브젝트 생성
@@ -201,62 +140,38 @@ public class ChunkBasedMapManager : MonoBehaviour
         
         Debug.Log("========== 청크 기반 맵 매니저 초기화 완료 ==========");
     }
-    
-    /// <summary>
-    /// GUID와 리소스 경로 매핑 데이터 로드
-    /// </summary>
-    private void LoadGuidPathMapping()
+
+    private void LoadAllModules()
     {
-        try
+        Debug.Log($"모듈 리소스 로드 시작 (경로: {moduleResourcesPath})");
+        
+        RoomModule[] modules = Resources.LoadAll<RoomModule>(moduleResourcesPath);
+        
+        foreach (var module in modules)
         {
-            // Resources/GuidMapping.json 파일에서 매핑 정보 로드
-            TextAsset mappingJson = Resources.Load<TextAsset>("GuidMapping");
-            if (mappingJson != null)
+            if (!string.IsNullOrEmpty(module.assetGUID) && module.modulePrefab != null)
             {
-                Debug.Log("GUID-경로 매핑 파일 로드 성공");
-                guidMappingData = JsonUtility.FromJson<ModuleGuidMappingData>(mappingJson.text);
-                mappingInitialized = true;
-                Debug.Log($"{guidMappingData.mappings.Count}개의 GUID 매핑 로드됨");
+                moduleCache[module.assetGUID] = module;
+                Debug.Log($"모듈 캐싱됨: {module.name} (GUID: {module.assetGUID})");
             }
             else
             {
-                Debug.LogWarning("GUID-경로 매핑 파일이 없습니다 (Resources/GuidMapping.json)");
-                // 빈 매핑 생성
-                guidMappingData = new ModuleGuidMappingData();
-                mappingInitialized = true;
+                Debug.LogWarning($"유효하지 않은 모듈 발견: {module.name} (GUID 없음 또는 프리팹 없음)");
             }
         }
-        catch (Exception e)
-        {
-            Debug.LogError($"GUID-경로 매핑 로드 오류: {e.Message}");
-            guidMappingData = new ModuleGuidMappingData();
-            mappingInitialized = true;
-        }
+        
+        Debug.Log($"모듈 리소스 로드 완료: {moduleCache.Count}개 모듈 로드됨");
     }
-    
+
     private void Update()
     {
-        // 플레이어의 현재 청크 계산
         Vector2Int newPlayerChunk = GetChunkFromPosition(playerTransform.position);
         
-        // 청크가 변경되었을 때만 청크 관리 시작
         if (newPlayerChunk != currentPlayerChunk)
         {
             currentPlayerChunk = newPlayerChunk;
             StartCoroutine(ManageChunks());
         }
-        
-        // 프리팹 기반 디버깅 (에디터에서만 실행)
-        #if UNITY_EDITOR
-        if (usePrefabBasedChunks && Input.GetKeyDown(KeyCode.F5))
-        {
-            Debug.Log("프리팹 청크 상태:");
-            foreach (var chunk in instancedChunks)
-            {
-                Debug.Log($"  청크 {chunk.Key} - 위치: {chunk.Value.transform.position}, 활성화: {chunk.Value.activeSelf}");
-            }
-        }
-        #endif
     }
     
     /// <summary>
@@ -268,7 +183,6 @@ public class ChunkBasedMapManager : MonoBehaviour
         int y = Mathf.FloorToInt(position.y / chunkSize);
         Vector2Int chunkId = new Vector2Int(x, y);
         
-        // 범위 제한 적용
         if (limitChunkRange)
         {
             chunkId.x = Mathf.Clamp(chunkId.x, minChunkX, maxChunkX);
@@ -283,14 +197,12 @@ public class ChunkBasedMapManager : MonoBehaviour
     /// </summary>
     private bool IsValidChunkId(Vector2Int chunkId)
     {
-        // 비정상적인 값 체크 (int.MinValue나 int.MaxValue에 가까운 값)
         if (chunkId.x == int.MinValue || chunkId.x == int.MaxValue || 
             chunkId.y == int.MinValue || chunkId.y == int.MaxValue)
         {
             return false;
         }
         
-        // 범위 제한이 활성화된 경우, 지정된 범위 내에 있는지 확인
         if (limitChunkRange)
         {
             return chunkId.x >= minChunkX && chunkId.x <= maxChunkX && 
@@ -298,25 +210,6 @@ public class ChunkBasedMapManager : MonoBehaviour
         }
         
         return true;
-    }
-    
-    /// <summary>
-    /// 청크 씬이 빌드 설정에 포함되어 있는지 확인
-    /// </summary>
-    private bool IsSceneInBuildSettings(string sceneName)
-    {
-        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
-        {
-            string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
-            string sceneNameFromPath = Path.GetFileNameWithoutExtension(scenePath);
-            
-            if (sceneNameFromPath == sceneName)
-            {
-                return true;
-            }
-        }
-        
-        return false;
     }
     
     /// <summary>
@@ -334,26 +227,21 @@ public class ChunkBasedMapManager : MonoBehaviour
     {
         Debug.Log($"청크 관리 시작 - 현재 플레이어 청크: {currentPlayerChunk} (위치: {playerTransform.position})");
         
-        // 필요한 청크 계산
         HashSet<Vector2Int> neededChunks = new HashSet<Vector2Int>();
         int loadRadius = Mathf.CeilToInt(loadDistance / chunkSize);
-        Debug.Log($"청크 로드 반경: {loadRadius} (청크 {loadRadius*2+1}x{loadRadius*2+1}개 영역)");
         
-        // 현재 청크와 주변 청크 모두 포함
+        // 현재 청크와 주변 청크 확인
         for (int dx = -loadRadius; dx <= loadRadius; dx++)
         {
             for (int dy = -loadRadius; dy <= loadRadius; dy++)
             {
                 Vector2Int chunkToCheck = new Vector2Int(currentPlayerChunk.x + dx, currentPlayerChunk.y + dy);
                 
-                // 청크 ID 유효성 검사 추가
                 if (!IsValidChunkId(chunkToCheck))
                 {
-                    Debug.Log($"유효하지 않은 청크 ID: {chunkToCheck}, 건너뜀");
                     continue;
                 }
                 
-                // 맨해튼 거리로 필터링 (원형 영역)
                 if (GetChunkDistance(currentPlayerChunk, chunkToCheck) <= loadRadius)
                 {
                     neededChunks.Add(chunkToCheck);
@@ -361,29 +249,13 @@ public class ChunkBasedMapManager : MonoBehaviour
             }
         }
         
-        Debug.Log($"로드 필요 청크 {neededChunks.Count}개: {string.Join(", ", neededChunks)}");
-        Debug.Log($"현재 로드된 청크 {loadedChunks.Count}개: {string.Join(", ", loadedChunks)}");
-        Debug.Log($"현재 로드 중인 청크 {chunksBeingLoaded.Count}개: {string.Join(", ", chunksBeingLoaded)}");
-        
         // 청크 로드
         foreach (Vector2Int chunk in neededChunks)
         {
             if (!loadedChunks.Contains(chunk) && !chunksBeingLoaded.Contains(chunk))
             {
                 chunksBeingLoaded.Add(chunk);
-                
-                if (usePrefabBasedChunks)
-                {
-                    // 프리팹 기반 로드
-                    StartCoroutine(LoadChunkPrefab(chunk));
-                }
-                else
-                {
-                    // 씬 기반 로드
-                    StartCoroutine(LoadChunk(chunk));
-                }
-                
-                // 동시에 너무 많은 청크를 로드하지 않도록 대기
+                StartCoroutine(LoadChunkPrefab(chunk));
                 yield return new WaitForSeconds(0.1f);
             }
         }
@@ -402,16 +274,7 @@ public class ChunkBasedMapManager : MonoBehaviour
         
         foreach (Vector2Int chunk in chunksToUnload)
         {
-            if (usePrefabBasedChunks)
-            {
-                // 프리팹 기반 언로드
-                StartCoroutine(UnloadChunkPrefab(chunk));
-            }
-            else
-            {
-                // 씬 기반 언로드
-                StartCoroutine(UnloadChunk(chunk));
-            }
+            StartCoroutine(UnloadChunkPrefab(chunk));
             yield return new WaitForSeconds(0.05f);
         }
     }
@@ -446,26 +309,20 @@ public class ChunkBasedMapManager : MonoBehaviour
         GameObject prefab = null;
         string prefabName = defaultChunkPrefabName;
         
-        // 좌표에 따라 다른 프리팹 선택 로직을 여기에 추가할 수 있음
-        // 예: 특정 위치에서는 특별한 청크 프리팹 사용
-        
         // 1. 직접 할당된 기본 프리팹 확인
         if (defaultChunkPrefab != null)
         {
             prefab = defaultChunkPrefab;
-            Debug.Log("직접 할당된 기본 프리팹 사용");
         }
         
         // 2. 프리팹 배열에서 확인
         if (prefab == null && chunkPrefabs != null && chunkPrefabs.Length > 0)
         {
-            // 임시로 첫 번째 프리팹 사용 (또는 인덱스 계산 로직 추가)
             foreach (var p in chunkPrefabs)
             {
                 if (p != null)
                 {
                     prefab = p;
-                    Debug.Log($"프리팹 배열에서 찾음: {p.name}");
                     break;
                 }
             }
@@ -475,13 +332,11 @@ public class ChunkBasedMapManager : MonoBehaviour
         if (prefab == null && prefabCache.TryGetValue(prefabName, out GameObject cachedPrefab))
         {
             prefab = cachedPrefab;
-            Debug.Log($"캐시된 프리팹 사용: {prefabName}");
         }
         
         // 4. 리소스에서 로드 시도
         if (prefab == null)
         {
-            // 여러 가능한 경로 시도
             string[] possiblePaths = new string[] 
             {
                 $"Modules/{prefabName}",
@@ -492,13 +347,10 @@ public class ChunkBasedMapManager : MonoBehaviour
             
             foreach (string path in possiblePaths)
             {
-                Debug.Log($"리소스에서 프리팹 로드 시도: {path}");
                 prefab = Resources.Load<GameObject>(path);
-                
                 if (prefab != null)
                 {
                     prefabCache[prefabName] = prefab;
-                    Debug.Log($"프리팹 로드 성공 및 캐싱: {path}");
                     break;
                 }
             }
@@ -507,7 +359,7 @@ public class ChunkBasedMapManager : MonoBehaviour
         // 프리팹을 찾지 못한 경우
         if (prefab == null)
         {
-            Debug.LogError($"청크 프리팹을 찾을 수 없음: {prefabName}. Inspector에서 defaultChunkPrefab을 직접 할당하세요.");
+            Debug.LogError($"청크 프리팹을 찾을 수 없음: {prefabName}");
             chunksBeingLoaded.Remove(chunkId);
             yield break;
         }
@@ -543,21 +395,21 @@ public class ChunkBasedMapManager : MonoBehaviour
             chunkInfo.isInitialized = true;
         }
         
-        // 인벤토리 체크 및 아이템 필터링
-        if (loadModulesFromJson)
-        {
-            FilterChunkItems(chunkInstance);
-        }
-        
         // 청크 인스턴스 등록
         instancedChunks[chunkId] = chunkInstance;
         loadedChunks.Add(chunkId);
+        
+        // JSON에서 모듈 로드
+        if (loadModulesFromJson)
+        {
+            yield return StartCoroutine(LoadModulesFromJson(chunkId, chunkInfo));
+        }
+        
+        // 아이템 필터링 (인벤토리 체크)
+        FilterChunkItems(chunkInstance);
+        
         chunksBeingLoaded.Remove(chunkId);
-        
         Debug.Log($"프리팹 청크 로드 완료: {chunkKey}");
-        
-        // 한 프레임 기다려서 시각적 렌더링 문제 방지
-        yield return null;
     }
     
     /// <summary>
@@ -598,114 +450,7 @@ public class ChunkBasedMapManager : MonoBehaviour
     }
     
     /// <summary>
-    /// 청크 로드 코루틴 
-    /// try-catch 블록 내에서 yield 사용 불가능하므로 수정
-    /// </summary>
-    private IEnumerator LoadChunk(Vector2Int chunkId)
-    {
-        // 유효하지 않은 청크 ID 필터링
-        if (!IsValidChunkId(chunkId))
-        {
-            Debug.LogWarning($"유효하지 않은 청크 ID: {chunkId}, 로드 건너뜀");
-            chunksBeingLoaded.Remove(chunkId);
-            yield break;
-        }
-        
-        string chunkName = string.Format(sceneNameFormat, chunkId.x, chunkId.y);
-        Debug.Log($"청크 로드 시작: {chunkName} (ID: {chunkId})");
-        
-        // 빌드 설정에 씬이 포함되어 있는지 확인
-        if (!IsSceneInBuildSettings(chunkName))
-        {
-            Debug.LogWarning($"씬이 빌드 설정에 없음: {chunkName}, 로드 건너뜀");
-            Debug.Log("빌드에 포함된 씬 목록:");
-            for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
-            {
-                string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
-                Debug.Log($"  씬 #{i}: {Path.GetFileNameWithoutExtension(scenePath)}");
-            }
-            chunksBeingLoaded.Remove(chunkId);
-            yield break;
-        }
-        
-        // 씬 로드 시도
-        AsyncOperation asyncLoad = null;
-        
-        try
-        {
-            Debug.Log($"AsyncOperation 생성 시도: {chunkName}");
-            asyncLoad = SceneManager.LoadSceneAsync(chunkName, LoadSceneMode.Additive);
-            Debug.Log(asyncLoad != null ? $"AsyncOperation 생성 성공: {chunkName}" : $"AsyncOperation 생성 실패: {chunkName}");
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"씬 로드 초기화 중 오류 발생: {chunkName}, {e.Message}\n{e.StackTrace}");
-            chunksBeingLoaded.Remove(chunkId);
-            yield break;
-        }
-        
-        if (asyncLoad == null)
-        {
-            Debug.LogWarning($"씬을 찾을 수 없음: {chunkName}");
-            chunksBeingLoaded.Remove(chunkId);
-            yield break;
-        }
-        
-        asyncLoad.allowSceneActivation = true;
-        
-        // 씬 로드 완료 대기
-        while (!asyncLoad.isDone)
-        {
-            Debug.Log($"씬 로드 진행 중: {chunkName} - 진행률: {asyncLoad.progress * 100}%");
-            yield return null;
-        }
-        
-        // 예외 처리 구역 외부에서 작업 수행
-        try
-        {
-            // 로드된 청크 등록
-            loadedChunks.Add(chunkId);
-            
-            // 청크 정보 컴포넌트 찾기
-            Scene loadedScene = SceneManager.GetSceneByName(chunkName);
-            ChunkInfo chunkInfo = null;
-            
-            GameObject[] rootObjects = loadedScene.GetRootGameObjects();
-            foreach (GameObject obj in rootObjects)
-            {
-                ChunkInfo foundInfo = obj.GetComponent<ChunkInfo>();
-                if (foundInfo != null)
-                {
-                    chunkInfo = foundInfo;
-                    chunkInfoCache[chunkId] = foundInfo;
-                    break;
-                }
-            }
-            
-            // 초기화 완료
-            if (chunkInfo != null)
-            {
-                chunkInfo.isInitialized = true;
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"청크 초기화 중 오류 발생: {chunkName}, {e.Message}");
-            // 오류가 있어도 계속 진행
-        }
-        
-        // JSON에서 모듈 로드 - 별도의 try-catch로 분리
-        if (loadModulesFromJson)
-        {
-            yield return StartCoroutine(LoadModulesFromJson(chunkId, chunkInfoCache.ContainsKey(chunkId) ? chunkInfoCache[chunkId] : null));
-        }
-        
-        chunksBeingLoaded.Remove(chunkId);
-        Debug.Log($"청크 로드 완료: {chunkName}");
-    }
-    
-    /// <summary>
-    /// JSON에서 모듈 데이터 로드 및 인스턴스화
+    /// JSON에서 모듈 데이터 로드하고 인스턴스화
     /// </summary>
     private IEnumerator LoadModulesFromJson(Vector2Int chunkId, ChunkInfo chunkInfo)
     {
@@ -713,98 +458,53 @@ public class ChunkBasedMapManager : MonoBehaviour
         string jsonPath = Path.Combine(resourcesJsonFolder, jsonFileName);
         Debug.Log($"JSON 파일 로드 시도: {jsonPath}");
         
-        TextAsset jsonAsset = null;
-        
-        try
-        {
-            jsonAsset = Resources.Load<TextAsset>(jsonPath);
-            Debug.Log(jsonAsset != null ? 
-                $"JSON 로드 성공: {jsonPath} (크기: {jsonAsset.text.Length}바이트)" : 
-                $"JSON 로드 실패: {jsonPath} - 파일을 찾을 수 없음");
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"JSON 로드 중 오류 발생: {jsonFileName}, {e.Message}\n{e.StackTrace}");
-            yield break;
-        }
-        
+        // JSON 파일 로드
+        TextAsset jsonAsset = Resources.Load<TextAsset>(jsonPath);
         if (jsonAsset == null)
         {
-            Debug.LogWarning($"JSON 파일을 찾을 수 없음: {jsonFileName} (경로: {jsonPath})");
-            Debug.Log($"Resources 폴더 내 JSON 파일이 존재하는지 확인하세요: {resourcesJsonFolder}/{jsonFileName}");
+            Debug.LogWarning($"JSON 파일을 찾을 수 없음: {jsonFileName}");
             yield break;
         }
-        
+
+        // JSON 파싱
         RoomData chunkData = null;
-        
         try
         {
-            // JSON 파싱
             chunkData = JsonUtility.FromJson<RoomData>(jsonAsset.text);
+            Debug.Log($"JSON 파싱 성공: {chunkData.placedModules.Count}개 모듈 데이터");
         }
         catch (Exception e)
         {
             Debug.LogError($"JSON 파싱 중 오류 발생: {jsonFileName}, {e.Message}");
             yield break;
         }
-        
+
         if (chunkData == null || chunkData.placedModules == null)
         {
             Debug.LogWarning($"청크 데이터 파싱 실패: {jsonFileName}");
             yield break;
         }
-        
-        // 인벤토리 매니저 참조
-        InventoryManager inventoryManager = InventoryManager.Instance;
-        if (inventoryManager == null)
-        {
-            Debug.LogWarning("InventoryManager를 찾을 수 없습니다.");
-            yield break;
-        }
 
-        // 플레이어가 가진 아이템 ID 목록 가져오기
-        List<string> ownedItemIDs = inventoryManager.GetAllItemIDs();
-
-        // 모듈 인스턴스화
         int moduleCount = 0;
         int batchSize = 5; // 한 번에 처리할 모듈 수
-        
+
+        // JSON의 배치 데이터를 기반으로 모듈 생성
         for (int i = 0; i < chunkData.placedModules.Count; i++)
         {
             var moduleData = chunkData.placedModules[i];
-            
-            // 코스튬 파츠 모듈인 경우 인벤토리 체크
-            if (moduleData.moduleType == "Costume" && ownedItemIDs.Contains(moduleData.itemID))
-            {
-                Debug.Log($"이미 소유한 코스튬 파츠 스킵: {moduleData.itemID}");
-                continue;
-            }
-
-            // try-catch 블록 밖에서 인스턴스화 (하지만 예외는 개별적으로 포착)
-            GameObject instance = null;
-            try
-            {
-                instance = InstantiateModuleFromData(moduleData, chunkId);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"모듈 인스턴스화 중 오류: {moduleData.moduleGUID}, {e.Message}");
-                // 오류가 있어도 다음 모듈로 계속 진행
-            }
-            
+            GameObject instance = InstantiateModuleFromMapping(moduleData, chunkId);
             if (instance != null)
             {
                 moduleCount++;
             }
-            
-            // 프레임 드랍 방지를 위해 대량 모듈 생성 시 분산 처리
-            // yield는 try-catch 블록 밖에 있어야 함
-            if (chunkData.placedModules.Count > 20 && (i + 1) % batchSize == 0)
+
+            // 프레임 드랍 방지
+            if ((i + 1) % batchSize == 0)
             {
                 yield return null;
             }
         }
-        
+
         // 연결 설정
         try
         {
@@ -814,101 +514,84 @@ public class ChunkBasedMapManager : MonoBehaviour
         {
             Debug.LogError($"모듈 연결 설정 중 오류 발생: {e.Message}");
         }
-        
+
         if (chunkInfo != null)
         {
             chunkInfo.moduleCount = moduleCount;
             chunkInfo.jsonFilePath = Path.Combine(resourcesJsonFolder, jsonFileName);
         }
-        
-        Debug.Log($"청크 JSON 로드 완료: {jsonFileName} (모듈 {moduleCount}개)");
     }
-    
+
     /// <summary>
-    /// 모듈 데이터로부터 게임 오브젝트 인스턴스화
+    /// 매핑된 모듈을 사용하여 프리팹 인스턴스화
     /// </summary>
-    private GameObject InstantiateModuleFromData(RoomData.PlacedModuleData moduleData, Vector2Int chunkId)
+    private GameObject InstantiateModuleFromMapping(RoomData.PlacedModuleData moduleData, Vector2Int chunkId)
     {
-        // 모듈 에셋 로드
-        RoomModule moduleAsset = GetModuleByGUID(moduleData.moduleGUID);
-        if (moduleAsset == null || moduleAsset.modulePrefab == null)
-        {
-            Debug.LogWarning($"모듈 로드 실패: {moduleData.moduleGUID}");
-            return null;
-        }
-        
-        // ID 생성
         string instanceId = $"{moduleData.moduleGUID}_{moduleData.position.x}_{moduleData.position.y}";
         
-        // 이미 인스턴스화 되었는지 확인
+        // 이미 인스턴스화된 경우 반환
         if (instancedModules.TryGetValue(instanceId, out GameObject existingInstance))
         {
             return existingInstance;
         }
-        
-        // 모듈 인스턴스화
-        GameObject instance = Instantiate(
-            moduleAsset.modulePrefab,
-            (Vector3)moduleData.position,
-            Quaternion.Euler(0, 0, moduleData.rotationStep * 90),
-            modulesRoot
-        );
-        
-        // 인스턴스 이름 설정
-        instance.name = $"Module_{moduleAsset.name}_{chunkId.x}_{chunkId.y}";
-        
-        // 모듈 컴포넌트 추가
-        RoomBehavior roomBehavior = instance.GetComponent<RoomBehavior>();
-        if (roomBehavior == null)
+
+        // 캐시에서 모듈 찾기
+        RoomModule moduleAsset = null;
+        if (moduleCache.TryGetValue(moduleData.moduleGUID, out moduleAsset))
         {
-            roomBehavior = instance.AddComponent<RoomBehavior>();
+            Debug.Log($"캐시에서 모듈 찾음: {moduleData.moduleGUID}");
         }
-        
-        roomBehavior.moduleData = moduleAsset;
-        roomBehavior.instanceId = instanceId;
-        
-        // 인스턴스화된 룸 내의 아이템 체크 및 필터링
-        CheckAndFilterItems(instance);
-        
-        // 인스턴스 캐싱 및 반환
-        instancedModules[instanceId] = instance;
-        return instance;
-    }
-    
-    // 룸 내의 아이템 체크 및 필터링 메서드
-    private void CheckAndFilterItems(GameObject roomInstance)
-    {
-        // 인벤토리 매니저 참조
-        InventoryManager inventoryManager = InventoryManager.Instance;
-        if (inventoryManager == null) return;
-        
-        // 룸 내의 모든 아이템 프리팹 찾기
-        Item[] items = roomInstance.GetComponentsInChildren<Item>(true);
-        
-        foreach (Item item in items)
+        else
         {
-            // Item 컴포넌트에 ItemData 참조가 있어야 함
-            ItemData itemData = item.Itemdata;
-            
-            if (itemData != null)
+            moduleAsset = GetModuleByGUID(moduleData.moduleGUID);
+            if (moduleAsset == null)
             {
-                // 코스튬 파츠이고 이미 인벤토리에 있는지 확인
-                if (itemData.itemType == ItemType.CostumeParts)
-                {
-                    // 인벤토리에서 같은 ID의 아이템 찾기
-                    ItemData ownedItem = inventoryManager.GetItemById(itemData.id);
-                    
-                    if (ownedItem != null)
-                    {
-                        // 이미 소유한 아이템이면 비활성화
-                        Debug.Log($"이미 소유한 코스튬 아이템 비활성화: {itemData.ItemName}");
-                        item.gameObject.SetActive(false);
-                    }
-                }
+                Debug.LogWarning($"모듈을 찾을 수 없음: {moduleData.moduleGUID}");
+                return null;
             }
         }
+
+        if (moduleAsset.modulePrefab == null)
+        {
+            Debug.LogWarning($"모듈의 프리팹이 없음: {moduleData.moduleGUID}");
+            return null;
+        }
+
+        try
+        {
+            // 프리팹 인스턴스화
+            GameObject instance = Instantiate(
+                moduleAsset.modulePrefab,
+                moduleData.position,
+                Quaternion.Euler(0, 0, moduleData.rotationStep * 90),
+                modulesRoot
+            );
+
+            // 인스턴스 설정
+            instance.name = $"Module_{moduleAsset.name}_{chunkId.x}_{chunkId.y}";
+            
+            // RoomBehavior 설정
+            RoomBehavior roomBehavior = instance.GetComponent<RoomBehavior>();
+            if (roomBehavior == null)
+            {
+                roomBehavior = instance.AddComponent<RoomBehavior>();
+            }
+            
+            roomBehavior.moduleData = moduleAsset;
+            roomBehavior.instanceId = instanceId;
+            
+            // 인스턴스 캐싱
+            instancedModules[instanceId] = instance;
+            
+            return instance;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"모듈 인스턴스화 중 오류: {moduleData.moduleGUID}, {e.Message}");
+            return null;
+        }
     }
-    
+
     /// <summary>
     /// 모듈 간 연결 설정
     /// </summary>
@@ -953,7 +636,7 @@ public class ChunkBasedMapManager : MonoBehaviour
             }
         }
     }
-    
+
     /// <summary>
     /// 프리팹 기반 청크 언로드 코루틴
     /// </summary>
@@ -965,21 +648,56 @@ public class ChunkBasedMapManager : MonoBehaviour
         // 인스턴스 참조 가져오기
         if (instancedChunks.TryGetValue(chunkId, out GameObject chunkInstance))
         {
+            // 청크에 속한 모듈 제거
+            if (loadModulesFromJson)
+            {
+                try
+                {
+                    // 이 청크에 속한 모듈 식별
+                    Rect chunkBounds = new Rect(
+                        chunkId.x * chunkSize,
+                        chunkId.y * chunkSize,
+                        chunkSize,
+                        chunkSize
+                    );
+                    
+                    List<string> modulesToRemove = new List<string>();
+                    
+                    foreach (var entry in instancedModules)
+                    {
+                        GameObject moduleInstance = entry.Value;
+                        if (moduleInstance != null)
+                        {
+                            Vector3 pos = moduleInstance.transform.position;
+                            if (chunkBounds.Contains(new Vector2(pos.x, pos.y)))
+                            {
+                                modulesToRemove.Add(entry.Key);
+                            }
+                        }
+                    }
+                    
+                    // 모듈 제거
+                    foreach (string key in modulesToRemove)
+                    {
+                        if (instancedModules.TryGetValue(key, out GameObject instance) && instance != null)
+                        {
+                            Destroy(instance);
+                        }
+                        instancedModules.Remove(key);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"모듈 제거 중 오류 발생: {e.Message}");
+                }
+            }
+            
             // 즉시 비활성화 (시각적 효과 위해)
             chunkInstance.SetActive(false);
             
-            // 풀링 시스템을 위해 완전히 제거하지 않고 비활성화만 할 수도 있음
-            // 이 경우 아래 Destroy 대신 SetActive(false)만 유지하고 캐시는 그대로 유지
-            
-            // 메모리 관리를 위해 완전히 제거
+            // 완전히 제거
             Destroy(chunkInstance);
             instancedChunks.Remove(chunkId);
-            
-            Debug.Log($"청크 인스턴스 제거됨: {chunkKey}");
-        }
-        else
-        {
-            Debug.LogWarning($"언로드할 청크 인스턴스를 찾을 수 없음: {chunkKey}");
         }
         
         // 로드된 청크 목록에서 제거
@@ -987,99 +705,9 @@ public class ChunkBasedMapManager : MonoBehaviour
         
         Debug.Log($"프리팹 청크 언로드 완료: {chunkKey}");
         
-        // 렌더링 문제 방지를 위한 대기
         yield return null;
     }
-    
-    /// <summary>
-    /// 청크 언로드 코루틴 - try-catch 블록 내에서 yield 사용 불가능하므로 수정
-    /// </summary>
-    private IEnumerator UnloadChunk(Vector2Int chunkId)
-    {
-        string chunkName = string.Format(sceneNameFormat, chunkId.x, chunkId.y);
-        Debug.Log($"청크 언로드 시작: {chunkName}");
-        
-        // 모듈 제거 (예외 처리)
-        if (loadModulesFromJson)
-        {
-            try
-            {
-                // 이 청크에 속한 모듈 식별
-                Rect chunkBounds = new Rect(
-                    chunkId.x * chunkSize,
-                    chunkId.y * chunkSize,
-                    chunkSize,
-                    chunkSize
-                );
-                
-                List<string> modulesToRemove = new List<string>();
-                
-                foreach (var entry in instancedModules)
-                {
-                    GameObject moduleInstance = entry.Value;
-                    if (moduleInstance != null)
-                    {
-                        Vector3 pos = moduleInstance.transform.position;
-                        if (chunkBounds.Contains(new Vector2(pos.x, pos.y)))
-                        {
-                            modulesToRemove.Add(entry.Key);
-                        }
-                    }
-                }
-                
-                // 모듈 제거
-                foreach (string key in modulesToRemove)
-                {
-                    if (instancedModules.TryGetValue(key, out GameObject instance) && instance != null)
-                    {
-                        Destroy(instance);
-                    }
-                    instancedModules.Remove(key);
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"모듈 제거 중 오류 발생: {e.Message}");
-                // 계속 진행
-            }
-        }
-        
-        // 씬 언로드 시도
-        AsyncOperation asyncUnload = null;
-        
-        try
-        {
-            asyncUnload = SceneManager.UnloadSceneAsync(chunkName);
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"씬 언로드 초기화 중 오류 발생: {chunkName}, {e.Message}");
-            loadedChunks.Remove(chunkId);
-            yield break;
-        }
-        
-        if (asyncUnload == null)
-        {
-            Debug.LogWarning($"씬을 언로드할 수 없음: {chunkName}");
-            loadedChunks.Remove(chunkId);
-            yield break;
-        }
-        
-        // 언로드 완료 대기
-        while (!asyncUnload.isDone)
-        {
-            yield return null;
-        }
-        
-        // 청크 정보 캐시에서 제거
-        chunkInfoCache.Remove(chunkId);
-        
-        // 로드된 청크 목록에서 제거
-        loadedChunks.Remove(chunkId);
-        
-        Debug.Log($"청크 언로드 완료: {chunkName}");
-    }
-    
+
     /// <summary>
     /// GUID로 모듈 에셋 가져오기 (캐싱 포함)
     /// </summary>
@@ -1091,9 +719,7 @@ public class ChunkBasedMapManager : MonoBehaviour
             return module;
         }
         
-        Debug.Log($"모듈 로드 시도 (GUID: {guid})");
-        
-        // 1. 직접 매핑 확인 (가장 안정적)
+        // 1. 직접 매핑 확인
         if (enableDirectMapping)
         {
             foreach (var mapping in moduleGuidMappings)
@@ -1101,143 +727,34 @@ public class ChunkBasedMapManager : MonoBehaviour
                 if (mapping.guid == guid && mapping.module != null)
                 {
                     module = mapping.module;
-                    Debug.Log($"직접 매핑으로 모듈 찾음: {guid} -> {module.name}");
                     moduleCache[guid] = module;
                     return module;
                 }
             }
         }
         
-        // 에셋 로드 (런타임/에디터 모드에 따라 다르게 처리)
-#if UNITY_EDITOR
-        try
+        // 2. Resources 폴더에서 모듈 찾기
+        string[] searchPaths = {
+            $"{moduleResourcesPath}/{guid}",
+            $"{moduleResourcesPath}/Rooms/{guid}",
+            $"{moduleResourcesPath}/Modules/{guid}",
+            guid // 직접 GUID로 시도
+        };
+        
+        foreach (string path in searchPaths)
         {
-            string assetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
-            Debug.Log($"에디터 모드 - GUID에서 에셋 경로 변환: {guid} -> {assetPath}");
-            
-            if (!string.IsNullOrEmpty(assetPath))
+            module = Resources.Load<RoomModule>(path);
+            if (module != null)
             {
-                module = UnityEditor.AssetDatabase.LoadAssetAtPath<RoomModule>(assetPath);
-                Debug.Log(module != null ? 
-                    $"에디터 모드 - 모듈 로드 성공: {assetPath}" : 
-                    $"에디터 모드 - 모듈 로드 실패: {assetPath}");
-            }
-            else
-            {
-                Debug.LogWarning($"에디터 모드 - GUID에 해당하는 경로 없음: {guid}");
+                moduleCache[guid] = module;
+                return module;
             }
         }
-        catch (Exception e)
-        {
-            Debug.LogError($"에디터 모드에서 모듈 로드 실패: {guid}, {e.Message}");
-        }
-#else
-        // 런타임 환경에서는 Resources나 Addressables 등을 사용
-        try
-        {
-            // 2. GUID 매핑 확인
-            string mappedPath = null;
-            if (mappingInitialized && guidMappingData != null)
-            {
-                var mapping = guidMappingData.mappings.Find(m => m.guid == guid);
-                if (mapping != null)
-                {
-                    mappedPath = mapping.resourcesPath;
-                    Debug.Log($"GUID 매핑 발견: {guid} -> {mappedPath}");
-                }
-            }
-            
-            // 매핑된 경로가 있으면 먼저 시도
-            if (!string.IsNullOrEmpty(mappedPath))
-            {
-                Debug.Log($"매핑된 경로로 모듈 로드 시도: {mappedPath}");
-                module = Resources.Load<RoomModule>(mappedPath);
-                if (module != null)
-                {
-                    Debug.Log($"매핑된 경로로 모듈 로드 성공: {mappedPath}");
-                }
-            }
-            
-            // 3. 이름으로 찾기 시도 (모듈 이름이 일정한 규칙을 따르는 경우)
-            if (module == null)
-            {
-                // GUID에서 모듈 이름을 추출하는 로직이 있다면 여기에 구현
-                // 예: guid가 "Modules/Wall_001" 형태라면 "Wall_001"만 추출
-                string possibleName = ExtractModuleNameFromGUID(guid);
-                if (!string.IsNullOrEmpty(possibleName))
-                {
-                    Debug.Log($"이름으로 모듈 로드 시도: {possibleName}");
-                    module = Resources.Load<RoomModule>($"Modules/{possibleName}");
-                    if (module != null)
-                    {
-                        Debug.Log($"이름으로 모듈 로드 성공: {possibleName}");
-                    }
-                }
-            }
-            
-            // 4. 백업: 일반적인 경로 시도
-            if (module == null)
-            {
-                // 다양한 경로 시도
-                string[] possiblePaths = {
-                    $"Modules/{guid}",
-                    $"RoomModules/{guid}",
-                    $"Modules/RoomModules/{guid}",
-                    guid // 직접 GUID만 사용
-                };
-                
-                foreach (string path in possiblePaths)
-                {
-                    Debug.Log($"런타임 환경 - 모듈 로드 시도: {path}");
-                    module = Resources.Load<RoomModule>(path);
-                    
-                    if (module != null)
-                    {
-                        Debug.Log($"런타임 환경 - 모듈 로드 성공: {path}");
-                        break;
-                    }
-                }
-                
-                if (module == null)
-                {
-                    Debug.LogError($"런타임 환경 - 모든 경로에서 모듈 로드 실패 (GUID: {guid})");
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"런타임 환경에서 모듈 로드 실패: {guid}, {e.Message}\n{e.StackTrace}");
-        }
-#endif
+        
+        Debug.LogWarning($"모듈을 찾을 수 없음: {guid}");
+        return null;
+    }
 
-        if (module != null)
-        {
-            moduleCache[guid] = module;
-            Debug.Log($"모듈 캐시에 추가됨: {guid}");
-        }
-        else
-        {
-            Debug.LogWarning($"모듈을 찾을 수 없음: {guid} - Resources 폴더에 모듈 에셋이 있는지 확인하세요");
-        }
-        
-        return module;
-    }
-    
-    // GUID에서 모듈 이름 추출 (필요한 경우 구현)
-    private string ExtractModuleNameFromGUID(string guid)
-    {
-        // 예: guid가 경로를 포함하면 파일 이름만 추출
-        int lastSlashIndex = guid.LastIndexOf('/');
-        if (lastSlashIndex >= 0 && lastSlashIndex < guid.Length - 1)
-        {
-            return guid.Substring(lastSlashIndex + 1);
-        }
-        
-        // 다른 이름 추출 로직이 필요하면 여기에 추가
-        
-        return guid; // 기본값으로 GUID 그대로 반환
-    }
-    
     /// <summary>
     /// 지정된 위치로 플레이어 이동 (디버깅 및 테스트용)
     /// </summary>
@@ -1256,7 +773,7 @@ public class ChunkBasedMapManager : MonoBehaviour
             }
         }
     }
-    
+
     /// <summary>
     /// 청크 정보 얻기 (디버깅용)
     /// </summary>
@@ -1264,7 +781,7 @@ public class ChunkBasedMapManager : MonoBehaviour
     {
         return new List<Vector2Int>(loadedChunks);
     }
-    
+
     /// <summary>
     /// 프리팹 청크 인스턴스 얻기 (디버깅용)
     /// </summary>
@@ -1272,7 +789,7 @@ public class ChunkBasedMapManager : MonoBehaviour
     {
         return new Dictionary<Vector2Int, GameObject>(instancedChunks);
     }
-    
+
     /// <summary>
     /// 에디터에서 시각화
     /// </summary>
@@ -1356,7 +873,6 @@ public class ChunkBasedMapManager : MonoBehaviour
                     Debug.Log($"모듈 폴더에서 {modules.Length}개 에셋 찾음: {path}");
                     foreach (var module in modules)
                     {
-                        // UnityEngine.Object로 명시적 캐스팅하여 name 속성에 접근
                         Debug.Log($"  - {module.GetType().Name}: {module.name}");
                     }
                 }
