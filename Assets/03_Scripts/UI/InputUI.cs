@@ -25,9 +25,12 @@ public class InputUI : MonoBehaviour
     [SerializeField] public GameObject settingMenu;
     [SerializeField] public GameObject checkPointMenu;
 
+
+
     public bool isPauseMenuOpen = false;
 
     [SerializeField] private InfoUI infoUI;
+    [SerializeField] private NPC npc;
 
     private void Start()
     {
@@ -40,28 +43,32 @@ public class InputUI : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (InteractionKeyInput.GetKeyDown(KeyCode.Escape))
         {
-            // 열려있는 UI가 있는지 확인.
-            if (IsAnyUIActive(true))
+            if (npc.istalking == false)
             {
-                UIManager.Instance.CloseAllPage();
-            }
-            else
-            {
-                PauseMenu(pauseMenu);
+                // 열려있는 UI가 있는지 확인.
+                if (IsAnyUIActive(true))
+                {
+                    UIManager.Instance.CloseAllPage();
+                    isPauseMenuOpen = false;
+                }
+                else
+                {
+                    PauseMenu(pauseMenu);
+                }
             }
         }
 
         if (isPauseMenuOpen) //예외처리. 미리 체크하는 편이 좋당
             return;
 
-        if (Input.GetKeyDown(KeyCode.M))
+        if (InteractionKeyInput.GetKeyDown(KeyCode.M))
         {
             SetMenu(mapMenu);
         }
 
-        if (Input.GetKeyDown(KeyCode.I))
+        if (InteractionKeyInput.GetKeyDown(KeyCode.I))
         {
             Debug.Log("I키가 눌렸습니다");
             SetMenu(infoMenu);
@@ -110,6 +117,12 @@ public class InputUI : MonoBehaviour
         PauseMenu(pauseMenu);
         SetMenu(menu);
     }
+
+
+
+
+
+
 
     public void ToMainMenu()
     {
