@@ -862,6 +862,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: loadDistance
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: unloadDistance
+      value: 250
+      objectReference: {fileID: 0}
+    - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
       propertyPath: moduleGuidMappings.Array.size
       value: 23
       objectReference: {fileID: 0}
