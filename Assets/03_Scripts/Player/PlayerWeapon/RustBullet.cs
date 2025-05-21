@@ -7,8 +7,8 @@ public class RustBullet : Bullet
     [SerializeField] private float speedReductionPercent = 0.3f; // 속도 감소 비율 (%)
     [SerializeField] private float damageOverTimeAmount = 2f;   // 시간당 추가 데미지
     [SerializeField] private GameObject acidEffectPrefab;       // 산성 효과 VFX 프리팹
-    [SerializeField] private float swayAmount = 1.5f;    // 좌우 흔들림 폭
-    [SerializeField] private float swaySpeed = 2f;       // 흔들림 속도
+    [SerializeField] private float swayAmount = 0.5f;    // 좌우 흔들림 폭
+    [SerializeField] private float swaySpeed = 1f;       // 흔들림 속도
 
     private Vector3 originalPosition; // 원래 진행 방향의 위치
     private Vector3 lastFramePosition; // 마지막 프레임의 위치
@@ -47,7 +47,7 @@ public class RustBullet : Bullet
             elapsedTime += Time.deltaTime;
             // 좌우로 흔들리는 오프셋 계산
             float sway = Mathf.Sin(elapsedTime * swaySpeed) * swayAmount;
-            swayOffset = new Vector3(0, sway, 0) * Time.deltaTime;
+            swayOffset = new Vector3(0, sway, 0);
             // 흔들림 오프셋 적용
             transform.position = originalPosition + swayOffset;
         }
