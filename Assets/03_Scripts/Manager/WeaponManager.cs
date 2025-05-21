@@ -35,6 +35,7 @@ public class WeaponManager : Singleton<WeaponManager>
     private float nextFireTime = 0f;
     private ElementType currentBulletType = ElementType.Normal;
     private PlayerMovement playerMovement;
+    private CollisionDetector collisionDetector;
 
     private bool isWallSliding = false;
     private int wallDirection = 1; // -1: 왼쪽, 1: 오른쪽
@@ -79,6 +80,7 @@ public class WeaponManager : Singleton<WeaponManager>
         if (player != null)
         {
             playerMovement = player.GetComponent<PlayerMovement>();
+            collisionDetector = player.GetComponent<CollisionDetector>();
         }
 
         // 매니저 컴포넌트들 초기화 (인스펙터에서 할당되지 않은 경우)
@@ -408,13 +410,23 @@ public class WeaponManager : Singleton<WeaponManager>
     // 발사 방향 계산
     private Vector2 GetAimDirection()
     {
-        if (isWallSliding)
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        bool isGrounded = false;
+        
+        // 플레이어 컴포넌트에서 바닥 접촉 상태 확인
+        if (collisionDetector != null)
+        {
+            isGrounded = collisionDetector.IsGrounded;
+        }
+        
+        // 벽 슬라이딩 중이고 바닥에 닿지 않은 경우에만 벽 반대 방향으로 발사
+        if (isWallSliding && !isGrounded)
         {
             // 벽의 반대 방향으로 발사
             return wallDirection == 1 ? Vector2.left : Vector2.right;
         }
-        // 기존 로직
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        
+        // 바닥에 닿았거나 벽 슬라이딩이 아닌 경우 기존 로직
         if (player != null)
         {
             SpriteRenderer spriteRenderer = player.GetComponent<SpriteRenderer>();
