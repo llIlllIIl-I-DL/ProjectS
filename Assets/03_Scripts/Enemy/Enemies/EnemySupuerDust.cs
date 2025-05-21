@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Enemy.States;
 
@@ -24,6 +22,13 @@ public class EnemySupuerDust : BaseEnemy
     private Vector2 startPosition;
     private Quaternion initialRotation;
     private Vector3 fixedPosition; // 위치를 강제로 고정하기 위한 변수
+    
+    private bool canFire = true;
+    private float attackTimer = 0f;
+    
+    private bool isHit = false;
+    private float hitAnimationDuration = 0.5f; // Hit 애니메이션 길이에 맞게 조정
+    private float hitAnimationTimer = 0f;
     
     #endregion
 
@@ -64,7 +69,29 @@ public class EnemySupuerDust : BaseEnemy
     /// </summary>
     protected override void Update()
     {
-        base.Update(); // BaseEnemy의 Update 호출
+        base.Update();
+        
+        // 공격 쿨다운 처리
+        if (!canFire)
+        {
+            attackTimer -= Time.deltaTime;
+            if (attackTimer <= 0)
+            {
+                canFire = true;
+            }
+        }
+
+        // Hit 애니메이션 타이머 처리
+        if (isHit)
+        {
+            hitAnimationTimer += Time.deltaTime;
+            if (hitAnimationTimer >= hitAnimationDuration)
+            {
+                isHit = false;
+                hitAnimationTimer = 0f;
+                animator.ResetTrigger("IsHit");
+            }
+        }
     }
 
     /// <summary>
@@ -72,9 +99,14 @@ public class EnemySupuerDust : BaseEnemy
     /// </summary>
     protected override void FixedUpdate()
     {
-        base.FixedUpdate(); // BaseEnemy의 FixedUpdate 호출
+        base.FixedUpdate();
         
-        // 위치 강제 고정
+        // 현재 Idle 상태가 아닐 때만 설정
+        if (!animator.GetBool("IsIdle"))
+        {
+            animator.SetBool("IsIdle", true);
+        }
+        
         transform.position = fixedPosition;
     }
     
@@ -145,87 +177,94 @@ public class EnemySupuerDust : BaseEnemy
         
         // 플레이어 방향 구하기
         Vector2 direction = (playerTransform.position - transform.position).normalized;
-        float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        Vector2 currentDirection = transform.right; // 현재 바라보는 방향
         
-        // 초기 각도에서 최대 회전 각도 제한 적용
-        float initialAngle = initialRotation.eulerAngles.z;
-        float clampedAngle = targetAngle;
-        
-        if (maxRotationAngle > 0)
+        // 스프라이트 방향 설정
+        if (spriteRenderer != null)
         {
-            // 최소/최대 허용 각도 계산
-            float minAllowedAngle = initialAngle - maxRotationAngle;
-            float maxAllowedAngle = initialAngle + maxRotationAngle;
-            
-            // 각도 제한 적용
-            clampedAngle = Mathf.Clamp(targetAngle, minAllowedAngle, maxAllowedAngle);
+            // 플레이어가 왼쪽에 있으면 스프라이트 뒤집기
+            spriteRenderer.flipX = direction.x < 0;
+        }
+    }
+
+    /// <summary>
+    /// 공격 실행 - 총알 발사
+    /// </summary>
+    private void FireBullet()
+    {
+        if (bulletPrefab == null || playerTransform == null) 
+        {
+            Debug.LogWarning("총알 프리팹이나 플레이어 참조가 없습니다!");
+            return;
         }
         
-        // 회전 적용
-        transform.rotation = Quaternion.Euler(0, 0, clampedAngle);
+        // 발사 방향 계산 - 플레이어 직접 조준
+        Vector2 directionToPlayer = (playerTransform.position - firePoint.position).normalized;
+        
+        // 총알 생성 및 발사
+        GameObject bullet = ObjectPoolingManager.Instance.GetObject(ObjectPoolingManager.PoolType.EnemyBullet);
+        if (bullet != null)
+        {
+            bullet.transform.position = firePoint.position;
+            
+            // 총알 회전 설정 (플레이어 방향으로)
+            float angle = Mathf.Atan2(directionToPlayer.y, directionToPlayer.x) * Mathf.Rad2Deg;
+            bullet.transform.rotation = Quaternion.Euler(0, 0, angle);
+            
+            // 발사자 설정
+            if (bullet.TryGetComponent<Bullet>(out Bullet bulletScript))
+            {
+                bulletScript.Shooter = gameObject;
+            }
+            
+            // 속도 설정
+            if (bullet.TryGetComponent<Rigidbody2D>(out Rigidbody2D bulletRb))
+            {
+                bulletRb.velocity = directionToPlayer * bulletSpeed;
+            }
+            
+            Debug.DrawRay(firePoint.position, directionToPlayer * 3f, Color.red, 0.5f);
+            Debug.Log($"총알 발사: 방향 = {directionToPlayer}, 각도 = {angle}도");
+        }
     }
-    
+
     /// <summary>
     /// 공격 실행 - 총알 발사
     /// </summary>
     public override void PerformAttack()
     {
-        // 총알 프리팹이 없으면 반환
-        if (bulletPrefab == null) 
+        if (!canFire) return;
+        
+        attackTimer = fireRate;
+        canFire = false;
+        animator.SetTrigger("IsAttack"); // 공격 애니메이션만 트리거
+    }
+    
+    /// <summary>
+    /// 피해를 받았을 때 처리
+    /// </summary>
+    public override void TakeDamage(float damage)
+    {
+        if (isDestroyed) return;
+        
+        float finalDamage = Mathf.Max(damage - defence, 1f);
+        
+        // Hit 애니메이션 처리 - 현재 진행 중인 애니메이션을 중단하지 않음
+        if (animator != null && !isHit)
         {
-            Debug.LogWarning("총알 프리팹이 할당되지 않았습니다!");
-            return;
+            isHit = true;
+            hitAnimationTimer = 0f;
+            animator.SetLayerWeight(1, 1f); // Hit 애니메이션용 레이어 가중치 설정
+            animator.SetTrigger("IsHit");
         }
         
-        // 발사 방향 계산 - 플레이어 방향으로
-        Vector2 fireDirection;
-        
-        if (playerTransform != null && playerDetected)
-        {
-            // 플레이어 방향 계산
-            fireDirection = (playerTransform.position - firePoint.position).normalized;
-        }
-        else
-        {
-            // 플레이어가 없거나 감지되지 않은 경우, 기본 방향으로 발사
-            fireDirection = firePoint.right;
-        }
-        
-        float angle = Mathf.Atan2(fireDirection.y, fireDirection.x) * Mathf.Rad2Deg;
-        Quaternion bulletRotation = Quaternion.Euler(0, 0, angle);
+        base.TakeDamage(finalDamage);
 
-        // 풀링 매니저에서 총알 가져오기
-        GameObject bullet = ObjectPoolingManager.Instance.GetObject(ObjectPoolingManager.PoolType.EnemyBullet);
-        if (bullet == null)
+        if (currentHealth <= 0)
         {
-            Debug.LogWarning("풀에서 총알을 가져오지 못했습니다!");
-            return;
+            DestroyEntity();
+            animator.SetTrigger("IsDead");
         }
-        bullet.transform.position = firePoint.position;
-        bullet.transform.rotation = bulletRotation;
-        
-        // 발사자 지정
-        Bullet bulletScript = bullet.GetComponent<Bullet>();
-        if (bulletScript != null)
-        {
-            bulletScript.Shooter = this.gameObject;
-        }
-        
-        // 총알에 속도와 데미지 적용
-        Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
-        if (bulletRb != null)
-        {
-            bulletRb.velocity = fireDirection * bulletSpeed;
-        }
-        else
-        {
-            Debug.LogWarning("총알에 필요한 컴포넌트가 없습니다!");
-            return;
-        }
-        
-        // 디버깅
-        Debug.DrawRay(firePoint.position, fireDirection * 3f, Color.red, 0.5f);
-        Debug.Log($"총알 발사 방향: {fireDirection}, 각도: {angle}도, 데미지: {attackPower}");
     }
     
     #endregion

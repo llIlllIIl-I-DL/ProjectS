@@ -31,6 +31,10 @@ namespace Enemy.States
         {
             if (debugMode) Debug.Log("PatrolState 진입");
             isWaiting = false;
+
+            // 애니메이션 설정
+            enemy.Animator.SetBool("IsWalking", true);
+            enemy.Animator.SetBool("IsIdle", false);
         }
 
         public override void Update()
@@ -71,7 +75,9 @@ namespace Enemy.States
                 if (debugMode && Time.frameCount % 60 == 0) Debug.Log("대기 중 또는 웨이포인트 없음");
                 return;
             }
-
+            
+            enemy.Animator.SetBool("IsWalking", true);
+            enemy.Animator.SetBool("IsIdle", false);
             // 1. 현재 목적지
             Vector2 targetPosition = waypoints[currentWaypoint];
             
@@ -85,7 +91,7 @@ namespace Enemy.States
             // 4. 이동 (가장 단순한 방식)
             float moveSpeed = 2.0f; // 기본값 - BaseEnemy에 GetMoveSpeed 없을 경우를 위해
             
-            try 
+            try
             {
                 // 가능하면 실제 속도 가져오기
                 moveSpeed = enemy.MoveSpeed;
@@ -107,13 +113,14 @@ namespace Enemy.States
             // 5. 목적지 도달 확인
             if (Mathf.Abs(enemy.transform.position.x - targetPosition.x) < waypointReachDistance)
             {
+                enemy.Animator.SetBool("IsWalking", false);
+                enemy.Animator.SetBool("IsIdle", true);
                 // 목적지 도달, 대기 시작
                 isWaiting = true;
                 waitTimer = 0;
                 
                 // 이동 정지 및 경사면에서 미끄러짐 방지 (중요 변경)
                 StopMovementCompletely();
-                
                 if (debugMode) Debug.Log($"웨이포인트 {currentWaypoint} 도달, 대기 시작");
             }
         }

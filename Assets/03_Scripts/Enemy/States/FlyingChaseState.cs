@@ -26,12 +26,18 @@ namespace Enemy.States
             losePlayerTimer = 0;
             isWaitingAtLastPosition = false;
             waitAtLastPositionTimer = 0f;
-            
+
             // 추격 상태 진입 시 현재 위치를 기준으로 설정
             EnemyScrap scrapEnemy = enemy as EnemyScrap;
             if (scrapEnemy != null)
             {
                 scrapEnemy.SetCurrentPositionAsOriginalY();
+            }
+
+            if (enemy.Animator != null)
+            {
+                enemy.Animator.SetBool("isFlying", true); // 비행 애니메이션 시작
+                enemy.Animator.SetBool("isAttacking", false); // 공격 애니메이션 중지
             }
         }
 
@@ -77,7 +83,7 @@ namespace Enemy.States
                 if (losePlayerTimer >= losePlayerTime)
                 {
                     // 플레이어를 놓친 후 시간이 지나면 상태 전환
-                    enemy.SwitchToState<PatrolState>();
+                    enemy.SwitchToState<FlyingPatrolState>();
                     return;
                 }
             }
@@ -106,6 +112,8 @@ namespace Enemy.States
                 enemy.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
                 return;
             }
+            
+            enemy.Animator.SetBool("isFlying", true);
             
             // 목표 위치 결정
             Vector2 targetPosition;
