@@ -435,7 +435,13 @@ public class WeaponManager : Singleton<WeaponManager>
             return wallDirection == 1 ? Vector2.left : Vector2.right;
         }
         
-        // 바닥에 닿았거나 벽 슬라이딩이 아닌 경우 기존 로직
+        // PlayerMovement 컴포넌트의 방향 정보 우선 사용 (점프 중에도 올바른 방향 유지)
+        if (playerMovement != null)
+        {
+            return playerMovement.FacingDirection > 0 ? Vector2.right : Vector2.left;
+        }
+        
+        // 플레이어 컴포넌트가 없는 경우 기존 로직으로 대체
         if (player != null)
         {
             SpriteRenderer spriteRenderer = player.GetComponent<SpriteRenderer>();

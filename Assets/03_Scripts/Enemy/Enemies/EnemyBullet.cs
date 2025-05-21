@@ -8,6 +8,7 @@ public class EnemyBullet : Bullet
     [SerializeField] private string wallHitAnimTrigger = "WallHit";
 
     private BaseEnemy enemy;
+    private Animator bulletAnimator;
     
     /// <summary>
     /// 총알 데미지 설정
@@ -17,11 +18,19 @@ public class EnemyBullet : Bullet
         Damage = newDamage;
     }
     
+    /// <summary>
+    /// 총알을 발사한 적 설정
+    /// </summary>
+    public void SetEnemy(BaseEnemy enemyRef)
+    {
+        enemy = enemyRef;
+    }
+    
     protected override void Start()
     {
         base.Start();
-        // 일정 시간 후 자동 파괴 (Bullet의 lifeTime 사용)
-        //Destroy(gameObject, LifeTime);
+        // 애니메이터 참조 가져오기
+        bulletAnimator = GetComponent<Animator>();
     }
     
     protected override void OnTriggerEnter2D(Collider2D other)
@@ -46,14 +55,27 @@ public class EnemyBullet : Bullet
             // 레이어에 따라 다른 애니메이션 재생
             if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
             {
-                if (enemy.Animator != null) enemy.Animator.SetTrigger(groundHitAnimTrigger);
+                PlayHitAnimation(groundHitAnimTrigger);
             }
             else if (other.gameObject.layer == LayerMask.NameToLayer("Wall"))
             {
-                if (enemy.Animator != null) enemy.Animator.SetTrigger(wallHitAnimTrigger);
+                PlayHitAnimation(wallHitAnimTrigger);
             }
 
             ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
+        }
+    }
+
+    // 충돌 애니메이션 재생 (안전하게 null 체크)
+    private void PlayHitAnimation(string triggerName)
+    {
+        if (enemy != null && enemy.Animator != null)
+        {
+            enemy.Animator.SetTrigger(triggerName);
+        }
+        else if (bulletAnimator != null)
+        {
+            bulletAnimator.SetTrigger(triggerName);
         }
     }
 
