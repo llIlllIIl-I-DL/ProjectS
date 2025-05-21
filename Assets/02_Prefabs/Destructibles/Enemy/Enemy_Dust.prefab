@@ -48,8 +48,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 278aafc7ce7e54fb09239bdf1681ab1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 10
-  currentHealth: 10
+  maxHealth: 9
+  currentHealth: 9
   possibleDrops: []
   dropChance: 0.3
   moveSpeed: 2
