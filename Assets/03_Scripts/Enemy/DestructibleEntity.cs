@@ -89,9 +89,9 @@ public abstract class DestructibleEntity : MonoBehaviour, IDestructible
         isDestroyed = true;
         PlayDestructionEffect();
         DropItem();
-        
+
         // 콜라이더 비활성화
-        // GetComponent<Collider2D>().enabled = false;
+        GetComponent<Collider2D>().enabled = false;
         
         // 지연 파괴
         Destroy(gameObject, 1.5f);

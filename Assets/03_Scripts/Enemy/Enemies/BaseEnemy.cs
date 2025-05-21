@@ -157,6 +157,7 @@ public abstract class BaseEnemy : DestructibleEntity, IDebuffable
     protected virtual void OnCollisionStay2D(Collision2D collision)
     {
         if (!dealsDamageOnContact) return; // 충돌 데미지가 비활성화된 경우 무시
+        if (isDestroyed) return; // 이미 파괴된 경우 무시
         
         // 플레이어와 충돌했는지 확인
         if (collision.gameObject.CompareTag("Player"))
