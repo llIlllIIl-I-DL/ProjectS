@@ -98,7 +98,7 @@ public class GameManager : MonoBehaviour
         }
 
         // ESC 키로 일시정지 토글
-        if (Input.GetKeyDown(KeyCode.Escape) && (currentState == GameState.Playing || currentState == GameState.Paused))
+        if (InteractionKeyInput.GetKeyDown(KeyCode.Escape) && (currentState == GameState.Playing || currentState == GameState.Paused))
         {
             TogglePause();
         }

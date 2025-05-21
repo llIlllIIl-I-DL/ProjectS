@@ -13,7 +13,7 @@ EditorBuildSettings:
     guid: 5d9cef26029ad984b93f958258b434d8
   - enabled: 1
     path: Assets/04_Scenes/MainScene.unity
-    guid: 4832abbb618d88c4cb9af39c1570a421
+    guid: 85606f5742456de43bdc7ee3cf05cbb1
   - enabled: 1
     path: Assets/Resources/Maps/Chunks/Scenes/Chunk_-1_-1.unity
     guid: e313bda439303644c87744278a345a77

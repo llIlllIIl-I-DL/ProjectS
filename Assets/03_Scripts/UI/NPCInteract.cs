@@ -1,7 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
 
 public class NPCInteract : MonoBehaviour
 {
@@ -11,8 +10,10 @@ public class NPCInteract : MonoBehaviour
 
     private GameObject _talkBox;
 
+
     public void ShowTalkBox(Sprite fIcon)
     {
+
         Time.timeScale = 0;
 
 
