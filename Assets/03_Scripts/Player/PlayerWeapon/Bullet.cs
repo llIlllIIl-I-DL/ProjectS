@@ -159,17 +159,14 @@ public abstract class Bullet : MonoBehaviour
     {
         // 발사자와의 충돌 무시
         if (other.gameObject == Shooter) return;
+        
+        // 기존 충돌 처리 로직
         string otherTag = other.tag;
         if (collisionHandlers != null && collisionHandlers.TryGetValue(otherTag, out var handler))
         {
             handler(other);
         }
         // targetTags에 없는 태그는 무시
-
-        if (isOvercharged)
-        {
-            ApplyOverchargeRecoil();
-        }
     }
     
     // 총알이 파괴될 때 호출되는 함수
@@ -261,6 +258,9 @@ public abstract class Bullet : MonoBehaviour
 
     private void ApplyOverchargeRecoil()// 기존 오버차징 로직 메서드로 분리
     {
+        // 참고: 이 메서드는 더 이상 사용되지 않습니다.
+        // 오버차지 데미지는 이제 WeaponManager.ApplyOverchargeRecoilDamage()에서 총알 발사 직후 바로 적용됩니다.
+        
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
@@ -268,9 +268,18 @@ public abstract class Bullet : MonoBehaviour
             if (playerHP != null)
             {
                 float selfDamage = playerHP.MaxHP * 0.05f;
+                Debug.Log($"오버차지 반동 적용 시도: 플레이어 최대 체력 = {playerHP.MaxHP}, 데미지 = {selfDamage}");
                 playerHP.TakeDamage(selfDamage);
-                Debug.Log($"과열 공격 반동으로 플레이어가 {selfDamage} 데미지를 입었습니다!");
+                Debug.Log($"과열 공격 반동으로 플레이어가 {selfDamage} 데미지를 입었습니다! 현재 체력: {playerHP.CurrentHP}");
             }
+            else
+            {
+                Debug.LogError("PlayerHP 컴포넌트를 찾을 수 없습니다!");
+            }
+        }
+        else
+        {
+            Debug.LogError("Player 태그를 가진 오브젝트를 찾을 수 없습니다!");
         }
     }
 }

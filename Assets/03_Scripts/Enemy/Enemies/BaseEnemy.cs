@@ -30,7 +30,6 @@ public abstract class BaseEnemy : DestructibleEntity, IDebuffable
     // Enemy 고유 상태 관련
     protected bool isStunned = false; // 기절 여부
     protected Transform playerTransform; 
-    protected Rigidbody2D rb;
     protected Animator animator;
     public Animator Animator => animator;
     
