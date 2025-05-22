@@ -1,6 +1,7 @@
 using BossFSM;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class BossUI : MonoBehaviour
@@ -11,7 +12,11 @@ public class BossUI : MonoBehaviour
     [SerializeField] private Slider bossHealthBar;
     [SerializeField] private BossHealth bossHealth;
 
-    GameObject _bossHealthUI;
+    [SerializeField] private Canvas bossClear;
+    [SerializeField] private Button bossClearGoToStartScene;
+
+    private GameObject _bossHealthUI;
+    public GameObject BossHealthUI => _bossHealthUI;
 
     public void Awake()
     {
@@ -68,16 +73,36 @@ public class BossUI : MonoBehaviour
     
     public IEnumerator BossClearStart()
     {
+        
         Time.timeScale = 0.3f;
         Time.fixedDeltaTime = 0.02f * Time.timeScale;
 
-        yield return new WaitForSeconds(1.5f);
+        
+        yield return new WaitForSeconds(1f);
 
+        
         Time.timeScale = 1f;
         Time.fixedDeltaTime = 0.02f;
-
+        
 
         Destroy(_bossHealthUI);
         Debug.Log("보스 클리어!");
-    }  
+
+        yield return new WaitForSeconds(3f);
+
+        BossClearPopUp();
+    } 
+
+    public void BossClearPopUp()
+    {
+        bossClear.gameObject.SetActive(true);
+
+        bossClearGoToStartScene.onClick.AddListener(() => CloseGame());
+    }
+
+    public void CloseGame()
+    {
+        Application.Quit();
+        Debug.Log("나갔다!");
+    }
 }

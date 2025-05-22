@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8943814327646698104}
   - component: {fileID: 3635050144733160158}
   - component: {fileID: 1276356225360333551}
+  - component: {fileID: 2897998465230149649}
   m_Layer: 0
   m_Name: Object_Lazer
   m_TagString: Untagged
@@ -104,19 +105,21 @@ MonoBehaviour:
   objectId: Object
   interactSound: {fileID: 0}
   interactSoundVolume: 1
-  laserRange: 5
+  laserRange: 30
   laserDuration: 9999
   cooldownTime: 0.1
   hitLayers:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 2240
   maxReflections: 3
   laserLine: {fileID: 3635050144733160158}
   laserWidth: 0.05
-  impactEffect: {fileID: 0}
+  impactEffect: {fileID: 7280020197245995908, guid: e05743796e1ce48fbb6e90b8f0f7fbb1, type: 3}
   firePoint: {fileID: 0}
   chargeSound: {fileID: 0}
   fireSound: {fileID: 0}
+  interactionBtnUI: {fileID: 8906878546166109895, guid: c8a22c0f864083844b929ff5b6c994f4, type: 3}
+  interactionBtnUITransform: {fileID: 541012107569450515}
 --- !u!120 &3635050144733160158
 LineRenderer:
   serializedVersion: 2
@@ -138,7 +141,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 95aff1f995ab94e95bb435d28fbc9af9, type: 2}
+  - {fileID: 2100000, guid: 3bd37d23f34ae491192309c99b700766, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -257,7 +260,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.024, y: 1.024}
+    oldSize: {x: 0.85333335, y: 0.85333335}
     newSize: {x: 1.024, y: 1.024}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -266,3 +269,15 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.024, y: 1.024}
   m_EdgeRadius: 0
+--- !u!114 &2897998465230149649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6674974126973164469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ee5d616bc71b3b479c78a37b60502da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

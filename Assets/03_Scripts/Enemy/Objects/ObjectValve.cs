@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using System.Linq;
+using Unity.VisualScripting.Antlr3.Runtime;
 
 /// <summary>
 /// 벨브 오브젝트 - 플레이어와 상호작용시 벨브를 열거나 닫음
@@ -27,6 +28,11 @@ public class ObjectValve : BaseObject
 
     // 자동 닫힘 타이머
     private float autoCloseTimer;
+
+    [Header("F Interaction")]
+    [SerializeField] private GameObject interactionBtnUI;
+    [SerializeField] private Transform interactionBtnUITransform;
+    private GameObject interactionButtonUI;
 
     #endregion
 
@@ -130,15 +136,55 @@ public class ObjectValve : BaseObject
     /// </summary>
     protected override void OnInteract(GameObject interactor)
     {
+        if (objectId == "BossValve" && BossWarningUI.Instance != null)
+        {
+            // 경고창 띄우기 (실제 열기는 UI 쪽에서)
+            Destroy(interactionButtonUI);
+            BossWarningUI.Instance.BossWarningWindowUI(interactor, this);
+            return;
+        }
+
+
+
         if (!isOpen)
         {
             OpenValve();
         }
-        else
+
+
+
         {
             CloseValve();
         }
     }
-
     #endregion
+    /*
+    protected override void OnPlayerEnterRange(GameObject player)
+    {
+        base.OnPlayerEnterRange(player);
+    }
+    
+
+    protected override void OnPlayerExitRange(GameObject player)
+    {
+        base.OnPlayerExitRange(player);
+    }
+    */
+
+    protected override void ShowInteractionPrompt()
+    {
+        if(isOpen == false)
+        interactionButtonUI = Instantiate(interactionBtnUI, interactionBtnUITransform);
+    }
+
+    protected override void HideInteractionPrompt()
+    {
+        Destroy(interactionButtonUI);
+    }
+
+    protected override void OnTriggerExit2D(Collider2D collider2D)
+    {
+        base.OnTriggerExit2D(collider2D);
+    }
+
 }

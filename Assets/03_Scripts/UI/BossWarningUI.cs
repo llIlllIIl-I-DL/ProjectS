@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,20 +16,17 @@ public class BossWarningUI : Singleton<BossWarningUI>
     [SerializeField] public Button[] Btn;
     //[SerializeField] public Button[] noBtn;
 
-    [HideInInspector] GameObject _bossWarningUI;
     [HideInInspector] public bool isApproved;
 
-    private ObjectDoor currentDoor;
+    private ObjectValve currentDoor;
 
-    GameObject _interactor;
-
-    public void BossWarningWindowUI(GameObject interactor, ObjectDoor door)
+    public void BossWarningWindowUI(GameObject interactor, ObjectValve door)
     {
-        _bossWarningUI = Instantiate(bossWarningUI, bossWarningUIParents);
-        _interactor = interactor;
+        bossWarningUI.SetActive(true);
+
         currentDoor = door;
 
-        Btn = _bossWarningUI.GetComponentsInChildren<Button>();
+        Btn = bossWarningUI.GetComponentsInChildren<Button>();
 
         Btn[0].onClick.AddListener(() => YesYesYes());
         Btn[1].onClick.AddListener(() => NoNoNo());
@@ -40,28 +38,22 @@ public class BossWarningUI : Singleton<BossWarningUI>
     {
         isApproved = true;
 
-        DestroyUI(isApproved);
+        if (currentDoor != null)
+            currentDoor.OpenValve();
+
+        DestroyUI();
     }
 
     public void NoNoNo()
     {
         isApproved = false;
 
-        DestroyUI(isApproved);
+        DestroyUI();
     }
 
-    public void DestroyUI(bool isApproved)
+    public void DestroyUI()
     {
-        Destroy(_bossWarningUI);
+        bossWarningUI.SetActive(false);
         Time.timeScale = 1f;
-
-        if (currentDoor != null)
-        {
-            currentDoor.OnEntrance(isApproved);
-        }
-        else
-        {
-            Debug.Log("상호작용할 대상이 설정되지 않았습니다.");
-        }
     }
 }

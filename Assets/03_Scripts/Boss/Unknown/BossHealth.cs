@@ -9,6 +9,8 @@ public class BossHealth : MonoBehaviour, IDebuffable
     [SerializeField] private float defence;
     [SerializeField] private float moveSpeed = 3;
 
+    [SerializeField] private BossUI bossUI;
+
     public float Defence
     {
         get => defence;
@@ -39,6 +41,7 @@ public class BossHealth : MonoBehaviour, IDebuffable
         // 보스가 죽었을 때 상태머신에 알림
         OnBossDied += HandleStateMachineNotification;
 
+        //bossUI = bossUI.BossHealthUI.gameObject.GetComponent<BossUI>();
     }
 
     private void HandleStateMachineNotification()
@@ -66,7 +69,8 @@ public class BossHealth : MonoBehaviour, IDebuffable
 
         currentHP -= damage;
         if (currentHP < 0) currentHP = 0;
-
+      
+        bossUI.UpdateBossHealthUI();
         Debug.Log($"[BossHealth] 데미지 받음! 남은 체력: {currentHP}");
 
         // 애니메이션 재생

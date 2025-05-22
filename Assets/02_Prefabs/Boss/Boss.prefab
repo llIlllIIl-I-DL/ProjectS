@@ -226,10 +226,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e1b22b3029e63848982c3cf195b7359, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 50
-  currentHP: 50
+  maxHP: 240
+  currentHP: 240
   defence: 10
   moveSpeed: 3
+  bossUI: {fileID: 0}
   damage: 5
 --- !u!114 &8649766649589793062
 MonoBehaviour:

@@ -29,7 +29,7 @@ public class BossDieState : IEnemyState
         animator.enabled = false;
 
         // Optional: 게임 오브젝트 비활성화
-        // stateMachine.gameObject.SetActive(false);
+        stateMachine.gameObject.SetActive(false);
     }
 
     public void Exit()
