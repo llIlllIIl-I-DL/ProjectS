@@ -97,6 +97,12 @@ public class BossUI : MonoBehaviour
     {
         bossClear.gameObject.SetActive(true);
 
-        bossClearGoToStartScene.onClick.AddListener(() => Application.Quit());
+        bossClearGoToStartScene.onClick.AddListener(() => CloseGame());
+    }
+
+    public void CloseGame()
+    {
+        Application.Quit();
+        Debug.Log("나갔다!");
     }
 }
