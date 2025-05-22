@@ -25,6 +25,9 @@ public class PlayerMovement : MonoBehaviour
     private float dashSpeedDecayRate = 0.95f; // 대시 속도 감소율 (settings에서 초기화됨)
     private float dashSpeedTimer = 0f; // 대시 속도 유지 타이머
     
+    // 점프 관련 변수
+    private bool jumpRequested = false; // 점프 요청 플래그 추가
+    
     [Header("경사로 설정")]
     [SerializeField] private float maxSlopeAngle = 45f;
     [SerializeField] private PhysicsMaterial2D noFriction;
@@ -43,6 +46,9 @@ public class PlayerMovement : MonoBehaviour
     public event System.Action<int> OnDirectionChanged;
     public event System.Action OnDashEnd;
     public event System.Action OnDashCooldownComplete;
+
+    // 이전 프레임의 지면 상태를 저장할 변수 추가
+    private bool isGroundedLastFrame = false;
 
     private void Awake()
     {
@@ -200,6 +206,17 @@ public class PlayerMovement : MonoBehaviour
     {
         // 간단한 지상 체크, 아래 방향으로 짧은 레이캐스트
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 0.1f, groundLayer);
+        
+        // 이전에 공중에 있었는데 지면에 착지했다면 대시 상태 초기화
+        if (hit.collider != null && !isGroundedLastFrame && wasDashing)
+        {
+            ResetDashState();
+            Debug.Log("지면에 착지하여 대시 상태 초기화");
+        }
+        
+        // 현재 지면 상태 저장
+        isGroundedLastFrame = hit.collider != null;
+        
         return hit.collider != null;
     }
     
@@ -242,6 +259,9 @@ public class PlayerMovement : MonoBehaviour
 
     public void Jump(float force)
     {
+        // 점프 요청 플래그 설정
+        jumpRequested = true;
+        
         float jumpForce = force;
         
         // 대시 중 점프시 대시 속도 유지
@@ -285,6 +305,9 @@ public class PlayerMovement : MonoBehaviour
 
         // 대시 중 상태를 확인하기 위한 플래그
         bool dashInterrupted = false;
+        
+        // 시작할 때 점프 요청 플래그 초기화
+        jumpRequested = false;
 
         while (Time.time < startTime + dashDuration && !dashInterrupted)
         {
@@ -293,12 +316,17 @@ public class PlayerMovement : MonoBehaviour
                 UtilityChangedStatController.Instance.InvincibleWhenDash();
             }
 
-            // y 속도가 0이 아니면 점프했다는 의미
-            if (rb.velocity.y > 0.1f)
+            // 점프 요청 플래그가 설정되었거나 y 속도가 0보다 크면 점프로 간주
+            if (jumpRequested || rb.velocity.y > 0.1f)
             {
                 // 점프로 인해 대시가 중단됨
                 dashInterrupted = true;
-                Debug.Log("대시 중 점프로 인해 대시가 중단되었습니다.");
+                
+                // 대시는 취소되지만 대시 속도는 유지
+                // currentDashSpeed와 wasDashing은 초기화하지 않음
+                // 이 상태값은 Jump 메서드에서 활용됨
+                
+                Debug.Log("대시 중 점프로 인해 대시가 중단되었습니다. 대시 속도는 유지됨");
                 break;
             }
 
@@ -316,16 +344,28 @@ public class PlayerMovement : MonoBehaviour
         // 점프로 인해 대시가 중단된 경우에는 쿨다운 시간을 단축
         float cooldownTime = dashInterrupted ? settings.dashCooldown * 0.5f : settings.dashCooldown;
         
-        // 점프로 인해 대시가 중단되지 않았을 경우에만 대시 상태 초기화
+        // 점프로 중단된 경우에는 대시 상태를 초기화하지 않음 (Jump 메서드에서 활용)
         if (!dashInterrupted)
         {
             currentDashSpeed = 0f;
             wasDashing = false;
         }
         
+        // 작업 완료 후 점프 요청 플래그 초기화
+        jumpRequested = false;
+        
         yield return new WaitForSeconds(cooldownTime);
 
         OnDashCooldownComplete?.Invoke();
+    }
+
+    // 대시 상태 리셋 메서드 추가
+    public void ResetDashState()
+    {
+        currentDashSpeed = 0f;
+        wasDashing = false;
+        dashSpeedTimer = 0f;
+        Debug.Log("대시 상태 초기화됨");
     }
 
     public void WallSlide(float slideSpeed, bool fastSlide = false)
@@ -463,15 +503,18 @@ public class PlayerMovement : MonoBehaviour
             // 타이머 감소
             dashSpeedTimer -= Time.deltaTime;
             
-            // 타이머가 종료되면 대시 속도 초기화
-            if (dashSpeedTimer <= 0f)
+            // 점진적으로 대시 속도 감소 적용
+            currentDashSpeed *= dashSpeedDecayRate;
+            
+            // 타이머가 종료되거나 속도가 임계값 이하면 대시 상태 초기화
+            if (dashSpeedTimer <= 0f || Mathf.Abs(currentDashSpeed) < 1.0f)
             {
-                currentDashSpeed = 0f;
-                wasDashing = false;
-                Debug.Log("대시 속도 유지 시간 종료");
+                ResetDashState();
+                Debug.Log("대시 속도 유지 시간 종료 또는 속도 임계값 도달");
+                return;
             }
             
-            // 실제 X축 속도를 대시 속도로 설정 (타이머 동안 일정하게 유지)
+            // 실제 X축 속도를 대시 속도로 설정 (타이머 동안 점진적으로 감소)
             rb.velocity = new Vector2(currentDashSpeed, rb.velocity.y);
         }
     }
