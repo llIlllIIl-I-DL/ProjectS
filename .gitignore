@@ -73,3 +73,5 @@ crashlytics-build.properties
 
 # 99_ThirdParty
 /[Aa]ssets/99_ThirdParty/
+Assets/StreamingAssets/build_info
+Assets/StreamingAssets/build_info
