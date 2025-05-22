@@ -136,7 +136,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isInteractable: 1
   interactionRange: 1
-  objectId: Object
+  objectId: BossValve
   interactSound: {fileID: 0}
   interactSoundVolume: 1
   isOpen: 0
@@ -175,6 +175,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  interactionBtnUI: {fileID: 8906878546166109895, guid: c8a22c0f864083844b929ff5b6c994f4, type: 3}
+  interactionBtnUITransform: {fileID: 3117146041944173318}
 --- !u!95 &4534983637737292003
 Animator:
   serializedVersion: 5

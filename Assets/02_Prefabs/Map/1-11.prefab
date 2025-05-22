@@ -26715,10 +26715,6 @@ PrefabInstance:
     m_TransformParent: {fileID: 4084943766525050487}
     m_Modifications:
     - target: {fileID: 2637748481192867082, guid: 0fb73347efb774c9498da91f1be0f430, type: 3}
-      propertyPath: objectId
-      value: BossValve
-      objectReference: {fileID: 0}
-    - target: {fileID: 2637748481192867082, guid: 0fb73347efb774c9498da91f1be0f430, type: 3}
       propertyPath: OnActivated.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 2994756900445255331}
@@ -26974,18 +26970,6 @@ PrefabInstance:
     - target: {fileID: 6674974126973164469, guid: 54c2f6b990b569c46833958422a5c68e, type: 3}
       propertyPath: m_Name
       value: Object_Lazer
-      objectReference: {fileID: 0}
-    - target: {fileID: 8943814327646698104, guid: 54c2f6b990b569c46833958422a5c68e, type: 3}
-      propertyPath: laserRange
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 8943814327646698104, guid: 54c2f6b990b569c46833958422a5c68e, type: 3}
-      propertyPath: impactEffect
-      value: 
-      objectReference: {fileID: 7280020197245995908, guid: e05743796e1ce48fbb6e90b8f0f7fbb1, type: 3}
-    - target: {fileID: 8943814327646698104, guid: 54c2f6b990b569c46833958422a5c68e, type: 3}
-      propertyPath: hitLayers.m_Bits
-      value: 2240
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

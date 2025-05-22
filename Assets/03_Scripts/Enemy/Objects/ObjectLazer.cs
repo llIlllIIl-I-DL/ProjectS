@@ -30,6 +30,11 @@ public class ObjectLazer : BaseObject
     private AudioSource audioSource;                      // 오디오 소스 컴포넌트
     private Coroutine laserCoroutine;                     // 레이저 코루틴 참조
 
+    [Header("F Interaction")]
+    [SerializeField] private GameObject interactionBtnUI;
+    [SerializeField] private Transform interactionBtnUITransform;
+    private GameObject interactionButtonUI;
+
     #endregion
 
     #region Unity Lifecycle
@@ -355,12 +360,37 @@ public class ObjectLazer : BaseObject
             // damageable.TakeDamage(laserDamage);
         }
     }
+    protected override void OnPlayerEnterRange(GameObject player)
+    {
+        base.OnPlayerEnterRange(player);
+    }
+
+    protected override void OnPlayerExitRange(GameObject player)
+    {
+        base.OnPlayerExitRange(player);
+    }
+
+    protected override void ShowInteractionPrompt()
+    {
+        if(isLaserActive == false)
+        interactionButtonUI = Instantiate(interactionBtnUI, interactionBtnUITransform);
+
+    }
+    protected override void HideInteractionPrompt()
+    {
+        interactionButtonUI.SetActive(false);
+    }
+
+    protected override void OnTriggerExit2D(Collider2D collider2D)
+    {
+        base.OnTriggerExit2D(collider2D);
+    }
 
     #endregion
 
     #region Editor
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
     // 편집기에서 레이저 방향 시각화
     private void OnDrawGizmos()
     {
