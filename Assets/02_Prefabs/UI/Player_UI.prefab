@@ -10484,7 +10484,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fadeSpeed: 1.5
   gameOverWindow: {fileID: 6371846572626685058, guid: 34613739cf51adf4baf0cbd3a6853f01, type: 3}
-  gameOverWindowParents: {fileID: 5834350049969042346, guid: 34613739cf51adf4baf0cbd3a6853f01, type: 3}
+  gameOverWindowParents: {fileID: 3660628152974828620}
   fadeOut: {fileID: 2937340609696970186, guid: d5f00ec4ee42d654aab33ff9b9d90956, type: 3}
   healthBar: {fileID: 4959195329951270868}
   healthBarImage: {fileID: 704897820366371018}
@@ -13111,6 +13111,7 @@ MonoBehaviour:
   checkPointMenu: {fileID: 710752009232436167}
   isPauseMenuOpen: 0
   infoUI: {fileID: 3971012270883256569}
+  npc: {fileID: 0}
 --- !u!1 &6312155761965897117
 GameObject:
   m_ObjectHideFlags: 0

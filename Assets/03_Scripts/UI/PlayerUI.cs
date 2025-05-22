@@ -375,7 +375,7 @@ public class PlayerUI : MonoBehaviour
                 // 찾은 캔버스를 부모로 설정
                 if (worldCanvas != null)
                 {
-                    _fadeOut.transform.SetParent(worldCanvas.transform, false);
+                    _fadeOut.transform.SetParent(gameOverWindowParents);
                 }
                 
                 StartCoroutine(FadeOut(_fadeOut));
@@ -448,7 +448,7 @@ public class PlayerUI : MonoBehaviour
                 // 안전하게 월드 캔버스를 사용하여 부모 설정
                 if (worldCanvas != null && gameOverWindowInstance != null)
                 {
-                    gameOverWindowInstance.transform.SetParent(worldCanvas.transform, false);
+                    gameOverWindowInstance.transform.SetParent(gameOverWindowParents);
                 }
             }
             catch (Exception e)
