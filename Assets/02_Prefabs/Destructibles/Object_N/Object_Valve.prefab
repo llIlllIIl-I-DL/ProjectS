@@ -149,8 +149,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ObjectLazer, Assembly-CSharp
-        m_MethodName: OnLazer
+        m_TargetAssemblyTypeName: ObjectDoor, Assembly-CSharp
+        m_MethodName: OpenDoor
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -164,8 +164,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ObjectLazer, Assembly-CSharp
-        m_MethodName: OffLazer
+        m_TargetAssemblyTypeName: ObjectDoor, Assembly-CSharp
+        m_MethodName: CloseDoor
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

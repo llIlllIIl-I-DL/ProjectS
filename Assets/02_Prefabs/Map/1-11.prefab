@@ -26386,6 +26386,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 4084943766525050487}
     m_Modifications:
     - target: {fileID: 2637748481192867082, guid: 0fb73347efb774c9498da91f1be0f430, type: 3}
+      propertyPath: objectId
+      value: BossValve
+      objectReference: {fileID: 0}
+    - target: {fileID: 2637748481192867082, guid: 0fb73347efb774c9498da91f1be0f430, type: 3}
       propertyPath: OnActivated.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 2994756900445255331}
@@ -26393,22 +26397,6 @@ PrefabInstance:
       propertyPath: OnDeactivated.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 2994756900445255331}
-    - target: {fileID: 2637748481192867082, guid: 0fb73347efb774c9498da91f1be0f430, type: 3}
-      propertyPath: OnActivated.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OpenDoor
-      objectReference: {fileID: 0}
-    - target: {fileID: 2637748481192867082, guid: 0fb73347efb774c9498da91f1be0f430, type: 3}
-      propertyPath: OnDeactivated.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: CloseDoor
-      objectReference: {fileID: 0}
-    - target: {fileID: 2637748481192867082, guid: 0fb73347efb774c9498da91f1be0f430, type: 3}
-      propertyPath: OnActivated.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: ObjectDoor, Assembly-CSharp
-      objectReference: {fileID: 0}
-    - target: {fileID: 2637748481192867082, guid: 0fb73347efb774c9498da91f1be0f430, type: 3}
-      propertyPath: OnDeactivated.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: ObjectDoor, Assembly-CSharp
-      objectReference: {fileID: 0}
     - target: {fileID: 3117146041944173318, guid: 0fb73347efb774c9498da91f1be0f430, type: 3}
       propertyPath: m_LocalPosition.x
       value: 86.670944

@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,11 +19,11 @@ public class BossWarningUI : Singleton<BossWarningUI>
     [HideInInspector] GameObject _bossWarningUI;
     [HideInInspector] public bool isApproved;
 
-    private ObjectDoor currentDoor;
+    private ObjectValve currentDoor;
 
     GameObject _interactor;
 
-    public void BossWarningWindowUI(GameObject interactor, ObjectDoor door)
+    public void BossWarningWindowUI(GameObject interactor, ObjectValve door)
     {
         _bossWarningUI = Instantiate(bossWarningUI, bossWarningUIParents);
         _interactor = interactor;
@@ -40,6 +41,9 @@ public class BossWarningUI : Singleton<BossWarningUI>
     {
         isApproved = true;
 
+        if (currentDoor != null)
+            currentDoor.OpenValve();
+
         DestroyUI(isApproved);
     }
 
@@ -54,14 +58,5 @@ public class BossWarningUI : Singleton<BossWarningUI>
     {
         Destroy(_bossWarningUI);
         Time.timeScale = 1f;
-
-        if (currentDoor != null)
-        {
-            currentDoor.OnEntrance(isApproved);
-        }
-        else
-        {
-            Debug.Log("상호작용할 대상이 설정되지 않았습니다.");
-        }
     }
 }
