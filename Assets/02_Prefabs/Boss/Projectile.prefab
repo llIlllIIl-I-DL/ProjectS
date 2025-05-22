@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 2802477730928767971}
   - component: {fileID: 6235774486074763702}
   - component: {fileID: 4664250236458328511}
-  - component: {fileID: 3346055379048512577}
   - component: {fileID: 2653717573708068837}
-  m_Layer: 0
+  - component: {fileID: 3154779489400537517}
+  m_Layer: 14
   m_Name: Projectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,19 +97,6 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
---- !u!114 &3346055379048512577
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8185762800821648384}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd8842e2dd9ab754da7d34f7ff3bc642, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lifeTime: 3
 --- !u!212 &2653717573708068837
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -162,3 +149,27 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &3154779489400537517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8185762800821648384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ad837ec7ae94094d9c1285d2078f50c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletSpeed: 4
+  damage: 1
+  knockbackForce: 1
+  maxAmmo: 30
+  currentAmmo: 0
+  bulletType: 0
+  targetTags:
+  - tag: Player
+  isOvercharged: 0
+  isReloading: 0
+  lifeTime: 3
+  piercing: 0
