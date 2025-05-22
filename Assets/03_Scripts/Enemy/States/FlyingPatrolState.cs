@@ -102,7 +102,7 @@ namespace Enemy.States
 
         public override void FixedUpdate()
         {
-            enemy.Animator.SetBool("isFlying", true);
+            enemy.Animator.SetBool("IsFlying", true);
             if (waitCounter <= 0)
             {
                 // 이동 방향 설정
