@@ -79,8 +79,43 @@ public class WeaponManager : Singleton<WeaponManager>
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
+            // PlayerMovement 컴포넌트 찾기 (직접 또는 부모에서)
             playerMovement = player.GetComponent<PlayerMovement>();
+            if (playerMovement == null)
+            {
+                playerMovement = player.GetComponentInParent<PlayerMovement>();
+                if (playerMovement == null)
+                {
+                    Debug.LogWarning("WeaponManager: PlayerMovement 컴포넌트를 찾을 수 없습니다.");
+                }
+                else
+                {
+                    Debug.Log("WeaponManager: PlayerMovement 컴포넌트를 부모 오브젝트에서 찾았습니다.");
+                }
+            }
+            else
+            {
+                Debug.Log("WeaponManager: PlayerMovement 컴포넌트를 찾았습니다.");
+            }
+            
+            // CollisionDetector 컴포넌트 찾기 (직접 또는 부모에서)
             collisionDetector = player.GetComponent<CollisionDetector>();
+            if (collisionDetector == null)
+            {
+                collisionDetector = player.GetComponentInParent<CollisionDetector>();
+                if (collisionDetector == null)
+                {
+                    Debug.LogWarning("WeaponManager: CollisionDetector 컴포넌트를 찾을 수 없습니다.");
+                }
+                else
+                {
+                    Debug.Log("WeaponManager: CollisionDetector 컴포넌트를 부모 오브젝트에서 찾았습니다.");
+                }
+            }
+            else
+            {
+                Debug.Log("WeaponManager: CollisionDetector 컴포넌트를 찾았습니다.");
+            }
         }
 
         // 매니저 컴포넌트들 초기화 (인스펙터에서 할당되지 않은 경우)
@@ -283,6 +318,8 @@ public class WeaponManager : Singleton<WeaponManager>
     private void FireBullet(bool isCharged)
     {
         Vector2 direction = GetAimDirection();
+        Debug.Log($"FireBullet - 발사 방향: {direction}, 점프 중: {!collisionDetector?.IsGrounded}");
+        
         // 차징 레벨에 따른 총알 설정
         Vector3 bulletScale;
         bool isOvercharged = isCharged && chargeManager.CurrentChargeLevel == 2;
@@ -305,9 +342,10 @@ public class WeaponManager : Singleton<WeaponManager>
             }
         }
         
-
+        // 발사 위치 조정
         Vector3 spawnPosition = firePoint.position + new Vector3(direction.x * 0.2f, 0, 0);
-        Debug.Log("spawnPosition: " + spawnPosition);
+        Debug.Log($"발사 위치: {spawnPosition}, 방향: {direction}");
+
         // 차징 레벨별 발사로직
         if (isCharged)
         {
@@ -412,8 +450,6 @@ public class WeaponManager : Singleton<WeaponManager>
                 trail.colorGradient = gradient;
             }
         }
-
-
     }
 
     // 발사 방향 계산
@@ -435,10 +471,12 @@ public class WeaponManager : Singleton<WeaponManager>
             return wallDirection == 1 ? Vector2.left : Vector2.right;
         }
         
-        // PlayerMovement 컴포넌트의 방향 정보 우선 사용 (점프 중에도 올바른 방향 유지)
+        // PlayerMovement 컴포넌트의 방향 정보 항상 우선 사용 (점프 중에도 올바른 방향 유지)
         if (playerMovement != null)
         {
-            return playerMovement.FacingDirection > 0 ? Vector2.right : Vector2.left;
+            int direction = playerMovement.FacingDirection;
+            Debug.Log($"발사 방향 계산: playerMovement.FacingDirection = {direction}");
+            return direction > 0 ? Vector2.right : Vector2.left;
         }
         
         // 플레이어 컴포넌트가 없는 경우 기존 로직으로 대체
@@ -447,14 +485,17 @@ public class WeaponManager : Singleton<WeaponManager>
             SpriteRenderer spriteRenderer = player.GetComponent<SpriteRenderer>();
             if (spriteRenderer != null)
             {
+                Debug.Log($"발사 방향 계산: SpriteRenderer.flipX = {spriteRenderer.flipX}");
                 return spriteRenderer.flipX ? Vector2.left : Vector2.right;
             }
             else if (player.transform.localScale.x < 0)
             {
+                Debug.Log("발사 방향 계산: transform.localScale.x < 0");
                 return Vector2.left;
             }
             else
             {
+                Debug.Log("발사 방향 계산: 기본값 Vector2.right 사용");
                 return Vector2.right;
             }
         }

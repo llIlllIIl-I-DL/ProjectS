@@ -27,6 +27,8 @@ public class InputUI : MonoBehaviour
 
 
 
+
+
     public bool isPauseMenuOpen = false;
 
     [SerializeField] private InfoUI infoUI;
@@ -126,6 +128,6 @@ public class InputUI : MonoBehaviour
 
     public void ToMainMenu()
     {
-        SceneManager.LoadScene("TempStartScene", LoadSceneMode.Single);
+        SceneManager.LoadScene("StartScene", LoadSceneMode.Single);
     }
 }
