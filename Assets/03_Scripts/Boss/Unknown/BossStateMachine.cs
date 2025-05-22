@@ -27,6 +27,14 @@ public class BossStateMachine : MonoBehaviour
     public float chaseRange = 5f;
     public bool isFastChasingAfterProjectile = false;
 
+    //[Header("중력 관련")]
+    //public float gravity = -20f;               // 중력 가속도
+    //public float verticalSpeed = 0f;           // 현재 수직 속도
+    //public float groundCheckDistance = 0.2f;   // 지면 감지 거리
+    //public LayerMask groundLayer;              // 지면 레이어
+
+    //private bool isGrounded;
+
     // 킥 공격 관련
     private float lastKickTime = -Mathf.Infinity;
     public float KickCooldown => GameConstants.Boss.KICK_COOLDOWN;

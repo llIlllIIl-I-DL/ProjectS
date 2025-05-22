@@ -249,3 +249,5 @@ MonoBehaviour:
   firePoint: {fileID: 8652785267295511849}
   chaseRange: 5
   isFastChasingAfterProjectile: 0
+  gravity: -9.81
+  verticalSpeed: 0
