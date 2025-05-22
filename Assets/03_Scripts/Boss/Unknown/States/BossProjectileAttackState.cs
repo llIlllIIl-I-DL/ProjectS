@@ -56,6 +56,17 @@ public class BossProjectileAttackState : IEnemyState
 
     public void Update()
     {
+        // 플레이어가 null이면 상태 전환
+        if (playerTransform == null)
+        {
+            if (!isCoroutineRunning)
+            {
+                Debug.LogWarning("Update - 플레이어 트랜스폼이 null입니다. 대기 상태로 전환합니다.");
+                stateMachine.ChangeState(BossState.Idle);
+            }
+            return;
+        }
+
         // 플레이어 방향으로 보스 방향 설정
         UpdateBossDirection();
 
@@ -83,12 +94,14 @@ public class BossProjectileAttackState : IEnemyState
 
     private void UpdateBossDirection()
     {
-        if (playerTransform != null)
+        if (playerTransform == null)
         {
-            float directionX = playerTransform.position.x - bossTransform.position.x;
-            if (directionX != 0)
-                bossTransform.localScale = new Vector3(Mathf.Sign(directionX), 1f, 1f);
+            return; // 플레이어가 없으면 방향 업데이트 중단
         }
+
+        float directionX = playerTransform.position.x - bossTransform.position.x;
+        if (directionX != 0)
+            bossTransform.localScale = new Vector3(Mathf.Sign(directionX), 1f, 1f);
     }
 
     private void CheckDistanceForStateChange()
@@ -123,6 +136,7 @@ public class BossProjectileAttackState : IEnemyState
         {
             if (playerTransform == null)
             {
+                Debug.LogWarning("플레이어 트랜스폼이 null입니다. 일반 공격을 중단합니다.");
                 EndProjectilePhase();
                 yield break;
             }
@@ -158,14 +172,19 @@ public class BossProjectileAttackState : IEnemyState
         // 차지 시간 대기
         yield return new WaitForSeconds(2f);
 
-        if (playerTransform != null)
+        // 플레이어 트랜스폼 확인
+        if (playerTransform == null)
         {
-            // 차지 공격 발사
-            FireProjectile(isCharged: true);
-
-            // 차지 공격 쿨다운 시작
-            stateMachine.StartCoroutine(ChargedAttackCooldown());
+            Debug.LogWarning("플레이어 트랜스폼이 null입니다. 차지 공격을 중단하고 상태를 전환합니다.");
+            EndProjectilePhase();
+            yield break;
         }
+
+        // 차지 공격 발사
+        FireProjectile(isCharged: true);
+
+        // 차지 공격 쿨다운 시작
+        stateMachine.StartCoroutine(ChargedAttackCooldown());
 
         // 공격 후 잠시 대기
         yield return new WaitForSeconds(0.5f);
@@ -179,6 +198,13 @@ public class BossProjectileAttackState : IEnemyState
         if (stateMachine.projectilePrefab == null || stateMachine.firePoint == null)
         {
             Debug.LogWarning("투사체 프리팹 또는 발사 지점이 설정되지 않았습니다.");
+            return;
+        }
+
+        // 플레이어 트랜스폼 확인
+        if (playerTransform == null)
+        {
+            Debug.LogWarning("플레이어 트랜스폼이 null입니다. 투사체 발사를 중단합니다.");
             return;
         }
 
@@ -215,9 +241,9 @@ public class BossProjectileAttackState : IEnemyState
 
             // 차지 공격은 관통 가능
             projectile.isPiercing = isCharged;
+            
+            Debug.Log($"{(isCharged ? "차지" : "일반")} 투사체 발사: 데미지 {projectile.damage}");
         }
-
-        Debug.Log($"{(isCharged ? "차지" : "일반")} 투사체 발사: 데미지 {projectile.damage}");
     }
 
     private IEnumerator ChargedAttackCooldown()
@@ -252,6 +278,7 @@ public class BossProjectileAttackState : IEnemyState
         }
         else
         {
+            Debug.LogWarning("EndProjectilePhase - 플레이어 트랜스폼이 null입니다. 대기 상태로 전환합니다.");
             stateMachine.ChangeState(BossState.Idle);
         }
     }
