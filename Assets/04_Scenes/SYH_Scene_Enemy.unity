@@ -1253,6 +1253,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy_SupuerDust
       objectReference: {fileID: 0}
+    - target: {fileID: 4740149032794228083, guid: 614a0f21ad7914181a98678b447e60db, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5833125960793421181, guid: 614a0f21ad7914181a98678b447e60db, type: 3}
       propertyPath: m_LocalPosition.x
       value: 12.78
@@ -1414,7 +1418,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6643864592962319589, guid: ad110ef73bc534f2896e28960730b5ad, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
