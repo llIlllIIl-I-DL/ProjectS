@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using System.Linq;
+using Unity.VisualScripting.Antlr3.Runtime;
 
 /// <summary>
 /// 벨브 오브젝트 - 플레이어와 상호작용시 벨브를 열거나 닫음
@@ -130,15 +131,25 @@ public class ObjectValve : BaseObject
     /// </summary>
     protected override void OnInteract(GameObject interactor)
     {
+        if (objectId == "BossValve" && BossWarningUI.Instance != null)
+        {
+            // 경고창 띄우기 (실제 열기는 UI 쪽에서)
+            BossWarningUI.Instance.BossWarningWindowUI(interactor, this);
+            return;
+        }
+
+
+
         if (!isOpen)
         {
             OpenValve();
         }
-        else
+
+
+
         {
             CloseValve();
         }
     }
-
     #endregion
 }

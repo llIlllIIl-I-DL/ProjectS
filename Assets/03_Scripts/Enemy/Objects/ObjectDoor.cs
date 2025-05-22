@@ -170,7 +170,7 @@ public class ObjectDoor : BaseObject
                 // 보스 경고 UI 표시
                 if (BossWarningUI.Instance != null)
                 {
-                    BossWarningUI.Instance.BossWarningWindowUI(interactor, this);
+                    //BossWarningUI.Instance.BossWarningWindowUI(interactor, this);
                     return;
                 }
                 break;
