@@ -18,6 +18,7 @@ public class InfoUI : MonoBehaviour
 
     [SerializeField] GameObject InfoMenu;
     static GameObject previousPage;
+    [SerializeField] private InvenInfoController InvenInfoController;
 
     public void Start()
     {
@@ -36,11 +37,21 @@ public class InfoUI : MonoBehaviour
             previousPage.SetActive(true);
             utilityPage.SetActive(false);
             suitPage.SetActive(false);
+
+            InvenInfoController.ClearDescriptionTitle();
+            InvenInfoController.ClearDescription();
+
         }
     }
 
     public void ActivateCategory(GameObject page)
     {
+        if (page != utilityPage)
+        {
+            InvenInfoController.ClearDescriptionTitle();
+            InvenInfoController.ClearDescription();
+        }
+
         if (previousPage != null)
         {
             previousPage.SetActive(false);

@@ -377,7 +377,7 @@ MonoBehaviour:
     \uBCF8 \uAC8C\uC784\uC740 RIVET\uC758 \uD14C\uC2A4\uD2B8 \uBC84\uC804\uC785\uB2C8\uB2E4.\n\n\uC870\uC791\uD0A4:\n\uC774\uB3D9:
     \uBC29\uD5A5\uD0A4  \uACF5\uACA9:Z  \uB300\uC26C:X  \uC810\uD504:C  \uACF5\uACA9
     \uC18D\uC131 \uBCC0\uACBD: A, S  \uC778\uBCA4\uD1A0\uB9AC:I  \uC0C1\uD638\uC791\uC6A9:
-    F  \uC124\uC815:ESC"
+    F  \uBA54\uB274:ESC"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e57dba4986f585a44a2a724235e41ceb, type: 2}
   m_sharedMaterial: {fileID: 8998966611788895184, guid: e57dba4986f585a44a2a724235e41ceb, type: 2}
