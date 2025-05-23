@@ -31,7 +31,9 @@ MonoBehaviour:
   canDoubleJump: 0
   dashSpeed: 8
   dashDuration: 0.3
-  dashCooldown: 0.8
+  dashCooldown: 1
+  dashSpeedDecayRate: 0.95
+  dashJumpSpeedDuration: 0.5
   wallSlideSpeed: 1.5
   wallSlideAcceleration: 5
   wallFastSlideSpeed: 4
