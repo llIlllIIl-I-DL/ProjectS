@@ -25,17 +25,31 @@ public class StartSceneUI : MonoBehaviour
 
     void Start()
     {
-        newBtn.onClick.AddListener(() => SceneManager.LoadScene("MainScene", LoadSceneMode.Single));
+        newBtn.onClick.AddListener(() => StartNewGame());
         loadBtn.onClick.AddListener(() => LoadMenu());
         optionBtn.onClick.AddListener(() => OptionMenu());
         exitBtn.onClick.AddListener(() => CloseGame());
-        
     }
 
-    public void NewGame()
+    public void StartNewGame()
     {
-        //difficultyMenu.SetActive(true);
-        //SelectDifficulty();
+        // GameManager가 있다면 게임 초기화
+        if (GameManager.Instance != null)
+        {
+            // 게임 데이터 초기화
+            GameManager.Instance.StartGame();
+            
+            // 게임 상태를 Playing으로 설정
+            GameManager.Instance.SetGameState(GameState.Playing);
+            
+            // 씬 로드
+            SceneManager.LoadScene("MainScene", LoadSceneMode.Single);
+        }
+        else
+        {
+            Debug.LogWarning("GameManager를 찾을 수 없습니다!");
+            SceneManager.LoadScene("MainScene", LoadSceneMode.Single);
+        }
     }
 
     public void SelectDifficulty()
@@ -45,13 +59,10 @@ public class StartSceneUI : MonoBehaviour
         hard.onClick.AddListener(() => SceneManager.LoadScene("MainScene", LoadSceneMode.Single));
     }
 
-
-
     public void LoadMenu()
     {
         checkPointMenu.SetActive(true);
     }
-
 
     public void OptionMenu()
     {

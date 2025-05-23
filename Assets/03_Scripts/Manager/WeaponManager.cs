@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.SceneManagement;
 
 public class WeaponManager : Singleton<WeaponManager>
 {
@@ -40,10 +41,58 @@ public class WeaponManager : Singleton<WeaponManager>
     private bool isWallSliding = false;
     private int wallDirection = 1; // -1: 왼쪽, 1: 오른쪽
 
+    private void Awake()
+    {
+        base.Awake();
+        if (Instance == this)
+        {
+            DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            InitializeComponents();
+        }
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // 씬이 로드될 때마다 firePoint 찾기
+        FindFirePoint();
+    }
+
+    private void FindFirePoint()
+    {
+        // Player 태그를 가진 오브젝트 찾기
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            // Player의 자식 중에서 "FirePoint" 이름을 가진 Transform 찾기
+            Transform foundFirePoint = player.transform.Find("FirePoint");
+            if (foundFirePoint != null)
+            {
+                firePoint = foundFirePoint;
+                Debug.Log("FirePoint 참조가 업데이트되었습니다.");
+            }
+            else
+            {
+                Debug.LogWarning("Player 오브젝트에서 FirePoint를 찾을 수 없습니다!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("씬에서 Player 태그를 가진 오브젝트를 찾을 수 없습니다!");
+        }
+    }
+
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
     private void Start()
     {
-        InitializeComponents();
-        RegisterEventListeners();
+        if (Instance == this)
+        {
+            RegisterEventListeners();
+        }
     }
 
     private void Update()
@@ -174,6 +223,13 @@ public class WeaponManager : Singleton<WeaponManager>
     {
         Debug.Log("FireNormalBullet 호출됨");
 
+        // 매니저 참조 체크
+        if (!IsValid())
+        {
+            Debug.LogWarning("WeaponManager: 필요한 참조가 없어 발사를 할 수 없습니다.");
+            return;
+        }
+
         // 재장전 중이거나 탄약 없으면 발사 불가
         if (ammoManager.IsReloading || ammoManager.CurrentAmmo <= 0)
         {
@@ -241,6 +297,13 @@ public class WeaponManager : Singleton<WeaponManager>
     // 차징 중단 (발사)
     public void StopCharging()
     {
+        // 매니저 참조 체크
+        if (!IsValid())
+        {
+            Debug.LogWarning("WeaponManager: 필요한 참조가 없어 차징을 중단할 수 없습니다.");
+            return;
+        }
+
         // 차징 중이 아니었으면 일반 공격으로 처리
         if (!chargeManager.IsCharging)
         {
@@ -314,9 +377,34 @@ public class WeaponManager : Singleton<WeaponManager>
         ammoManager.UseAmmo();
     }
 
+    // 매니저의 유효성 검사
+    private bool IsValid()
+    {
+        if (chargeManager == null || ammoManager == null || effectManager == null || bulletFactory == null)
+        {
+            Debug.LogWarning("WeaponManager: 일부 매니저 참조가 없습니다.");
+            return false;
+        }
+        return true;
+    }
+
     // 총알 실제 발사 처리 (일반 및 차징샷 공통)
     private void FireBullet(bool isCharged)
     {
+        // 매니저 참조 체크
+        if (!IsValid())
+        {
+            Debug.LogWarning("WeaponManager: 필요한 참조가 없어 총알을 발사할 수 없습니다.");
+            return;
+        }
+
+        // firePoint 체크
+        if (firePoint == null)
+        {
+            Debug.LogWarning("WeaponManager: firePoint가 없어 총알을 발사할 수 없습니다.");
+            return;
+        }
+
         Vector2 direction = GetAimDirection();
         Debug.Log($"FireBullet - 발사 방향: {direction}, 점프 중: {!collisionDetector?.IsGrounded}");
         
@@ -371,9 +459,21 @@ public class WeaponManager : Singleton<WeaponManager>
         {
             bulletScale = normalBulletScale;
         }
+
         GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null)
+        {
+            Debug.LogWarning("WeaponManager: Player를 찾을 수 없어 총알을 발사할 수 없습니다.");
+            return;
+        }
+
         // BulletFactory를 사용하여 총알 생성
-        GameObject bullet = bulletFactory.CreateBullet(currentBulletType, spawnPosition, Quaternion.identity,player);
+        GameObject bullet = bulletFactory.CreateBullet(currentBulletType, spawnPosition, Quaternion.identity, player);
+        if (bullet == null)
+        {
+            Debug.LogWarning("WeaponManager: 총알 생성에 실패했습니다.");
+            return;
+        }
 
         // 총알 크기 설정
         bullet.transform.localScale = bulletScale;

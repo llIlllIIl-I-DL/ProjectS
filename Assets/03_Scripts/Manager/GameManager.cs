@@ -67,6 +67,9 @@ public class GameManager : MonoBehaviour
             instance = this;
             DontDestroyOnLoad(gameObject);
             InitializeGame();
+            
+            // 씬 전환 이벤트 구독
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
         {
@@ -230,9 +233,23 @@ public class GameManager : MonoBehaviour
         gameTime = 0f;
         score = 0;
         playerLevel = 1;
-
+        currentLives = maxLives;
+        isGameInitialized = false;
+        
+        // 매니저 참조 초기화
+        itemManager = null;
+        inventoryManager = null;
+        costumeManager = null;
+        weaponManager = null;
+        audioManager = null;
+        
+        // 매니저 참조 다시 설정
+        StartCoroutine(SetupManagerReferences());
+        
         // 게임 시작 상태로 변경
         SetGameState(GameState.Playing);
+        
+        Debug.Log("새로운 게임이 시작되었습니다.");
     }
 
     // 게임 오버
@@ -405,7 +422,18 @@ public class GameManager : MonoBehaviour
         if (currentLives <= 0)
         {
             // 목숨이 없으면 게임 오버
-            GameOver();
+            ChangeGameState(GameState.GameOver);
+            
+            // 게임 오버 UI 표시
+            if (PlayerUI.Instance != null)
+            {
+                PlayerUI.Instance.ShowGameOverUI();
+            }
+            
+            // 게임 데이터 저장
+            SaveGameData();
+            
+            Debug.Log("게임 오버 처리 완료");
             return;
         }
         
@@ -429,7 +457,10 @@ public class GameManager : MonoBehaviour
             yield break;
         }
         
-        Debug.Log("리스폰 처리 시작: 체력 초기화 및 상태 리셋");
+        Debug.Log("리스폰 처리 시작: 게임 초기화 및 상태 리셋");
+        
+        // 게임 초기화
+        StartGame();
         
         // 1. 플레이어 체력 초기화
         var playerHP = player.GetComponent<PlayerHP>();
@@ -494,7 +525,22 @@ public class GameManager : MonoBehaviour
         SetGameState(GameState.Playing);
         
         isRespawning = false;
-        Debug.Log("플레이어 부활 완료!");
+        Debug.Log("플레이어 부활 및 게임 초기화 완료!");
+    }
+
+    // 씬 로드 시 호출되는 메서드
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Debug.Log($"씬 로드됨: {scene.name}");
+        
+        // 매니저 참조 다시 설정
+        StartCoroutine(SetupManagerReferences());
+        
+        // 게임 상태 초기화
+        if (scene.name == "GameScene") // 게임 씬 이름에 맞게 수정 필요
+        {
+            SetGameState(GameState.Playing);
+        }
     }
 
     private void OnDestroy()
@@ -510,5 +556,40 @@ public class GameManager : MonoBehaviour
         {
             costumeManager.OnCostumeActivated -= OnCostumeActivated;
         }
+        
+        // 씬 전환 이벤트 구독 해제
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    // 플레이어 사망 애니메이션 처리 및 게임 오버
+    private IEnumerator ShowDeathAnimation(GameObject player)
+    {
+        Debug.Log("게임 오버 처리 시작: 사망 애니메이션 재생");
+        
+        // 플레이어 애니메이터 가져오기
+        var playerAnimator = player.GetComponent<PlayerAnimator>();
+        if (playerAnimator != null)
+        {
+            // 사망 애니메이션 재생
+            playerAnimator.SetDead(true);
+            playerAnimator.SetAnimatorSpeed(1.0f);
+        }
+        
+        // 사망 애니메이션 재생 시간 대기 (2초)
+        yield return new WaitForSeconds(2f);
+        
+        // 게임 오버 상태로 변경
+        ChangeGameState(GameState.GameOver);
+        
+        // 게임 오버 UI 표시
+        if (PlayerUI.Instance != null)
+        {
+            PlayerUI.Instance.ShowGameOverUI();
+        }
+        
+        // 게임 데이터 저장
+        SaveGameData();
+        
+        Debug.Log("게임 오버 처리 완료");
     }
 } 
