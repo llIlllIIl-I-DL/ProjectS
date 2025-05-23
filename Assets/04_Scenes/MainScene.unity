@@ -302,6 +302,10 @@ PrefabInstance:
       propertyPath: npc
       value: 
       objectReference: {fileID: 726038685}
+    - target: {fileID: 2056732234574917837, guid: db3c2052c4847e142aa567b3ab2dbdbe, type: 3}
+      propertyPath: gameOverWindowParents
+      value: 
+      objectReference: {fileID: 1886332053}
     - target: {fileID: 3660628152974828620, guid: db3c2052c4847e142aa567b3ab2dbdbe, type: 3}
       propertyPath: m_Pivot.x
       value: 0

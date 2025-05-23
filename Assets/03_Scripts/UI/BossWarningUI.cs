@@ -6,8 +6,10 @@ using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BossWarningUI : Singleton<BossWarningUI>
+public class BossWarningUI : MonoBehaviour
 {
+    public static BossWarningUI Instance { get; private set; }
+
     [Header("창")]
     [SerializeField] public GameObject bossWarningUI;
     [SerializeField] public Transform bossWarningUIParents;
@@ -19,6 +21,18 @@ public class BossWarningUI : Singleton<BossWarningUI>
     [HideInInspector] public bool isApproved;
 
     private ObjectValve currentDoor;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     public void BossWarningWindowUI(GameObject interactor, ObjectValve door)
     {
