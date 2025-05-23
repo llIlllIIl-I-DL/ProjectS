@@ -221,10 +221,14 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
                 IsChargingAttack = false;
                 OnAttackRelease?.Invoke();
                 OnChargeAttackRelease?.Invoke();
-                WeaponManager.Instance.StopCharging();
                 
-                // 약간의 지연 후 새로운 차징 시작
-                StartCoroutine(StartNewChargingAfterDelay(0.05f));
+                // WeaponManager null 체크 추가
+                if (WeaponManager.Instance != null)
+                {
+                    WeaponManager.Instance.StopCharging();
+                    // 약간의 지연 후 새로운 차징 시작
+                    StartCoroutine(StartNewChargingAfterDelay(0.05f));
+                }
             }
             else
             {
@@ -232,7 +236,12 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
                 IsChargingAttack = true;
                 OnAttackInput?.Invoke();
                 OnChargeAttackStart?.Invoke();
-                WeaponManager.Instance.StartCharging();
+                
+                // WeaponManager null 체크 추가
+                if (WeaponManager.Instance != null)
+                {
+                    WeaponManager.Instance.StartCharging();
+                }
             }
         }
         else if (context.canceled)
@@ -246,7 +255,12 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
                 IsChargingAttack = false;
                 OnAttackRelease?.Invoke();
                 OnChargeAttackRelease?.Invoke();
-                WeaponManager.Instance.StopCharging();
+                
+                // WeaponManager null 체크 추가
+                if (WeaponManager.Instance != null)
+                {
+                    WeaponManager.Instance.StopCharging();
+                }
             }
         }
     }
@@ -263,7 +277,12 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
             IsChargingAttack = true;
             OnAttackInput?.Invoke();
             OnChargeAttackStart?.Invoke();
-            WeaponManager.Instance.StartCharging();
+            
+            // WeaponManager null 체크 추가
+            if (WeaponManager.Instance != null)
+            {
+                WeaponManager.Instance.StartCharging();
+            }
         }
     }
 
