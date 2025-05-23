@@ -264,17 +264,34 @@ public class PlayerMovement : MonoBehaviour
         
         float jumpForce = force;
         
-        // 대시 중 점프시 대시 속도 유지
+        // 대시 중 점프 시 
         if (wasDashing && Mathf.Abs(currentDashSpeed) > 0.1f)
         {
-            // 대시 중 점프 - X축 속도는 대시 속도 유지
-            rb.velocity = new Vector2(currentDashSpeed, jumpForce);
-            Debug.Log($"대시 점프: X축 속도 {currentDashSpeed} 유지, Y축 속도 {jumpForce} 적용");
+            // 현재 입력 방향 확인 (PlayerInputHandler에서 받아온 값 사용)
+            float inputDirection = Input.GetAxisRaw("Horizontal");
+            
+            // 입력이 있는 경우 해당 방향으로 점프, 없는 경우 현재 대시 방향 유지
+            float jumpDirection = Mathf.Abs(inputDirection) > 0.1f ? Mathf.Sign(inputDirection) : Mathf.Sign(currentDashSpeed);
+            
+            // : 대시 중 점프시 X축 속도는 입력 방향 또는 대시 방향으로 설정
+            float jumpSpeed = Mathf.Abs(currentDashSpeed) * jumpDirection;
+            rb.velocity = new Vector2(jumpSpeed, jumpForce);
+            
+            Debug.Log($" 대시 점프: 입력 방향 {inputDirection}, 점프 방향 {jumpDirection}, X축 속도 {jumpSpeed}, Y축 속도 {jumpForce}");
         }
         else
         {
             // 일반 점프
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            
+            // 대시 상태가 있었다면 초기화 (이전에 대시 점프를 했다면)
+            if (wasDashing)
+            {
+                currentDashSpeed = 0f;
+                wasDashing = false;
+                dashSpeedTimer = 0f;
+                Debug.Log(": 일반 점프로 대시 상태 초기화");
+            }
         }
     }
 
@@ -292,6 +309,9 @@ public class PlayerMovement : MonoBehaviour
         currentDashSpeed = facingDirection * dashSpeed;
         wasDashing = true;
         
+        // 코루틴 시작 전 모든 수평 속도 초기화 
+        rb.velocity = new Vector2(0, rb.velocity.y);
+        
         StartCoroutine(DashCoroutine(dashSpeed, dashDuration));
     }
 
@@ -299,7 +319,7 @@ public class PlayerMovement : MonoBehaviour
     {
         float startTime = Time.time;
 
-        // 대시 시작 시 속도 설정
+        // : 즉시 최대 속도로 대시 시작
         rb.velocity = new Vector2(facingDirection * dashSpeed, 0f);
         rb.gravityScale = 0;
 
@@ -308,6 +328,9 @@ public class PlayerMovement : MonoBehaviour
         
         // 시작할 때 점프 요청 플래그 초기화
         jumpRequested = false;
+        
+        // 대시 중 방향 변경 불가 플래그 
+        int dashDirection = facingDirection;
 
         while (Time.time < startTime + dashDuration && !dashInterrupted)
         {
@@ -322,7 +345,7 @@ public class PlayerMovement : MonoBehaviour
                 // 점프로 인해 대시가 중단됨
                 dashInterrupted = true;
                 
-                // 대시는 취소되지만 대시 속도는 유지
+                // 대시는 취소되지만 대시 속도는 유지 
                 // currentDashSpeed와 wasDashing은 초기화하지 않음
                 // 이 상태값은 Jump 메서드에서 활용됨
                 
@@ -330,13 +353,20 @@ public class PlayerMovement : MonoBehaviour
                 break;
             }
 
-            // 대시 중 일정한 속도 유지 (x 축만)
-            rb.velocity = new Vector2(facingDirection * dashSpeed, rb.velocity.y);
+            // : 대시 중 절대로 일정한 속도 유지 (방향 변경 불가)
+            rb.velocity = new Vector2(dashDirection * dashSpeed, 0f);
             yield return null;
         }
 
         // 대시 종료 시 중력 복원 (점프로 중단된 경우 포함)
         rb.gravityScale = 1;
+        
+        // : 점프로 중단되지 않았다면 즉시 정지
+        if (!dashInterrupted)
+        {
+            rb.velocity = new Vector2(0f, rb.velocity.y);
+        }
+        
         OnDashEnd?.Invoke();
 
         UtilityChangedStatController.Instance.isInvincibleDash = false;
@@ -357,15 +387,38 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitForSeconds(cooldownTime);
 
         OnDashCooldownComplete?.Invoke();
+        
+        // 대시가 종료된 후 0.2초 뒤에 대시 속도와 타이머를 초기화
+        if (dashInterrupted)
+        {
+            StartCoroutine(ResetDashStateAfterDelay(0.2f));
+        }
     }
 
-    // 대시 상태 리셋 메서드 추가
+    // 대시 상태가 종료된 후 일정 시간 뒤에 대시 속도와 타이머를 초기화하는 코루틴
+    private IEnumerator ResetDashStateAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        
+        // 대시 속도와 타이머 초기화
+        currentDashSpeed = 0f;
+        dashSpeedTimer = 0f;
+        wasDashing = false;
+        
+        Debug.Log(": 대시 상태 종료 후 0.2초 뒤 초기화 완료");
+    }
+
+    // 대시 상태에서 땅에 착지했을 때 대시 상태 리셋
     public void ResetDashState()
     {
+        // : 착지 시 즉시 대시 상태 초기화 및 속도 완전 리셋
         currentDashSpeed = 0f;
         wasDashing = false;
         dashSpeedTimer = 0f;
-        Debug.Log("대시 상태 초기화됨");
+        
+        // 착지 시 수평 속도 급감속 
+        rb.velocity = new Vector2(rb.velocity.x * 0.5f, rb.velocity.y);
+        Debug.Log(": 대시 상태 초기화됨");
     }
 
     public void WallSlide(float slideSpeed, bool fastSlide = false)
@@ -497,24 +550,25 @@ public class PlayerMovement : MonoBehaviour
             if (dashSpeedTimer <= 0f && settings != null)
             {
                 dashSpeedTimer = settings.dashJumpSpeedDuration;
-                Debug.Log($"대시 점프: 대시 속도 {currentDashSpeed} 유지 시간 {dashSpeedTimer}초");
+                Debug.Log($" 대시 점프: 대시 속도 {currentDashSpeed} 유지 시간 {dashSpeedTimer}초");
             }
             
             // 타이머 감소
             dashSpeedTimer -= Time.deltaTime;
             
-            // 점진적으로 대시 속도 감소 적용
-            currentDashSpeed *= dashSpeedDecayRate;
+            // : 점프 중에는 속도 감소가 거의 없음 (매우 느린 감소)
+            currentDashSpeed *= 0.998f;
             
-            // 타이머가 종료되거나 속도가 임계값 이하면 대시 상태 초기화
-            if (dashSpeedTimer <= 0f || Mathf.Abs(currentDashSpeed) < 1.0f)
+            // 타이머가 종료되면 대시 상태 초기화
+            if (dashSpeedTimer <= 0f)
             {
-                ResetDashState();
-                Debug.Log("대시 속도 유지 시간 종료 또는 속도 임계값 도달");
+                // 타이머만 초기화하고 대시 상태는 유지 (다음 점프에서 초기화)
+                dashSpeedTimer = 0f;
+                Debug.Log(": 대시 속도 유지 시간 종료");
                 return;
             }
             
-            // 실제 X축 속도를 대시 속도로 설정 (타이머 동안 점진적으로 감소)
+            // : X축 속도를 완벽하게 유지
             rb.velocity = new Vector2(currentDashSpeed, rb.velocity.y);
         }
     }
