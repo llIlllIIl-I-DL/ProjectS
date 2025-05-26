@@ -333,11 +333,23 @@ public class PlayerUI : MonoBehaviour
     }
 
     // 탄약 UI를 업데이트하는 메서드
-    private void UpdateAmmoUI(int ammo, int maxAmmo)
+    public void UpdateAmmoUI(int ammo, int maxAmmo)
     {
-        float ratio = (float)ammo / maxAmmo;
-        ammoBar.value = ratio;
-        ammoBarImage.fillAmount = ratio;
+        if (ammoBarImage == null || !ammoBarImage.gameObject.activeInHierarchy)
+        {
+            return;
+        }
+
+        try
+        {
+            float fillAmount = (float)ammo / maxAmmo;
+            ammoBar.value = fillAmount;
+            ammoBarImage.fillAmount = fillAmount;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"UI 업데이트 중 오류 발생: {e.Message}");
+        }
     }
 
 
