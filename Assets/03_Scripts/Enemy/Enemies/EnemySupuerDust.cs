@@ -198,8 +198,9 @@ public class EnemySupuerDust : BaseEnemy
             return;
         }
         
-        // 발사 방향 계산 - 플레이어 직접 조준
-        Vector2 directionToPlayer = (playerTransform.position - firePoint.position).normalized;
+        // 플레이어의 x축 위치만 고려하여 방향 결정
+        float directionX = playerTransform.position.x > transform.position.x ? 1f : -1f;
+        Vector2 shootDirection = new Vector2(directionX, 0).normalized;
         
         // 총알 생성 및 발사
         GameObject bullet = ObjectPoolingManager.Instance.GetObject(ObjectPoolingManager.PoolType.EnemyBullet);
@@ -207,8 +208,8 @@ public class EnemySupuerDust : BaseEnemy
         {
             bullet.transform.position = firePoint.position;
             
-            // 총알 회전 설정 (플레이어 방향으로)
-            float angle = Mathf.Atan2(directionToPlayer.y, directionToPlayer.x) * Mathf.Rad2Deg;
+            // 총알 회전 설정 (좌우 방향만)
+            float angle = directionX > 0 ? 0f : 180f;
             bullet.transform.rotation = Quaternion.Euler(0, 0, angle);
             
             // 발사자 설정
@@ -217,14 +218,14 @@ public class EnemySupuerDust : BaseEnemy
                 bulletScript.Shooter = gameObject;
             }
             
-            // 속도 설정
+            // 속도 설정 - x축 방향으로만
             if (bullet.TryGetComponent<Rigidbody2D>(out Rigidbody2D bulletRb))
             {
-                bulletRb.velocity = directionToPlayer * bulletSpeed;
+                bulletRb.velocity = shootDirection * bulletSpeed;
             }
             
-            Debug.DrawRay(firePoint.position, directionToPlayer * 3f, Color.red, 0.5f);
-            Debug.Log($"총알 발사: 방향 = {directionToPlayer}, 각도 = {angle}도");
+            Debug.DrawRay(firePoint.position, shootDirection * 3f, Color.red, 0.5f);
+            Debug.Log($"총알 발사: 방향 = {shootDirection}");
         }
     }
 
