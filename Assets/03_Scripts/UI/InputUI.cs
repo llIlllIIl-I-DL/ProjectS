@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.InputSystem;
 
 public class InputUI : MonoBehaviour
 {
     public GameObject currentPage = null;
-
 
     [Header("UI 창")]
     [SerializeField] public GameObject pauseMenu;
@@ -25,10 +25,6 @@ public class InputUI : MonoBehaviour
     [SerializeField] public GameObject settingMenu;
     [SerializeField] public GameObject checkPointMenu;
 
-
-
-
-
     public bool isPauseMenuOpen = false;
 
     [SerializeField] private InfoUI infoUI;
@@ -43,10 +39,8 @@ public class InputUI : MonoBehaviour
         toMainMenuBtn.onClick.AddListener(() => ToMainMenu());
     }
 
-    void Update()
+    public void OpenPauseMenu()
     {
-        if (InteractionKeyInput.GetKeyDown(KeyCode.Escape))
-        {
             if (npc.istalking == false)
             {
                 // 열려있는 UI가 있는지 확인.
@@ -62,20 +56,23 @@ public class InputUI : MonoBehaviour
             }
         }
 
-        if (isPauseMenuOpen) //예외처리. 미리 체크하는 편이 좋당
+    public void OpenMap()
+    {
+        if (isPauseMenuOpen)
             return;
 
-        if (InteractionKeyInput.GetKeyDown(KeyCode.M))
-        {
             SetMenu(mapMenu);
-        }
 
-        if (InteractionKeyInput.GetKeyDown(KeyCode.I))
-        {
+    }
+
+    public void OpenInventory()
+    {
+        if (isPauseMenuOpen)
+            return;
+
             Debug.Log("I키가 눌렸습니다");
             SetMenu(infoMenu);
             infoUI.SetDefaultPage();
-        }
     }
 
     bool IsAnyUIActive(bool isfalse)

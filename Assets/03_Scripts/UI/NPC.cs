@@ -51,7 +51,6 @@ public class NPC : BaseObject
     {
         if (istalking == false)
         {
-            InteractionKeyInput.BlockAllExceptF = true;
             UIManager.Instance.NPCTalkInteraction(npcFaceIcon);
             Destroy(interactionButtonUI);
             istalking = true;
@@ -60,7 +59,6 @@ public class NPC : BaseObject
 
         else
         {
-            InteractionKeyInput.BlockAllExceptF = false;
             UIManager.Instance.ClosedNPCTalkInteraction(npcFaceIcon);
             istalking = false;
         }

@@ -11,7 +11,7 @@ public class UIManager : Singleton<UIManager> //조금 리팩토링 필요!!
     public List<GameObject> allUIPages = new List<GameObject>();
 
     NPCInteract npcInteract;
-    InputUI inputUI;
+    public InputUI inputUI;
     Player player;
 
     //보통 Manager에 들어가는 기능 = (UIManager라 했을 때) UI를 가지고 찾고 전달하고...show add remove 등등
