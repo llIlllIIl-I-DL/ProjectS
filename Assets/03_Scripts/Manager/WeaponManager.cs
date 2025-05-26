@@ -113,15 +113,16 @@ public class WeaponManager : Singleton<WeaponManager>
         if (PlayerUI.Instance != null)
         {
             PlayerUI.Instance.UpdateAmmoUI(current, max);
-        if (ammoManager != null)
-        {
-            ammoManager.OnAmmoChanged -= (current, max) =>
+            if (ammoManager != null)
             {
-                if (PlayerUI.Instance != null)
+                ammoManager.OnAmmoChanged -= (current, max) =>
                 {
-                    PlayerUI.Instance.UpdateAmmoUI(current, max);
-                }
-            };
+                    if (PlayerUI.Instance != null)
+                    {
+                        PlayerUI.Instance.UpdateAmmoUI(current, max);
+                    }
+                };
+            }
         }
     }
 
@@ -470,7 +471,6 @@ public class WeaponManager : Singleton<WeaponManager>
             float rad = randomAngle * Mathf.Deg2Rad;
             if (isOvercharged)
             {
-                // 오버차징인 경우 발사 방향 기존방향과 동일
                 direction = new Vector2(direction.x, direction.y);
             }
             else
@@ -524,6 +524,15 @@ public class WeaponManager : Singleton<WeaponManager>
             return;
         }
 
+        // 총알 초기화
+        var bulletScript = bullet.GetComponent<Bullet>();
+        if (bulletScript == null)
+        {
+            Debug.LogWarning("WeaponManager: 총알에 Bullet 컴포넌트가 없습니다.");
+            ObjectPoolingManager.Instance.ReturnBullet(bullet, currentBulletType);
+            return;
+        }
+
         // 총알 크기 설정
         bullet.transform.localScale = bulletScale;
 
@@ -535,33 +544,26 @@ public class WeaponManager : Singleton<WeaponManager>
         }
 
         // 총알 데미지 설정
-        var bulletScript = bullet.GetComponent<Bullet>();
-        if (bulletScript != null)
+        float damage = bulletDamage * (1f + atkUpPercent);
+        if (isCharged)
         {
-            // 속성별 데미지 조정 (차징 레벨에 따라)
-            float damage = bulletDamage * (1f + atkUpPercent);
-            if (isCharged)
+            int chargeLevel = chargeManager.CurrentChargeLevel;
+            if (chargeLevel == 2)
             {
-                int chargeLevel = chargeManager.CurrentChargeLevel;
-                if (chargeLevel == 2)
-                {
-                    damage *= 2.5f; // 2단계 차징 데미지 증가
-                }
-                else if (chargeLevel == 1)
-                {
-                    damage *= 1.5f; // 1단계 차징 데미지 증가
-                }
+                damage *= 3f; // 2단계 차징 데미지 증가
             }
-            bulletScript.Damage = damage;
-            
-            // 총알의 오버차지 상태 설정
-            bulletScript.IsOvercharged = isOvercharged;
-            if (isOvercharged) {
-                Debug.Log("오버차지 상태로 총알 발사!");
-                
-                // 총알 발사 직후 바로 오버차지 데미지 적용
-                ApplyOverchargeRecoilDamage();
+            else if (chargeLevel == 1)
+            {
+                damage *= 1.5f; // 1단계 차징 데미지 증가
             }
+        }
+        bulletScript.Damage = damage;
+        
+        // 총알의 오버차지 상태 설정
+        bulletScript.IsOvercharged = isOvercharged;
+        if (isOvercharged) {
+            Debug.Log("오버차지 상태로 총알 발사!");
+            ApplyOverchargeRecoilDamage();
         }
 
         // 총알 회전 설정
@@ -576,28 +578,32 @@ public class WeaponManager : Singleton<WeaponManager>
             if (trail == null)
             {
                 trail = bullet.AddComponent<TrailRenderer>();
-                trail.startWidth = 0.1f * bulletScale.x;
-                trail.endWidth = 0.01f;
-                trail.time = 0.1f;
-
-                // 트레일 색상 설정
-                Gradient gradient = new Gradient();
-                Color bulletColor = chargeManager.CurrentChargeLevel == 2 ?
-                    new Color(1.0f, 0.5f, 0.1f, 1.0f) : // 주황색 (고온 증기)
-                    new Color(0.7f, 0.7f, 0.7f, 1.0f);  // 회색 (일반 증기)
-
-                gradient.SetKeys(
-                    new GradientColorKey[] {
-                        new GradientColorKey(bulletColor, 0.0f),
-                        new GradientColorKey(new Color(0.8f, 0.8f, 0.8f, 1f), 1.0f)
-                    },
-                    new GradientAlphaKey[] {
-                        new GradientAlphaKey(0.7f, 0.0f),
-                        new GradientAlphaKey(0.0f, 1.0f)
-                    }
-                );
-                trail.colorGradient = gradient;
             }
+
+            // 트레일 설정 업데이트
+            trail.startWidth = 0.1f * bulletScale.x;
+            trail.endWidth = 0.01f;
+            trail.time = 0.1f;
+            trail.emitting = true;
+            trail.Clear(); // 이전 트레일 제거
+
+            // 트레일 색상 설정
+            Gradient gradient = new Gradient();
+            Color bulletColor = chargeManager.CurrentChargeLevel == 2 ?
+                new Color(1.0f, 0.5f, 0.1f, 1.0f) : // 주황색 (고온 증기)
+                new Color(0.7f, 0.7f, 0.7f, 1.0f);  // 회색 (일반 증기)
+
+            gradient.SetKeys(
+                new GradientColorKey[] {
+                    new GradientColorKey(bulletColor, 0.0f),
+                    new GradientColorKey(new Color(0.8f, 0.8f, 0.8f, 1f), 1.0f)
+                },
+                new GradientAlphaKey[] {
+                    new GradientAlphaKey(0.7f, 0.0f),
+                    new GradientAlphaKey(0.0f, 1.0f)
+                }
+            );
+            trail.colorGradient = gradient;
         }
     }
 

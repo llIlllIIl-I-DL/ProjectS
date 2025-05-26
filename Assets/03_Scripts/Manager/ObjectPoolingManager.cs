@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal; // URP 카메라를 위한 네임스페이스
 
 // 개별 오브젝트 풀 클래스
 public class ObjectPool
@@ -7,6 +8,8 @@ public class ObjectPool
     private GameObject prefab;
     private Queue<GameObject> pool = new Queue<GameObject>();
     private Transform poolParent;
+
+    public Transform PoolParent => poolParent;  // poolParent에 접근하기 위한 프로퍼티 추가
 
     public ObjectPool(GameObject prefab, int initialSize, Transform parent)
     {
@@ -51,6 +54,13 @@ public class ObjectPool
         {
             ps.Stop();
             ps.Clear();
+        }
+
+        // 총알 컴포넌트 초기화
+        Bullet bullet = obj.GetComponent<Bullet>();
+        if (bullet != null)
+        {
+            bullet.ResetBullet();
         }
         
         obj.SetActive(false);
@@ -121,6 +131,9 @@ public class ObjectPoolingManager : MonoBehaviour
     // ElementType과 PoolType 매핑
     private Dictionary<ElementType, PoolType> bulletTypeToPoolType = new Dictionary<ElementType, PoolType>();
 
+    private Camera mainCamera;
+    private float viewportMargin = -0.1f; // 뷰포트 경계에서의 여유 공간
+
     private void Awake()
     {
         if (_instance != null && _instance != this)
@@ -132,6 +145,13 @@ public class ObjectPoolingManager : MonoBehaviour
         _instance = this;
         DontDestroyOnLoad(gameObject);
 
+        // 메인 카메라 찾기
+        mainCamera = Camera.main;
+        if (mainCamera == null)
+        {
+            Debug.LogWarning("메인 카메라를 찾을 수 없습니다!");
+        }
+
         // 디버프 프리팹 매핑
         InitializeDebuffPrefabMapping();
         
@@ -140,6 +160,33 @@ public class ObjectPoolingManager : MonoBehaviour
 
         // 초기화 메서드에 추가
         InitializeBulletMapping();
+    }
+
+    private void Update()
+    {
+        CheckBulletsInViewport();
+    }
+
+    private void CheckBulletsInViewport()
+    {
+        if (mainCamera == null) return;
+
+        // 씬 전체에서 Bullet 컴포넌트를 가진 활성 오브젝트를 모두 찾음
+        Bullet[] bullets = GameObject.FindObjectsOfType<Bullet>(false);
+        foreach (var bullet in bullets)
+        {
+            if (!bullet.gameObject.activeInHierarchy) continue;
+
+            Vector3 viewportPoint = mainCamera.WorldToViewportPoint(bullet.transform.position);
+            if (viewportPoint.x < -viewportMargin ||
+                viewportPoint.x > 1 + viewportMargin ||
+                viewportPoint.y < -viewportMargin ||
+                viewportPoint.y > 1 + viewportMargin ||
+                viewportPoint.z < 0)
+            {
+                ObjectPoolingManager.Instance.ReturnBullet(bullet.gameObject, bullet.BulletType);
+            }
+        }
     }
 
     private void InitializeDebuffPrefabMapping()

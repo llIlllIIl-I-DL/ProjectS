@@ -18,10 +18,25 @@ public class BulletFactory : MonoBehaviour
 
     public GameObject CreateBullet(ElementType type, Vector3 pos, Quaternion rot, GameObject shooter)
     {
-        if (!bulletPrefabMap.TryGetValue(type, out var prefab)) prefab = bulletPrefabMap[ElementType.Normal];
-        var bulletObj = Instantiate(prefab, pos, rot);
+        // ObjectPoolingManager를 통해 총알 가져오기
+        GameObject bulletObj = ObjectPoolingManager.Instance.GetBullet(type, shooter.transform);
+        if (bulletObj == null)
+        {
+            Debug.LogWarning($"Failed to get bullet from pool for type: {type}");
+            return null;
+        }
+
+        // 총알 위치와 회전 설정
+        bulletObj.transform.position = pos;
+        bulletObj.transform.rotation = rot;
+
+        // 발사자 정보 설정
         var bullet = bulletObj.GetComponent<Bullet>();
-        bullet.Shooter = shooter; // 발사자 정보 주입
+        if (bullet != null)
+        {
+            bullet.Shooter = shooter;
+        }
+
         return bulletObj;
     }
 
@@ -45,4 +60,4 @@ public class BulletFactory : MonoBehaviour
             }
         }
     }
-} 
+}

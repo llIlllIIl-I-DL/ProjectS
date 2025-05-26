@@ -1153,6 +1153,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 5381dff4897522644a0e55be21e4b9cc, type: 2}
     - target: {fileID: 3751922212304491143, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: maxActiveBullets
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3751922212304491143, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
       propertyPath: poolInfos.Array.size
       value: 6
       objectReference: {fileID: 0}
@@ -1166,7 +1170,7 @@ PrefabInstance:
       objectReference: {fileID: 4363198470078929428, guid: 00c8892831c5e438faf6f7d95f95044a, type: 3}
     - target: {fileID: 3751922212304491143, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
       propertyPath: poolInfos.Array.data[0].initialSize
-      value: 20
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3751922212304491143, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
       propertyPath: poolInfos.Array.data[1].initialSize

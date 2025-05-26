@@ -39,7 +39,7 @@ public class IronBullet : Bullet
             lifeTimer += Time.deltaTime;
             if (lifeTimer >= lifeTime)
             {
-                Destroy(gameObject);
+                ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
             }
             // 벽이 움직이면 따라가게 하고 싶으면:
             if (attachedWall != null)
@@ -52,7 +52,7 @@ public class IronBullet : Bullet
             destroyTimer += Time.deltaTime;
             if (destroyTimer >= overchargedLifetime)
             {
-                Destroy(gameObject);
+                ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
             }
         }
     }

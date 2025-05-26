@@ -145,15 +145,19 @@ public abstract class Bullet : MonoBehaviour
         lifeTimer += Time.deltaTime;
         if (lifeTimer >= lifeTime)
         {
-            Destroy(gameObject);
+            // Destroy(gameObject) 대신 풀링 매니저로 반환
+            ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
         }
     }
     // 총알 상태 초기화 (풀에서 가져올 때 호출)
     public virtual void ResetBullet()
     {
         // 필요한 초기화 작업
-        // 예: 충돌 카운터 리셋, 효과 초기화 등
         lifeTimer = 0f; // 타이머 초기화
+        hasHitEnemy = false; // 충돌 상태 초기화
+        canHitPlayer = true; // 플레이어 피격 가능 상태 초기화
+        playerIgnoreTimer = 0f; // 플레이어 무시 타이머 초기화
+        ignoreCollisionReset = false; // 충돌 무시 상태 초기화
     }
     protected virtual void OnTriggerEnter2D(Collider2D other)
     {
@@ -171,6 +175,12 @@ public abstract class Bullet : MonoBehaviour
     
     // 총알이 파괴될 때 호출되는 함수
     protected virtual void OnDestroy()
+    {
+        // 파생 클래스에서 오버라이드 가능
+    }
+
+    // 총알이 비활성화될 때 호출되는 함수
+    protected virtual void OnDisable()
     {
         // 파생 클래스에서 오버라이드 가능
     }

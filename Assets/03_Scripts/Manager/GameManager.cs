@@ -66,10 +66,12 @@ public class GameManager : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
-            InitializeGame();
             
             // 씬 전환 이벤트 구독
             SceneManager.sceneLoaded += OnSceneLoaded;
+            
+            // 초기화는 Start에서 진행
+            isGameInitialized = false;
         }
         else
         {
@@ -79,6 +81,11 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        if (!isGameInitialized)
+        {
+            InitializeGame();
+        }
+        
         // 게임 데이터 로드
         LoadGameData();
         
@@ -119,7 +126,7 @@ public class GameManager : MonoBehaviour
         // 목숨 초기화
         currentLives = maxLives;
         
-        // 매니저 참조 가져오기
+        // 매니저 참조 가져오기 (UI는 제외)
         itemManager = ItemManager.Instance;
         inventoryManager = InventoryManager.Instance;
         costumeManager = CostumeManager.Instance;
@@ -138,6 +145,7 @@ public class GameManager : MonoBehaviour
         // 모든 매니저가 초기화될 때까지 대기
         yield return new WaitForSeconds(0.5f);
 
+        // UI 관련 매니저는 제외하고 초기화
         if (itemManager == null) itemManager = ItemManager.Instance;
         if (inventoryManager == null) inventoryManager = InventoryManager.Instance;
         if (costumeManager == null) costumeManager = CostumeManager.Instance;
