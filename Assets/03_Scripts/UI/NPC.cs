@@ -16,7 +16,6 @@ public class NPC : BaseObject
     protected override void OnInteract(GameObject interactor)
     {
         TalkToNPC();
-
     }
 
     protected override void OnTriggerExit2D(Collider2D collider2D)

@@ -177,7 +177,11 @@ public abstract class BaseObject : MonoBehaviour
     /// <summary>
     /// 실제 상호작용 처리
     /// </summary>
-    protected abstract void OnInteract(GameObject interactor);
+    protected virtual void OnInteract(GameObject interactor)
+    {
+        UIManager.Instance.playerInputHandler.IsInteracting = true;
+    }
+
     
     /// <summary>
     /// 오브젝트의 현재 상태를 문자열로 변환
