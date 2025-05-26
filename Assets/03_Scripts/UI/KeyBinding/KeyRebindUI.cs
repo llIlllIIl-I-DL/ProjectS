@@ -67,16 +67,33 @@ public class KeyRebindUI : MonoBehaviour
 
     public void StartRebind()
     {
+        var action = GetAction();
+        if (action == null) return;
+
         keyText.text = "입력 대기중...";
-        GetAction().PerformInteractiveRebinding(bindingIndex)
+        
+        // 액션 비활성화
+        action.Disable();
+        
+        action.PerformInteractiveRebinding(bindingIndex)
             .WithControlsExcluding("Mouse") // 마우스 제외
             .OnComplete(operation =>
             {
                 operation.Dispose();
                 UpdateKeyText();
                 // 저장
-                PlayerPrefs.SetString(ActionName + "_rebind", GetAction().bindings[bindingIndex].effectivePath);
+                PlayerPrefs.SetString(ActionName + "_rebind", action.bindings[bindingIndex].effectivePath);
                 PlayerPrefs.Save();
+                
+                // 액션 다시 활성화
+                action.Enable();
+            })
+            .OnCancel(operation =>
+            {
+                operation.Dispose();
+                UpdateKeyText();
+                // 취소 시에도 액션 다시 활성화
+                action.Enable();
             })
             .Start();
     }
