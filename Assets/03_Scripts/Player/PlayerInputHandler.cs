@@ -4,9 +4,18 @@ using UnityEngine.InputSystem;
 using System.Collections;
 
 
-public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
+public class PlayerInputHandler : MonoBehaviour, PlayerInput. IPlayerActions
 {
     private BaseObject baseObject;
+
+    private bool isInteracting = false;
+
+    public bool IsInteracting
+    {
+        get => isInteracting;
+        set => isInteracting = value;
+    }
+
 
     [SerializeField] private float interactionRadius = 2f; // 상호작용 가능 범위
     [SerializeField] private float doubleTapTime = 0.5f;
@@ -374,6 +383,9 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
 
     public void OnInteraction(InputAction.CallbackContext context)
     {
+        if (!IsInteracting)
+            IsInteracting = (!false);
+
         if (context.started)
         {
             Debug.Log("상호작용 입력 감지");
@@ -409,5 +421,44 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
         DashPressed = false;
         IsAttackPressed = false;
         IsChargingAttack = false;
+    }
+
+    public void OnInventory(InputAction.CallbackContext context)
+    {
+        if (isInteracting == true)
+            return;
+
+        if (context.started)
+        {
+            Debug.Log("I를 눌렀다!!");
+
+            UIManager.Instance.inputUI.OpenInventory();
+        }
+    }
+
+    public void OnMap(InputAction.CallbackContext context)
+    {
+        if (isInteracting == true)
+            return;
+
+        if (context.started)
+        {
+            Debug.Log("M을 눌렀다!!");
+
+            UIManager.Instance.inputUI.OpenMap();
+        }
+    }
+
+    public void OnPauseMenu(InputAction.CallbackContext context)
+    {
+        if (isInteracting == true)
+            return;
+
+        if (context.started)
+        {
+            Debug.Log("ESC를 눌렀다!!");
+
+            UIManager.Instance.inputUI.OpenPauseMenu();
+        }
     }
 }
