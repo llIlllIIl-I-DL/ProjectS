@@ -100,13 +100,13 @@ public class GameManager : MonoBehaviour
             gameTime += Time.deltaTime;
         }
 
+        /*
         // ESC 키로 일시정지 토글
         if (InteractionKeyInput.GetKeyDown(KeyCode.Escape) && (currentState == GameState.Playing || currentState == GameState.Paused))
         {
             TogglePause();
         }
-
-
+        */
     }
 
     // 게임 초기화

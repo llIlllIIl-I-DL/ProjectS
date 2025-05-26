@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 
@@ -10,13 +11,9 @@ public class NPCInteract : MonoBehaviour
 
     private GameObject _talkBox;
 
-
     public void ShowTalkBox(Sprite fIcon)
     {
-
         Time.timeScale = 0;
-
-
         Image[] images = talkBox.GetComponentsInChildren<Image>();
         faceIcon = images[1];
 

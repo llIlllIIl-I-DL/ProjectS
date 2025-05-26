@@ -146,28 +146,18 @@ public class ObjectValve : BaseObject
 
         if (!isOpen)
         {
+            UIManager.Instance.playerInputHandler.IsInteracting = false;
             OpenValve();
         }
 
 
 
         {
+            UIManager.Instance.playerInputHandler.IsInteracting = false;
             CloseValve();
         }
     }
     #endregion
-    /*
-    protected override void OnPlayerEnterRange(GameObject player)
-    {
-        base.OnPlayerEnterRange(player);
-    }
-    
-
-    protected override void OnPlayerExitRange(GameObject player)
-    {
-        base.OnPlayerExitRange(player);
-    }
-    */
 
     protected override void ShowInteractionPrompt()
     {
