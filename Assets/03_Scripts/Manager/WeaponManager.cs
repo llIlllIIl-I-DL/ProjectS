@@ -113,6 +113,15 @@ public class WeaponManager : Singleton<WeaponManager>
         if (PlayerUI.Instance != null)
         {
             PlayerUI.Instance.UpdateAmmoUI(current, max);
+        if (ammoManager != null)
+        {
+            ammoManager.OnAmmoChanged -= (current, max) =>
+            {
+                if (PlayerUI.Instance != null)
+                {
+                    PlayerUI.Instance.UpdateAmmoUI(current, max);
+                }
+            };
         }
     }
 

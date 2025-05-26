@@ -22650,7 +22650,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uAC8C\uC784 \uD074\uB9AC\uC5B4!\n\nREVET\uC758 \uD14C\uC2A4\uD2B8 \uBC84\uC804\uC740
+  m_text: "\uAC8C\uC784 \uD074\uB9AC\uC5B4!\n\nRIVET\uC758 \uD14C\uC2A4\uD2B8 \uBC84\uC804\uC740
     \uC5EC\uAE30\uAE4C\uC9C0\uC785\uB2C8\uB2E4.\n\uD50C\uB808\uC774\uD574\uC8FC\uC154\uC11C
     \uAC10\uC0AC\uD569\uB2C8\uB2E4!"
   m_isRightToLeft: 0

@@ -37,6 +37,7 @@ public class InvenInfoController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI descriptionTitle;
     [SerializeField] private TextMeshProUGUI itemDescription;
 
+
     [SerializeField] private Button utilityEquipBtn;
     [SerializeField] private Button utilityRemoveBtn;
 
@@ -63,6 +64,16 @@ public class InvenInfoController : MonoBehaviour
 
         utilityResetYesBtn.onClick.AddListener(() => ResetUtility());
         utilityResetNoBtn.onClick.AddListener(() => isRealUtilityResetPopUp.SetActive(false));
+    }
+
+    public void ClearDescriptionTitle()
+    {
+        descriptionTitle.text = "";
+    }
+
+    public void ClearDescription()
+    {
+        itemDescription.text = "";
     }
 
     public void IsRealResetUtility() //초기화하시겠습니까?
