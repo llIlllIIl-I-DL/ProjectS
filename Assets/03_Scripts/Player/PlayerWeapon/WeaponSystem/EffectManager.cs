@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EffectManager : MonoBehaviour
 {
@@ -24,11 +25,39 @@ public class EffectManager : MonoBehaviour
             audioSource.pitch = 1.0f;
         }
 
+        // 씬 전환 이벤트 구독
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        
+        // 초기화
+        Initialize();
+    }
+
+    private void OnDestroy()
+    {
+        // 씬 전환 이벤트 구독 해제
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Initialize();
+    }
+
+    public void Initialize()
+    {
         // 플레이어 찾기
         player = GameObject.FindGameObjectWithTag("Player");
         if (player == null)
         {
-            Debug.LogError("EffectManager: 플레이어를 찾을 수 없습니다.");
+            Debug.LogWarning("EffectManager: 플레이어를 찾을 수 없습니다. 나중에 다시 시도합니다.");
+            return;
+        }
+
+        // 기존 이펙트 정리
+        if (pressureEffect != null)
+        {
+            Destroy(pressureEffect.gameObject);
+            pressureEffect = null;
         }
 
         // 스팀 압력 이펙트 생성
@@ -39,21 +68,33 @@ public class EffectManager : MonoBehaviour
     {
         if (steamPressureEffectPrefab != null && player != null)
         {
-            // 이펙트를 플레이어의 자식으로 생성
-            GameObject effectObj = Instantiate(steamPressureEffectPrefab, player.transform.position, Quaternion.identity);
-            effectObj.transform.SetParent(player.transform);
-            effectObj.SetActive(false); // 초기에는 비활성화 상태로 설정
-
-            pressureEffect = effectObj.GetComponent<SteamPressureEffect>();
-
-            // 압력 이펙트에 사운드 설정
-            if (pressureEffect != null)
+            try
             {
+                // 이펙트를 플레이어의 자식으로 생성
+                GameObject effectObj = Instantiate(steamPressureEffectPrefab, player.transform.position, Quaternion.identity);
+                effectObj.transform.SetParent(player.transform);
+                effectObj.SetActive(false); // 초기에는 비활성화 상태로 설정
+
+                pressureEffect = effectObj.GetComponent<SteamPressureEffect>();
+                if (pressureEffect == null)
+                {
+                    Debug.LogError("EffectManager: SteamPressureEffect 컴포넌트를 찾을 수 없습니다.");
+                    Destroy(effectObj);
+                    return;
+                }
+
+                // 압력 이펙트에 사운드 설정
                 var effectAudio = effectObj.GetComponent<AudioSource>();
                 if (effectAudio != null)
                 {
                     effectAudio.clip = pressureBuildSound;
                 }
+
+                Debug.Log("EffectManager: 압력 이펙트가 성공적으로 생성되었습니다.");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"EffectManager: 이펙트 생성 중 오류 발생: {e.Message}");
             }
         }
         else
@@ -65,7 +106,7 @@ public class EffectManager : MonoBehaviour
     // 차징 압력 이펙트 업데이트 - 즉시 활성화
     public void UpdatePressureEffect(float pressure)
     {
-        if (pressureEffect != null)
+        if (pressureEffect != null && pressureEffect.gameObject != null)
         {
             // 압력이 0보다 크면 이펙트 활성화, 아니면 비활성화
             bool shouldBeActive = pressure > 0f;
@@ -82,6 +123,11 @@ public class EffectManager : MonoBehaviour
             {
                 pressureEffect.gameObject.SetActive(false);
             }
+        }
+        else
+        {
+            Debug.LogWarning("EffectManager: pressureEffect가 null이거나 파괴되었습니다. 재초기화가 필요합니다.");
+            Initialize();
         }
     }
 

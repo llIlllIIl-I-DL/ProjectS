@@ -56,6 +56,15 @@ public class WeaponManager : Singleton<WeaponManager>
     {
         // 씬이 로드될 때마다 firePoint 찾기
         FindFirePoint();
+        
+        // 이펙트 매니저 재초기화
+        if (effectManager != null)
+        {
+            effectManager.Initialize();
+        }
+        
+        // 이벤트 리스너 재등록
+        RegisterEventListeners();
     }
 
     private void FindFirePoint()
@@ -85,6 +94,26 @@ public class WeaponManager : Singleton<WeaponManager>
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
+        
+        // 이벤트 구독 해제
+        if (ammoManager != null)
+        {
+            ammoManager.OnAmmoChanged -= HandleAmmoChanged;
+        }
+        
+        if (chargeManager != null)
+        {
+            chargeManager.OnChargeLevelChanged -= effectManager.PlayChargeLevelSound;
+            chargeManager.OnChargePressureChanged -= effectManager.UpdatePressureEffect;
+        }
+    }
+
+    private void HandleAmmoChanged(int current, int max)
+    {
+        if (PlayerUI.Instance != null)
+        {
+            PlayerUI.Instance.UpdateAmmoUI(current, max);
+        }
     }
 
     private void Start()
@@ -211,11 +240,22 @@ public class WeaponManager : Singleton<WeaponManager>
     private void RegisterEventListeners()
     {
         // 차징 관련 이벤트 등록
-        chargeManager.OnChargeLevelChanged += effectManager.PlayChargeLevelSound;
-        chargeManager.OnChargePressureChanged += effectManager.UpdatePressureEffect;
+        if (chargeManager != null && effectManager != null)
+        {
+            chargeManager.OnChargeLevelChanged -= effectManager.PlayChargeLevelSound;
+            chargeManager.OnChargePressureChanged -= effectManager.UpdatePressureEffect;
+            
+            chargeManager.OnChargeLevelChanged += effectManager.PlayChargeLevelSound;
+            chargeManager.OnChargePressureChanged += effectManager.UpdatePressureEffect;
+        }
 
         // 탄약 관련 이벤트 전달
         ammoManager.OnAmmoChanged += (current, max) => OnAmmoChanged?.Invoke(current, max);
+        if (ammoManager != null)
+        {
+            ammoManager.OnAmmoChanged -= HandleAmmoChanged;
+            ammoManager.OnAmmoChanged += HandleAmmoChanged;
+        }
     }
 
     // 일반 총알 발사
