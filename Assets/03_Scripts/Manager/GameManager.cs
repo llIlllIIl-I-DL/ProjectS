@@ -69,7 +69,8 @@ public class GameManager : MonoBehaviour
             
             // 씬 전환 이벤트 구독
             SceneManager.sceneLoaded += OnSceneLoaded;
-            
+            FindObjectOfType<CustomRebind>()?.ApplyAllSavedBindings();
+
             // 초기화는 Start에서 진행
             isGameInitialized = false;
         }

@@ -62,9 +62,15 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput. IPlayerActions
 
     private void Awake()
     {
-        playerInputs = new PlayerInput();
+        // InputManager가 없으면 생성
+        if (InputManager.Instance == null)
+        {
+            GameObject inputManagerObj = new GameObject("InputManager");
+            inputManagerObj.AddComponent<InputManager>();
+        }
 
-        // 콜백 설정
+        // InputManager의 playerInput 사용
+        playerInputs = InputManager.Instance.playerInput;
         playerInputs.Player.SetCallbacks(this);
     }
 
