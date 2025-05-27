@@ -34,17 +34,18 @@ public class ObjectPool
     {
         GameObject obj = pool.Count > 0 ? pool.Dequeue() : CreateNewObject();
         
-        if (parent != null)
+        // 총알인 경우 부모를 null로 설정
+        Bullet bullet = obj.GetComponent<Bullet>();
+        if (bullet != null)
+        {
+            obj.transform.SetParent(null);
+        }
+        else if (parent != null)
         {
             obj.transform.SetParent(parent);
             obj.transform.localPosition = Vector3.zero;
         }
-        else
-        {
-            obj.transform.SetParent(null);
-        }
         
-        Bullet bullet = obj.GetComponent<Bullet>();
         if (bullet != null)
         {
             bullet.ResetBullet();
@@ -74,6 +75,7 @@ public class ObjectPool
         }
         
         obj.SetActive(false);
+        // 해당 풀 타입의 부모 오브젝트의 자식으로 반환
         obj.transform.SetParent(poolParent);
         pool.Enqueue(obj);
     }
@@ -273,6 +275,13 @@ public class ObjectPoolingManager : MonoBehaviour
     // 총알 반환하기
     public void ReturnBullet(GameObject bullet, ElementType bulletType)
     {
+        // EnemyBullet 컴포넌트가 있으면 무조건 EnemyBullet 풀로 반환
+        if (bullet.GetComponent<EnemyBullet>() != null)
+        {
+            ReturnObject(bullet, PoolType.EnemyBullet);
+            return;
+        }
+
         if (bulletTypeToPoolType.TryGetValue(bulletType, out PoolType poolType))
         {
             ReturnObject(bullet, poolType);

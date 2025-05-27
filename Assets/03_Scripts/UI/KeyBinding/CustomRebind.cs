@@ -29,7 +29,7 @@ public class CustomRebind : MonoBehaviour
     {
         if (InputManager.Instance == null || InputManager.Instance.playerInput == null)
         {
-            Debug.LogError("InputManager.Instance 또는 playerInput이 null입니다.");
+            Debug.LogWarning("InputManager.Instance 또는 playerInput이 null입니다.");
             return;
         }
 
@@ -161,7 +161,7 @@ public class CustomRebind : MonoBehaviour
     {
         if (InputManager.Instance == null || InputManager.Instance.playerInput == null)
         {
-            Debug.LogError("InputManager.Instance 또는 playerInput이 null입니다.");
+            Debug.Log("InputManager.Instance 또는 playerInput이 null입니다.");
             return;
         }
 
