@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BossRoomTrigger : MonoBehaviour
+public class BossRoomEnterTrigger : MonoBehaviour
 {
     [Header("보스 참조")]
     [SerializeField] private BossStateMachine bossSM;
@@ -20,7 +20,7 @@ public class BossRoomTrigger : MonoBehaviour
         if (triggerArea != null && !triggerArea.isTrigger)
         {
             triggerArea.isTrigger = true;
-            Debug.Log("[BossRoomTrigger] 콜라이더를 트리거로 설정했습니다.");
+            Debug.Log("[BossRoomEnterTrigger] 콜라이더를 트리거로 설정했습니다.");
         }
         
         // 보스 참조 확인
@@ -28,7 +28,7 @@ public class BossRoomTrigger : MonoBehaviour
         {
             bossSM = FindObjectOfType<BossStateMachine>();
             if (bossSM == null)
-                Debug.LogError("[BossRoomTrigger] 보스 스테이트 머신을 찾을 수 없습니다.");
+                Debug.LogError("[BossRoomEnterTrigger] 보스 스테이트 머신을 찾을 수 없습니다.");
         }
     }
     
@@ -38,7 +38,7 @@ public class BossRoomTrigger : MonoBehaviour
         
         if (other.CompareTag(GameConstants.Tags.PLAYER))
         {
-            Debug.Log("[BossRoomTrigger] 플레이어가 보스룸에 입장했습니다!");
+            Debug.Log("[BossRoomEnterTrigger] 플레이어가 보스룸에 입장했습니다!");
             
             // 보스에게 플레이어 감지 알림
             if (bossSM != null)
@@ -50,21 +50,21 @@ public class BossRoomTrigger : MonoBehaviour
             }
         }
     }
-    
+
     private void OnTriggerExit2D(Collider2D other)
     {
         if (other.CompareTag(GameConstants.Tags.PLAYER))
         {
             Debug.Log("[BossRoomTrigger] 플레이어가 보스룸을 벗어났습니다!");
-            
-            // 보스에게 플레이어 감지 종료 알림 (선택 사항)
-            // if (bossSM != null)
-            // {
-            //     bossSM.LosePlayerDetection();
-            // }
+
+            // 보스 비활성화 처리
+            if (bossSM != null)
+            {
+                bossSM.ResetBoss(); // 리셋 호출
+            }
         }
     }
-    
+
     private void OnDrawGizmos()
     {
         // 트리거 영역 시각화

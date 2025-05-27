@@ -26262,12 +26262,20 @@ PrefabInstance:
       value: Boss
       objectReference: {fileID: 0}
     - target: {fileID: 6037248528551649251, guid: 2c3a3642b8b4bdc4da4f67d532b07284, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6037248528551649251, guid: 2c3a3642b8b4bdc4da4f67d532b07284, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6037248528551649251, guid: 2c3a3642b8b4bdc4da4f67d532b07284, type: 3}
       propertyPath: m_LocalPosition.x
       value: 113.87
       objectReference: {fileID: 0}
     - target: {fileID: 6037248528551649251, guid: 2c3a3642b8b4bdc4da4f67d532b07284, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -35.98
+      value: -36.15
       objectReference: {fileID: 0}
     - target: {fileID: 6037248528551649251, guid: 2c3a3642b8b4bdc4da4f67d532b07284, type: 3}
       propertyPath: m_LocalPosition.z
@@ -27196,11 +27204,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 358750963785422038, guid: d953f671fee6db8409f1d4ede587d7f6, type: 3}
       propertyPath: m_Name
-      value: BossRoomTrigger
+      value: BossRoomEnterTrigger
       objectReference: {fileID: 0}
     - target: {fileID: 4937170789849778092, guid: d953f671fee6db8409f1d4ede587d7f6, type: 3}
       propertyPath: m_LocalScale.x
-      value: 10
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 4937170789849778092, guid: d953f671fee6db8409f1d4ede587d7f6, type: 3}
       propertyPath: m_LocalScale.y
@@ -27208,7 +27216,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4937170789849778092, guid: d953f671fee6db8409f1d4ede587d7f6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 100
+      value: 103.85
       objectReference: {fileID: 0}
     - target: {fileID: 4937170789849778092, guid: d953f671fee6db8409f1d4ede587d7f6, type: 3}
       propertyPath: m_LocalPosition.y

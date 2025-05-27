@@ -23,6 +23,9 @@ public class BossStateMachine : MonoBehaviour
     public GameObject projectilePrefab;
     public Transform firePoint;
 
+    [Header("보스 초기 위치")]
+    private Vector3 originalPosition;
+
     [Header("설정")]
     public float chaseRange = 5f;
     public bool isFastChasingAfterProjectile = false;
@@ -63,6 +66,7 @@ public class BossStateMachine : MonoBehaviour
     private void Start()
     {
         playerTransform = GameObject.FindWithTag(GameConstants.Tags.PLAYER)?.transform;
+        originalPosition = transform.position;
 
         // 상태 초기화
         InitializeStates();
@@ -206,5 +210,37 @@ public class BossStateMachine : MonoBehaviour
     public void UpdateKickCooldown()
     {
         lastKickTime = Time.time;
+    }
+
+    public void ResetBoss()
+    {
+        Debug.Log("[BossStateMachine] 보스 리셋!");
+
+        // 1. 비활성화 상태로 전환
+        isActive = false;
+        isDead = false;
+        playerTransform = null;
+
+        // 2. 체력 회복
+        if (bossHealth != null)
+        {
+            bossHealth.ResetHealth(); // 아래에 정의 필요
+        }
+
+        // 3. 상태 초기화
+        ChangeState(BossState.Inactive);
+
+        // 4. 위치 초기화 (선택적)
+        transform.position = originalPosition; // 초기 위치 저장 필요
+
+        // 5. 애니메이터 초기화
+        if (animator != null)
+        {
+            animator.Rebind(); // 애니메이션 초기화
+            animator.Update(0f);
+        }
+
+        // 6. 쿨다운 초기화
+        lastKickTime = -Mathf.Infinity;
     }
 }
