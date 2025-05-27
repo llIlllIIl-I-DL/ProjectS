@@ -125,6 +125,8 @@ public class InputUI : MonoBehaviour
 
     public void ToMainMenu()
     {
+        //열려있는 모든 UI를 닫습니다.
+        UIManager.Instance.CloseAllPage();
         SceneManager.LoadScene("StartScene", LoadSceneMode.Single);
     }
 }
