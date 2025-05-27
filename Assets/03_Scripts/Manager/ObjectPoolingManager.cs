@@ -39,6 +39,10 @@ public class ObjectPool
             obj.transform.SetParent(parent);
             obj.transform.localPosition = Vector3.zero;
         }
+        else
+        {
+            obj.transform.SetParent(null);
+        }
         
         obj.SetActive(true);
         return obj;
@@ -133,6 +137,7 @@ public class ObjectPoolingManager : MonoBehaviour
 
     private Camera mainCamera;
     private float viewportMargin = -0.1f; // 뷰포트 경계에서의 여유 공간
+    private float worldBoundaryMargin = 1f; // 월드 경계에서의 여유 공간
 
     private void Awake()
     {
@@ -164,10 +169,10 @@ public class ObjectPoolingManager : MonoBehaviour
 
     private void Update()
     {
-        CheckBulletsInViewport();
+        CheckBulletsInWorld();
     }
 
-    private void CheckBulletsInViewport()
+    private void CheckBulletsInWorld()
     {
         if (mainCamera == null) return;
 
@@ -177,12 +182,11 @@ public class ObjectPoolingManager : MonoBehaviour
         {
             if (!bullet.gameObject.activeInHierarchy) continue;
 
-            Vector3 viewportPoint = mainCamera.WorldToViewportPoint(bullet.transform.position);
-            if (viewportPoint.x < -viewportMargin ||
-                viewportPoint.x > 1 + viewportMargin ||
-                viewportPoint.y < -viewportMargin ||
-                viewportPoint.y > 1 + viewportMargin ||
-                viewportPoint.z < 0)
+            Vector3 bulletPosition = bullet.transform.position;
+            
+            // 월드 좌표 기준으로 경계 체크
+            if (Mathf.Abs(bulletPosition.x) > 20f + worldBoundaryMargin || // 적절한 월드 경계값으로 조정
+                Mathf.Abs(bulletPosition.y) > 20f + worldBoundaryMargin)   // 적절한 월드 경계값으로 조정
             {
                 ObjectPoolingManager.Instance.ReturnBullet(bullet.gameObject, bullet.BulletType);
             }

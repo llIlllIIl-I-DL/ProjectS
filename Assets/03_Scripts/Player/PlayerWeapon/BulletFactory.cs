@@ -18,8 +18,8 @@ public class BulletFactory : MonoBehaviour
 
     public GameObject CreateBullet(ElementType type, Vector3 pos, Quaternion rot, GameObject shooter)
     {
-        // ObjectPoolingManager를 통해 총알 가져오기
-        GameObject bulletObj = ObjectPoolingManager.Instance.GetBullet(type, shooter.transform);
+        // 부모를 null로 넘김
+        GameObject bulletObj = ObjectPoolingManager.Instance.GetBullet(type, null);
         if (bulletObj == null)
         {
             Debug.LogWarning($"Failed to get bullet from pool for type: {type}");
