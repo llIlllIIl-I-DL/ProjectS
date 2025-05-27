@@ -44,6 +44,12 @@ public class ObjectPool
             obj.transform.SetParent(null);
         }
         
+        Bullet bullet = obj.GetComponent<Bullet>();
+        if (bullet != null)
+        {
+            bullet.ResetBullet();
+        }
+        
         obj.SetActive(true);
         return obj;
     }
