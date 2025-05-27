@@ -662,30 +662,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4118599055586503967, guid: 22eb52c076f95d14da938a3812493791, type: 3}
-      propertyPath: actionName
-      value: Attack
-      objectReference: {fileID: 0}
-    - target: {fileID: 4118599055586503967, guid: 22eb52c076f95d14da938a3812493791, type: 3}
-      propertyPath: actionType
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 5003367392155063107, guid: 22eb52c076f95d14da938a3812493791, type: 3}
-      propertyPath: actionName
-      value: Jump
-      objectReference: {fileID: 0}
-    - target: {fileID: 5003367392155063107, guid: 22eb52c076f95d14da938a3812493791, type: 3}
-      propertyPath: actionType
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6312265313130995474, guid: 22eb52c076f95d14da938a3812493791, type: 3}
-      propertyPath: actionName
-      value: Dash
-      objectReference: {fileID: 0}
-    - target: {fileID: 6312265313130995474, guid: 22eb52c076f95d14da938a3812493791, type: 3}
-      propertyPath: actionType
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8389524016363950343, guid: 22eb52c076f95d14da938a3812493791, type: 3}
       propertyPath: m_Name
       value: SettingUI new
@@ -752,6 +728,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2814908013609280432, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: inputUI
+      value: 
+      objectReference: {fileID: 1976624743379527755}
     - target: {fileID: 2814908013609280432, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
       propertyPath: allUIPages.Array.data[0]
       value: 
