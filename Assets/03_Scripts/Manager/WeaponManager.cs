@@ -85,6 +85,16 @@ public class WeaponManager : Singleton<WeaponManager>
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
+        if (ammoManager != null)
+        {
+            ammoManager.OnAmmoChanged -= (current, max) =>
+            {
+                if (PlayerUI.Instance != null)
+                {
+                    PlayerUI.Instance.UpdateAmmoUI(current, max);
+                }
+            };
+        }
     }
 
     private void Start()
@@ -215,7 +225,16 @@ public class WeaponManager : Singleton<WeaponManager>
         chargeManager.OnChargePressureChanged += effectManager.UpdatePressureEffect;
 
         // 탄약 관련 이벤트 전달
-        ammoManager.OnAmmoChanged += (current, max) => OnAmmoChanged?.Invoke(current, max);
+        if (ammoManager != null)
+        {
+            ammoManager.OnAmmoChanged += (current, max) =>
+            {
+                if (PlayerUI.Instance != null)
+                {
+                    PlayerUI.Instance.UpdateAmmoUI(current, max);
+                }
+            };
+        }
     }
 
     // 일반 총알 발사

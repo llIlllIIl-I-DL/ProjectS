@@ -67,6 +67,7 @@ public class BossWarningUI : MonoBehaviour
 
     public void DestroyUI()
     {
+        UIManager.Instance.playerInputHandler.IsInteracting = false;
         bossWarningUI.SetActive(false);
         Time.timeScale = 1f;
     }

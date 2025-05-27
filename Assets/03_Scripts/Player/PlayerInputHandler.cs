@@ -4,9 +4,18 @@ using UnityEngine.InputSystem;
 using System.Collections;
 
 
-public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
+public class PlayerInputHandler : MonoBehaviour, PlayerInput. IPlayerActions
 {
     private BaseObject baseObject;
+
+    private bool isInteracting = false;
+
+    public bool IsInteracting
+    {
+        get => isInteracting;
+        set => isInteracting = value;
+    }
+
 
     [SerializeField] private float interactionRadius = 2f; // 상호작용 가능 범위
     [SerializeField] private float doubleTapTime = 0.5f;
@@ -124,6 +133,9 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
     // PlayerInput.IPlayerActions 인터페이스 구현
     public void OnMove(InputAction.CallbackContext context)
     {
+        if (isInteracting == true)
+            return;
+
         if (context.performed || context.canceled)
         {
             Vector2 inputVector = context.ReadValue<Vector2>();
@@ -221,10 +233,14 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
                 IsChargingAttack = false;
                 OnAttackRelease?.Invoke();
                 OnChargeAttackRelease?.Invoke();
-                WeaponManager.Instance.StopCharging();
                 
-                // 약간의 지연 후 새로운 차징 시작
-                StartCoroutine(StartNewChargingAfterDelay(0.05f));
+                // WeaponManager null 체크 추가
+                if (WeaponManager.Instance != null)
+                {
+                    WeaponManager.Instance.StopCharging();
+                    // 약간의 지연 후 새로운 차징 시작
+                    StartCoroutine(StartNewChargingAfterDelay(0.05f));
+                }
             }
             else
             {
@@ -232,7 +248,12 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
                 IsChargingAttack = true;
                 OnAttackInput?.Invoke();
                 OnChargeAttackStart?.Invoke();
-                WeaponManager.Instance.StartCharging();
+                
+                // WeaponManager null 체크 추가
+                if (WeaponManager.Instance != null)
+                {
+                    WeaponManager.Instance.StartCharging();
+                }
             }
         }
         else if (context.canceled)
@@ -246,7 +267,12 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
                 IsChargingAttack = false;
                 OnAttackRelease?.Invoke();
                 OnChargeAttackRelease?.Invoke();
-                WeaponManager.Instance.StopCharging();
+                
+                // WeaponManager null 체크 추가
+                if (WeaponManager.Instance != null)
+                {
+                    WeaponManager.Instance.StopCharging();
+                }
             }
         }
     }
@@ -263,7 +289,12 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
             IsChargingAttack = true;
             OnAttackInput?.Invoke();
             OnChargeAttackStart?.Invoke();
-            WeaponManager.Instance.StartCharging();
+            
+            // WeaponManager null 체크 추가
+            if (WeaponManager.Instance != null)
+            {
+                WeaponManager.Instance.StartCharging();
+            }
         }
     }
 
@@ -355,6 +386,8 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
 
     public void OnInteraction(InputAction.CallbackContext context)
     {
+        IsInteracting = !IsInteracting;
+
         if (context.started)
         {
             Debug.Log("상호작용 입력 감지");
@@ -390,5 +423,38 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput.IPlayerActions
         DashPressed = false;
         IsAttackPressed = false;
         IsChargingAttack = false;
+    }
+
+    public void OnInventory(InputAction.CallbackContext context)
+    {
+        if (isInteracting == true)
+            return;
+
+        if (context.started)
+        {
+            UIManager.Instance.inputUI.OpenInventory();
+        }
+    }
+
+    public void OnMap(InputAction.CallbackContext context)
+    {
+        if (isInteracting == true)
+            return;
+
+        if (context.started)
+        {
+            UIManager.Instance.inputUI.OpenMap();
+        }
+    }
+
+    public void OnPauseMenu(InputAction.CallbackContext context)
+    {
+        if (isInteracting == true)
+            return;
+
+        if (context.started)
+        {
+            UIManager.Instance.inputUI.OpenPauseMenu();
+        }
     }
 }

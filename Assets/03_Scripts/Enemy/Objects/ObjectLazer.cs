@@ -92,8 +92,9 @@ public class ObjectLazer : BaseObject
             Debug.Log("레이저 쿨다운 중...");
             return;
         }
-        
+
         // 레이저 켜기
+        UIManager.Instance.playerInputHandler.IsInteracting = false;
         OnLazer();
     }
 

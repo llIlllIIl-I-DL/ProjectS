@@ -16,7 +16,6 @@ public class NPC : BaseObject
     protected override void OnInteract(GameObject interactor)
     {
         TalkToNPC();
-
     }
 
     protected override void OnTriggerExit2D(Collider2D collider2D)
@@ -51,7 +50,6 @@ public class NPC : BaseObject
     {
         if (istalking == false)
         {
-            InteractionKeyInput.BlockAllExceptF = true;
             UIManager.Instance.NPCTalkInteraction(npcFaceIcon);
             Destroy(interactionButtonUI);
             istalking = true;
@@ -60,7 +58,6 @@ public class NPC : BaseObject
 
         else
         {
-            InteractionKeyInput.BlockAllExceptF = false;
             UIManager.Instance.ClosedNPCTalkInteraction(npcFaceIcon);
             istalking = false;
         }

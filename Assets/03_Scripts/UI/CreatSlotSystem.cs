@@ -75,7 +75,6 @@ public class CreatSlotSystem : MonoBehaviour
     {
         for (int i = 0; i < slotCount; i++)
         {
-            Debug.Log($"슬롯 생성 중: {i}");
             InvenSlotUI newSlot = Instantiate(slotPrefab, slotParent);
             slotList.Add(newSlot);
         }
