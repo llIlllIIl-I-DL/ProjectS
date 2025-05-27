@@ -141,9 +141,7 @@ public class ObjectPoolingManager : MonoBehaviour
     // ElementType과 PoolType 매핑
     private Dictionary<ElementType, PoolType> bulletTypeToPoolType = new Dictionary<ElementType, PoolType>();
 
-    private Camera mainCamera;
-    private float viewportMargin = -0.1f; // 뷰포트 경계에서의 여유 공간
-    private float worldBoundaryMargin = 1f; // 월드 경계에서의 여유 공간
+    [SerializeField] private Collider2D bulletBoundary; // 인스펙터에서 직접 할당 가능
 
     private void Awake()
     {
@@ -156,13 +154,6 @@ public class ObjectPoolingManager : MonoBehaviour
         _instance = this;
         DontDestroyOnLoad(gameObject);
 
-        // 메인 카메라 찾기
-        mainCamera = Camera.main;
-        if (mainCamera == null)
-        {
-            Debug.LogWarning("메인 카메라를 찾을 수 없습니다!");
-        }
-
         // 디버프 프리팹 매핑
         InitializeDebuffPrefabMapping();
         
@@ -171,29 +162,36 @@ public class ObjectPoolingManager : MonoBehaviour
 
         // 초기화 메서드에 추가
         InitializeBulletMapping();
+
+        // 인스펙터에서 할당하지 않았다면 Find로 시도
+        if (bulletBoundary == null)
+        {
+            GameObject boundaryObj = GameObject.FindWithTag("BulletBoundary");
+            if (boundaryObj != null)
+                bulletBoundary = boundaryObj.GetComponent<Collider2D>();
+        }
+        if (bulletBoundary == null)
+            Debug.LogWarning("플레이어의 경계 콜라이더(bulletBoundary)를 찾을 수 없습니다! 총알 반환이 정상 동작하지 않을 수 있습니다.");
     }
 
     private void Update()
     {
-        CheckBulletsInWorld();
+        CheckBulletsInBoundary();
     }
 
-    private void CheckBulletsInWorld()
+    private void CheckBulletsInBoundary()
     {
-        if (mainCamera == null) return;
+        if (bulletBoundary == null) return;
 
-        // 씬 전체에서 Bullet 컴포넌트를 가진 활성 오브젝트를 모두 찾음
         Bullet[] bullets = GameObject.FindObjectsOfType<Bullet>(false);
         foreach (var bullet in bullets)
         {
             if (!bullet.gameObject.activeInHierarchy) continue;
 
             Vector3 bulletPosition = bullet.transform.position;
-            
-            // 월드 좌표 기준으로 경계 체크
-            if (Mathf.Abs(bulletPosition.x) > 20f + worldBoundaryMargin || // 적절한 월드 경계값으로 조정
-                Mathf.Abs(bulletPosition.y) > 20f + worldBoundaryMargin)   // 적절한 월드 경계값으로 조정
+            if (!bulletBoundary.bounds.Contains(bulletPosition))
             {
+                Debug.Log($"총알 위치 {bulletPosition} / 경계 {bulletBoundary.bounds.center}, {bulletBoundary.bounds.size}");
                 ObjectPoolingManager.Instance.ReturnBullet(bullet.gameObject, bullet.BulletType);
             }
         }
