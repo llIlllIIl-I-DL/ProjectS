@@ -523,4 +523,55 @@ public class PlayerUI : MonoBehaviour
         SceneManager.LoadScene("StartScene", LoadSceneMode.Single);
         Debug.Log("스타트씬 이동!!");
     }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        RefreshUI();
+    }
+    public void RefreshUI()
+    {
+        player = FindObjectOfType<Player>();
+        if (player == null)
+        {
+            Debug.LogWarning("Player not found!");
+            return;
+        }
+        playerHP = GameObject.FindGameObjectWithTag("Player")?.GetComponent<PlayerHP>();
+        if (playerHP == null)
+        {
+            Debug.LogWarning("PlayerHP component not found!");
+            return;
+        }
+        playercollider = GameObject.FindGameObjectWithTag("Player")?.GetComponent<BoxCollider2D>();
+        if (playercollider == null)
+        {
+            Debug.LogWarning("BoxCollider2D component not found!");
+            return;
+        }
+        playerHP.OnHPChanged += OnPlayerHPChanged;
+        float maxHP = playerHP.MaxHP;
+        float currentHP = playerHP.CurrentHP;
+        if (WeaponManager.Instance != null)
+        {
+            int ammo = WeaponManager.Instance.AmmoManager.CurrentAmmo;
+            int maxAmmo = WeaponManager.Instance.AmmoManager.MaxAmmo;
+            WeaponManager.Instance.OnAmmoChanged += UpdateAmmoUI;
+            UpdateAmmoUI(ammo, maxAmmo);
+        }
+        if (InventoryManager.Instance != null)
+        {
+            InventoryManager.Instance.OnWeaponAttributeChanged += UpdateWeaponAttributeUI;
+            UpdateWeaponAttributeUI(InventoryManager.Instance.EquippedWeaponAttribute);
+        }
+        UpdatePlayerHPInUItext();
+        SetHealthBar(playerHP.MaxHP, playerHP.CurrentHP);
+    }
 }
