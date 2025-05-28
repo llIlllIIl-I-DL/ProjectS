@@ -164,6 +164,14 @@ public abstract class Bullet : MonoBehaviour
         // 발사자와의 충돌 무시
         if (other.gameObject == Shooter) return;
         
+        // Wall이나 Ground 레이어와 충돌 시 총알 반환
+        if (other.gameObject.layer == LayerMask.NameToLayer("Wall") || 
+            other.gameObject.layer == LayerMask.NameToLayer("Ground"))
+        {
+            ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
+            return;
+        }
+        
         // 기존 충돌 처리 로직
         string otherTag = other.tag;
         if (collisionHandlers != null && collisionHandlers.TryGetValue(otherTag, out var handler))
@@ -291,6 +299,18 @@ public abstract class Bullet : MonoBehaviour
         {
             Debug.LogError("Player 태그를 가진 오브젝트를 찾을 수 없습니다!");
         }
+    }
+
+    private void HandleWallCollision(Collider2D other)
+    {
+        // 벽과 충돌 시 총알 반환
+        ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
+    }
+
+    private void HandleGroundCollision(Collider2D other)
+    {
+        // 바닥과 충돌 시 총알 반환
+        ObjectPoolingManager.Instance.ReturnBullet(gameObject, BulletType);
     }
 }
 
