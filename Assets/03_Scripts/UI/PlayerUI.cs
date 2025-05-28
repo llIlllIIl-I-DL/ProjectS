@@ -18,8 +18,9 @@ public class PlayerUI : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
-        else
+        else if (Instance != this)
         {
             Destroy(gameObject);
         }
@@ -78,9 +79,31 @@ public class PlayerUI : MonoBehaviour
 
     public void Start()
     {
+        if (Instance != this)
+        {
+            return;
+        }
+
         player = FindObjectOfType<Player>();
-        playerHP = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHP>();
-        playercollider = GameObject.FindGameObjectWithTag("Player").GetComponent<BoxCollider2D>();
+        if (player == null)
+        {
+            Debug.LogWarning("Player not found!");
+            return;
+        }
+
+        playerHP = GameObject.FindGameObjectWithTag("Player")?.GetComponent<PlayerHP>();
+        if (playerHP == null)
+        {
+            Debug.LogWarning("PlayerHP component not found!");
+            return;
+        }
+
+        playercollider = GameObject.FindGameObjectWithTag("Player")?.GetComponent<BoxCollider2D>();
+        if (playercollider == null)
+        {
+            Debug.LogWarning("BoxCollider2D component not found!");
+            return;
+        }
 
         // HP 변경 이벤트 구독
         playerHP.OnHPChanged += OnPlayerHPChanged;
@@ -88,18 +111,20 @@ public class PlayerUI : MonoBehaviour
         float maxHP = playerHP.MaxHP;
         float currentHP = playerHP.CurrentHP;
 
-        int ammo = WeaponManager.Instance.AmmoManager.CurrentAmmo;
-        int maxAmmo = WeaponManager.Instance.AmmoManager.MaxAmmo;
-
-        
-
-        // 탄약 변경 이벤트 구독
         if (WeaponManager.Instance != null)
         {
+            int ammo = WeaponManager.Instance.AmmoManager.CurrentAmmo;
+            int maxAmmo = WeaponManager.Instance.AmmoManager.MaxAmmo;
+
+            // 탄약 변경 이벤트 구독
             WeaponManager.Instance.OnAmmoChanged += UpdateAmmoUI;
+            // 초기 Ammo UI 업데이트
+            UpdateAmmoUI(ammo, maxAmmo);
         }
-        // 초기 Ammo UI 업데이트
-        UpdateAmmoUI(ammo, maxAmmo);
+        else
+        {
+            Debug.LogWarning("WeaponManager.Instance is null!");
+        }
 
         Vector3 realPosition = healthBar.transform.position;
         Debug.Log($"{realPosition}");
@@ -111,11 +136,18 @@ public class PlayerUI : MonoBehaviour
         {
             InventoryManager.Instance.OnWeaponAttributeChanged += UpdateWeaponAttributeUI;
         }
+        else
+        {
+            Debug.LogWarning("InventoryManager.Instance is null!");
+        }
 
         UpdatePlayerHPInUItext();
         SetHealthBar(playerHP.MaxHP, playerHP.CurrentHP);
         // 초기 무기 속성 설정
-        UpdateWeaponAttributeUI(InventoryManager.Instance.EquippedWeaponAttribute);
+        if (InventoryManager.Instance != null)
+        {
+            UpdateWeaponAttributeUI(InventoryManager.Instance.EquippedWeaponAttribute);
+        }
     }
 
     private void OnPlayerHPChanged(float maxHP, float currentHP)

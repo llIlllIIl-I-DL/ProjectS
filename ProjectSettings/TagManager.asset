@@ -17,6 +17,7 @@ TagManager:
   - PlayerAttack
   - Wall
   - NPC
+  - BulletBoundary
   layers:
   - Default
   - TransparentFX
@@ -34,8 +35,8 @@ TagManager:
   - Boss
   - Projectile
   - Conveyor
-  - 
-  - 
+  - Map
+  - MapIcon
   - 
   - 
   - 

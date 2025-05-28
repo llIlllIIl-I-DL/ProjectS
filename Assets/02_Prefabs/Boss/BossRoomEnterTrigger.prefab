@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2809206034831110366}
   - component: {fileID: 9124627581676010502}
   m_Layer: 0
-  m_Name: BossRoomTrigger
+  m_Name: BossRoomEnterTrigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

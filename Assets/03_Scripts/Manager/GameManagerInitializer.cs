@@ -20,4 +20,17 @@ public class GameManagerInitializer : MonoBehaviour
             Debug.Log("GameManager를 생성했습니다.");
         }
     }
+
+    private void Start()
+    {
+        // GameManager가 제대로 초기화되었는지 확인
+        if (GameManager.Instance != null)
+        {
+            Debug.Log("GameManager 초기화 완료");
+        }
+        else
+        {
+            Debug.LogWarning("GameManager 초기화 실패");
+        }
+    }
 } 

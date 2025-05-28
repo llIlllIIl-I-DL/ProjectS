@@ -81,6 +81,11 @@ public class BossHealth : MonoBehaviour, IDebuffable
             OnBossDied?.Invoke();
         }
     }
+    public void ResetHealth()
+    {
+        currentHP = maxHP;
+        // 체력바도 필요시 초기화
+    }
 
     public float GetCurrentHP() => currentHP;
 }

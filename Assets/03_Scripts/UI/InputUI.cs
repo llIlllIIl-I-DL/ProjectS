@@ -41,20 +41,20 @@ public class InputUI : MonoBehaviour
 
     public void OpenPauseMenu()
     {
-            if (npc.istalking == false)
+        if (npc == null || !npc.istalking)
+        {
+            // 열려있는 UI가 있는지 확인.
+            if (IsAnyUIActive(true))
             {
-                // 열려있는 UI가 있는지 확인.
-                if (IsAnyUIActive(true))
-                {
-                    UIManager.Instance.CloseAllPage();
-                    isPauseMenuOpen = false;
-                }
-                else
-                {
-                    PauseMenu(pauseMenu);
-                }
+                UIManager.Instance.CloseAllPage();
+                isPauseMenuOpen = false;
+            }
+            else
+            {
+                PauseMenu(pauseMenu);
             }
         }
+    }
 
     public void OpenMap()
     {
@@ -125,6 +125,8 @@ public class InputUI : MonoBehaviour
 
     public void ToMainMenu()
     {
+        //열려있는 모든 UI를 닫습니다.
+        UIManager.Instance.CloseAllPage();
         SceneManager.LoadScene("StartScene", LoadSceneMode.Single);
     }
 }
