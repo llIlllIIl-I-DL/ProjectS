@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 1480243169832319279}
   - component: {fileID: 4876743641536663670}
   - component: {fileID: 4410121900498740424}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Object_Window
-  m_TagString: Destructible
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -148,6 +148,7 @@ MonoBehaviour:
   possibleDrops: []
   dropChance: 0.3
   destroyEffectPrefab: {fileID: 9002412034580591336, guid: f1cc85886470c4439807cdfe8684bee1, type: 3}
+  hitEffectPrefab: {fileID: 0}
   dustEffectPrefab: {fileID: 0}
   destroySound: {fileID: 0}
   hitSound: {fileID: 0}
