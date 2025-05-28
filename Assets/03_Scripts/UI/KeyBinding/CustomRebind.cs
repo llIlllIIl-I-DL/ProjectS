@@ -8,14 +8,7 @@ public class CustomRebind : MonoBehaviour
     void Awake()
     {
         DontDestroyOnLoad(gameObject);
-        
-        // InputManager가 없으면 생성
-        if (InputManager.Instance == null)
-        {
-            GameObject inputManagerObj = new GameObject("InputManager");
-            inputManagerObj.AddComponent<InputManager>();
-        }
-        
+        // InputManager를 직접 생성하지 않고, 싱글톤 인스턴스만 참조
         ApplyAllSavedBindings();
     }
 
