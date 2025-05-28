@@ -26251,7 +26251,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1639416485537054702, guid: 2c3a3642b8b4bdc4da4f67d532b07284, type: 3}
       propertyPath: m_FlipX
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1639416485537054702, guid: 2c3a3642b8b4bdc4da4f67d532b07284, type: 3}
       propertyPath: m_FlipY
@@ -26309,6 +26309,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8649766649589793062, guid: 2c3a3642b8b4bdc4da4f67d532b07284, type: 3}
+      propertyPath: bossTransform
+      value: 
+      objectReference: {fileID: 6037248528551649251, guid: 2c3a3642b8b4bdc4da4f67d532b07284, type: 3}
+    - target: {fileID: 8649766649589793062, guid: 2c3a3642b8b4bdc4da4f67d532b07284, type: 3}
+      propertyPath: playerTransform
+      value: 
+      objectReference: {fileID: 3137287986617449566, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
     - target: {fileID: 9104626096230436622, guid: 2c3a3642b8b4bdc4da4f67d532b07284, type: 3}
       propertyPath: bossUI
       value: 
