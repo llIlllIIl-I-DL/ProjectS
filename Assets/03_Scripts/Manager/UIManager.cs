@@ -11,6 +11,7 @@ public class UIManager : Singleton<UIManager> //조금 리팩토링 필요!!
     public List<GameObject> allUIPages = new List<GameObject>();
 
     NPCInteract npcInteract;
+    public PlayerInputHandler playerInputHandler;
     public InputUI inputUI;
     Player player;
 
@@ -21,6 +22,7 @@ public class UIManager : Singleton<UIManager> //조금 리팩토링 필요!!
         inputUI = FindObjectOfType<InputUI>();
         player = FindObjectOfType<Player>();
 
+        playerInputHandler = player.gameObject.GetComponent<PlayerInputHandler>();
         npcInteract = GetComponent<NPCInteract>();
 
         utilityItemList.GetUtility(player); //플레이어의 특성 15개 아이템 데이터를 담아두는 리스트

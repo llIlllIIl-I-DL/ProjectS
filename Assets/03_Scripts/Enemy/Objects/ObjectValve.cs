@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using System.Linq;
-using Unity.VisualScripting.Antlr3.Runtime;
+
 
 /// <summary>
 /// 벨브 오브젝트 - 플레이어와 상호작용시 벨브를 열거나 닫음
@@ -148,28 +146,18 @@ public class ObjectValve : BaseObject
 
         if (!isOpen)
         {
+            UIManager.Instance.playerInputHandler.IsInteracting = false;
             OpenValve();
         }
 
 
 
         {
+            UIManager.Instance.playerInputHandler.IsInteracting = false;
             CloseValve();
         }
     }
     #endregion
-    /*
-    protected override void OnPlayerEnterRange(GameObject player)
-    {
-        base.OnPlayerEnterRange(player);
-    }
-    
-
-    protected override void OnPlayerExitRange(GameObject player)
-    {
-        base.OnPlayerExitRange(player);
-    }
-    */
 
     protected override void ShowInteractionPrompt()
     {

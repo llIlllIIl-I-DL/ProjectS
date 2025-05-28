@@ -161,6 +161,9 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput. IPlayerActions
     // PlayerInput.IPlayerActions 인터페이스 구현
     public void OnMove(InputAction.CallbackContext context)
     {
+        if (isInteracting == true)
+            return;
+
         if (context.performed || context.canceled)
         {
             Vector2 inputVector = context.ReadValue<Vector2>();
@@ -411,8 +414,7 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput. IPlayerActions
 
     public void OnInteraction(InputAction.CallbackContext context)
     {
-        if (!IsInteracting)
-            IsInteracting = (!false);
+        IsInteracting = !IsInteracting;
 
         if (context.started)
         {
@@ -458,8 +460,6 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput. IPlayerActions
 
         if (context.started)
         {
-            Debug.Log("I를 눌렀다!!");
-
             UIManager.Instance.inputUI.OpenInventory();
         }
     }
@@ -471,8 +471,6 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput. IPlayerActions
 
         if (context.started)
         {
-            Debug.Log("M을 눌렀다!!");
-
             UIManager.Instance.inputUI.OpenMap();
         }
     }
@@ -484,8 +482,6 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput. IPlayerActions
 
         if (context.started)
         {
-            Debug.Log("ESC를 눌렀다!!");
-
             UIManager.Instance.inputUI.OpenPauseMenu();
         }
     }
