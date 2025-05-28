@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal; // URP 카메라를 위한 네임스페이스
 
 // 개별 오브젝트 풀 클래스
 public class ObjectPool
@@ -7,6 +8,8 @@ public class ObjectPool
     private GameObject prefab;
     private Queue<GameObject> pool = new Queue<GameObject>();
     private Transform poolParent;
+
+    public Transform PoolParent => poolParent;  // poolParent에 접근하기 위한 프로퍼티 추가
 
     public ObjectPool(GameObject prefab, int initialSize, Transform parent)
     {
@@ -31,10 +34,21 @@ public class ObjectPool
     {
         GameObject obj = pool.Count > 0 ? pool.Dequeue() : CreateNewObject();
         
-        if (parent != null)
+        // 총알인 경우 부모를 null로 설정
+        Bullet bullet = obj.GetComponent<Bullet>();
+        if (bullet != null)
+        {
+            obj.transform.SetParent(null);
+        }
+        else if (parent != null)
         {
             obj.transform.SetParent(parent);
             obj.transform.localPosition = Vector3.zero;
+        }
+        
+        if (bullet != null)
+        {
+            bullet.ResetBullet();
         }
         
         obj.SetActive(true);
@@ -52,8 +66,16 @@ public class ObjectPool
             ps.Stop();
             ps.Clear();
         }
+
+        // 총알 컴포넌트 초기화
+        Bullet bullet = obj.GetComponent<Bullet>();
+        if (bullet != null)
+        {
+            bullet.ResetBullet();
+        }
         
         obj.SetActive(false);
+        // 해당 풀 타입의 부모 오브젝트의 자식으로 반환
         obj.transform.SetParent(poolParent);
         pool.Enqueue(obj);
     }
@@ -121,6 +143,8 @@ public class ObjectPoolingManager : MonoBehaviour
     // ElementType과 PoolType 매핑
     private Dictionary<ElementType, PoolType> bulletTypeToPoolType = new Dictionary<ElementType, PoolType>();
 
+    [SerializeField] private Collider2D bulletBoundary; // 인스펙터에서 직접 할당 가능
+
     private void Awake()
     {
         if (_instance != null && _instance != this)
@@ -140,6 +164,39 @@ public class ObjectPoolingManager : MonoBehaviour
 
         // 초기화 메서드에 추가
         InitializeBulletMapping();
+
+        // 인스펙터에서 할당하지 않았다면 Find로 시도
+        if (bulletBoundary == null)
+        {
+            GameObject boundaryObj = GameObject.FindWithTag("BulletBoundary");
+            if (boundaryObj != null)
+                bulletBoundary = boundaryObj.GetComponent<Collider2D>();
+        }
+        if (bulletBoundary == null)
+            Debug.LogWarning("플레이어의 경계 콜라이더(bulletBoundary)를 찾을 수 없습니다! 총알 반환이 정상 동작하지 않을 수 있습니다.");
+    }
+
+    private void Update()
+    {
+        CheckBulletsInBoundary();
+    }
+
+    private void CheckBulletsInBoundary()
+    {
+        if (bulletBoundary == null) return;
+
+        Bullet[] bullets = GameObject.FindObjectsOfType<Bullet>(false);
+        foreach (var bullet in bullets)
+        {
+            if (!bullet.gameObject.activeInHierarchy) continue;
+
+            Vector3 bulletPosition = bullet.transform.position;
+            if (!bulletBoundary.bounds.Contains(bulletPosition))
+            {
+                Debug.Log($"총알 위치 {bulletPosition} / 경계 {bulletBoundary.bounds.center}, {bulletBoundary.bounds.size}");
+                ObjectPoolingManager.Instance.ReturnBullet(bullet.gameObject, bullet.BulletType);
+            }
+        }
     }
 
     private void InitializeDebuffPrefabMapping()
@@ -218,6 +275,13 @@ public class ObjectPoolingManager : MonoBehaviour
     // 총알 반환하기
     public void ReturnBullet(GameObject bullet, ElementType bulletType)
     {
+        // EnemyBullet 컴포넌트가 있으면 무조건 EnemyBullet 풀로 반환
+        if (bullet.GetComponent<EnemyBullet>() != null)
+        {
+            ReturnObject(bullet, PoolType.EnemyBullet);
+            return;
+        }
+
         if (bulletTypeToPoolType.TryGetValue(bulletType, out PoolType poolType))
         {
             ReturnObject(bullet, poolType);

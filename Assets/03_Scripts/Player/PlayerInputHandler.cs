@@ -62,23 +62,51 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput. IPlayerActions
 
     private void Awake()
     {
-        playerInputs = new PlayerInput();
+        // InputManager가 없으면 생성
+        if (InputManager.Instance == null)
+        {
+            GameObject inputManagerObj = new GameObject("InputManager");
+            inputManagerObj.AddComponent<InputManager>();
+        }
 
-        // 콜백 설정
-        playerInputs.Player.SetCallbacks(this);
+        // InputManager의 playerInput 사용
+        if (InputManager.Instance != null)
+        {
+            playerInputs = InputManager.Instance.playerInput;
+            if (playerInputs != null)
+            {
+                playerInputs.Player.SetCallbacks(this);
+            }
+            else
+            {
+                Debug.LogError("PlayerInput이 초기화되지 않았습니다!");
+            }
+        }
+        else
+        {
+            Debug.LogError("InputManager.Instance가 null입니다!");
+        }
     }
 
     private void OnEnable()
     {
-        playerInputs.Player.Enable();
-        Debug.Log("PlayerInput이 활성화되었습니다.");
-        
-        // 이벤트 구독 상태 확인 - 디버깅용 로그 제거
+        if (playerInputs != null)
+        {
+            playerInputs.Player.Enable();
+            Debug.Log("PlayerInput이 활성화되었습니다.");
+        }
+        else
+        {
+            Debug.LogWarning("PlayerInput이 초기화되지 않아 활성화할 수 없습니다.");
+        }
     }
 
     private void OnDisable()
     {
-        playerInputs.Player.Disable();
+        if (playerInputs != null)
+        {
+            playerInputs.Player.Disable();
+        }
     }
 
     private void Update()

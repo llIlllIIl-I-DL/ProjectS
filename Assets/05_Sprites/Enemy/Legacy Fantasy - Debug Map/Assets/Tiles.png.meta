@@ -227,6 +227,48 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Door_Close
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 256
+        width: 9
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 55ff90902770640feb21e41ab973d78d
+      internalID: 1194777918
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Door_Open
+      rect:
+        serializedVersion: 2
+        x: 274
+        y: 256
+        width: 30
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9a8f4a2c9aec4492fb21ec6aad26e06c
+      internalID: 1991843533
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -239,6 +281,8 @@ TextureImporter:
     secondaryTextures: []
     nameFileIdTable:
       DefaultBottom: -325158833
+      Door_Close: 1194777918
+      Door_Open: 1991843533
       LeverTop: 294375796
       PlateTop: -2094133729
       Spike: -921233780

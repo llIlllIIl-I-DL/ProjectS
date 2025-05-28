@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/05_Sprites/Object.meta
+guid: 5e1d5f16a41c5354991d4cef9bba83a2
+folderAsset: yes
+DefaultImporter:
+========
+guid: 11a268c7fb08a439b86f32bc3020131f
+NativeFormatImporter:
+>>>>>>>> 294e2e55f9f0331a00c44843e827c0fe2e71b43c:Assets/06_Animations/Object/Door/Close.anim.meta
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

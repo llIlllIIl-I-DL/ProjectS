@@ -103,6 +103,11 @@ public class InvenInfoController : MonoBehaviour
             icon.color = color;
         }
 
+        utilityUnLockBtn.gameObject.SetActive(true);
+
+        utilityEquipBtn.gameObject.SetActive(false);
+        utilityRemoveBtn.gameObject.SetActive(false);
+
         utilityChangedStatController.currentUtilityList.Clear();
 
         isRealUtilityResetPopUp.SetActive(false);
