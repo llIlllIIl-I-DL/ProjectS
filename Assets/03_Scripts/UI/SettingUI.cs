@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class SettingUI : MonoBehaviour
 {
@@ -91,5 +92,18 @@ public class SettingUI : MonoBehaviour
         }
         // 밝기 슬라이더 동기화 (예시, 실제 밝기 값은 별도 저장 필요)
         // gammaSlider.value = ...;
+    }
+
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        UpdateUI();
     }
 }
