@@ -451,7 +451,7 @@ GameObject:
   - component: {fileID: 64423038208396272}
   m_Layer: 3
   m_Name: BulletBoundary
-  m_TagString: Untagged
+  m_TagString: BulletBoundary
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
