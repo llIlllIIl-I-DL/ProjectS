@@ -82,7 +82,7 @@ Assets/
 │   └── Utility/
 ├── Prefabs/
 ├── Scenes/
-└── ScriptableObjects/
+└── Resource/
 ```
 
 ## 주요 클래스 설명
