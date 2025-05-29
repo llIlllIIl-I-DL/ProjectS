@@ -82,6 +82,7 @@ public class ObjectLazer : BaseObject
         if (isLaserActive)
         {
             OffLazer();
+            UIManager.Instance.playerInputHandler.IsInteracting = false;
             Debug.Log("레이저 강제 종료됨");
             return;
         }
@@ -373,13 +374,13 @@ public class ObjectLazer : BaseObject
 
     protected override void ShowInteractionPrompt()
     {
-        if(isLaserActive == false)
+        if(interactionButtonUI == null)
         interactionButtonUI = Instantiate(interactionBtnUI, interactionBtnUITransform);
 
     }
     protected override void HideInteractionPrompt()
     {
-        interactionButtonUI.SetActive(false);
+        Destroy(interactionButtonUI);
     }
 
     protected override void OnTriggerExit2D(Collider2D collider2D)
