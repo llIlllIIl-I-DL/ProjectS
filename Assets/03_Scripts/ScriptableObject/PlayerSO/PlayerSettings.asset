@@ -22,7 +22,7 @@ MonoBehaviour:
   crouchSpeed: 0.5
   crouchHeightRatio: 0.6
   crouchOffsetY: -0.186
-  jumpForce: 6
+  jumpForce: 7
   jumpCutMultiplier: 0.5
   fallGravityMultiplier: 1.7
   coyoteTime: 0.2
