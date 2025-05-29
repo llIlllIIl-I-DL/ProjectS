@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6235774486074763702}
   - component: {fileID: 4664250236458328511}
   - component: {fileID: 2653717573708068837}
-  - component: {fileID: 3154779489400537517}
+  - component: {fileID: 1742101931675656743}
   m_Layer: 14
   m_Name: Projectile
   m_TagString: Untagged
@@ -149,7 +149,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &3154779489400537517
+--- !u!114 &1742101931675656743
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -158,18 +158,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 8185762800821648384}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ad837ec7ae94094d9c1285d2078f50c, type: 3}
+  m_Script: {fileID: 11500000, guid: 8177935134fcc4c4aa421c7ada905a90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletSpeed: 4
+  bulletSpeed: 1
   damage: 1
-  knockbackForce: 1
+  knockbackForce: 0
   maxAmmo: 30
   currentAmmo: 0
   bulletType: 0
   targetTags:
   - tag: Player
-  isOvercharged: 0
+  isOvercharged: 1
   isReloading: 0
   lifeTime: 3
-  piercing: 0
+  isPiercing: 1
+  groundHitAnimTrigger: GroundHit
+  wallHitAnimTrigger: WallHit

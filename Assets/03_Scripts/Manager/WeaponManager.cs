@@ -456,7 +456,7 @@ public class WeaponManager : Singleton<WeaponManager>
         }
 
         Vector2 direction = GetAimDirection();
-        Debug.Log($"FireBullet - 발사 방향: {direction}, 점프 중: {!collisionDetector?.IsGrounded}");
+        Debug.Log($"FireBullet - 발사 방향: {direction}, 벽타기: {isWallSliding}, 바닥: {collisionDetector?.IsGrounded}");
         
         // 차징 레벨에 따른 총알 설정
         Vector3 bulletScale;
@@ -479,8 +479,16 @@ public class WeaponManager : Singleton<WeaponManager>
             }
         }
         
-        // 발사 위치 조정
-        Vector3 spawnPosition = firePoint.position + new Vector3(direction.x * 0.2f, 0, 0);
+        // 발사 위치 조정 (벽타기 상태일 때는 약간 바깥쪽으로 조정)
+        Vector3 spawnPosition = firePoint.position;
+        if (isWallSliding)
+        {
+            spawnPosition += new Vector3(direction.x * 0.35f, 0, 0);
+        }
+        else
+        {
+            spawnPosition += new Vector3(direction.x * 0.2f, 0, 0);
+        }
         Debug.Log($"발사 위치: {spawnPosition}, 방향: {direction}");
 
         // 차징 레벨별 발사로직
