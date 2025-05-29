@@ -1783,6 +1783,14 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 4316d0ce7e8da4d3f99cac3dcec0ddb8, type: 2}
+    - target: {fileID: 8302293059116101514, guid: ba08748fb9d2443618cb8aa494672385, type: 3}
+      propertyPath: moveSpeed
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8302293059116101514, guid: ba08748fb9d2443618cb8aa494672385, type: 3}
+      propertyPath: openOffset
+      value: 0.2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
