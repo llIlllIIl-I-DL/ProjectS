@@ -13,6 +13,8 @@ public class NPCInteract : MonoBehaviour
 
     public void ShowTalkBox(Sprite fIcon)
     {
+        UIManager.Instance.playerInputHandler.IsInteracting = true;
+
         Time.timeScale = 0;
         Image[] images = talkBox.GetComponentsInChildren<Image>();
         faceIcon = images[1];
@@ -32,6 +34,8 @@ public class NPCInteract : MonoBehaviour
 
     public void ClosedShowTalkBox(Sprite fIcon)
     {
+        UIManager.Instance.playerInputHandler.IsInteracting = false;
+
         Time.timeScale = 1;
 
         Destroy(_talkBox);

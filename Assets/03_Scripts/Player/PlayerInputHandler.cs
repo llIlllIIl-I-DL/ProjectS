@@ -414,8 +414,6 @@ public class PlayerInputHandler : MonoBehaviour, PlayerInput. IPlayerActions
 
     public void OnInteraction(InputAction.CallbackContext context)
     {
-        IsInteracting = !IsInteracting;
-
         if (context.started)
         {
             Debug.Log("상호작용 입력 감지");

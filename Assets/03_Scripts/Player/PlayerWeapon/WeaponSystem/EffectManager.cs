@@ -6,25 +6,15 @@ public class EffectManager : MonoBehaviour
 {
     [Header("스팀 압력 이펙트")]
     [SerializeField] private GameObject steamPressureEffectPrefab;
-    [SerializeField] private AudioClip pressureBuildSound;// 압력 증가 사운드
-    [SerializeField] private AudioClip pressureReleaseSound;// 압력 방출 사운드
-    [SerializeField] private AudioClip steamHissSound;// 스팀 소리
+    [SerializeField] private string pressureBuildSoundName; // 압력 증가 사운드 이름
+    [SerializeField] private string pressureReleaseSoundName; // 압력 방출 사운드 이름
+    [SerializeField] private string steamHissSoundName; // 스팀 소리 이름
 
     private SteamPressureEffect pressureEffect;
-    private AudioSource audioSource;
     private GameObject player;
 
     private void Awake()
     {
-        // 오디오 소스 컴포넌트 가져오기
-        audioSource = GetComponent<AudioSource>();
-        if (audioSource == null)
-        {
-            audioSource = gameObject.AddComponent<AudioSource>();
-            audioSource.volume = 0.7f;
-            audioSource.pitch = 1.0f;
-        }
-
         // 씬 전환 이벤트 구독
         SceneManager.sceneLoaded += OnSceneLoaded;
         
@@ -83,13 +73,6 @@ public class EffectManager : MonoBehaviour
                     return;
                 }
 
-                // 압력 이펙트에 사운드 설정
-                var effectAudio = effectObj.GetComponent<AudioSource>();
-                if (effectAudio != null)
-                {
-                    effectAudio.clip = pressureBuildSound;
-                }
-
                 Debug.Log("EffectManager: 압력 이펙트가 성공적으로 생성되었습니다.");
             }
             catch (System.Exception e)
@@ -134,18 +117,13 @@ public class EffectManager : MonoBehaviour
     // 차징 레벨 변경 시 사운드 재생
     public void PlayChargeLevelSound(int level)
     {
-        if (audioSource != null && pressureBuildSound != null)
+        if (level == 1)
         {
-            if (level == 1)
-            {
-                audioSource.pitch = 1.0f;
-                audioSource.PlayOneShot(pressureBuildSound, 0.5f);
-            }
-            else if (level == 2)
-            {
-                audioSource.pitch = 1.2f;
-                audioSource.PlayOneShot(pressureBuildSound, 0.7f);
-            }
+            AudioManager.Instance.PlaySFX(pressureBuildSoundName, 0.5f);
+        }
+        else if (level == 2)
+        {
+            AudioManager.Instance.PlaySFX(pressureBuildSoundName, 0.7f);
         }
     }
 
@@ -188,42 +166,32 @@ public class EffectManager : MonoBehaviour
     // 압력 방출 사운드 재생
     private void PlayPressureReleaseSound(float pressure)
     {
-        if (audioSource != null && pressureReleaseSound != null && pressure > 0.3f)
+        if (pressure > 0.3f)
         {
-            audioSource.pitch = UnityEngine.Random.Range(0.8f, 1.2f);
-            audioSource.PlayOneShot(pressureReleaseSound, Mathf.Min(1.0f, pressure));
+            AudioManager.Instance.PlaySFX(pressureReleaseSoundName, Mathf.Min(1.0f, pressure));
         }
     }
 
     // 일반 발사 사운드 재생
     public void PlayFireSound()
     {
-        if (audioSource != null && steamHissSound != null)
-        {
-            audioSource.pitch = 1.2f;
-            audioSource.PlayOneShot(steamHissSound, 0.5f);
-        }
+        AudioManager.Instance.PlaySFX(steamHissSoundName, 0.5f);
     }
 
     // 차징샷 발사 사운드 재생
     public void PlayChargeShotSound(int chargeLevel)
     {
-        if (audioSource != null && pressureReleaseSound != null)
+        if (chargeLevel == 2)
         {
-            if (chargeLevel == 2)
-            {
-                audioSource.pitch = 0.8f;
-                audioSource.PlayOneShot(pressureReleaseSound, 1.0f);
-            }
-            else if (chargeLevel == 1)
-            {
-                audioSource.pitch = 1.0f;
-                audioSource.PlayOneShot(pressureReleaseSound, 0.7f);
-            }
-            else
-            {
-                PlayFireSound(); // 차징이 안된 경우 일반 발사 사운드
-            }
+            AudioManager.Instance.PlaySFX(pressureReleaseSoundName, 1.0f);
+        }
+        else if (chargeLevel == 1)
+        {
+            AudioManager.Instance.PlaySFX(pressureReleaseSoundName, 0.7f);
+        }
+        else
+        {
+            PlayFireSound(); // 차징이 안된 경우 일반 발사 사운드
         }
     }
 }

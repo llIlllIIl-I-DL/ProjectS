@@ -161,7 +161,7 @@ public class ObjectValve : BaseObject
 
     protected override void ShowInteractionPrompt()
     {
-        if(isOpen == false)
+        if(isOpen == false && interactionButtonUI == null)
         interactionButtonUI = Instantiate(interactionBtnUI, interactionBtnUITransform);
     }
 

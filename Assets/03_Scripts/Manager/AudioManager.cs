@@ -298,7 +298,7 @@ public class AudioManager : Singleton<AudioManager>
 
         if (clip == null)
         {
-            Debug.LogError($"오디오 클립을 찾을 수 없습니다: {clipName}");
+            Debug.LogWarning($"오디오 클립을 찾을 수 없습니다: {clipName}");
             return null;
         }
 
