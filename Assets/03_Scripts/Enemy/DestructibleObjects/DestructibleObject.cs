@@ -19,6 +19,7 @@ public class DestructibleObject : DestructibleEntity
     [SerializeField] protected AudioClip destroySound; // 파괴 사운드(선택 사항)
     [SerializeField] protected AudioClip hitSound; // 피격 사운드(선택 사항)
     [SerializeField] protected Sprite damagedSprite; // 손상된 외형(선택 사항)
+    [SerializeField] protected Sprite destroyedSprite; // 파괴된 외형(선택 사항)
     
     [Header("파괴 속성")]
     [SerializeField] protected bool enableDestructionForce = false; // 파괴 힘 적용 여부
