@@ -35,13 +35,17 @@ public class NPC : BaseObject
 
     protected override void ShowInteractionPrompt()
     {
+        if (interactionButtonUI == null)
         interactionButtonUI = Instantiate(interactionBtnUI, interactionBtnUITransform);
 
+        else
+        interactionButtonUI.gameObject.SetActive(true);
     }
 
     protected override void HideInteractionPrompt()
     {
-        Destroy(interactionButtonUI);
+        if (interactionButtonUI != null)
+            interactionButtonUI.gameObject.SetActive(false);
     }
 
 
