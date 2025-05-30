@@ -16,7 +16,6 @@ public class BossWarningUI : MonoBehaviour
 
     [Header("선택 버튼")]
     [SerializeField] public Button[] Btn;
-    //[SerializeField] public Button[] noBtn;
 
     [HideInInspector] public bool isApproved;
 
