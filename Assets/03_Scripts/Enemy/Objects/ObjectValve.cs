@@ -137,7 +137,7 @@ public class ObjectValve : BaseObject
         if (objectId == "BossValve" && BossWarningUI.Instance != null)
         {
             // 경고창 띄우기 (실제 열기는 UI 쪽에서)
-            Destroy(interactionButtonUI);
+            interactionButtonUI.SetActive(false);
             BossWarningUI.Instance.BossWarningWindowUI(interactor, this);
             return;
         }
@@ -163,11 +163,14 @@ public class ObjectValve : BaseObject
     {
         if(isOpen == false && interactionButtonUI == null)
         interactionButtonUI = Instantiate(interactionBtnUI, interactionBtnUITransform);
+
+        else
+        interactionButtonUI.SetActive(true);
     }
 
     protected override void HideInteractionPrompt()
     {
-        Destroy(interactionButtonUI);
+        interactionButtonUI.SetActive(false);
     }
 
     protected override void OnTriggerExit2D(Collider2D collider2D)

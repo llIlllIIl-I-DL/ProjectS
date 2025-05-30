@@ -13,7 +13,6 @@ public class BossUI : MonoBehaviour
     [SerializeField] private BossHealth bossHealth;
 
     [SerializeField] private Canvas bossClear;
-    [SerializeField] private Button bossClearGoToStartScene;
 
     private GameObject _bossHealthUI;
     public GameObject BossHealthUI => _bossHealthUI;
@@ -96,8 +95,6 @@ public class BossUI : MonoBehaviour
     public void BossClearPopUp()
     {
         bossClear.gameObject.SetActive(true);
-
-        bossClearGoToStartScene.onClick.AddListener(() => CloseGame());
     }
 
     public void CloseGame()
