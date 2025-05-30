@@ -377,10 +377,13 @@ public class ObjectLazer : BaseObject
         if(interactionButtonUI == null)
         interactionButtonUI = Instantiate(interactionBtnUI, interactionBtnUITransform);
 
+        else
+        interactionButtonUI.gameObject.SetActive(true);
+
     }
     protected override void HideInteractionPrompt()
     {
-        Destroy(interactionButtonUI);
+        interactionButtonUI.gameObject.SetActive(false);
     }
 
     protected override void OnTriggerExit2D(Collider2D collider2D)

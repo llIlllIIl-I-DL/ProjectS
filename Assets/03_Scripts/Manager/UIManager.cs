@@ -30,12 +30,13 @@ public class UIManager : Singleton<UIManager> //조금 리팩토링 필요!!
 
     public void NPCTalkInteraction(Sprite faceIcon)
     {
-        npcInteract.ShowTalkBox(faceIcon);
+        if (npcInteract.IsTalkOver == true)
+            npcInteract.ShowTalkBox(faceIcon);
+
+        else
+            npcInteract.NextDialogue();
     }
-    public void ClosedNPCTalkInteraction(Sprite faceIcon)
-    {
-        npcInteract.ClosedShowTalkBox(faceIcon);
-    }
+
 
     public void CloseAllPage() //모든 UI 창은 뒤로가기 버튼 뿐만 아니라 ESC를 눌렀을 때에도 false가 됨
     {
