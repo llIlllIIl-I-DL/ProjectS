@@ -6,7 +6,6 @@ public class NPC : BaseObject
 
     [SerializeField] private GameObject interactionBtnUI;
     [SerializeField] private Transform interactionBtnUITransform;
-    [SerializeField] private Animator Interaction;
 
     private GameObject interactionButtonUI;
 
@@ -48,18 +47,7 @@ public class NPC : BaseObject
 
     public void TalkToNPC()
     {
-        if (istalking == false)
-        {
-            UIManager.Instance.NPCTalkInteraction(npcFaceIcon);
-            Destroy(interactionButtonUI);
-            istalking = true;
-        }
-
-
-        else
-        {
-            UIManager.Instance.ClosedNPCTalkInteraction(npcFaceIcon);
-            istalking = false;
-        }
+        UIManager.Instance.NPCTalkInteraction(npcFaceIcon);
+        Destroy(interactionButtonUI);
     }
 }
