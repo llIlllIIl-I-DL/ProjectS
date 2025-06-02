@@ -13,10 +13,22 @@ MonoBehaviour:
   m_Name: SmallHealItem
   m_EditorClassIdentifier: 
   itemName: "\uC791\uC740 \uC5D0\uB108\uC9C0 \uD329"
-  itemIcon: {fileID: 0}
-  itemAttrivuteType: 0
+  itemIcon: {fileID: -41737279, guid: c5f9760882a292946b3300e2cbcd3b53, type: 3}
+  unLockedItemIcon: {fileID: 0}
+  itemType: 0
+  itemUsageType: 0
+  itemAttributeType: 0
   description: "\uCCB4\uB825\uC744 20\uB9CC\uD07C \uD68C\uBCF5\uD569\uB2C8\uB2E4."
+  id: 0
   effectValue: 20
   isConsumable: 1
   isStackable: 1
   maxStackAmount: 5
+  partsType: 0
+  costumeSetId: 
+  elementType: 0
+  damage: 0
+  attackSpeed: 0
+  utilityPointForNow: 0
+  attributeType: 0
+  utilityPointForUnLock: 0
