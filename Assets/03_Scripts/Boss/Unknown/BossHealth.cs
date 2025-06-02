@@ -40,8 +40,6 @@ public class BossHealth : MonoBehaviour, IDebuffable
 
         // 보스가 죽었을 때 상태머신에 알림
         OnBossDied += HandleStateMachineNotification;
-
-        //bossUI = bossUI.BossHealthUI.gameObject.GetComponent<BossUI>();
     }
 
     private void HandleStateMachineNotification()
