@@ -558,7 +558,7 @@ public class WeaponManager : Singleton<WeaponManager>
             int chargeLevel = chargeManager.CurrentChargeLevel;
             if (chargeLevel == 2)
             {
-                damage *= 3f; // 2단계 차징 데미지 증가
+                damage *= 8f; // 2단계 차징 데미지 증가
             }
             else if (chargeLevel == 1)
             {
@@ -754,7 +754,7 @@ public class WeaponManager : Singleton<WeaponManager>
             PlayerHP playerHP = player.GetComponent<PlayerHP>();
             if (playerHP != null)
             {
-                float selfDamage = playerHP.MaxHP * 0.05f;
+                float selfDamage = playerHP.MaxHP * 0.15f;
                 Debug.Log($"오버차지 반동 즉시 적용: 플레이어 최대 체력 = {playerHP.MaxHP}, 데미지 = {selfDamage}");
                 playerHP.TakeDamage(selfDamage);
                 Debug.Log($"과열 공격 반동으로 플레이어가 {selfDamage} 데미지를 즉시 입었습니다! 현재 체력: {playerHP.CurrentHP}");
