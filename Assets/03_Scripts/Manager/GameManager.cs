@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -244,7 +245,7 @@ public class GameManager : MonoBehaviour
         playerLevel = 1;
         currentLives = maxLives;
         isGameInitialized = false;
-        
+
         // 매니저 참조 초기화
         itemManager = null;
         inventoryManager = null;

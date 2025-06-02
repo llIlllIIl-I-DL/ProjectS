@@ -41,6 +41,14 @@ public class InputUI : MonoBehaviour
 
     public void OpenPauseMenu()
     {
+        foreach (var page in UIManager.Instance.settingUIPages)
+        {
+            if (page != null && page.activeSelf)
+            {
+                return;
+            }
+        }
+
         if (npc == null || !npc.istalking)
         {
             // 열려있는 UI가 있는지 확인.

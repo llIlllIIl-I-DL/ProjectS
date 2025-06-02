@@ -123,6 +123,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &177468818 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 710752009232436167, guid: db3c2052c4847e142aa567b3ab2dbdbe, type: 3}
+  m_PrefabInstance: {fileID: 949605950}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &193034904
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -279,6 +284,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &515485345 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6805471080551082536, guid: db3c2052c4847e142aa567b3ab2dbdbe, type: 3}
+  m_PrefabInstance: {fileID: 949605950}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &517385062 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3833654377192727227, guid: db3c2052c4847e142aa567b3ab2dbdbe, type: 3}
@@ -829,6 +839,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1085610137807060774, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
     - target: {fileID: 2733234320404715751, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
       propertyPath: m_Name
       value: Manager
@@ -878,6 +892,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1886332056}
     - target: {fileID: 2814908013609280432, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: allUIPages.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2814908013609280432, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
       propertyPath: allUIPages.Array.data[0]
       value: 
       objectReference: {fileID: 517385062}
@@ -889,6 +907,26 @@ PrefabInstance:
       propertyPath: allUIPages.Array.data[2]
       value: 
       objectReference: {fileID: 1674866636}
+    - target: {fileID: 2814908013609280432, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: allUIPages.Array.data[3]
+      value: 
+      objectReference: {fileID: 177468818}
+    - target: {fileID: 2814908013609280432, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: allUIPages.Array.data[4]
+      value: 
+      objectReference: {fileID: 515485345}
+    - target: {fileID: 2814908013609280432, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: settingUIPages.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2814908013609280432, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: settingUIPages.Array.data[0]
+      value: 
+      objectReference: {fileID: 177468818}
+    - target: {fileID: 2814908013609280432, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: settingUIPages.Array.data[1]
+      value: 
+      objectReference: {fileID: 515485345}
     - target: {fileID: 3707640916848362950, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
       propertyPath: playerTransform
       value: 

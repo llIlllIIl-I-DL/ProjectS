@@ -449,6 +449,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIManager
       objectReference: {fileID: 0}
+    - target: {fileID: 3094791353059250708, guid: fd00e2999b7ace24192d61966638e697, type: 3}
+      propertyPath: settingUIPages.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 7556120981888034525, guid: fd00e2999b7ace24192d61966638e697, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -516,6 +520,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   talkBox: {fileID: 8838566563766705098, guid: 3fa28b0b48c40344e9e641a777defdc1, type: 3}
+  dialogues: []
 --- !u!4 &7295510638163859321 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7556120981888034525, guid: fd00e2999b7ace24192d61966638e697, type: 3}
@@ -1006,16 +1011,24 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7293587237820881787, guid: c3dbbffbd11c88442b19301ca43d8e15, type: 3}
       propertyPath: poolInfos.Array.size
-      value: 6
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 7293587237820881787, guid: c3dbbffbd11c88442b19301ca43d8e15, type: 3}
       propertyPath: poolInfos.Array.data[5].type
       value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 7293587237820881787, guid: c3dbbffbd11c88442b19301ca43d8e15, type: 3}
+      propertyPath: poolInfos.Array.data[6].type
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7293587237820881787, guid: c3dbbffbd11c88442b19301ca43d8e15, type: 3}
       propertyPath: poolInfos.Array.data[5].prefab
       value: 
       objectReference: {fileID: 4363198470078929428, guid: 00c8892831c5e438faf6f7d95f95044a, type: 3}
+    - target: {fileID: 7293587237820881787, guid: c3dbbffbd11c88442b19301ca43d8e15, type: 3}
+      propertyPath: poolInfos.Array.data[6].prefab
+      value: 
+      objectReference: {fileID: 8185762800821648384, guid: 5e2ab09353e4dd04684a03973d264cc3, type: 3}
     - target: {fileID: 7293587237820881787, guid: c3dbbffbd11c88442b19301ca43d8e15, type: 3}
       propertyPath: poolInfos.Array.data[0].initialSize
       value: 20
@@ -1030,6 +1043,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7293587237820881787, guid: c3dbbffbd11c88442b19301ca43d8e15, type: 3}
       propertyPath: poolInfos.Array.data[5].initialSize
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 7293587237820881787, guid: c3dbbffbd11c88442b19301ca43d8e15, type: 3}
+      propertyPath: poolInfos.Array.data[6].initialSize
       value: 20
       objectReference: {fileID: 0}
     m_RemovedComponents: []

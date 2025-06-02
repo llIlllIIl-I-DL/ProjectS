@@ -9,6 +9,7 @@ public class UIManager : Singleton<UIManager> //조금 리팩토링 필요!!
     [SerializeField] public UtilityItemList utilityItemList;
 
     public List<GameObject> allUIPages = new List<GameObject>();
+    public List<GameObject> settingUIPages = new List<GameObject>();
 
     NPCInteract npcInteract;
     public PlayerInputHandler playerInputHandler;
@@ -26,6 +27,42 @@ public class UIManager : Singleton<UIManager> //조금 리팩토링 필요!!
         npcInteract = GetComponent<NPCInteract>();
 
         utilityItemList.GetUtility(player); //플레이어의 특성 15개 아이템 데이터를 담아두는 리스트
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDestroy()
+    {
+        // 파괴될 때 씬 콜백 해제
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        AddInputUI();
+
+        inputUI = FindObjectOfType<InputUI>();
+        player = FindObjectOfType<Player>();
+        playerInputHandler = player.gameObject.GetComponent<PlayerInputHandler>();
+    }
+
+    public void AddInputUI()
+    {
+        allUIPages.Clear();
+
+        Canvas[] canvases = FindObjectsOfType<Canvas>(includeInactive: true);
+        foreach (Canvas c in canvases)
+        {
+            if (c.gameObject.CompareTag("InputUI"))
+                allUIPages.Add(c.gameObject);
+        }
+
+        Canvas[] canvasess = FindObjectsOfType<Canvas>(includeInactive: true);
+        foreach (Canvas c in canvasess)
+        {
+            if (c.gameObject.CompareTag("Setting"))
+                settingUIPages.Add(c.gameObject);
+        }
     }
 
     public void NPCTalkInteraction(Sprite faceIcon)
