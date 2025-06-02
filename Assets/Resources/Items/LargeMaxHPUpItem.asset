@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: LargeMaxHPUpItem
   m_EditorClassIdentifier: 
   itemName: "\uC0DD\uBA85\uB825 \uD0F1\uD06C"
-  itemIcon: {fileID: -41975022, guid: c5f9760882a292946b3300e2cbcd3b53, type: 3}
+  itemIcon: {fileID: -41975022, guid: 01973a809d663dc4e9b877a158b8995e, type: 3}
   unLockedItemIcon: {fileID: 0}
   itemType: 0
   itemUsageType: 0

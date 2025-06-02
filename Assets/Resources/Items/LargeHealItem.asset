@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: LargeHealItem
   m_EditorClassIdentifier: 
   itemName: "\uD070 \uC5D0\uB108\uC9C0 \uD329"
-  itemIcon: {fileID: 1018764641, guid: c5f9760882a292946b3300e2cbcd3b53, type: 3}
+  itemIcon: {fileID: 1018764641, guid: 01973a809d663dc4e9b877a158b8995e, type: 3}
   unLockedItemIcon: {fileID: 0}
   itemType: 0
   itemUsageType: 0

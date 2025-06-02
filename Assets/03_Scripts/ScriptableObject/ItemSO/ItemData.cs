@@ -31,6 +31,7 @@ public enum PartsType
 }
 public enum ElementType
 {
+    None,
     Normal,
     Rust,
     Iron,
