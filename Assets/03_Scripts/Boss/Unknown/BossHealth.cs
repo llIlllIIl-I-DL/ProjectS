@@ -40,8 +40,6 @@ public class BossHealth : MonoBehaviour, IDebuffable
 
         // 보스가 죽었을 때 상태머신에 알림
         OnBossDied += HandleStateMachineNotification;
-
-        //bossUI = bossUI.BossHealthUI.gameObject.GetComponent<BossUI>();
     }
 
     private void HandleStateMachineNotification()
@@ -69,11 +67,14 @@ public class BossHealth : MonoBehaviour, IDebuffable
 
         currentHP -= damage;
         if (currentHP < 0) currentHP = 0;
-      
-        bossUI.UpdateBossHealthUI();
+
+        if (bossUI != null)
+            bossUI.UpdateBossHealthUI();
+        else
+            Debug.LogWarning("[BossHealth] bossUI가 null입니다.");
+
         Debug.Log($"[BossHealth] 데미지 받음! 남은 체력: {currentHP}");
 
-        // 애니메이션 재생
         animator?.SetTrigger(GameConstants.AnimParams.HIT);
 
         if (currentHP <= 0)
