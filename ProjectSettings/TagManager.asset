@@ -18,6 +18,7 @@ TagManager:
   - Wall
   - NPC
   - BulletBoundary
+  - Setting
   layers:
   - Default
   - TransparentFX

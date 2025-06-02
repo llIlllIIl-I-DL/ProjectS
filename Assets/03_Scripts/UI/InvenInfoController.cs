@@ -46,7 +46,8 @@ public class InvenInfoController : MonoBehaviour
     [SerializeField] public List<Image> currentEquippedUtility;
 
     private UtilityChangedStatController utilityChangedStatController;
-    private Player player;
+    public Player player;
+
     private int revertUtilityPoint;
 
     [HideInInspector] public float maxAmmo;
