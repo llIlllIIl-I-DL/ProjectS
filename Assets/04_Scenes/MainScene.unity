@@ -810,6 +810,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3137287986617449566, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
   m_PrefabInstance: {fileID: 2066729056}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1886332056 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3952546512422567701, guid: b80a58a74c39c3949bf3e1dccdcb4547, type: 3}
+  m_PrefabInstance: {fileID: 2066729056}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee62d861d9d3b074da481deae43ef2c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1993154727
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -862,6 +873,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2814908013609280432, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
+      propertyPath: playerInputHandler
+      value: 
+      objectReference: {fileID: 1886332056}
     - target: {fileID: 2814908013609280432, guid: ef140c61e61ec3b42912320e7d2f5841, type: 3}
       propertyPath: allUIPages.Array.data[0]
       value: 
