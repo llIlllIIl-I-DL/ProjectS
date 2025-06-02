@@ -1245,6 +1245,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   talkBox: {fileID: 8838566563766705098, guid: 3fa28b0b48c40344e9e641a777defdc1, type: 3}
+  dialogues: []
 --- !u!1001 &810601831
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -26480,7 +26480,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 358122391513329194, guid: 17c1967bfc65e44629bee56c9c6b029d, type: 3}
       propertyPath: OnDeactivated.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 358122391513329194, guid: 17c1967bfc65e44629bee56c9c6b029d, type: 3}
       propertyPath: OnActivated.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
@@ -26573,6 +26573,14 @@ PrefabInstance:
     - target: {fileID: 3762710125657334403, guid: 17c1967bfc65e44629bee56c9c6b029d, type: 3}
       propertyPath: m_Name
       value: Object_PressurePlate
+      objectReference: {fileID: 0}
+    - target: {fileID: 5558284801528832975, guid: 17c1967bfc65e44629bee56c9c6b029d, type: 3}
+      propertyPath: m_SortingOrder
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9054804466574721980, guid: 17c1967bfc65e44629bee56c9c6b029d, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
