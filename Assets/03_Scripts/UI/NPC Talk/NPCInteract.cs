@@ -3,7 +3,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using VInspector.Libs;
 
 
 public class NPCInteract : MonoBehaviour
